@@ -1,0 +1,6 @@
+This directory holds Phase 0B live experiment artifacts.
+
+- `experiments/runs/` is gitignored and is where live runs write
+  `manifest.json`, per-request traces, raw usage and `result.json`.
+- Review artifacts locally before deliberately committing a sanitized result.
+- Never store credentials, authorization headers, or full HTTP header dumps.

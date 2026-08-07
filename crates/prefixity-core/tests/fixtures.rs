@@ -270,7 +270,7 @@ fn scenario_09_anthropic_usage_semantics_are_normalized_correctly() {
     assert_eq!(normalized.cache_read_tokens, Some(4000));
     assert_eq!(normalized.cache_write_tokens, Some(500));
     assert_eq!(normalized.output_tokens, Some(120));
-    assert_eq!(normalized.normalization_source, "anthropic");
+    assert_eq!(normalized.normalization_source, "anthropic-messages-v1");
 }
 
 #[test]
@@ -284,7 +284,10 @@ fn scenario_10_deepseek_usage_semantics_are_normalized_correctly() {
     assert_eq!(normalized.cache_read_tokens, Some(4000));
     assert_eq!(normalized.cache_write_tokens, None);
     assert_eq!(normalized.output_tokens, Some(120));
-    assert_eq!(normalized.normalization_source, "deepseek");
+    assert_eq!(
+        normalized.normalization_source,
+        "deepseek-chat-completions-v1"
+    );
 }
 
 #[test]
@@ -298,7 +301,10 @@ fn scenario_11_openai_usage_semantics_are_normalized_correctly() {
     assert_eq!(normalized.cache_read_tokens, Some(4000));
     assert_eq!(normalized.cache_write_tokens, None);
     assert_eq!(normalized.output_tokens, Some(120));
-    assert_eq!(normalized.normalization_source, "openai");
+    assert_eq!(
+        normalized.normalization_source,
+        "openai-chat-completions-v1"
+    );
 }
 
 #[test]

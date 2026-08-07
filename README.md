@@ -23,17 +23,24 @@ A perfectly acceptable Phase 0 result is:
 
 ## Status
 
-- **Phase 0A.1**: offline analysis + simulation harness (this repository).
-- No daemon, no localhost proxy, no live provider calls, no telemetry.
+- **Phase 0A** complete.
+- **Phase 0A.1** complete (semantic corrections; CI green on Linux/macOS/Windows).
+- **Phase 0B** harness under development / controlled live validation.
+- No daemon, no localhost proxy, no telemetry.
 - No semantic response caching, no KV-cache storage, no RAG, no automatic
   context mutation of live requests.
-- Repository: <https://github.com/hourwise/Prefixity>. Phase 0 remains an
-  offline harness; live provider calls are deferred to a later phase.
+- Repository: <https://github.com/hourwise/Prefixity>. Phase 0B makes paid
+  provider calls **only** with `--execute-live`, an explicit request limit
+  (default 3, hard ceiling 10), and a local input-token ceiling.
 
 ## Requirements
 
 - Stable Rust (workspace is pinned to edition 2021, MSRV 1.75).
-- No network access is required to run the harness.
+- The offline analysis harness needs no network access.
+- The experimental `prefixity-live` harness needs network access **only**
+  when `--execute-live` is passed, and reads credentials only from
+  environment variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`,
+  `DEEPSEEK_API_KEY`).
 
 ## Quick start
 
@@ -69,6 +76,25 @@ Policies (research hypotheses, not production recommendations):
 `baseline`, `stable-prefix`, `defer-volatile`, `prune-stale-tool-output`,
 `combined`. The name `compression` is reserved for future work.
 
+## Live validation harness (Phase 0B, experimental)
+
+The separate `prefixity-live` binary sends **tightly controlled synthetic
+requests** to OpenAI, Anthropic, or DeepSeek to test whether the offline
+model matches real provider usage reports. It makes paid calls **only** with
+`--execute-live`; `dry-run` and `run` without the flag make zero network
+requests.
+
+```sh
+# Dry run: prints exactly what would be sent. Zero network, no credential needed.
+cargo run -p prefixity-live -- dry-run --provider openai --model <model> --scenario schema-smoke
+
+# Live run: explicit opt-in required.
+cargo run -p prefixity-live -- run --provider openai --model <model> --scenario stable-prefix --execute-live
+```
+
+Scenarios: `schema-smoke`, `stable-prefix`, `early-divergence`,
+`late-divergence`. See `docs/phase-0/PHASE_0B_LIVE_VALIDATION.md`.
+
 ## Three distinct concepts
 
 Prefixity keeps three concepts strictly separate (Phase 0A.1):
@@ -93,11 +119,13 @@ usage supports it.
 Prefixity/
 ├── Cargo.toml                 # workspace manifest
 ├── crates/
-│   ├── prefixity-core/        # deterministic analysis logic
-│   └── prefixity-cli/         # thin CLI over the core logic
+│   ├── prefixity-core/        # deterministic analysis logic (authoritative)
+│   ├── prefixity-cli/         # thin CLI over the core logic
+│   └── prefixity-live/        # Phase 0B live validation harness (experimental)
 ├── docs/                      # charter, threat model, prior art, phase-0 docs
 ├── fixtures/traces/           # synthetic trace fixtures (no real secrets)
-└── provider-profiles/         # SYNTHETIC cost profiles (not real pricing)
+├── provider-profiles/         # SYNTHETIC cost profiles (not real pricing)
+└── experiments/               # live run artifacts (runs/ gitignored)
 ```
 
 ## Source-of-truth principles
@@ -129,6 +157,8 @@ Prefixity/
 - `docs/phase-0/PHASE_0_PLAN.md` — the Phase 0 plan.
 - `docs/phase-0/TRACE_FORMAT.md` — the versioned trace format.
 - `docs/phase-0/EXPERIMENTS.md` — the three future experimental groups.
+- `docs/phase-0/PHASE_0B_LIVE_VALIDATION.md` — controlled live validation
+  (purpose, guardrails, scenarios A–D, procedure, stop conditions).
 - `docs/phase-0/SUCCESS_CRITERIA.md` — success/failure criteria and stop
   conditions.
 

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/prefixity-core", "crates/prefixity-cli"]
+members = ["crates/prefixity-core", "crates/prefixity-cli", "crates/prefixity-live"]
 
 [workspace.package]
 version = "0.1.0"

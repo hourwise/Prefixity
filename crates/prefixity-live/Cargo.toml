@@ -1,0 +1,23 @@
+[package]
+name = "prefixity-live"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Phase 0B controlled live validation harness (experimental research; makes paid API calls ONLY with --execute-live)."
+
+[lib]
+name = "prefixity_live"
+path = "src/lib.rs"
+
+[[bin]]
+name = "prefixity-live"
+path = "src/main.rs"
+
+[dependencies]
+prefixity-core = { path = "../prefixity-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { workspace = true }
+thiserror = { workspace = true }
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }

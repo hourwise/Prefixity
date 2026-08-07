@@ -40,7 +40,7 @@
     }
   ],
   "usage": {
-    "provider_schema": "openai",
+    "provider_schema": "openai-chat-completions-v1",
     "raw": {
       "prompt_tokens": 5000,
       "prompt_tokens_details": {

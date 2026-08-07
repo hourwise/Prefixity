@@ -40,7 +40,7 @@
     }
   ],
   "usage": {
-    "provider_schema": "anthropic",
+    "provider_schema": "anthropic-messages-v1",
     "raw": {
       "input_tokens": 500,
       "cache_read_input_tokens": 4000,

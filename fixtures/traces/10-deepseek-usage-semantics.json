@@ -40,7 +40,7 @@
     }
   ],
   "usage": {
-    "provider_schema": "deepseek",
+    "provider_schema": "deepseek-chat-completions-v1",
     "raw": {
       "prompt_cache_hit_tokens": 4000,
       "prompt_cache_miss_tokens": 1000,

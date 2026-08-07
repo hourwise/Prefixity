@@ -1,11 +1,17 @@
 //! Provider usage normalisation.
 //!
-//! Raw provider usage fields have **different meanings per provider**. For
-//! example, Anthropic's `input_tokens` is the *uncached* remainder (total is
-//! the sum of three input categories), while the synthetic schema's
-//! `input_tokens` is the *total* input. A normalizer converts known raw
-//! schemas into a provider-independent [`NormalizedUsage`] without inventing
-//! values that cannot be derived.
+//! Raw provider usage fields have **different meanings per provider** — and
+//! per **API surface**. One provider may expose different usage semantics
+//! across endpoints (e.g. OpenAI Chat Completions vs a future OpenAI
+//! Responses surface), so the provider name alone is insufficient. Schemas
+//! are therefore identified by explicit, versioned API-surface identifiers
+//! such as `openai-chat-completions-v1`.
+//!
+//! For example, Anthropic Messages' `input_tokens` is the *uncached*
+//! remainder (total is the sum of three input categories), while the
+//! synthetic schema's `input_tokens` is the *total* input. A normalizer
+//! converts known raw schemas into a provider-independent
+//! [`NormalizedUsage`] without inventing values that cannot be derived.
 //!
 //! Phase 0A.1 implements **deterministic, offline** normalizers only. They
 //! make no network calls. Raw data is always preserved (see
@@ -14,6 +20,19 @@
 use crate::model::RawUsage;
 use std::collections::BTreeMap;
 use std::fmt;
+
+/// Schema identifier for Prefixity's own synthetic usage shape.
+pub const SCHEMA_SYNTHETIC: &str = "synthetic";
+/// OpenAI Chat Completions API usage surface, version 1.
+pub const SCHEMA_OPENAI_CHAT_COMPLETIONS_V1: &str = "openai-chat-completions-v1";
+/// Anthropic Messages API usage surface, version 1.
+pub const SCHEMA_ANTHROPIC_MESSAGES_V1: &str = "anthropic-messages-v1";
+/// DeepSeek Chat Completions API usage surface, version 1.
+pub const SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1: &str = "deepseek-chat-completions-v1";
+/// **Reserved** for a future OpenAI Responses adapter. No normalizer is
+/// registered for this surface yet; traces carrying it are never interpreted
+/// as Chat Completions.
+pub const SCHEMA_OPENAI_RESPONSES_V1: &str = "openai-responses-v1";
 
 /// A provider-independent, normalised view of one request's usage.
 ///
@@ -121,7 +140,7 @@ pub struct AnthropicNormalizer;
 
 impl UsageNormalizer for AnthropicNormalizer {
     fn schema_name(&self) -> &'static str {
-        "anthropic"
+        SCHEMA_ANTHROPIC_MESSAGES_V1
     }
     fn normalize(&self, raw: &RawUsage) -> NormalizedUsage {
         let fresh = read_u64(&raw.raw, "input_tokens");
@@ -156,7 +175,7 @@ pub struct DeepSeekNormalizer;
 
 impl UsageNormalizer for DeepSeekNormalizer {
     fn schema_name(&self) -> &'static str {
-        "deepseek"
+        SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1
     }
     fn normalize(&self, raw: &RawUsage) -> NormalizedUsage {
         let read = read_u64(&raw.raw, "prompt_cache_hit_tokens");
@@ -190,7 +209,7 @@ pub struct OpenAiNormalizer;
 
 impl UsageNormalizer for OpenAiNormalizer {
     fn schema_name(&self) -> &'static str {
-        "openai"
+        SCHEMA_OPENAI_CHAT_COMPLETIONS_V1
     }
     fn normalize(&self, raw: &RawUsage) -> NormalizedUsage {
         let total = read_u64(&raw.raw, "prompt_tokens");
@@ -213,25 +232,43 @@ impl UsageNormalizer for OpenAiNormalizer {
     }
 }
 
-/// The names of the usage schemas with an offline normalizer in Phase 0A.1.
+/// The usage schemas with an offline normalizer in this version. The reserved
+/// [`SCHEMA_OPENAI_RESPONSES_V1`] surface is intentionally **not** listed.
 pub fn available_schemas() -> &'static [&'static str] {
-    &["synthetic", "anthropic", "deepseek", "openai"]
+    &[
+        SCHEMA_SYNTHETIC,
+        SCHEMA_OPENAI_CHAT_COMPLETIONS_V1,
+        SCHEMA_ANTHROPIC_MESSAGES_V1,
+        SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1,
+    ]
 }
 
-/// Normalise a raw usage capture by dispatching on its `provider_schema`.
+/// Normalise a raw usage capture by dispatching on its versioned
+/// `provider_schema` (an explicit API-surface identifier).
 ///
-/// Unknown schemas produce an all-`None` [`NormalizedUsage`] with a clear
-/// explanation — values are never manufactured for unhandled schemas.
+/// Unknown schemas — including generic provider names and the reserved
+/// `openai-responses-v1` surface — produce an all-`None` [`NormalizedUsage`]
+/// with a clear explanation. Values are never manufactured, and an unknown
+/// OpenAI schema is never silently interpreted as Chat Completions.
 pub fn normalize_usage(raw: &RawUsage) -> NormalizedUsage {
     match raw.provider_schema.as_str() {
-        "synthetic" => SyntheticNormalizer.normalize(raw),
-        "anthropic" => AnthropicNormalizer.normalize(raw),
-        "deepseek" => DeepSeekNormalizer.normalize(raw),
-        "openai" => OpenAiNormalizer.normalize(raw),
+        SCHEMA_SYNTHETIC => SyntheticNormalizer.normalize(raw),
+        SCHEMA_OPENAI_CHAT_COMPLETIONS_V1 => OpenAiNormalizer.normalize(raw),
+        SCHEMA_ANTHROPIC_MESSAGES_V1 => AnthropicNormalizer.normalize(raw),
+        SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1 => DeepSeekNormalizer.normalize(raw),
+        SCHEMA_OPENAI_RESPONSES_V1 => {
+            let mut usage = NormalizedUsage::empty("unknown-schema");
+            usage.explanation = "schema 'openai-responses-v1' is reserved for a later OpenAI \
+                Responses adapter; no normalizer is registered in this version and it is NOT \
+                interpreted as Chat Completions"
+                .to_string();
+            usage
+        }
         other => {
             let mut usage = NormalizedUsage::empty("unknown-schema");
             usage.explanation = format!(
-                "no offline normalizer registered for schema '{other}'; values cannot be derived safely"
+                "no offline normalizer registered for schema '{other}'; the provider name alone is \
+                 not sufficient (the API surface must be identified); values cannot be derived safely"
             );
             usage
         }
@@ -274,7 +311,7 @@ mod tests {
     #[test]
     fn anthropic_totals_are_the_sum_of_three_categories() {
         let usage = AnthropicNormalizer.normalize(&raw(
-            "anthropic",
+            SCHEMA_ANTHROPIC_MESSAGES_V1,
             &[
                 ("input_tokens", 500),
                 ("cache_read_input_tokens", 4000),
@@ -287,12 +324,13 @@ mod tests {
         assert_eq!(usage.cache_read_tokens, Some(4000));
         assert_eq!(usage.cache_write_tokens, Some(500));
         assert_eq!(usage.output_tokens, Some(120));
+        assert_eq!(usage.normalization_source, SCHEMA_ANTHROPIC_MESSAGES_V1);
     }
 
     #[test]
     fn deepseek_hit_plus_miss_is_total() {
         let usage = DeepSeekNormalizer.normalize(&raw(
-            "deepseek",
+            SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1,
             &[
                 ("prompt_cache_hit_tokens", 4000),
                 ("prompt_cache_miss_tokens", 1000),
@@ -303,6 +341,10 @@ mod tests {
         assert_eq!(usage.fresh_input_tokens, Some(1000));
         assert_eq!(usage.cache_read_tokens, Some(4000));
         assert_eq!(usage.cache_write_tokens, None);
+        assert_eq!(
+            usage.normalization_source,
+            SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1
+        );
     }
 
     #[test]
@@ -315,13 +357,17 @@ mod tests {
         );
         map.insert("completion_tokens".to_string(), serde_json::json!(120));
         let usage = OpenAiNormalizer.normalize(&RawUsage {
-            provider_schema: "openai".to_string(),
+            provider_schema: SCHEMA_OPENAI_CHAT_COMPLETIONS_V1.to_string(),
             raw: map,
         });
         assert_eq!(usage.total_input_tokens, Some(5000));
         assert_eq!(usage.fresh_input_tokens, Some(1000));
         assert_eq!(usage.cache_read_tokens, Some(4000));
         assert_eq!(usage.cache_write_tokens, None);
+        assert_eq!(
+            usage.normalization_source,
+            SCHEMA_OPENAI_CHAT_COMPLETIONS_V1
+        );
     }
 
     #[test]
@@ -330,7 +376,7 @@ mod tests {
         // Anthropic-shaped raw into the synthetic normalizer must NOT produce
         // the Anthropic result.
         let anthropic_raw = raw(
-            "anthropic",
+            SCHEMA_ANTHROPIC_MESSAGES_V1,
             &[
                 ("input_tokens", 500),
                 ("cache_read_input_tokens", 4000),
@@ -354,11 +400,29 @@ mod tests {
         // Anthropic with only input_tokens cannot derive a total: it would
         // need the read/write categories too. Values are never invented.
         assert_eq!(
-            normalize_usage(&raw("anthropic", &[("input_tokens", 5)])).total_input_tokens,
+            normalize_usage(&raw(SCHEMA_ANTHROPIC_MESSAGES_V1, &[("input_tokens", 5)]))
+                .total_input_tokens,
             None
         );
         let unknown = normalize_usage(&raw("mystery-vendor", &[("input_tokens", 5)]));
         assert_eq!(unknown.total_input_tokens, None);
         assert!(unknown.explanation.contains("no offline normalizer"));
+    }
+
+    #[test]
+    fn generic_and_reserved_schemas_are_not_interpreted() {
+        // A generic provider name is NOT a valid schema: dispatch must not
+        // guess the API surface.
+        let generic = normalize_usage(&raw("openai", &[("prompt_tokens", 100)]));
+        assert_eq!(generic.total_input_tokens, None);
+        assert_eq!(generic.normalization_source, "unknown-schema");
+
+        // The reserved Responses surface must not be read as Chat Completions.
+        let reserved = normalize_usage(&raw(SCHEMA_OPENAI_RESPONSES_V1, &[("prompt_tokens", 100)]));
+        assert_eq!(reserved.total_input_tokens, None);
+        assert!(reserved.explanation.contains("reserved"));
+        assert!(reserved
+            .explanation
+            .contains("NOT interpreted as Chat Completions"));
     }
 }

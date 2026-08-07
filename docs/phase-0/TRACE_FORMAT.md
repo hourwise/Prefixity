@@ -77,23 +77,30 @@ remains content-level identity.
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `provider_schema` | string | Which schema the `raw` fields follow: `synthetic`, `anthropic`, `deepseek`, `openai`, or a custom name. |
+| `provider_schema` | string | An **explicit versioned API-surface identifier** naming the exact endpoint/request schema the `raw` fields follow: `synthetic`, `openai-chat-completions-v1`, `anthropic-messages-v1`, `deepseek-chat-completions-v1`, or a custom versioned name. |
 | `raw` | object | Provider-specific raw usage fields, preserved verbatim and never reinterpreted in place. |
 
-Normalization is a separate, offline, schema-aware step (`prefixity-core::usage`)
-that produces a provider-independent `NormalizedUsage` with explicit
-categories: `total_input_tokens`, `fresh_input_tokens`, `cache_read_tokens`,
-`cache_write_tokens`, `output_tokens`. Values that cannot be derived are left
-unset — never invented. Unknown schemas are never interpreted.
+The provider name alone is **not sufficient** to interpret `raw`: a single
+provider can expose different usage semantics across different API surfaces
+(e.g. OpenAI's Chat Completions vs. the newer Responses API report tokens
+differently). The versioned API-surface identifier is what disambiguates them.
+Normalization is a separate, offline, schema-aware step
+(`prefixity-core::usage`) that produces a provider-independent
+`NormalizedUsage` with explicit categories: `total_input_tokens`,
+`fresh_input_tokens`, `cache_read_tokens`, `cache_write_tokens`,
+`output_tokens`. Values that cannot be derived are left unset — never
+invented. Unknown schemas are never interpreted; in particular, an unknown
+`openai-*` schema is **not** silently treated as Chat Completions.
 
 Known schema semantics:
 
 | Schema | Meaning |
 | --- | --- |
 | `synthetic` | `input_tokens` = total; `fresh = total - read - write` is supported. |
-| `anthropic` | `input_tokens` = uncached remainder; total = input + cache_read_input_tokens + cache_creation_input_tokens. |
-| `deepseek` | total = prompt_cache_hit_tokens + prompt_cache_miss_tokens; cache writes not reported. |
-| `openai` | `prompt_tokens` = total; `cached_tokens` nested under `prompt_tokens_details`; cache writes not reported. |
+| `anthropic-messages-v1` | Messages API: `input_tokens` = uncached remainder; total = input + cache_read_input_tokens + cache_creation_input_tokens. |
+| `deepseek-chat-completions-v1` | Chat Completions-compatible: total = prompt_cache_hit_tokens + prompt_cache_miss_tokens; cache writes not reported. |
+| `openai-chat-completions-v1` | Chat Completions API: `prompt_tokens` = total; `cached_tokens` nested under `prompt_tokens_details`; cache writes not reported. |
+| `openai-responses-v1` | **Reserved.** The OpenAI Responses API surface is not yet implemented; traces carrying this schema are recognized but never interpreted as Chat Completions. |
 
 Per source-of-truth principle 7, provider-reported usage **outranks**
 Prefixity's heuristic candidates when determining what actually happened.

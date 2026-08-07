@@ -148,18 +148,21 @@ pub struct ContextBlock {
 
 /// Provider-specific raw usage for one request, preserved verbatim.
 ///
-/// The `provider_schema` names the semantics of the `raw` fields (for example
-/// `synthetic`, `anthropic`, `deepseek`, `openai`). The `raw` map is opaque
-/// to the rest of the model: it is never reinterpreted in place. A normalizer
-/// (see [`crate::usage`]) converts known schemas into a
-/// [`crate::usage::NormalizedUsage`].
+/// The `provider_schema` names the semantics of the `raw` fields as an
+/// **explicit versioned API-surface identifier**, e.g.
+/// `openai-chat-completions-v1`, `anthropic-messages-v1`,
+/// `deepseek-chat-completions-v1`, or `synthetic`. The provider name alone is
+/// insufficient: one provider may expose different usage semantics across
+/// endpoints. The `raw` map is opaque to the rest of the model — it is never
+/// reinterpreted in place. A normalizer (see [`crate::usage`]) converts known
+/// schemas into a [`crate::usage::NormalizedUsage`].
 ///
 /// Provider field semantics are **not interchangeable**. For example,
 /// Anthropic's `input_tokens` means *uncached* tokens, while the synthetic
 /// schema's `input_tokens` means *total* input.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub struct RawUsage {
-    /// Which usage schema the `raw` fields follow.
+    /// Which versioned API-surface schema the `raw` fields follow.
     #[serde(default)]
     pub provider_schema: String,
     /// Provider-specific raw usage fields, preserved verbatim.
