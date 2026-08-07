@@ -37,6 +37,8 @@ const ALL_FIXTURES: &[&str] = &[
     "16-global-reorder-would-be-unsafe.json",
     "17-deepseek-live-schema-smoke.json",
     "18-deepseek-live-stable-prefix.json",
+    "19-deepseek-live-early-divergence.json",
+    "20-deepseek-live-late-divergence.json",
 ];
 
 #[test]
@@ -106,6 +108,94 @@ fn scenario_18_deepseek_live_stable_prefix_normalizes() {
     let lower = raw.to_lowercase();
     for forbidden in [
         "api_key", "bearer", "sk-", "2ede2c23", "8aca13db", "77bfc238",
+    ] {
+        assert!(
+            !lower.contains(forbidden),
+            "fixture must not contain '{forbidden}'"
+        );
+    }
+}
+
+#[test]
+fn scenario_19_deepseek_live_early_divergence_normalizes() {
+    // Sanitized fixture from the first real Phase 0B DeepSeek live
+    // early-divergence run (2026-08-07, deepseek-v4-flash). Request C shape:
+    // the early header was changed, so the provider reported zero cache
+    // reuse for the entire request.
+    let trace = common::load_fixture("19-deepseek-live-early-divergence.json");
+    let usage = trace.usage.as_ref().expect("fixture must carry usage");
+    assert_eq!(usage.provider_schema, "deepseek-chat-completions-v1");
+    let normalized = normalize_usage(usage);
+    assert_eq!(
+        normalized.normalization_source,
+        "deepseek-chat-completions-v1"
+    );
+    // Observed live values for C: hit 0 + miss 18064 = total 18064.
+    assert_eq!(normalized.total_input_tokens, Some(18064));
+    assert_eq!(normalized.fresh_input_tokens, Some(18064));
+    assert_eq!(normalized.cache_read_tokens, Some(0));
+    assert_eq!(normalized.output_tokens, Some(1));
+
+    // The early-changed header is a 4-block... no, 3-block shape (no late
+    // suffix): header (CHANGED) + synthetic-prefix + tail.
+    assert_eq!(trace.blocks.len(), 3);
+    assert_eq!(trace.blocks[0].id, "prefix-header");
+
+    // Safe only: no credentials, no authorization headers, no provider
+    // request ids (the live request id was 7011ae3c-c498-447b-84ef-c0ea8dfad8ca).
+    let raw = std::fs::read_to_string(common::fixture_path(
+        "19-deepseek-live-early-divergence.json",
+    ))
+    .unwrap();
+    let lower = raw.to_lowercase();
+    for forbidden in [
+        "api_key", "bearer", "sk-", "7011ae3c", "c498447b", "84efc0ea",
+    ] {
+        assert!(
+            !lower.contains(forbidden),
+            "fixture must not contain '{forbidden}'"
+        );
+    }
+}
+
+#[test]
+fn scenario_20_deepseek_live_late_divergence_normalizes() {
+    // Sanitized fixture from the first real Phase 0B DeepSeek live
+    // late-divergence run (2026-08-07, deepseek-v4-flash). Request C shape:
+    // the late suffix was changed; provider reported partial cache reuse
+    // (10496 of 18115) — the PARTIAL_MATCH evidence.
+    let trace = common::load_fixture("20-deepseek-live-late-divergence.json");
+    let usage = trace.usage.as_ref().expect("fixture must carry usage");
+    assert_eq!(usage.provider_schema, "deepseek-chat-completions-v1");
+    let normalized = normalize_usage(usage);
+    assert_eq!(
+        normalized.normalization_source,
+        "deepseek-chat-completions-v1"
+    );
+    // Observed live values for C: hit 10496 + miss 7619 = total 18115.
+    assert_eq!(normalized.total_input_tokens, Some(18115));
+    assert_eq!(normalized.fresh_input_tokens, Some(7619));
+    assert_eq!(normalized.cache_read_tokens, Some(10496));
+    assert_eq!(normalized.output_tokens, Some(1));
+
+    // The late-divergence shape is 4 real blocks:
+    // header + stable core + late suffix + tail.
+    assert_eq!(trace.blocks.len(), 4);
+    let ids: Vec<&str> = trace.blocks.iter().map(|b| b.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        vec!["prefix-header", "synthetic-prefix", "late-suffix", "tail"]
+    );
+
+    // Safe only: no credentials, no authorization headers, no provider
+    // request ids (the live request id was f30d9fd1-9398-49ad-b829-802d2ed4aab8).
+    let raw = std::fs::read_to_string(common::fixture_path(
+        "20-deepseek-live-late-divergence.json",
+    ))
+    .unwrap();
+    let lower = raw.to_lowercase();
+    for forbidden in [
+        "api_key", "bearer", "sk-", "f30d9fd1", "939849ad", "b829802d",
     ] {
         assert!(
             !lower.contains(forbidden),

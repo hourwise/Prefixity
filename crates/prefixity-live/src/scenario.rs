@@ -14,8 +14,11 @@ pub enum Scenario {
     /// A block near the beginning changes (turn B for OpenAI/Anthropic,
     /// turn C for DeepSeek so A and B first establish the common prefix).
     EarlyDivergence,
-    /// The large prefix is unchanged; only a small tail changes (2 requests
-    /// for OpenAI/Anthropic, 3 for DeepSeek).
+    /// The prefix is split into a stable core (~90%) and a late mutable
+    /// suffix (~10%) as separate structural and wire blocks. The suffix
+    /// changes late (2 requests for OpenAI/Anthropic; 4 for DeepSeek, which
+    /// primes with A/B, diverges the suffix at C, and probes common-core
+    /// persistence with a second distinct suffix at D).
     LateDivergence,
 }
 

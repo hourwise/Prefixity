@@ -15,7 +15,11 @@ use std::time::{SystemTime, UNIX_EPOCH};
 ///   DeepSeek's 10s experimental settle before C).
 /// * v4: added `late_divergence_core_percent` / `late_divergence_suffix_percent`
 ///   (the Phase 0B experimental late-divergence split).
-pub const EXPERIMENT_FORMAT_VERSION: u32 = 4;
+/// * v5: added `late_suffix_mutation_turns` — the explicit 1-based turn list
+///   on which the late suffix mutates. This makes the corrected four-turn
+///   DeepSeek `late-divergence` plan (mutations at C and D, delays
+///   `[0, 0, 0, 10000]`) fully reconstructable from the manifest alone.
+pub const EXPERIMENT_FORMAT_VERSION: u32 = 5;
 
 /// Describes one Phase 0B experiment. Serialized to `manifest.json`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -52,6 +56,10 @@ pub struct ExperimentManifest {
     /// Late-divergence experimental split: percentage in the late mutable
     /// suffix. `None` for non-late-divergence scenarios.
     pub late_divergence_suffix_percent: Option<u64>,
+    /// The 1-based turns (in order) on which the late mutable suffix changes
+    /// (e.g. `[3, 4]` for the four-turn DeepSeek late plan, `[2]` for
+    /// OpenAI/Anthropic). `None` for non-late-divergence scenarios.
+    pub late_suffix_mutation_turns: Option<Vec<usize>>,
     /// Creation time (ISO-8601 UTC).
     pub created_at: String,
     /// Prefixity commit SHA at run time, when resolvable locally.
@@ -97,6 +105,9 @@ pub struct ManifestInput {
     /// Late-divergence experimental split: suffix percentage, if
     /// late-divergence.
     pub late_divergence_suffix_percent: Option<u64>,
+    /// The 1-based turns (in order) on which the late mutable suffix changes,
+    /// if late-divergence.
+    pub late_suffix_mutation_turns: Option<Vec<usize>>,
     /// Optional notes.
     pub notes: Option<String>,
     /// `--max-requests` in force.
@@ -124,6 +135,7 @@ pub fn build_manifest(input: &ManifestInput) -> ExperimentManifest {
         request_pre_delays_ms: input.request_pre_delays_ms.clone(),
         late_divergence_core_percent: input.late_divergence_core_percent,
         late_divergence_suffix_percent: input.late_divergence_suffix_percent,
+        late_suffix_mutation_turns: input.late_suffix_mutation_turns.clone(),
         created_at: iso8601_utc_now(),
         commit_sha: detect_commit_sha(),
         notes: input.notes.clone(),
@@ -206,6 +218,7 @@ mod tests {
             request_pre_delays_ms: vec![0, 0, 10_000],
             late_divergence_core_percent: None,
             late_divergence_suffix_percent: None,
+            late_suffix_mutation_turns: None,
             notes: None,
             max_requests: 3,
             max_estimated_input_tokens: 50_000,
@@ -224,6 +237,45 @@ mod tests {
         assert_eq!(manifest.api_surface, "openai-chat-completions-v1");
         assert!(manifest.endpoint.starts_with("https://"));
         assert_eq!(manifest.request_pre_delays_ms, vec![0, 0, 10_000]);
+    }
+
+    #[test]
+    fn manifest_records_late_suffix_mutation_turns_for_four_turn_plan() {
+        // The corrected DeepSeek late-divergence plan must be reconstructable
+        // from the manifest: 4 requests, 90/10 split, mutations at C and D,
+        // delays [0, 0, 0, 10000].
+        let manifest = build_manifest(&ManifestInput {
+            experiment_id: "deepseek-late-divergence-02".to_string(),
+            provider: "deepseek".to_string(),
+            api_surface: "deepseek-chat-completions-v1".to_string(),
+            endpoint: "https://api.deepseek.com/chat/completions".to_string(),
+            model: "deepseek-v4-flash".to_string(),
+            scenario: "late-divergence".to_string(),
+            seed: 42,
+            target_prefix_tokens: 8000,
+            request_count: 4,
+            request_pre_delays_ms: vec![0, 0, 0, 10_000],
+            late_divergence_core_percent: Some(90),
+            late_divergence_suffix_percent: Some(10),
+            late_suffix_mutation_turns: Some(vec![3, 4]),
+            notes: Some("four-turn persistence probe".to_string()),
+            max_requests: 10,
+            max_estimated_input_tokens: 50_000,
+            timeout_ms: 60_000,
+        });
+        assert_eq!(manifest.experiment_format_version, 5);
+        assert_eq!(manifest.request_count, 4);
+        assert_eq!(manifest.request_pre_delays_ms, vec![0, 0, 0, 10_000]);
+        assert_eq!(manifest.late_divergence_core_percent, Some(90));
+        assert_eq!(manifest.late_divergence_suffix_percent, Some(10));
+        assert_eq!(manifest.late_suffix_mutation_turns, Some(vec![3, 4]));
+        // No credentials in the serialized form.
+        let json = serde_json::to_string(&manifest).unwrap();
+        let lower = json.to_lowercase();
+        assert!(!lower.contains("api_key"));
+        assert!(!lower.contains("authorization"));
+        assert!(!lower.contains("secret"));
+        assert!(!lower.contains("credential"));
     }
 
     #[test]

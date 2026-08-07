@@ -1,0 +1,70 @@
+{
+  "format_version": 2,
+  "request_id": "20-deepseek-live-late-divergence",
+  "session_id": "deepseek-late-divergence-01",
+  "timestamp": "2026-08-07T15:51:00Z",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "blocks": [
+    {
+      "id": "prefix-header",
+      "source": "timestamp",
+      "position": 0,
+      "content_hash": "c5cc65e70400c3fc2bcb7e0ab6dbafaca2293b98f8567e95e0f6aaf3ee506f70",
+      "token_count": 16,
+      "byte_count": 61,
+      "semantic_zone": "system",
+      "structural_path": "messages[0]",
+      "role": "system"
+    },
+    {
+      "id": "synthetic-prefix",
+      "source": "system_policy",
+      "position": 1,
+      "content_hash": "417a095716699e7c67655b62af406d58b5db73528f09fa0407d2510e31b2b822",
+      "token_count": 7229,
+      "byte_count": 28916,
+      "semantic_zone": "system",
+      "structural_path": "messages[1]",
+      "role": "system"
+    },
+    {
+      "id": "late-suffix",
+      "source": "system_policy",
+      "position": 2,
+      "content_hash": "6567bb7eb0344ebebcb4fcaec2590676b128e687fec5114f8e81137969f724df",
+      "token_count": 803,
+      "byte_count": 3212,
+      "semantic_zone": "system",
+      "structural_path": "messages[2]",
+      "role": "system"
+    },
+    {
+      "id": "tail",
+      "source": "user_request",
+      "position": 3,
+      "content_hash": "4e6977665c5d079155c8a8780bf0a502927d39c49ff97fd1e90c2d8b4f18e152",
+      "token_count": 15,
+      "byte_count": 57,
+      "semantic_zone": "messages",
+      "structural_path": "messages[3]",
+      "role": "user"
+    }
+  ],
+  "usage": {
+    "provider_schema": "deepseek-chat-completions-v1",
+    "raw": {
+      "completion_tokens": 1,
+      "prompt_cache_hit_tokens": 10496,
+      "prompt_cache_miss_tokens": 7619,
+      "prompt_tokens": 18115,
+      "prompt_tokens_details": {
+        "cached_tokens": 10496
+      },
+      "total_tokens": 18116
+    }
+  },
+  "metadata": {
+    "note": "Sanitized fixture derived from the Phase 0B live DeepSeek late-divergence run (2026-08-07, deepseek-v4-flash, commit c894861, HTTP 200). Request C shape after the late suffix was changed: cache read 10496, fresh 7619, total 18115; Prefixity estimate 8063. Live reconciliation: A->B stable pair MATCH (structural 0.9981 vs provider 0.9992); B->C first late break PARTIAL_MATCH (structural POTENTIAL 0.8985 = 7245/8063 estimated tokens vs REALIZED provider cache 0.5794 = 10496/18115 provider tokens; realization gap 0.3191). This is valuable evidence, not a failure: some provider reuse occurred but realized cache availability was materially below structural potential. Contains ONLY safe usage/accounting and reconciliation evidence; no credentials, no authorization headers, no provider request ids, no full provider responses."
+  }
+}

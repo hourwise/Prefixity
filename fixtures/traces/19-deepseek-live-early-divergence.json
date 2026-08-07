@@ -1,0 +1,59 @@
+{
+  "format_version": 2,
+  "request_id": "19-deepseek-live-early-divergence",
+  "session_id": "deepseek-early-divergence-01",
+  "timestamp": "2026-08-07T15:46:48Z",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "blocks": [
+    {
+      "id": "prefix-header",
+      "source": "timestamp",
+      "position": 0,
+      "content_hash": "7eb495a04b60efebafe15ba97e66b1dcbdb34e876bcbdcdeff6c54a64b582b17",
+      "token_count": 18,
+      "byte_count": 70,
+      "semantic_zone": "system",
+      "structural_path": "messages[0]",
+      "role": "system"
+    },
+    {
+      "id": "synthetic-prefix",
+      "source": "system_policy",
+      "position": 1,
+      "content_hash": "3eaea931175ecb15584c663c872ddcaf1361fe637525fb2d1695c2f73ba5ff5f",
+      "token_count": 8033,
+      "byte_count": 32129,
+      "semantic_zone": "system",
+      "structural_path": "messages[1]",
+      "role": "system"
+    },
+    {
+      "id": "tail",
+      "source": "user_request",
+      "position": 2,
+      "content_hash": "df6c2690b4ed4278675926f35d2e7549e9e18c97f86550176dab3544058ba3c0",
+      "token_count": 15,
+      "byte_count": 58,
+      "semantic_zone": "messages",
+      "structural_path": "messages[2]",
+      "role": "user"
+    }
+  ],
+  "usage": {
+    "provider_schema": "deepseek-chat-completions-v1",
+    "raw": {
+      "completion_tokens": 1,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 18064,
+      "prompt_tokens": 18064,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 18065
+    }
+  },
+  "metadata": {
+    "note": "Sanitized fixture derived from the Phase 0B live DeepSeek early-divergence run (2026-08-07, deepseek-v4-flash, commit c894861, HTTP 200). Request C shape after the early HEADER was changed: cache read 0, fresh 18064, total 18064; Prefixity estimate 8066. Live reconciliation: A->B stable pair MATCH (structural 0.9981 vs provider 0.9993); B->C early break MATCH (structural 0.0 vs provider 0.0). Contains ONLY safe usage/accounting and reconciliation evidence; no credentials, no authorization headers, no provider request ids, no full provider responses."
+  }
+}

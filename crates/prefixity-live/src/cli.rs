@@ -17,8 +17,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Hard Phase 0B ceiling on requests per command.
 pub const MAX_REQUESTS_CEILING: usize = 10;
-/// Default request-count guard.
-pub const DEFAULT_MAX_REQUESTS: usize = 3;
+/// Default request-count guard. Raised to 4 in Phase 0B.3 so the four-turn
+/// DeepSeek `late-divergence` plan (A/B/C/D) runs without a custom flag.
+pub const DEFAULT_MAX_REQUESTS: usize = 4;
 /// Default approximate target prefix size in tokens.
 pub const DEFAULT_TARGET_PREFIX_TOKENS: u64 = 8_000;
 /// Default local **Prefixity-estimate** input safety ceiling. This is a
@@ -224,18 +225,30 @@ fn format_dry_run(info: &DryRunInfo) -> String {
         lines.push("late divergence:".to_string());
         lines.push(format!("    stable core target: {}%", ld.core_percent));
         lines.push(format!("    mutable suffix target: {}%", ld.suffix_percent));
+        let mutation_labels: Vec<&str> = ld
+            .mutation_turns
+            .iter()
+            .map(|turn| crate::content::turn_label(*turn))
+            .collect();
         lines.push(format!(
-            "    mutation turn: {}",
-            crate::content::turn_label(ld.mutation_turn)
+            "    mutation turns: {}",
+            mutation_labels.join(", ")
         ));
     }
     lines.push(format!("planned requests:     {}", info.request_count));
     for turn in &info.turns {
+        // Late-divergence dry runs make the per-turn suffix variant explicit
+        // (original vs changed variant 1 vs changed variant 2).
+        let suffix_label = match turn.suffix_variant {
+            crate::content::SuffixVariant::None => String::new(),
+            variant => format!(", late suffix: {}", variant.label()),
+        };
         lines.push(format!(
-            "request {} ({}): pre-delay {} ms",
+            "request {} ({}): pre-delay {} ms{}",
             turn.turn,
             crate::content::turn_label(turn.turn),
-            turn.pre_request_delay_ms
+            turn.pre_request_delay_ms,
+            suffix_label
         ));
     }
     lines.push(format!("estimated bytes:      {}", info.estimated_bytes));
@@ -301,6 +314,31 @@ mod tests {
     }
 
     #[test]
+    fn default_max_requests_allows_the_four_turn_deepseek_late_plan() {
+        // The default request-count guard (4 since Phase 0B.3) must permit
+        // the four-turn DeepSeek late-divergence plan without extra flags.
+        let cli = Cli::try_parse_from([
+            "prefixity-live",
+            "dry-run",
+            "--provider",
+            "deepseek",
+            "--model",
+            "deepseek-v4-flash",
+            "--scenario",
+            "late-divergence",
+        ])
+        .unwrap();
+        let opts = match &cli.command {
+            LiveCommand::DryRun { opts } => opts,
+            _ => unreachable!(),
+        };
+        assert_eq!(opts.max_requests, DEFAULT_MAX_REQUESTS);
+        assert_eq!(opts.max_requests, 4);
+        // The ceiling is unchanged at 10.
+        assert_eq!(MAX_REQUESTS_CEILING, 10);
+    }
+
+    #[test]
     fn dry_run_report_labels_the_value_as_estimated() {
         let info = DryRunInfo {
             provider: "deepseek".to_string(),
@@ -313,6 +351,7 @@ mod tests {
                     header: "h".to_string(),
                     prefix: "p".to_string(),
                     suffix: None,
+                    suffix_variant: crate::content::SuffixVariant::None,
                     tail: "t1".to_string(),
                     pre_request_delay_ms: 0,
                 },
@@ -321,6 +360,7 @@ mod tests {
                     header: "h".to_string(),
                     prefix: "p".to_string(),
                     suffix: None,
+                    suffix_variant: crate::content::SuffixVariant::None,
                     tail: "t2".to_string(),
                     pre_request_delay_ms: 0,
                 },
@@ -329,6 +369,7 @@ mod tests {
                     header: "h".to_string(),
                     prefix: "p".to_string(),
                     suffix: None,
+                    suffix_variant: crate::content::SuffixVariant::None,
                     tail: "t3".to_string(),
                     pre_request_delay_ms: 10_000,
                 },
@@ -349,5 +390,74 @@ mod tests {
         // The per-request settle plan is visible.
         assert!(report.contains("request 1 (A): pre-delay 0 ms"));
         assert!(report.contains("request 3 (C): pre-delay 10000 ms"));
+    }
+
+    #[test]
+    fn dry_run_report_shows_late_suffix_variants_and_mutation_turns() {
+        let info = DryRunInfo {
+            provider: "deepseek".to_string(),
+            model: "deepseek-v4-flash".to_string(),
+            scenario: "late-divergence".to_string(),
+            request_count: 4,
+            turns: vec![
+                TurnSpec {
+                    turn: 1,
+                    header: "h".to_string(),
+                    prefix: "p".to_string(),
+                    suffix: Some("orig".to_string()),
+                    suffix_variant: crate::content::SuffixVariant::Original,
+                    tail: "t1".to_string(),
+                    pre_request_delay_ms: 0,
+                },
+                TurnSpec {
+                    turn: 2,
+                    header: "h".to_string(),
+                    prefix: "p".to_string(),
+                    suffix: Some("orig".to_string()),
+                    suffix_variant: crate::content::SuffixVariant::Original,
+                    tail: "t2".to_string(),
+                    pre_request_delay_ms: 0,
+                },
+                TurnSpec {
+                    turn: 3,
+                    header: "h".to_string(),
+                    prefix: "p".to_string(),
+                    suffix: Some("v1".to_string()),
+                    suffix_variant: crate::content::SuffixVariant::Variant1,
+                    tail: "t3".to_string(),
+                    pre_request_delay_ms: 0,
+                },
+                TurnSpec {
+                    turn: 4,
+                    header: "h".to_string(),
+                    prefix: "p".to_string(),
+                    suffix: Some("v2".to_string()),
+                    suffix_variant: crate::content::SuffixVariant::Variant2,
+                    tail: "t4".to_string(),
+                    pre_request_delay_ms: 10_000,
+                },
+            ],
+            late_divergence: Some(crate::experiment::LateDivergenceInfo {
+                core_percent: 90,
+                suffix_percent: 10,
+                mutation_turns: vec![3, 4],
+            }),
+            estimated_bytes: 2246,
+            estimated_tokens: 8063,
+            artifact_dir: std::path::PathBuf::from("experiments/runs/x"),
+            required_env_var: "DEEPSEEK_API_KEY",
+            max_requests: 10,
+            max_estimated_input_tokens: 25_000,
+            guard_reason: None,
+        };
+        let report = format_dry_run(&info);
+        assert!(report.contains("planned requests:     4"));
+        assert!(report.contains("mutation turns: C, D"));
+        assert!(report.contains("request 1 (A): pre-delay 0 ms, late suffix: original"));
+        assert!(report.contains("request 2 (B): pre-delay 0 ms, late suffix: original"));
+        assert!(report.contains("request 3 (C): pre-delay 0 ms, late suffix: changed variant 1"));
+        assert!(
+            report.contains("request 4 (D): pre-delay 10000 ms, late suffix: changed variant 2")
+        );
     }
 }

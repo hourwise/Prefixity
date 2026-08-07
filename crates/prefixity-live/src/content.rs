@@ -82,8 +82,14 @@ pub const LATE_DIVERGENCE_SUFFIX_PERCENT: u64 = 10;
 /// Seed-derivation tag for the ORIGINAL late-divergence suffix.
 const LATE_SUFFIX_ORIGINAL_TAG: u64 = 0x0A11_CE01;
 
-/// Seed-derivation tag for the CHANGED late-divergence suffix.
-const LATE_SUFFIX_CHANGED_TAG: u64 = 0x0C11_CE01;
+/// Seed-derivation tag for CHANGED late-divergence suffix variant 1.
+const LATE_SUFFIX_CHANGED_1_TAG: u64 = 0x0C11_CE01;
+
+/// Seed-derivation tag for CHANGED late-divergence suffix variant 2.
+///
+/// Distinct from BOTH the original tag and variant 1's tag, so variant 2 is
+/// byte-distinct from the original suffix and from variant 1.
+const LATE_SUFFIX_CHANGED_2_TAG: u64 = 0x0D11_CE01;
 
 /// Derive a deterministic sub-seed from the experiment seed and a fixed tag
 /// (SplitMix-style mixing so adjacent seeds/tags diverge). No OS randomness
@@ -107,11 +113,47 @@ pub fn generate_late_divergence_prefix(seed: u64, target_tokens: u64) -> (String
     (core, original_suffix)
 }
 
-/// Generate the CHANGED late-divergence suffix (same target size, different
-/// derived seed) deterministically.
+/// Generate CHANGED late-divergence suffix **variant 1** (same target size,
+/// a different derived seed from the original) deterministically.
 pub fn generate_changed_late_suffix(seed: u64, target_tokens: u64) -> String {
     let suffix_target = target_tokens * LATE_DIVERGENCE_SUFFIX_PERCENT / 100;
-    generate_prefix(derived_seed(seed, LATE_SUFFIX_CHANGED_TAG), suffix_target)
+    generate_prefix(derived_seed(seed, LATE_SUFFIX_CHANGED_1_TAG), suffix_target)
+}
+
+/// Generate CHANGED late-divergence suffix **variant 2** (same target size,
+/// yet another derived seed) deterministically. Variant 2 is byte-distinct
+/// from BOTH the original suffix and variant 1, so a D request cannot hit
+/// C's complete request simply by re-sending identical suffix content.
+pub fn generate_changed_late_suffix_variant2(seed: u64, target_tokens: u64) -> String {
+    let suffix_target = target_tokens * LATE_DIVERGENCE_SUFFIX_PERCENT / 100;
+    generate_prefix(derived_seed(seed, LATE_SUFFIX_CHANGED_2_TAG), suffix_target)
+}
+
+/// Which deterministic late-suffix variant a planned turn carries. No OS
+/// randomness and no timestamps are involved; every variant is reproducible
+/// from the experiment seed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SuffixVariant {
+    /// No late suffix (non-`late-divergence` scenario).
+    None,
+    /// The ORIGINAL late suffix.
+    Original,
+    /// CHANGED late suffix variant 1.
+    Variant1,
+    /// CHANGED late suffix variant 2.
+    Variant2,
+}
+
+impl SuffixVariant {
+    /// Human-readable label used in dry runs and reports.
+    pub fn label(&self) -> &'static str {
+        match self {
+            SuffixVariant::None => "none",
+            SuffixVariant::Original => "original",
+            SuffixVariant::Variant1 => "changed variant 1",
+            SuffixVariant::Variant2 => "changed variant 2",
+        }
+    }
 }
 
 /// The experiment header block text (identical across turns, except for
@@ -146,12 +188,13 @@ pub fn tail_for(scenario: Scenario, turn: usize) -> String {
     }
 }
 
-/// Single-letter label for a turn (A/B/C) used in content and reports.
+/// Single-letter label for a turn (A/B/C/D) used in content and reports.
 pub fn turn_label(turn: usize) -> &'static str {
     match turn {
         1 => "A",
         2 => "B",
         3 => "C",
+        4 => "D",
         _ => "X",
     }
 }
@@ -210,6 +253,9 @@ mod tests {
         let changed_a = generate_changed_late_suffix(42, 8000);
         let changed_b = generate_changed_late_suffix(42, 8000);
         assert_eq!(changed_a, changed_b);
+        let variant2_a = generate_changed_late_suffix_variant2(42, 8000);
+        let variant2_b = generate_changed_late_suffix_variant2(42, 8000);
+        assert_eq!(variant2_a, variant2_b);
     }
 
     #[test]
@@ -219,6 +265,39 @@ mod tests {
         assert_ne!(core, original);
         assert_ne!(original, changed);
         assert_ne!(core, changed);
+    }
+
+    #[test]
+    fn late_divergence_three_suffix_variants_are_byte_distinct_and_deterministic() {
+        // Original, variant 1 and variant 2 must all be pairwise
+        // byte-distinct, deterministic, and different from the stable core.
+        // No timestamps or OS randomness are used.
+        let (core, original) = generate_late_divergence_prefix(42, 8000);
+        let variant1 = generate_changed_late_suffix(42, 8000);
+        let variant2 = generate_changed_late_suffix_variant2(42, 8000);
+
+        // Deterministic across calls.
+        assert_eq!(original, generate_late_divergence_prefix(42, 8000).1);
+        assert_eq!(variant1, generate_changed_late_suffix(42, 8000));
+        assert_eq!(variant2, generate_changed_late_suffix_variant2(42, 8000));
+
+        // Pairwise byte-distinct among the three suffix variants.
+        assert_ne!(original, variant1, "original must differ from variant 1");
+        assert_ne!(original, variant2, "original must differ from variant 2");
+        assert_ne!(variant1, variant2, "variant 1 must differ from variant 2");
+
+        // All three differ from the stable core.
+        assert_ne!(core, original);
+        assert_ne!(core, variant1);
+        assert_ne!(core, variant2);
+    }
+
+    #[test]
+    fn suffix_variant_labels_are_stable() {
+        assert_eq!(SuffixVariant::None.label(), "none");
+        assert_eq!(SuffixVariant::Original.label(), "original");
+        assert_eq!(SuffixVariant::Variant1.label(), "changed variant 1");
+        assert_eq!(SuffixVariant::Variant2.label(), "changed variant 2");
     }
 
     #[test]

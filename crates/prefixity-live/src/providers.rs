@@ -17,9 +17,13 @@ use std::collections::BTreeMap;
 
 /// Conservative Phase 0B experimental settle delay (ms) applied **before
 /// DeepSeek's final request** so best-effort, asynchronous cache persistence
-/// has time to complete after A and B establish the common prefix. This is
-/// an experimental control, NOT an official DeepSeek requirement or a
-/// scientifically validated optimum.
+/// has time to complete after the previous request established a new
+/// common-prefix boundary. This is an experimental control, NOT an official
+/// DeepSeek requirement or a scientifically validated optimum. The important
+/// settle period is after the request that first exposes a divergence: for
+/// `stable-prefix`/`early-divergence` that is C (after A/B establish the
+/// common prefix); for `late-divergence` it is D (after C first diverges the
+/// late suffix and lets DeepSeek discover the shorter common core).
 pub const DEEPSEEK_SETTLE_DELAY_MS: u64 = 10_000;
 
 /// The explicit per-provider, per-scenario request plan.
@@ -39,8 +43,9 @@ pub struct ProviderTurnPlan {
     /// `stable-prefix`.
     pub late_suffix_mutates_from: Option<usize>,
     /// Experimental settle delay (ms) applied **before the final turn** (for
-    /// example, before DeepSeek's C request, after A and B have established
-    /// the common prefix). Zero for OpenAI/Anthropic and schema-smoke.
+    /// example, before DeepSeek's C request after A/B established the common
+    /// prefix, or before DeepSeek's D request after C first diverged the
+    /// late suffix). Zero for OpenAI/Anthropic and schema-smoke.
     pub settle_delay_ms: u64,
 }
 
@@ -87,11 +92,17 @@ impl ProviderTurnPlan {
         }
     }
 
-    /// A DeepSeek late-divergence plan: three requests, the settle delay
-    /// before C, and the late mutable suffix changing only at C.
+    /// A DeepSeek late-divergence plan: **four** requests (A, B, C, D). A and
+    /// B carry the ORIGINAL late suffix and demonstrate long stable-prefix
+    /// cache availability. C first diverges the late suffix (variant 1),
+    /// exposing the shorter common stable core. D carries a SECOND distinct
+    /// suffix variant (so it cannot simply hit C's request-boundary cache)
+    /// and tests whether the common core persisted after C. The experimental
+    /// settle delay is applied **before D**, after C has completed and
+    /// allowed common-prefix persistence.
     pub fn deepseek_late() -> ProviderTurnPlan {
         ProviderTurnPlan {
-            turns: 3,
+            turns: 4,
             header_diverges_from: None,
             late_suffix_mutates_from: Some(3),
             settle_delay_ms: DEEPSEEK_SETTLE_DELAY_MS,
@@ -116,6 +127,15 @@ impl ProviderTurnPlan {
     /// The first turn (1-based) whose late suffix mutates, if any.
     pub fn late_mutation_turn(&self) -> Option<usize> {
         self.late_suffix_mutates_from
+    }
+
+    /// The 1-based turns, in order, whose late suffix mutates (e.g. `[3, 4]`
+    /// for the four-turn DeepSeek late plan, `[2]` for OpenAI/Anthropic).
+    /// Empty when the scenario has no late suffix.
+    pub fn late_mutation_turns(&self) -> Vec<usize> {
+        (1..=self.turns)
+            .filter(|turn| self.late_suffix_mutates(*turn))
+            .collect()
     }
 }
 
@@ -404,12 +424,15 @@ impl LiveProvider for AnthropicProvider {
 /// DeepSeek adapter.
 ///
 /// DeepSeek documentation describes cache construction as potentially
-/// requiring a prior completed request, so every non-schema-smoke scenario
-/// plans **three** requests (A, B, C): A and B first establish the common
-/// prefix, and the C request is the one whose reuse is measured. For
-/// `early-divergence` the early header is only diverged at C, never at B.
-/// The plan is still bounded by `--max-requests`. Thinking is explicitly
-/// disabled (see [`DeepSeekProvider::build_request_body`]).
+/// requiring a prior completed request, so `stable-prefix` and
+/// `early-divergence` plan **three** requests (A, B, C): A and B first
+/// establish the common prefix, and the C request is the one whose reuse is
+/// measured. `late-divergence` plans **four** requests (A, B, C, D): A/B
+/// carry the original late suffix, C first diverges it (variant 1), and D
+/// carries a second distinct suffix variant to test common-core persistence
+/// after C. For `early-divergence` the early header is only diverged at C,
+/// never at B. Plans are still bounded by `--max-requests`. Thinking is
+/// explicitly disabled (see [`DeepSeekProvider::build_request_body`]).
 #[derive(Debug, Default)]
 pub struct DeepSeekProvider;
 
@@ -482,8 +505,10 @@ impl LiveProvider for DeepSeekProvider {
             // settle delay is applied before C so best-effort async cache
             // persistence can complete. The early header only diverges at C.
             Scenario::EarlyDivergence => ProviderTurnPlan::deepseek(Some(3)),
-            // Late-divergence mutates the late suffix only at C (after the
-            // same 10s settle); StablePrefix keeps a single prefix block.
+            // Late-divergence is four requests: A/B carry the original late
+            // suffix, C first diverges it (variant 1), D carries a second
+            // distinct suffix variant. The 10s settle is applied before D,
+            // after C has exposed the common-prefix boundary.
             Scenario::LateDivergence => ProviderTurnPlan::deepseek_late(),
             _ => ProviderTurnPlan::deepseek(None),
         }
@@ -568,13 +593,14 @@ mod tests {
             deepseek.plan_turns(Scenario::SchemaSmoke),
             ProviderTurnPlan::stable(1)
         );
-        // B, C, D all prime with A and B, then measure the third request
-        // with a settle delay before it.
+        // B and C prime with A and B, then measure the third request with a
+        // settle delay before it.
         assert_eq!(
             deepseek.plan_turns(Scenario::StablePrefix),
             ProviderTurnPlan::deepseek(None)
         );
-        // Late-divergence mutates the late suffix only at C.
+        // Late-divergence is four requests (A/B/C/D): the late suffix first
+        // mutates at C, and D carries a second distinct variant.
         assert_eq!(
             deepseek.plan_turns(Scenario::LateDivergence),
             ProviderTurnPlan::deepseek_late()
@@ -587,17 +613,24 @@ mod tests {
     }
 
     #[test]
-    fn deepseek_settle_delay_applies_before_c_only() {
-        for scenario in [
-            Scenario::StablePrefix,
-            Scenario::EarlyDivergence,
-            Scenario::LateDivergence,
-        ] {
+    fn deepseek_settle_delay_applies_before_the_final_turn() {
+        // StablePrefix and EarlyDivergence are three turns: the settle
+        // applies before C (after A/B establish the common prefix).
+        for scenario in [Scenario::StablePrefix, Scenario::EarlyDivergence] {
             let plan = DeepSeekProvider.plan_turns(scenario);
+            assert_eq!(plan.turns, 3);
             assert_eq!(plan.pre_request_delay_ms(1), 0);
             assert_eq!(plan.pre_request_delay_ms(2), 0);
             assert_eq!(plan.pre_request_delay_ms(3), DEEPSEEK_SETTLE_DELAY_MS);
         }
+        // LateDivergence is four turns: the settle applies before D (after C
+        // first diverges the late suffix and lets the common core persist).
+        let late = DeepSeekProvider.plan_turns(Scenario::LateDivergence);
+        assert_eq!(late.turns, 4);
+        assert_eq!(late.pre_request_delay_ms(1), 0);
+        assert_eq!(late.pre_request_delay_ms(2), 0);
+        assert_eq!(late.pre_request_delay_ms(3), 0);
+        assert_eq!(late.pre_request_delay_ms(4), DEEPSEEK_SETTLE_DELAY_MS);
         // schema-smoke has no settle delay.
         let smoke = DeepSeekProvider.plan_turns(Scenario::SchemaSmoke);
         assert_eq!(smoke.settle_delay_ms, 0);
@@ -671,17 +704,21 @@ mod tests {
     }
 
     #[test]
-    fn late_divergence_plan_mutates_suffix_at_the_measurement_turn() {
-        // DeepSeek: A/B establish context, C mutates the late suffix.
+    fn late_divergence_plan_mutates_suffix_at_the_measurement_turns() {
+        // DeepSeek: A/B carry the original suffix; C mutates it (variant 1)
+        // and D mutates it again (variant 2).
         let deepseek_plan = DeepSeekProvider.plan_turns(Scenario::LateDivergence);
         assert_eq!(deepseek_plan.late_mutation_turn(), Some(3));
+        assert_eq!(deepseek_plan.late_mutation_turns(), vec![3, 4]);
         assert!(!deepseek_plan.late_suffix_mutates(1));
         assert!(!deepseek_plan.late_suffix_mutates(2));
         assert!(deepseek_plan.late_suffix_mutates(3));
-        // OpenAI/Anthropic: B is the measurement turn.
+        assert!(deepseek_plan.late_suffix_mutates(4));
+        // OpenAI/Anthropic: B is the only measurement turn.
         for provider in [&OpenAiProvider as &dyn LiveProvider, &AnthropicProvider] {
             let plan = provider.plan_turns(Scenario::LateDivergence);
             assert_eq!(plan.late_mutation_turn(), Some(2));
+            assert_eq!(plan.late_mutation_turns(), vec![2]);
             assert!(!plan.late_suffix_mutates(1));
             assert!(plan.late_suffix_mutates(2));
             // StablePrefix never mutates a suffix.
@@ -698,6 +735,10 @@ mod tests {
                 .late_mutation_turn(),
             None
         );
+        assert!(DeepSeekProvider
+            .plan_turns(Scenario::StablePrefix)
+            .late_mutation_turns()
+            .is_empty());
     }
 
     #[test]

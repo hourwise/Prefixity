@@ -60,7 +60,10 @@ fn config(
         scenario,
         seed: 42,
         target_prefix_tokens: 8000,
-        max_requests: 3,
+        // High enough that every scenario's full plan (including the
+        // four-turn DeepSeek late-divergence plan) passes the request-count
+        // guard; individual tests tighten the guard when testing it.
+        max_requests: 10,
         max_estimated_input_tokens: 50_000,
         timeout_ms: 5_000,
         runs_dir,
@@ -168,7 +171,7 @@ fn openai_stable_prefix_full_pipeline_with_mock() {
         serde_json::from_str(&std::fs::read_to_string(dir.join("manifest.json")).unwrap()).unwrap();
     assert_eq!(manifest["model"], "test-model");
     assert_eq!(manifest["scenario"], "stable-prefix");
-    assert_eq!(manifest["experiment_format_version"], 4);
+    assert_eq!(manifest["experiment_format_version"], 5);
     assert_eq!(manifest["max_estimated_input_tokens"], 50_000);
 
     std::fs::remove_dir_all(&runs).ok();
@@ -506,7 +509,7 @@ fn deepseek_execution_sleeps_once_for_settle_before_c() {
 }
 
 #[test]
-fn deepseek_late_divergence_pipeline_mutates_suffix_and_reconciles() {
+fn deepseek_late_divergence_pipeline_is_four_turns_with_one_settle_before_d() {
     let key = test_key();
     let runs = common::temp_dir("ds-late");
     let cfg = config(
@@ -515,37 +518,93 @@ fn deepseek_late_divergence_pipeline_mutates_suffix_and_reconciles() {
         runs.clone(),
         "ds-late-1",
     );
-    // A and B share the original late suffix; C changes it and the provider
-    // reports cache reuse matching the stable core (~7200 of 8100).
+    // A and B share the original late suffix; C changes it (variant 1) and
+    // the provider reports cache reuse matching the stable core (~7200 of
+    // 8100); D uses variant 2 (a different suffix again) and the provider
+    // reports reuse matching the persisted stable core.
     let mock = MockTransport::new(vec![
         ok_response(200, &common::deepseek_ok(0, 8100, 8)),
         ok_response(200, &common::deepseek_ok(0, 8100, 8)),
         ok_response(200, &common::deepseek_ok(7200, 900, 8)),
+        ok_response(200, &common::deepseek_ok(7200, 900, 8)),
     ]);
     let sleeper = RecordingSleeper::default();
     let result = execute_live_experiment(&cfg, &mock, Some(&key), &sleeper).unwrap();
-    assert_eq!(mock.call_count(), 3);
+    assert_eq!(mock.call_count(), 4);
+    // Exactly one experimental sleep, before D (after C has exposed the
+    // common-prefix boundary). No sleep before A/B/C and none after D.
     assert_eq!(sleeper.calls(), vec![10_000]);
+
+    // Four planned turns; three pairs retained (A->B, B->C, C->D).
+    assert_eq!(result.request_count, 4);
+    assert_eq!(result.pairs.len(), 3);
+    let pair_turns: Vec<(usize, usize)> = result
+        .pairs
+        .iter()
+        .map(|p| (p.request_a, p.request_b))
+        .collect();
+    assert_eq!(pair_turns, vec![(1, 2), (2, 3), (3, 4)]);
 
     // Every late-divergence trace has 4 real structural blocks.
     let dir = runs.join("ds-late-1");
-    let trace_c: prefixity_core::model::RequestTrace =
-        serde_json::from_str(&std::fs::read_to_string(dir.join("request-03.trace.json")).unwrap())
+    let trace_d: prefixity_core::model::RequestTrace =
+        serde_json::from_str(&std::fs::read_to_string(dir.join("request-04.trace.json")).unwrap())
             .unwrap();
-    assert_eq!(trace_c.blocks.len(), 4);
-    let ids: Vec<&str> = trace_c.blocks.iter().map(|b| b.id.as_str()).collect();
+    assert_eq!(trace_d.blocks.len(), 4);
+    let ids: Vec<&str> = trace_d.blocks.iter().map(|b| b.id.as_str()).collect();
     assert_eq!(
         ids,
         vec!["prefix-header", "synthetic-prefix", "late-suffix", "tail"]
     );
-    // B -> C is the measured pair: reuse is high but below stable-prefix,
-    // and reconciles to MATCH against the provider's reported cache ratio.
-    let last = &result.pairs[1];
-    assert_eq!(last.conclusion, Conclusion::Match);
-    let structural = last.structural_reuse_ratio.unwrap();
+
+    // The per-request pre-delay plan is recorded.
+    let delays: Vec<u64> = result
+        .requests
+        .iter()
+        .map(|r| r.pre_request_delay_ms)
+        .collect();
+    assert_eq!(delays, vec![0, 0, 0, 10_000]);
+
+    // C -> D (the primary/final pair) is the persistence measurement and is
+    // the overall conclusion. B -> C (diagnostic) is retained.
+    assert_eq!(
+        result.pairs[1].role,
+        prefixity_live::result::PairRole::Diagnostic
+    );
+    assert_eq!(
+        result.pairs[2].role,
+        prefixity_live::result::PairRole::Primary
+    );
+    assert_eq!(result.pairs[2].conclusion, Conclusion::Match);
+    let structural = result.pairs[2].structural_reuse_ratio.unwrap();
     assert!(structural > 0.80 && structural < 0.95, "got {structural}");
-    assert!(last.reuse_ratio_difference.unwrap() < 0.10);
+    assert!(result.pairs[2].reuse_ratio_difference.unwrap() < 0.10);
+    // Overall conclusion is the primary (final) pair.
     assert_eq!(result.conclusion, Conclusion::Match);
+    std::fs::remove_dir_all(&runs).ok();
+}
+
+#[test]
+fn deepseek_late_divergence_dry_run_shows_four_turns_and_never_sleeps() {
+    let runs = common::temp_dir("ds-late-dry");
+    let cfg = config(
+        "deepseek",
+        Scenario::LateDivergence,
+        runs.clone(),
+        "ds-late-dry-1",
+    );
+    let start = std::time::Instant::now();
+    let info = describe_dry_run(&cfg).unwrap();
+    // Dry-run never sleeps: it returns quickly even though D plans 10s.
+    assert!(start.elapsed().as_millis() < 5_000);
+    assert_eq!(info.request_count, 4);
+    let delays: Vec<u64> = info.turns.iter().map(|t| t.pre_request_delay_ms).collect();
+    assert_eq!(delays, vec![0, 0, 0, 10_000]);
+    // The late-divergence split and mutation turns are exposed.
+    let ld = info.late_divergence.as_ref().unwrap();
+    assert_eq!(ld.core_percent, 90);
+    assert_eq!(ld.suffix_percent, 10);
+    assert_eq!(ld.mutation_turns, vec![3, 4]);
     std::fs::remove_dir_all(&runs).ok();
 }
 

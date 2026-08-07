@@ -31,7 +31,7 @@ A perfectly acceptable Phase 0 result is:
   context mutation of live requests.
 - Repository: <https://github.com/hourwise/Prefixity>. Phase 0B makes paid
   provider calls **only** with `--execute-live`, an explicit request limit
-  (default 3, hard ceiling 10), and a local input-token ceiling.
+  (default 4, hard ceiling 10), and a local input-token ceiling.
 
 ## Requirements
 
@@ -109,6 +109,20 @@ Prefixity keeps three concepts strictly separate (Phase 0A.1):
   captured as raw usage and normalized per schema. Per source-of-truth
   principle 7, provider-reported values outrank Prefixity's estimates when
   determining what actually happened.
+
+Phase 0B live validation adds an explicit distinction between **structural
+potential** and **realized cache** (see `docs/phase-0/PHASE_0B_FINDINGS.md`):
+
+- **`structural_reuse_ratio`** — the observed reusable-prefix **POTENTIAL**
+  in Prefixity's structural model. It is *not* a prediction of the exact
+  provider cache-hit ratio.
+- **`provider_cache_reuse_ratio`** — the **REALIZED** provider cache reuse
+  reported for that request (best-effort, asynchronous persistence may lag
+  or exceed structural potential).
+- **`reuse_ratio_difference`** — the realization/alignment gap between those
+  observations. PARTIAL_MATCH / NO_MATCH do not by themselves prove that
+  Prefixity's structural analysis is wrong; provider cache availability and
+  state can differ.
 
 Cost never bills candidates at cache-read prices unless provider-normalized
 usage supports it.

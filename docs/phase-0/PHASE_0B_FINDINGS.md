@@ -4,6 +4,35 @@ Evidence collected from controlled live validation runs. Each entry is a
 **single observation**; repeated, documented runs are required before any
 claim.
 
+## Terminology: structural potential vs realized provider cache
+
+To avoid implying that Prefixity predicts exact provider cache-hit ratios,
+Phase 0B distinguishes three concepts in every report:
+
+- **`structural_reuse_ratio`** — the observed reusable-prefix **POTENTIAL**
+  in Prefixity's structural model: what a provider cache *could* serve given
+  perfect persistence of that prefix. It is **not** a prediction of the
+  exact provider cache-hit ratio.
+- **`provider_cache_reuse_ratio`** — the **REALIZED** provider cache reuse
+  reported for that request (best-effort, asynchronous persistence may lag
+  or exceed structural potential).
+- **`reuse_ratio_difference`** — the **realization/alignment gap** between
+  those two observations.
+
+Classification meanings:
+
+- **MATCH** — structural potential and realized provider reuse aligned
+  closely for this observation.
+- **PARTIAL_MATCH** — some provider reuse occurred but realized cache
+  availability was materially below/above structural potential. It does
+  **NOT** necessarily mean Prefixity's structural comparison was wrong;
+  provider cache availability/state can differ.
+- **NO_MATCH** — likewise must not be casually described as proof that
+  structural analysis is incorrect; provider cache availability/state can
+  differ.
+
+Thresholds are research defaults and are **not** tuned per result.
+
 ## Finding 1 — DeepSeek schema-smoke (2026-08-07)
 | Field | Value |
 | --- | --- |
@@ -119,3 +148,103 @@ See the sanitized regression fixture
 `fixtures/traces/18-deepseek-live-stable-prefix.json` (request B shape) and
 the reconciliation values under `experiments/runs/deepseek-stable-prefix-01/`
 (gitignored).
+
+## Finding 3 — first live DeepSeek early-divergence break (2026-08-07)
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-08-07 |
+| Provider | DeepSeek |
+| Model | `deepseek-v4-flash` |
+| Scenario | `early-divergence` |
+| Commit | `c894861` |
+| Requests | 3 (A/B/C), settle delay 10 s before C |
+| HTTP | 200 |
+| Conclusion | **MATCH** |
+
+Observed values:
+
+1. A → B: **stable pair** — structural reuse potential ~99.8%
+   (8049/8064 estimated tokens) vs realized provider cache reuse ~99.9%
+   (18048/18061 provider tokens), realization gap ≈ 0.0011 → **MATCH**.
+2. B → C: the **early header was changed** — structural reuse potential
+   **0.0** (0/8066 estimated tokens) vs realized provider cache reuse
+   **0.0** (0/18064 provider tokens) → **MATCH** (consistent no-reuse
+   observations).
+
+Interpretation:
+
+The early prefix break destroyed **both** structural reuse potential and
+realized provider cache reuse. This is a single observation and, like the
+stable-prefix run, uses ratio-based reconciliation with distinct measurement
+bases (Prefixity chars/4 vs provider tokens); the absolute counts are never
+subtracted from each other.
+
+See the sanitized regression fixture
+`fixtures/traces/19-deepseek-live-early-divergence.json` (request C shape)
+and the reconciliation values under
+`experiments/runs/deepseek-early-divergence-01/` (gitignored).
+
+## Finding 4 — first live DeepSeek late-divergence PARTIAL_MATCH (2026-08-07)
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-08-07 |
+| Provider | DeepSeek |
+| Model | `deepseek-v4-flash` |
+| Scenario | `late-divergence` |
+| Commit | `c894861` |
+| Requests | 3 (A/B/C), settle delay 10 s before C |
+| HTTP | 200 |
+| Conclusion | **PARTIAL_MATCH** |
+
+Observed values:
+
+1. A → B: **stable pair** — structural reuse potential ~99.8%
+   (8048/8063 estimated tokens) vs realized provider cache reuse ~99.9%
+   (18048/18063 provider tokens), realization gap ≈ 0.0010 → **MATCH**.
+2. B → C: the **late suffix was changed** — structural reuse potential
+   **~89.9%** (7245/8063 estimated tokens, header + stable core) vs
+   **realized** provider cache reuse **~57.9%** (10496/18115 provider
+   tokens), realization gap ≈ **0.3191** → **PARTIAL_MATCH**.
+
+This **PARTIAL_MATCH is valuable evidence, not a failed experiment**:
+some provider reuse occurred (10496 provider tokens served from a shorter,
+already-available cache unit) but realized cache availability was materially
+below Prefixity's structural reuse potential. Per DeepSeek's documented
+cache semantics, cache prefixes are independent complete persisted units;
+C changed the late suffix, so the previously persisted long prefix unit
+could no longer fully match, and C itself may have caused DeepSeek to
+detect/persist the common stable core.
+
+Consequence (design): the DeepSeek `late-divergence` scenario is revised to
+**four requests** (A/B/C/D) in Phase 0B.3 — D carries a **second distinct
+suffix variant** (different from both the original and C's variant 1) so it
+cannot simply hit C's request-boundary cache, and it tests whether the
+common stable core persisted after C. The conservative settle period moves
+to **after C and before D**. The hypothesis is that D MAY show provider
+cache reuse closer to Prefixity's structural potential; if it does not,
+that evidence is preserved too. No expectation of MATCH is encoded.
+
+Thresholds were **not** tuned: the live B → C PARTIAL_MATCH (0.8985 vs
+0.5794, gap 0.3191) remains PARTIAL_MATCH under the unchanged
+`REUSE_RATIO_MATCH_TOLERANCE = 0.10`.
+
+See the sanitized regression fixture
+`fixtures/traces/20-deepseek-live-late-divergence.json` (request C shape)
+and the reconciliation values under
+`experiments/runs/deepseek-late-divergence-01/` (gitignored).
+
+## Remaining scientific uncertainty
+
+- These are **single observations** per scenario; providers vary by model,
+  region, cache state, and time. Repeated, documented runs are required
+  before any claim.
+- `structural_reuse_ratio` is structural **potential**, not a prediction of
+  the exact provider cache-hit ratio; provider cache persistence is
+  best-effort and asynchronous, so realized reuse can lag potential.
+- The 10-second settle delay is an experimental control, not a provider SLA
+  or a validated optimum.
+- No provider tokenizer is implemented; no token multiplier is inferred from
+  the observed absolute count differences (e.g. 8063 vs 18115). Only
+  proportions are compared.

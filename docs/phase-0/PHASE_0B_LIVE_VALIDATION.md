@@ -67,7 +67,7 @@ normalization.
 
 | Provider | API-surface schema | Raw fields | Notes |
 | --- | --- | --- | --- |
-| DeepSeek | `deepseek-chat-completions-v1` | `prompt_cache_hit_tokens`, `prompt_cache_miss_tokens` | **First live provider for the current validation sequence.** Model: `deepseek-v4-flash` (never the retired `deepseek-chat` / `deepseek-reasoner` aliases). Thinking is explicitly disabled (`thinking.type=disabled`) so the run measures prompt/cache behaviour, not reasoning; temperature stays 0. Cache construction is async/best-effort and may need a prior completed request, so B–D each prime with A then B and apply a 10 s settle delay before the measured third request (see "Cache settling"). |
+| DeepSeek | `deepseek-chat-completions-v1` | `prompt_cache_hit_tokens`, `prompt_cache_miss_tokens` | **First live provider for the current validation sequence.** Model: `deepseek-v4-flash` (never the retired `deepseek-chat` / `deepseek-reasoner` aliases). Thinking is explicitly disabled (`thinking.type=disabled`) so the run measures prompt/cache behaviour, not reasoning; temperature stays 0. Cache construction is async/best-effort and may need a prior completed request, so B–D each prime with A then B and apply a 10 s settle delay before the measured final request (`late-divergence` is four turns: A/B original suffix, C diverges it, D carries a second distinct suffix, settle before D — see "Cache settling"). |
 | OpenAI | `openai-chat-completions-v1` | `prompt_tokens`, `completion_tokens`, `prompt_tokens_details.cached_tokens` | `prompt_tokens` = total input; cached tokens nested. No explicit cache control in baseline. No `thinking` field is sent. |
 | Anthropic | `anthropic-messages-v1` | `input_tokens`, `cache_read_input_tokens`, `cache_creation_input_tokens` | `input_tokens` = uncached remainder; total is the sum of the three. Explicit `cache_control` on the large prefix block. |
 
@@ -90,8 +90,9 @@ These shapes are assumptions to be **falsified** by schema-smoke, not facts.
 ## Spend / request guardrails
 
 - No command makes a call without `--execute-live`.
-- `--max-requests` default 3, hard ceiling 10 (values above 10 are
-  rejected).
+- `--max-requests` default 4 (raised in Phase 0B.3 so the four-turn DeepSeek
+  `late-divergence` plan runs by default), hard ceiling 10 (values above 10
+  are rejected).
 - `--max-estimated-input-tokens` is a conservative **local Prefixity
   estimate** (chars/4) safety ceiling; the run refuses **before any call**
   if the estimated input would exceed it. It is **NOT** a provider
@@ -127,9 +128,14 @@ provider_cache_reuse_ratio =
     / provider_reported_total_input_tokens_for_request_B
 ```
 
-Reports phrase this as e.g. "structural reuse 97.8% of Prefixity-estimated
-request context" and "provider cache reuse 96.9% of provider-reported input
-tokens" — never as "7,800 Prefixity tokens equals 16,900 provider tokens".
+`structural_reuse_ratio` is the observed reusable-prefix **POTENTIAL** in
+Prefixity's structural model; `provider_cache_reuse_ratio` is the
+**REALIZED** provider cache reuse for that request; `reuse_ratio_difference`
+is the realization/alignment gap. Reports phrase this as e.g. "structural
+reuse POTENTIAL 97.8% of Prefixity-estimated request context" and "REALIZED
+provider cache reuse 96.9% of provider-reported input tokens" — never as
+"7,800 Prefixity tokens equals 16,900 provider tokens", and never as a claim
+that Prefixity predicts the exact provider cache-hit ratio.
 
 **Remaining limitation:** ratio comparison is better than absolute
 cross-tokenizer comparison but is still not exact. Provider total input may
@@ -145,7 +151,7 @@ metric (see `PHASE_0B_FINDINGS.md`).
 | A | `schema-smoke` | 1 | Does one real response match our usage schema? The endpoint schema's defining fields must be derivable — for `deepseek-chat-completions-v1` that is `total_input_tokens`, `fresh_input_tokens` and `cache_read_tokens` (i.e. hit + miss input semantics). Completion/output tokens **alone are not a match**. STOP for that provider if not. |
 | B | `stable-prefix` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | Provider behaviour when consecutive requests share the same large prefix. DeepSeek primes with A then B and measures the third request (C). |
 | C | `early-divergence` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | Change a block near the beginning. OpenAI/Anthropic change the header at B. DeepSeek keeps the header unchanged through A and B (they establish the common prefix) and changes it only at C; the important comparison is B → C. |
-| D | `late-divergence` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | The prefix is split into a stable core (~90%) and a late mutable suffix (~10%) as **separate structural and wire blocks**. The suffix changes on the measurement turn (B for OpenAI/Anthropic; C for DeepSeek); the header and core stay identical. Asks: does the observed reusable-prefix proportion track the provider's cached-prefix proportion when content changes late? |
+| D | `late-divergence` | 2 (OpenAI/Anthropic); 4 (DeepSeek) | The prefix is split into a stable core (~90%) and a late mutable suffix (~10%) as **separate structural and wire blocks**. The suffix changes on the measurement turn (B for OpenAI/Anthropic; C and D for DeepSeek); the header and core stay identical. DeepSeek's D carries a **second distinct suffix variant** so it cannot hit C's request-boundary cache, probing whether the common core persisted after C. Asks: does the observed reusable-prefix proportion track the provider's cached-prefix proportion when content changes late? |
 
 DeepSeek's B–D priming sequence (per provider/scenario plan, not hidden
 arithmetic):
@@ -156,8 +162,24 @@ early-divergence:A = header + prefix + tail A;  B = header + prefix + tail B;
                  C = CHANGED header + prefix + tail C
 late-divergence: A = header + core + suffix_orig + tail A;
                  B = header + core + suffix_orig + tail B;
-                 C = header + core + CHANGED suffix + tail C
+                 C = header + core + CHANGED suffix v1 + tail C;
+                 D = header + core + CHANGED suffix v2 + tail D
 ```
+
+The four-turn DeepSeek `late-divergence` plan:
+
+- **A** — initial population (original suffix).
+- **B** — demonstrates long stable-prefix cache availability (original
+  suffix).
+- **C** — introduces the first late divergence (changed suffix variant 1)
+  and allows DeepSeek to discover/persist the shorter common core.
+- **D** — uses a second changed suffix variant (different from BOTH the
+  original and C's variant 1), so it cannot simply hit C's full
+  request-boundary cache; it tests whether the common stable core persisted
+  after C.
+
+The structural first divergence for both B → C and C → D is the late-suffix
+block; Prefixity observes reuse through header + core in both cases.
 
 ### Late-divergence split
 
@@ -173,10 +195,11 @@ conceptually and on the wire into:
 
 The 90/10 split is a Phase 0B **experimental test split**, not a
 scientifically optimized value. Both sections are generated deterministically
-from the experiment seed (derived sub-seeds for the original and changed
-suffix), so a repeated configuration produces byte-identical content.
+from the experiment seed (derived sub-seeds for the original, changed
+variant 1, and changed variant 2 suffixes), so a repeated configuration
+produces byte-identical content.
 
-The first meaningful structural divergence for DeepSeek B → C is therefore
+The first meaningful structural divergence for DeepSeek B → C and C → D is
 the changed late suffix; Prefixity observes reuse through header + core. The
 expected structural reuse is materially below the ~99.8% stable-prefix
 result and broadly around the intended split. No provider cache ratio is
@@ -187,12 +210,21 @@ hard-coded.
 Official DeepSeek Context Caching documentation states that cache
 construction is **asynchronous and best-effort** and can take seconds, and
 that common-prefix persistence may be established after multiple requests.
-Phase 0B therefore applies a conservative **10-second settle period after
-request B and before request C** for every DeepSeek B–D scenario:
+Phase 0B therefore applies a conservative **10-second settle period before
+the final request** of every DeepSeek B–D scenario. Where that settle lands
+depends on which request first exposes the common-prefix boundary:
 
 ```
-pre_request_delay_ms:  A = 0;  B = 0;  C = 10000
+stable-prefix / early-divergence:
+    pre_request_delay_ms:  A = 0;  B = 0;  C = 10000
+late-divergence (four turns):
+    pre_request_delay_ms:  A = 0;  B = 0;  C = 0;  D = 10000
 ```
+
+For `late-divergence`, waiting before C cannot help: the differing suffix
+has not yet been observed, so the common-prefix boundary does not yet exist.
+The important settle period is **after C and before D**, allowing
+common-prefix persistence to complete before the D persistence probe.
 
 This is an **experimental control**, not a provider SLA or a required value,
 and it is not a scientifically validated optimum. A zero cache hit after
@@ -201,8 +233,8 @@ prove that structural reuse is incorrect. B is deliberately given no delay:
 A/B must first establish the common prefix, and the experiment must not
 encode an assumption that B must report zero reuse.
 
-Dry runs report the full per-request delay plan but **never sleep** and make
-zero network requests.
+Dry runs report the full per-request delay plan (and per-request suffix
+variant) but **never sleep** and make zero network requests.
 
 Cache-expiry/TTL experiments are **not** part of Phase 0B baseline.
 
@@ -243,23 +275,45 @@ and the two reuse **proportions**, plus their absolute difference
 from Prefixity estimated tokens (mixing incompatible units) has been
 removed.
 
+Each pair is labelled with a **role**:
+
+- **diagnostic** — earlier pairs (priming / cache-availability checks, or
+  first-divergence observations such as B → C). Never discarded.
+- **primary** — the final measurement pair (e.g. DeepSeek late C → D, the
+  persistence probe), which drives the overall conclusion.
+
+Terminology (see `PHASE_0B_FINDINGS.md`):
+
+- **`structural_reuse_ratio`** — observed reusable-prefix **POTENTIAL** in
+  Prefixity's structural model. Not a prediction of the exact provider
+  cache-hit ratio.
+- **`provider_cache_reuse_ratio`** — **REALIZED** provider cache reuse
+  reported for that request.
+- **`reuse_ratio_difference`** — the **realization/alignment gap** between
+  those observations.
+
 Classification is **proportion-based** with Phase 0B experimental
 thresholds (`REUSE_RATIO_MATCH_TOLERANCE = 0.10` absolute percentage-point
 distance; effectively-zero ≤ 0.05; clearly-substantial ≥ 0.20):
 
 - **MATCH** — both proportions effectively zero, or the absolute
-  proportion distance is within the 0.10 threshold.
+  proportion distance is within the 0.10 threshold: structural potential and
+  realized provider reuse aligned closely for this observation.
 - **PARTIAL_MATCH** — material but nonzero proportion disagreement (> 0.10)
-  with meaningful reuse on both sides.
+  with meaningful reuse on both sides: some provider reuse occurred but
+  realized cache availability was materially below/above structural
+  potential. This does **not** necessarily mean Prefixity's structural
+  comparison was wrong.
 - **NO_MATCH** — one side effectively zero while the other is clearly
-  substantial.
+  substantial. Must not be casually described as proof that structural
+  analysis is incorrect; provider cache availability/state can differ.
 - **INCONCLUSIVE** — provider cache-read or total-input unavailable, or the
   Prefixity estimated input denominator is zero.
 - **SCHEMA_MISMATCH** — the response does not fit our normalizer.
 
 These thresholds are research defaults, not scientifically validated; see
 `PHASE_0B_FINDINGS.md` for the live evidence that motivated the
-proportion-based approach.
+proportion-based approach. They are not tuned per result.
 
 One successful run proves very little: providers vary by model, region,
 cache state, and time. Repeated, documented runs across providers are

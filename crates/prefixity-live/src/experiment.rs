@@ -7,9 +7,9 @@
 
 use crate::artifacts;
 use crate::content::{
-    estimate_tokens, generate_changed_late_suffix, generate_late_divergence_prefix,
-    generate_prefix, header_for, tail_for, LATE_DIVERGENCE_CORE_PERCENT,
-    LATE_DIVERGENCE_SUFFIX_PERCENT,
+    estimate_tokens, generate_changed_late_suffix, generate_changed_late_suffix_variant2,
+    generate_late_divergence_prefix, generate_prefix, header_for, tail_for, SuffixVariant,
+    LATE_DIVERGENCE_CORE_PERCENT, LATE_DIVERGENCE_SUFFIX_PERCENT,
 };
 use crate::credentials::Credentials;
 use crate::error::LiveError;
@@ -17,7 +17,7 @@ use crate::manifest::{build_manifest, iso8601_utc_now, ManifestInput};
 use crate::providers::{provider_from_id, LiveProvider};
 use crate::result::{
     classify_pair, classify_schema_smoke, overall_conclusion, reuse_ratio, Conclusion,
-    ExperimentResult, PairResult, RequestResult,
+    ExperimentResult, PairResult, PairRole, RequestResult,
 };
 use crate::scenario::Scenario;
 use crate::trace::{build_trace, RequestRecord};
@@ -86,6 +86,9 @@ pub struct TurnSpec {
     pub prefix: String,
     /// Late mutable suffix content, if any (`late-divergence` only).
     pub suffix: Option<String>,
+    /// Which deterministic late-suffix variant this turn carries
+    /// (`SuffixVariant::None` for scenarios without a late suffix).
+    pub suffix_variant: SuffixVariant,
     /// Per-turn tail instruction.
     pub tail: String,
     /// Pre-request delay (ms) applied before this request (experimental
@@ -129,12 +132,22 @@ pub fn build_plan(config: &ExperimentConfig) -> Result<ExperimentPlan, LiveError
             String::new(),
         )
     };
+    // Two distinct changed suffix variants: variant 1 (first mutation turn,
+    // e.g. DeepSeek C) and variant 2 (later mutation turns, e.g. DeepSeek D).
+    // Variant 2 differs from BOTH the original and variant 1, so D cannot
+    // hit C's complete request by re-sending identical suffix content.
     let changed_suffix = if config.scenario == Scenario::LateDivergence {
         generate_changed_late_suffix(config.seed, config.target_prefix_tokens)
     } else {
         String::new()
     };
+    let changed_suffix_2 = if config.scenario == Scenario::LateDivergence {
+        generate_changed_late_suffix_variant2(config.seed, config.target_prefix_tokens)
+    } else {
+        String::new()
+    };
     let header_base = header_for(&id, config.seed);
+    let first_mutation_turn = turn_plan.late_mutation_turn();
 
     let mut turns = Vec::with_capacity(request_count);
     let mut estimated_bytes = 0u64;
@@ -154,16 +167,21 @@ pub fn build_plan(config: &ExperimentConfig) -> Result<ExperimentPlan, LiveError
             header_base.clone()
         };
         let tail = tail_for(config.scenario, turn);
-        // Late-divergence: the original suffix until the plan's mutation
-        // turn, then the changed suffix (a distinct deterministic block).
-        let suffix = if config.scenario == Scenario::LateDivergence {
+        // Late-divergence: the ORIGINAL suffix before the mutation turns,
+        // changed variant 1 on the first mutation turn, and changed variant
+        // 2 on subsequent mutation turns — all deterministic.
+        let (suffix, suffix_variant) = if config.scenario == Scenario::LateDivergence {
             if turn_plan.late_suffix_mutates(turn) {
-                Some(changed_suffix.clone())
+                if first_mutation_turn == Some(turn) {
+                    (Some(changed_suffix.clone()), SuffixVariant::Variant1)
+                } else {
+                    (Some(changed_suffix_2.clone()), SuffixVariant::Variant2)
+                }
             } else {
-                Some(original_suffix.clone())
+                (Some(original_suffix.clone()), SuffixVariant::Original)
             }
         } else {
-            None
+            (None, SuffixVariant::None)
         };
         let suffix_text = suffix.as_deref().unwrap_or("");
         let bytes = (header.len() + prefix.len() + suffix_text.len() + tail.len()) as u64;
@@ -178,6 +196,7 @@ pub fn build_plan(config: &ExperimentConfig) -> Result<ExperimentPlan, LiveError
             header,
             prefix: prefix.clone(),
             suffix,
+            suffix_variant,
             tail,
             pre_request_delay_ms: turn_plan.pre_request_delay_ms(turn),
         });
@@ -245,8 +264,10 @@ pub struct LateDivergenceInfo {
     pub core_percent: u64,
     /// Percentage of the prefix in the late mutable suffix.
     pub suffix_percent: u64,
-    /// The 1-based turn on which the late suffix first mutates.
-    pub mutation_turn: usize,
+    /// The 1-based turns (in order) on which the late suffix mutates (e.g.
+    /// `[3, 4]` for the four-turn DeepSeek late plan, `[2]` for
+    /// OpenAI/Anthropic).
+    pub mutation_turns: Vec<usize>,
 }
 
 /// Information printed by a dry run. Contains no credential value.
@@ -295,7 +316,7 @@ pub fn describe_dry_run(config: &ExperimentConfig) -> Result<DryRunInfo, LiveErr
         Some(LateDivergenceInfo {
             core_percent: LATE_DIVERGENCE_CORE_PERCENT,
             suffix_percent: LATE_DIVERGENCE_SUFFIX_PERCENT,
-            mutation_turn: turn_plan.late_mutation_turn().unwrap_or(0),
+            mutation_turns: turn_plan.late_mutation_turns(),
         })
     } else {
         None
@@ -357,6 +378,8 @@ pub fn execute_live_experiment(
             .then_some(LATE_DIVERGENCE_CORE_PERCENT),
         late_divergence_suffix_percent: (config.scenario == Scenario::LateDivergence)
             .then_some(LATE_DIVERGENCE_SUFFIX_PERCENT),
+        late_suffix_mutation_turns: (config.scenario == Scenario::LateDivergence)
+            .then(|| provider.plan_turns(config.scenario).late_mutation_turns()),
         notes: config.notes.clone(),
         max_requests: config.max_requests,
         max_estimated_input_tokens: config.max_estimated_input_tokens,
@@ -533,7 +556,11 @@ pub fn execute_live_experiment(
 
     // Reconciliation: compare consecutive traces and provider-reported usage
     // through PROPORTIONS. Absolute token counts from different tokenizers
-    // (Prefixity chars/4 vs provider tokens) are never subtracted.
+    // (Prefixity chars/4 vs provider tokens) are never subtracted. Each pair
+    // is labelled diagnostic or primary: the final pair is the PRIMARY
+    // measurement pair and drives the overall conclusion; earlier pairs
+    // (priming / cache-availability / first-divergence) are retained as
+    // diagnostic evidence.
     let mut pairs: Vec<PairResult> = Vec::new();
     for i in 0..traces.len().saturating_sub(1) {
         let comparison = compare_traces(&traces[i], &traces[i + 1], None).map_err(|e| {
@@ -560,7 +587,7 @@ pub fn execute_live_experiment(
         let conclusion = classify_pair(structural_ratio, provider_ratio);
         let note = match (provider_cache_read, provider_total) {
             (Some(read), Some(_)) => format!(
-                "structural reuse {} of Prefixity-estimated request input ({} estimated tokens) vs provider cache reuse {} of provider-reported input ({} provider tokens); ratio difference {} => {}",
+                "structural reuse POTENTIAL {} of Prefixity-estimated request input ({} estimated tokens) vs REALIZED provider cache reuse {} of provider-reported input ({} provider tokens); realization gap {} => {}",
                 pct(structural_ratio),
                 observed,
                 pct(provider_ratio),
@@ -580,6 +607,11 @@ pub fn execute_live_experiment(
             provider_reported_total_input_tokens: provider_total,
             provider_cache_reuse_ratio: provider_ratio,
             reuse_ratio_difference,
+            role: if i == traces.len().saturating_sub(2) {
+                PairRole::Primary
+            } else {
+                PairRole::Diagnostic
+            },
             conclusion,
             note,
         });
@@ -649,9 +681,10 @@ fn build_summary(
     }
     for pair in pairs {
         lines.push(format!(
-            "  pair {}->{}: structural_reuse_ratio={} ({} estimated tokens) provider_cache_reuse_ratio={} ({} provider tokens) => {}",
+            "  pair {}->{} [{}]: structural_reuse_ratio={} ({} estimated tokens) provider_cache_reuse_ratio={} ({} provider tokens) => {}",
             pair.request_a,
             pair.request_b,
+            pair.role.label(),
             pct(pair.structural_reuse_ratio),
             pair.observed_structural_reuse_estimated_tokens,
             pct(pair.provider_cache_reuse_ratio),
@@ -724,21 +757,54 @@ mod tests {
     }
 
     #[test]
-    fn deepseek_late_divergence_plan_mutates_late_suffix_at_c() {
+    fn deepseek_late_divergence_plan_is_four_turns_a_b_c_d() {
         let plan = build_plan(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
-        assert_eq!(plan.turns.len(), 3);
-        // A and B: header, core and suffix identical; tails distinct.
+        assert_eq!(plan.turns.len(), 4);
+        // A and B: header, core and ORIGINAL suffix identical; tails distinct.
         assert_eq!(plan.turns[0].header, plan.turns[1].header);
         assert_eq!(plan.turns[0].prefix, plan.turns[1].prefix);
         assert_eq!(plan.turns[0].suffix, plan.turns[1].suffix);
         assert_ne!(plan.turns[0].tail, plan.turns[1].tail);
-        // C: header and core unchanged, late suffix CHANGED, tail distinct.
+        // C: header and core unchanged, late suffix CHANGED (variant 1).
         assert_eq!(plan.turns[1].header, plan.turns[2].header);
         assert_eq!(plan.turns[1].prefix, plan.turns[2].prefix);
         assert_ne!(plan.turns[1].suffix, plan.turns[2].suffix);
-        assert_ne!(plan.turns[1].tail, plan.turns[2].tail);
+        // D: header and core unchanged, late suffix CHANGED (variant 2),
+        // different from BOTH the original (A/B) and C's variant 1.
+        assert_eq!(plan.turns[1].header, plan.turns[3].header);
+        assert_eq!(plan.turns[1].prefix, plan.turns[3].prefix);
+        assert_ne!(plan.turns[0].suffix, plan.turns[3].suffix);
+        assert_ne!(plan.turns[2].suffix, plan.turns[3].suffix);
+        // Tails are all distinct.
+        assert_ne!(plan.turns[2].tail, plan.turns[3].tail);
         // Every late-divergence turn carries a suffix.
         assert!(plan.turns.iter().all(|t| t.suffix.is_some()));
+    }
+
+    #[test]
+    fn deepseek_late_divergence_suffix_variants_are_assigned_per_turn() {
+        use crate::content::SuffixVariant;
+        let plan = build_plan(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
+        let variants: Vec<SuffixVariant> = plan.turns.iter().map(|t| t.suffix_variant).collect();
+        assert_eq!(
+            variants,
+            vec![
+                SuffixVariant::Original,
+                SuffixVariant::Original,
+                SuffixVariant::Variant1,
+                SuffixVariant::Variant2,
+            ]
+        );
+    }
+
+    #[test]
+    fn deepseek_late_divergence_delay_plan_is_zero_zero_zero_ten_seconds() {
+        let plan = build_plan(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
+        assert_eq!(plan.turns.len(), 4);
+        let delays: Vec<u64> = plan.turns.iter().map(|t| t.pre_request_delay_ms).collect();
+        // The important settle period is AFTER C (which first exposes the
+        // late-divergence common-prefix boundary) and BEFORE D.
+        assert_eq!(delays, vec![0, 0, 0, 10_000]);
     }
 
     #[test]
@@ -861,15 +927,173 @@ mod tests {
     }
 
     #[test]
+    fn deepseek_late_c_to_d_first_structural_divergence_is_late_suffix() {
+        let config = test_config("deepseek", Scenario::LateDivergence);
+        let plan = build_plan(&config).unwrap();
+        let provider = plan.provider.as_ref();
+        let model = &config.model;
+        let experiment_id = &config.experiment_id;
+        // C and D share header and stable core; only the late suffix content
+        // (variant 1 vs variant 2) and the tail differ.
+        assert_eq!(plan.turns[2].header, plan.turns[3].header);
+        assert_eq!(plan.turns[2].prefix, plan.turns[3].prefix);
+        assert_ne!(plan.turns[2].suffix, plan.turns[3].suffix);
+        assert_ne!(plan.turns[2].tail, plan.turns[3].tail);
+        let trace_c = build_trace(provider, model, experiment_id, &record_for(&plan.turns[2]));
+        let trace_d = build_trace(provider, model, experiment_id, &record_for(&plan.turns[3]));
+        let comparison = compare_traces(&trace_c, &trace_d, None).unwrap();
+        // The first (and only) structural divergence is the late-suffix block
+        // (position 2); header and core are reused.
+        let divergence = comparison.first_divergence.as_ref().expect("a divergence");
+        assert_eq!(divergence.position, 2);
+        assert_eq!(divergence.current_block_id, "late-suffix");
+        let expected_reuse =
+            estimate_tokens(&plan.turns[2].header) + estimate_tokens(&plan.turns[2].prefix);
+        assert_eq!(comparison.observed_reusable_prefix_tokens, expected_reuse);
+    }
+
+    #[test]
+    fn deepseek_late_b_to_c_and_c_to_d_reuse_are_high_but_below_stable() {
+        // Both first-divergence pairs (B -> C and C -> D) observe reuse
+        // through header + stable core only: high but materially below the
+        // ~0.998 stable-prefix reuse. Ratios are not hard-coded to exact
+        // values.
+        let stable_config = test_config("deepseek", Scenario::StablePrefix);
+        let late_config = test_config("deepseek", Scenario::LateDivergence);
+        let stable = build_plan(&stable_config).unwrap();
+        let late = build_plan(&late_config).unwrap();
+        let stable_provider = stable.provider.as_ref();
+        let late_provider = late.provider.as_ref();
+
+        // StablePrefix B -> C ratio (baseline ~0.998).
+        let sb = build_trace(
+            stable_provider,
+            &stable_config.model,
+            &stable_config.experiment_id,
+            &record_for(&stable.turns[1]),
+        );
+        let sc = build_trace(
+            stable_provider,
+            &stable_config.model,
+            &stable_config.experiment_id,
+            &record_for(&stable.turns[2]),
+        );
+        let stable_compare = compare_traces(&sb, &sc, None).unwrap();
+        let stable_total = estimate_tokens(&stable.turns[1].header)
+            + estimate_tokens(&stable.turns[1].prefix)
+            + estimate_tokens(&stable.turns[1].tail);
+        let stable_ratio =
+            stable_compare.observed_reusable_prefix_tokens as f64 / stable_total as f64;
+
+        // LateDivergence B -> C and C -> D ratios.
+        let lb = build_trace(
+            late_provider,
+            &late_config.model,
+            &late_config.experiment_id,
+            &record_for(&late.turns[1]),
+        );
+        let lc = build_trace(
+            late_provider,
+            &late_config.model,
+            &late_config.experiment_id,
+            &record_for(&late.turns[2]),
+        );
+        let ld = build_trace(
+            late_provider,
+            &late_config.model,
+            &late_config.experiment_id,
+            &record_for(&late.turns[3]),
+        );
+        let bc = compare_traces(&lb, &lc, None).unwrap();
+        let cd = compare_traces(&lc, &ld, None).unwrap();
+        let late_total = estimate_tokens(&late.turns[1].header)
+            + estimate_tokens(&late.turns[1].prefix)
+            + estimate_tokens(late.turns[1].suffix.as_deref().unwrap())
+            + estimate_tokens(&late.turns[1].tail);
+        let bc_ratio = bc.observed_reusable_prefix_tokens as f64 / late_total as f64;
+        let cd_ratio = cd.observed_reusable_prefix_tokens as f64 / late_total as f64;
+
+        assert!(stable_ratio > 0.99, "stable ratio {stable_ratio}");
+        for (name, ratio) in [("B->C", bc_ratio), ("C->D", cd_ratio)] {
+            assert!(
+                ratio > 0.80 && ratio < 0.95,
+                "{name} late ratio {ratio} should sit around the 90/10 split"
+            );
+            assert!(
+                ratio < stable_ratio - 0.03,
+                "{name} late ratio {ratio} must be materially below stable {stable_ratio}"
+            );
+        }
+        // B -> C and C -> D observe approximately the same structural reuse
+        // (same header + stable core split; only the late suffix content
+        // differs between the pairs).
+        assert!(
+            (bc_ratio - cd_ratio).abs() < 0.01,
+            "B->C {bc_ratio} and C->D {cd_ratio} should agree closely"
+        );
+    }
+
+    #[test]
+    fn deepseek_late_live_b_to_c_structural_ratio_reproduces() {
+        // Sanitized live evidence (deepseek-late-divergence-01, 2026-08-07):
+        // B -> C observed structural reuse 7245 / 8063 estimated tokens =
+        // 0.8985. The content is deterministic from seed 42 + scenario, so
+        // the offline plan regenerates the same structural observation.
+        let mut config = test_config("deepseek", Scenario::LateDivergence);
+        config.experiment_id = "deepseek-late-divergence-01".to_string();
+        let plan = build_plan(&config).unwrap();
+        let provider = plan.provider.as_ref();
+        let model = &config.model;
+        let experiment_id = &config.experiment_id;
+        let trace_b = build_trace(provider, model, experiment_id, &record_for(&plan.turns[1]));
+        let trace_c = build_trace(provider, model, experiment_id, &record_for(&plan.turns[2]));
+        let comparison = compare_traces(&trace_b, &trace_c, None).unwrap();
+        let total = estimate_tokens(&plan.turns[1].header)
+            + estimate_tokens(&plan.turns[1].prefix)
+            + estimate_tokens(plan.turns[1].suffix.as_deref().unwrap())
+            + estimate_tokens(&plan.turns[1].tail);
+        let ratio = comparison.observed_reusable_prefix_tokens as f64 / total as f64;
+        assert!(
+            (ratio - 0.8985489271983133).abs() < 0.001,
+            "expected live B->C structural ratio ~0.8985, got {ratio}"
+        );
+    }
+
+    #[test]
+    fn deepseek_early_live_b_to_c_structural_reuse_is_zero() {
+        // Sanitized live evidence (deepseek-early-divergence-01, 2026-08-07):
+        // B -> C changed the early header, destroying all structural reuse
+        // (observed 0 / 8066 estimated tokens). Reproducible offline from
+        // the deterministic plan.
+        let mut config = test_config("deepseek", Scenario::EarlyDivergence);
+        config.experiment_id = "deepseek-early-divergence-01".to_string();
+        let plan = build_plan(&config).unwrap();
+        let provider = plan.provider.as_ref();
+        let model = &config.model;
+        let experiment_id = &config.experiment_id;
+        let trace_b = build_trace(provider, model, experiment_id, &record_for(&plan.turns[1]));
+        let trace_c = build_trace(provider, model, experiment_id, &record_for(&plan.turns[2]));
+        let comparison = compare_traces(&trace_b, &trace_c, None).unwrap();
+        assert_eq!(
+            comparison.observed_reusable_prefix_tokens, 0,
+            "early header break must destroy structural reuse"
+        );
+        let divergence = comparison.first_divergence.as_ref().unwrap();
+        assert_eq!(divergence.position, 0);
+        assert_eq!(divergence.current_block_id, "prefix-header");
+    }
+
+    #[test]
     fn dry_run_exposes_late_divergence_split_and_never_sleeps() {
         let start = std::time::Instant::now();
         let info = describe_dry_run(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
         let ld = info.late_divergence.as_ref().expect("late-divergence info");
         assert_eq!(ld.core_percent, 90);
         assert_eq!(ld.suffix_percent, 10);
-        assert_eq!(ld.mutation_turn, 3);
+        assert_eq!(ld.mutation_turns, vec![3, 4]);
+        assert_eq!(info.request_count, 4);
         let delays: Vec<u64> = info.turns.iter().map(|t| t.pre_request_delay_ms).collect();
-        assert_eq!(delays, vec![0, 0, 10_000]);
+        assert_eq!(delays, vec![0, 0, 0, 10_000]);
         assert!(start.elapsed().as_millis() < 5_000);
     }
 
@@ -928,18 +1152,23 @@ mod tests {
 
     #[test]
     fn deepseek_settle_delay_is_recorded_in_turn_specs() {
-        // B, C, D: A=0, B=0, C=10000.
-        for scenario in [
-            Scenario::StablePrefix,
-            Scenario::EarlyDivergence,
-            Scenario::LateDivergence,
-        ] {
+        // StablePrefix and EarlyDivergence: A=0, B=0, C=10000 (settle before
+        // the measured third request, after A/B establish the common prefix).
+        for scenario in [Scenario::StablePrefix, Scenario::EarlyDivergence] {
             let plan = build_plan(&test_config("deepseek", scenario)).unwrap();
             assert_eq!(plan.turns.len(), 3);
             assert_eq!(plan.turns[0].pre_request_delay_ms, 0);
             assert_eq!(plan.turns[1].pre_request_delay_ms, 0);
             assert_eq!(plan.turns[2].pre_request_delay_ms, 10_000);
         }
+        // LateDivergence is four turns: A=0, B=0, C=0, D=10000 (the settle
+        // is after C, which first exposes the common-prefix boundary).
+        let late = build_plan(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
+        assert_eq!(late.turns.len(), 4);
+        assert_eq!(late.turns[0].pre_request_delay_ms, 0);
+        assert_eq!(late.turns[1].pre_request_delay_ms, 0);
+        assert_eq!(late.turns[2].pre_request_delay_ms, 0);
+        assert_eq!(late.turns[3].pre_request_delay_ms, 10_000);
         // schema-smoke has no delay.
         let smoke = build_plan(&test_config("deepseek", Scenario::SchemaSmoke)).unwrap();
         assert_eq!(smoke.turns[0].pre_request_delay_ms, 0);

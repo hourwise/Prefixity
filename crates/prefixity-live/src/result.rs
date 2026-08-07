@@ -1,26 +1,43 @@
 //! Experiment result and conservative conclusion classification.
 //!
-//! The classification compares **observed structural prefix reuse** (from
-//! `prefixity-core::compare`, in Prefixity's estimated-token unit) with
-//! **provider-reported cache reuse** (from normalized usage, in the
+//! The classification compares **observed structural prefix reuse**
+//! (from `prefixity-core::compare`, in Prefixity's estimated-token unit)
+//! with **provider-reported cache reuse** (from normalized usage, in the
 //! provider's token unit) through their **proportions**. Absolute token
-//! counts from different tokenizers are never subtracted from each other. A
-//! single MATCH proves very little; the classification is deliberately
+//! counts from different tokenizers are never subtracted from each other.
+//!
+//! Terminology: `structural_reuse_ratio` is the observed reusable-prefix
+//! **POTENTIAL** in Prefixity's structural model — what a provider cache
+//! *could* serve given perfect persistence of that prefix. It is not a
+//! prediction of the exact provider cache-hit ratio. `provider_cache_reuse_ratio`
+//! is the **REALIZED** provider cache reuse reported for that request
+//! (best-effort, asynchronous persistence may lag or exceed structural
+//! potential). `reuse_ratio_difference` is the realization/alignment gap
+//! between those two observations.
+//!
+//! A single MATCH proves very little; the classification is deliberately
 //! conservative and documented in `docs/phase-0/PHASE_0B_LIVE_VALIDATION.md`
 //! and `docs/phase-0/PHASE_0B_FINDINGS.md`.
 
 use prefixity_core::usage::{NormalizedUsage, SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// Conservative conclusion classification.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Conclusion {
-    /// Provider behaviour broadly corresponds to the structural prediction.
+    /// Structural reuse potential and realized provider cache reuse aligned
+    /// closely for this observation.
     Match,
-    /// Some reuse appears but differs materially from the prediction.
+    /// Some provider reuse occurred but realized cache availability was
+    /// materially below/above structural potential. This does NOT
+    /// necessarily mean Prefixity's structural comparison was wrong —
+    /// provider cache availability/state can differ.
     PartialMatch,
-    /// Provider behaviour contradicts the structural prediction.
+    /// One side observed effectively zero reuse while the other observed
+    /// clearly substantial reuse. Must not be casually described as proof
+    /// that structural analysis is incorrect; provider cache
+    /// availability/state can differ.
     NoMatch,
     /// The provider did not expose enough data for a conclusion.
     Inconclusive,
@@ -87,7 +104,10 @@ pub struct RequestResult {
 ///   (`provider_reported_*` fields).
 ///
 /// Classification compares the two reuse **proportions** (each relative to
-/// its own denominator), not the absolute counts.
+/// its own denominator), not the absolute counts. `structural_reuse_ratio`
+/// is the reusable-prefix **POTENTIAL** in Prefixity's structural model;
+/// `provider_cache_reuse_ratio` is the **REALIZED** provider cache reuse for
+/// that request; `reuse_ratio_difference` is the realization/alignment gap.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct PairResult {
     /// 1-based turn numbers of the pair.
@@ -98,25 +118,61 @@ pub struct PairResult {
     pub observed_structural_reuse_estimated_tokens: u64,
     /// Request B's total input, in Prefixity estimated tokens.
     pub request_b_prefixity_estimated_input_tokens: u64,
+    /// Observed reusable-prefix **POTENTIAL** in Prefixity's structural
+    /// model:
     /// `observed_structural_reuse_estimated_tokens / request_b_prefixity_estimated_input_tokens`.
+    /// This is NOT a prediction of the exact provider cache-hit ratio.
     pub structural_reuse_ratio: Option<f64>,
     // --- Provider token unit ---
     /// Provider-reported cache-read tokens for request B (normalized), if any.
     pub provider_reported_cache_read_tokens: Option<u64>,
     /// Provider-reported total input tokens for request B (normalized), if any.
     pub provider_reported_total_input_tokens: Option<u64>,
+    /// **REALIZED** provider cache reuse:
     /// `provider_reported_cache_read_tokens / provider_reported_total_input_tokens`.
     pub provider_cache_reuse_ratio: Option<f64>,
     // --- Proportion comparison ---
     /// `|structural_reuse_ratio - provider_cache_reuse_ratio|` when both are
-    /// available. Replaces the old cross-tokenizer `difference` field, which
-    /// subtracted provider tokens from Prefixity estimated tokens and mixed
-    /// incompatible units.
+    /// available: the realization/alignment gap between structural potential
+    /// and realized provider reuse. Replaces the old cross-tokenizer
+    /// `difference` field, which subtracted provider tokens from Prefixity
+    /// estimated tokens and mixed incompatible units.
     pub reuse_ratio_difference: Option<f64>,
+    /// Whether this pair is a diagnostic pair or the experiment's PRIMARY
+    /// (final) measurement pair, which drives the overall conclusion.
+    pub role: PairRole,
     /// Per-pair conclusion (proportion-based).
     pub conclusion: Conclusion,
-    /// Human-readable note, with measurement bases labelled.
+    /// Human-readable note, with measurement bases labelled and the
+    /// potential-vs-realized distinction made explicit.
     pub note: String,
+}
+
+/// Whether a consecutive-request pair is diagnostic or the experiment's
+/// primary (final) measurement pair.
+///
+/// Earlier pairs (e.g. A → B priming / cache-availability checks, or B → C
+/// first-divergence diagnostics) are `Diagnostic`. The final pair is
+/// `Primary` and is what the overall conclusion is based on. Diagnostic
+/// pairs are never discarded — they are recorded evidence too.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum PairRole {
+    /// Non-final pair (priming / cache-availability / first-divergence
+    /// diagnostics).
+    Diagnostic,
+    /// The final measurement pair; drives the overall conclusion.
+    Primary,
+}
+
+impl PairRole {
+    /// Human-readable label for reports.
+    pub fn label(&self) -> &'static str {
+        match self {
+            PairRole::Diagnostic => "diagnostic",
+            PairRole::Primary => "primary",
+        }
+    }
 }
 
 /// The full result of a live experiment. Serialized to `result.json`.
@@ -171,13 +227,19 @@ pub fn reuse_ratio(numerator: u64, denominator: u64) -> Option<f64> {
 
 /// Classify one pair from the two reuse proportions.
 ///
-/// `structural_reuse_ratio` is the observed structural reuse as a proportion
-/// of Prefixity's estimated request input; `provider_cache_reuse_ratio` is
-/// the provider-reported cache read as a proportion of the provider's
-/// reported total input. Absolute token counts from different tokenizers are
-/// not directly comparable, so classification uses proportions only. If
-/// either proportion is unavailable (missing provider figure or a zero
-/// Prefixity denominator), the result is INCONCLUSIVE.
+/// `structural_reuse_ratio` is the observed reusable-prefix **POTENTIAL** in
+/// Prefixity's structural model (as a proportion of Prefixity's estimated
+/// request input); `provider_cache_reuse_ratio` is the **REALIZED** provider
+/// cache reuse (as a proportion of the provider's reported total input).
+/// Absolute token counts from different tokenizers are not directly
+/// comparable, so classification uses proportions only. If either proportion
+/// is unavailable (missing provider figure or a zero Prefixity denominator),
+/// the result is INCONCLUSIVE.
+///
+/// MATCH means the two observations aligned closely for this request;
+/// PARTIAL_MATCH means some provider reuse occurred but realized cache
+/// availability was materially below/above structural potential — it does
+/// NOT necessarily mean Prefixity's structural comparison was wrong.
 pub fn classify_pair(
     structural_reuse_ratio: Option<f64>,
     provider_cache_reuse_ratio: Option<f64>,
@@ -279,8 +341,9 @@ pub fn classify_schema_smoke(normalized: &NormalizedUsage) -> Conclusion {
 }
 
 /// The overall experiment conclusion: schema-smoke conclusion if present,
-/// otherwise the conclusion of the final pair (most representative of
-/// steady-state behaviour).
+/// otherwise the conclusion of the PRIMARY (final) measurement pair. For
+/// four-turn DeepSeek late-divergence, the final pair C → D is the primary
+/// persistence measurement; B → C remains recorded as a diagnostic pair.
 pub fn overall_conclusion(schema_smoke: Option<Conclusion>, pairs: &[PairResult]) -> Conclusion {
     if let Some(conclusion) = schema_smoke {
         return conclusion;
@@ -368,6 +431,97 @@ mod tests {
     }
 
     #[test]
+    fn early_divergence_live_evidence_pair_b_to_c_is_match() {
+        // Sanitized evidence from the first real DeepSeek early-divergence
+        // run (deepseek-early-divergence-01, 2026-08-07). B -> C changed the
+        // early header: structural reuse potential 0.0 (0/8066 estimated
+        // tokens) and realized provider cache reuse 0.0 (0/18064 provider
+        // tokens). Both effectively zero => MATCH (consistent no-reuse
+        // observations). The early prefix break destroyed both.
+        let structural = reuse_ratio(0, 8066).unwrap();
+        let provider = reuse_ratio(0, 18064).unwrap();
+        assert_eq!(structural, 0.0);
+        assert_eq!(provider, 0.0);
+        let difference = (structural - provider).abs();
+        assert_eq!(difference, 0.0);
+        assert_eq!(
+            classify_pair(Some(structural), Some(provider)),
+            Conclusion::Match
+        );
+        // The live A -> B stable pair was also a MATCH
+        // (0.9981398809523809 structural vs 0.9992802170422457 provider).
+        let stable_structural = reuse_ratio(8049, 8064).unwrap();
+        let stable_provider = reuse_ratio(18048, 18061).unwrap();
+        assert!((stable_structural - 0.9981398809523809).abs() < 1e-9);
+        assert!((stable_provider - 0.9992802170422457).abs() < 1e-9);
+        assert_eq!(
+            classify_pair(Some(stable_structural), Some(stable_provider)),
+            Conclusion::Match
+        );
+    }
+
+    #[test]
+    fn late_divergence_live_evidence_pair_b_to_c_is_partial_match() {
+        // Sanitized evidence from the first real DeepSeek late-divergence
+        // run (deepseek-late-divergence-01, 2026-08-07). B -> C changed the
+        // late suffix: structural reuse potential ~0.8985 (7245/8063
+        // estimated tokens) vs realized provider cache reuse ~0.5794
+        // (10496/18115 provider tokens); realization gap ~0.3191.
+        //
+        // This is VALUABLE PARTIAL_MATCH evidence, not a failure: some
+        // provider reuse occurred but realized cache availability was
+        // materially below structural potential. Thresholds must NOT be
+        // tuned to turn this into MATCH.
+        let structural = reuse_ratio(7245, 8063).unwrap();
+        let provider = reuse_ratio(10496, 18115).unwrap();
+        assert!(
+            (structural - 0.8985489271983133).abs() < 1e-9,
+            "got {structural}"
+        );
+        assert!(
+            (provider - 0.5794093292851228).abs() < 1e-9,
+            "got {provider}"
+        );
+        let difference = (structural - provider).abs();
+        assert!(
+            (difference - 0.31913959791319046).abs() < 1e-9,
+            "got {difference}"
+        );
+        assert_eq!(
+            classify_pair(Some(structural), Some(provider)),
+            Conclusion::PartialMatch
+        );
+        // The live A -> B stable pair for the same run was a MATCH
+        // (0.9981396502542478 structural vs 0.9991695731606045 provider).
+        let stable_structural = reuse_ratio(8048, 8063).unwrap();
+        let stable_provider = reuse_ratio(18048, 18063).unwrap();
+        assert!((stable_structural - 0.9981396502542478).abs() < 1e-9);
+        assert!((stable_provider - 0.9991695731606045).abs() < 1e-9);
+        assert_eq!(
+            classify_pair(Some(stable_structural), Some(stable_provider)),
+            Conclusion::Match
+        );
+    }
+
+    #[test]
+    fn late_divergence_live_partial_match_thresholds_are_not_tuned() {
+        // Guard against threshold drift: the live late PARTIAL_MATCH must
+        // remain PARTIAL_MATCH with the current constants. If someone
+        // widens REUSE_RATIO_MATCH_TOLERANCE to swallow it, this fails.
+        let structural = reuse_ratio(7245, 8063).unwrap();
+        let provider = reuse_ratio(10496, 18115).unwrap();
+        let distance = (structural - provider).abs();
+        assert!(
+            distance > REUSE_RATIO_MATCH_TOLERANCE,
+            "live late realization gap {distance} must exceed the MATCH tolerance {REUSE_RATIO_MATCH_TOLERANCE}"
+        );
+        assert_eq!(
+            classify_pair(Some(structural), Some(provider)),
+            Conclusion::PartialMatch
+        );
+    }
+
+    #[test]
     fn schema_smoke_classification() {
         let mut normalized = NormalizedUsage {
             total_input_tokens: Some(100),
@@ -441,6 +595,7 @@ mod tests {
             provider_reported_total_input_tokens: Some(17000),
             provider_cache_reuse_ratio: Some(0.95),
             reuse_ratio_difference: Some(0.0),
+            role: PairRole::Primary,
             conclusion: Conclusion::Match,
             note: "n".to_string(),
         };
