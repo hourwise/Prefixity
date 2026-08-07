@@ -35,6 +35,7 @@ const ALL_FIXTURES: &[&str] = &[
     "15-history-proves-prefix-reuse.json",
     "15-history-proves-prefix-reuse-turn2.json",
     "16-global-reorder-would-be-unsafe.json",
+    "17-deepseek-live-schema-smoke.json",
 ];
 
 #[test]
@@ -43,6 +44,39 @@ fn all_fixtures_load_and_validate() {
         let trace = common::load_fixture(name);
         validate_trace(&trace, None).unwrap_or_else(|e| panic!("{name} failed validation: {e}"));
         assert_eq!(trace.format_version, TRACE_FORMAT_VERSION, "{name}");
+    }
+}
+
+#[test]
+fn scenario_17_deepseek_live_schema_smoke_normalizes() {
+    // Sanitized fixture derived from the first real Phase 0B DeepSeek live
+    // schema-smoke (2026-08-07, deepseek-v4-flash). Proves the observed live
+    // usage shape normalizes to the recorded values. It is NOT synthetic
+    // provider documentation.
+    let trace = common::load_fixture("17-deepseek-live-schema-smoke.json");
+    let usage = trace.usage.as_ref().expect("fixture must carry usage");
+    assert_eq!(usage.provider_schema, "deepseek-chat-completions-v1");
+    let normalized = normalize_usage(usage);
+    assert_eq!(
+        normalized.normalization_source,
+        "deepseek-chat-completions-v1"
+    );
+    // Observed live values: hit 0 + miss 1215 = total 1215; cache read 0.
+    assert_eq!(normalized.total_input_tokens, Some(1215));
+    assert_eq!(normalized.fresh_input_tokens, Some(1215));
+    assert_eq!(normalized.cache_read_tokens, Some(0));
+    assert_eq!(normalized.output_tokens, Some(1));
+
+    // The fixture must contain only safe accounting values: no credentials,
+    // no credential headers/values, no provider request id.
+    let raw = std::fs::read_to_string(common::fixture_path("17-deepseek-live-schema-smoke.json"))
+        .unwrap();
+    let lower = raw.to_lowercase();
+    for forbidden in ["api_key", "bearer", "sk-", "48883131"] {
+        assert!(
+            !lower.contains(forbidden),
+            "fixture must not contain '{forbidden}'"
+        );
     }
 }
 

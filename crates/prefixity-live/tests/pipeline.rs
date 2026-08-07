@@ -37,7 +37,7 @@ fn config(
         seed: 42,
         target_prefix_tokens: 8000,
         max_requests: 3,
-        max_input_tokens: 50_000,
+        max_estimated_input_tokens: 50_000,
         timeout_ms: 5_000,
         runs_dir,
         experiment_id: experiment_id.to_string(),
@@ -105,7 +105,15 @@ fn openai_stable_prefix_full_pipeline_with_mock() {
         Some(8000)
     );
     // Observed structural reuse should be large (the ~8k prefix matched).
-    assert!(result.pairs[0].observed_structural_reuse_tokens > 7_000);
+    assert!(result.pairs[0].observed_structural_reuse_estimated_tokens > 7_000);
+    // The ratios are the comparison basis: both near 1.0 with a tiny
+    // absolute difference, despite very different token bases.
+    let structural = result.pairs[0].structural_reuse_ratio.unwrap();
+    let provider = result.pairs[0].provider_cache_reuse_ratio.unwrap();
+    assert!(structural > 0.95);
+    assert!(provider > 0.95);
+    assert!(result.pairs[0].reuse_ratio_difference.unwrap() < 0.10);
+    assert_eq!(result.pairs[0].conclusion, Conclusion::Match);
 
     // All expected artifacts exist.
     let dir = runs.join("openai-b-1");
@@ -136,7 +144,8 @@ fn openai_stable_prefix_full_pipeline_with_mock() {
         serde_json::from_str(&std::fs::read_to_string(dir.join("manifest.json")).unwrap()).unwrap();
     assert_eq!(manifest["model"], "test-model");
     assert_eq!(manifest["scenario"], "stable-prefix");
-    assert_eq!(manifest["experiment_format_version"], 1);
+    assert_eq!(manifest["experiment_format_version"], 2);
+    assert_eq!(manifest["max_estimated_input_tokens"], 50_000);
 
     std::fs::remove_dir_all(&runs).ok();
 }
@@ -191,6 +200,15 @@ fn deepseek_stable_prefix_plans_three_requests_and_reports_pairs() {
     // Pair (1,2): provider reports no reuse despite an identical prefix.
     assert_eq!(result.pairs[0].provider_reported_cache_read_tokens, Some(0));
     assert_eq!(result.pairs[0].conclusion, Conclusion::NoMatch);
+    assert_eq!(
+        result.pairs[0].provider_reported_total_input_tokens,
+        Some(8100)
+    );
+    // Structural reuse is a large proportion of the estimated input while
+    // the provider ratio is zero -> the ratio difference is large.
+    assert!(result.pairs[0].structural_reuse_ratio.unwrap() > 0.95);
+    assert_eq!(result.pairs[0].provider_cache_reuse_ratio.unwrap(), 0.0);
+    assert!(result.pairs[0].reuse_ratio_difference.unwrap() > 0.9);
     // Pair (2,3): provider reports reuse ~= observed -> Match.
     assert_eq!(
         result.pairs[1].provider_reported_cache_read_tokens,
@@ -213,7 +231,7 @@ fn late_divergence_observes_large_structural_reuse() {
     ]);
     let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
     assert!(
-        result.pairs[0].observed_structural_reuse_tokens > 7_000,
+        result.pairs[0].observed_structural_reuse_estimated_tokens > 7_000,
         "late divergence should keep a large prefix reusable"
     );
     assert_eq!(result.conclusion, Conclusion::Match);
@@ -232,7 +250,10 @@ fn early_divergence_observes_no_structural_reuse() {
         ok_response(200, &common::openai_ok(8100, 8, Some(0))),
     ]);
     let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
-    assert_eq!(result.pairs[0].observed_structural_reuse_tokens, 0);
+    assert_eq!(
+        result.pairs[0].observed_structural_reuse_estimated_tokens,
+        0
+    );
     assert_eq!(result.conclusion, Conclusion::Match);
     std::fs::remove_dir_all(&runs).ok();
 }
@@ -255,10 +276,11 @@ fn token_ceiling_refuses_before_any_call() {
     let key = test_key();
     let runs = common::temp_dir("tokens");
     let mut cfg = config("openai", Scenario::StablePrefix, runs.clone(), "tokens-1");
-    cfg.max_input_tokens = 100; // the ~8k prefix far exceeds this
+    cfg.max_estimated_input_tokens = 100; // the ~8k prefix far exceeds this
     let mock = MockTransport::new(Vec::new());
     let err = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap_err();
     assert!(matches!(err, LiveError::Guard { .. }));
+    assert!(err.to_string().contains("max-estimated-input-tokens"));
     assert_eq!(mock.call_count(), 0);
     std::fs::remove_dir_all(&runs).ok();
 }

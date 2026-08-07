@@ -7,7 +7,11 @@ use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// The Phase 0B experiment manifest format version.
-pub const EXPERIMENT_FORMAT_VERSION: u32 = 1;
+///
+/// v2: `max_input_tokens` renamed to `max_estimated_input_tokens` (the
+/// value is a conservative local Prefixity estimate, not a provider
+/// billing/tokenizer guarantee).
+pub const EXPERIMENT_FORMAT_VERSION: u32 = 2;
 
 /// Describes one Phase 0B experiment. Serialized to `manifest.json`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -43,8 +47,10 @@ pub struct ExperimentManifest {
     pub notes: Option<String>,
     /// The `--max-requests` value in force.
     pub max_requests: usize,
-    /// The `--max-input-tokens` safety ceiling in force.
-    pub max_input_tokens: u64,
+    /// The `--max-estimated-input-tokens` safety ceiling in force
+    /// (conservative local Prefixity estimate; not a provider
+    /// billing/tokenizer guarantee).
+    pub max_estimated_input_tokens: u64,
     /// Per-request timeout in milliseconds.
     pub timeout_ms: u64,
 }
@@ -75,8 +81,9 @@ pub struct ManifestInput {
     pub notes: Option<String>,
     /// `--max-requests` in force.
     pub max_requests: usize,
-    /// `--max-input-tokens` safety ceiling.
-    pub max_input_tokens: u64,
+    /// `--max-estimated-input-tokens` safety ceiling (conservative local
+    /// Prefixity estimate; not a provider billing/tokenizer guarantee).
+    pub max_estimated_input_tokens: u64,
     /// Per-request timeout in milliseconds.
     pub timeout_ms: u64,
 }
@@ -98,7 +105,7 @@ pub fn build_manifest(input: &ManifestInput) -> ExperimentManifest {
         commit_sha: detect_commit_sha(),
         notes: input.notes.clone(),
         max_requests: input.max_requests,
-        max_input_tokens: input.max_input_tokens,
+        max_estimated_input_tokens: input.max_estimated_input_tokens,
         timeout_ms: input.timeout_ms,
     }
 }
@@ -175,7 +182,7 @@ mod tests {
             request_count: 1,
             notes: None,
             max_requests: 3,
-            max_input_tokens: 50_000,
+            max_estimated_input_tokens: 50_000,
             timeout_ms: 60_000,
         });
         let json = serde_json::to_string(&manifest).unwrap();

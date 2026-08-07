@@ -19,8 +19,10 @@ pub const MAX_REQUESTS_CEILING: usize = 10;
 pub const DEFAULT_MAX_REQUESTS: usize = 3;
 /// Default approximate target prefix size in tokens.
 pub const DEFAULT_TARGET_PREFIX_TOKENS: u64 = 8_000;
-/// Default local input-token safety ceiling.
-pub const DEFAULT_MAX_INPUT_TOKENS: u64 = 50_000;
+/// Default local **Prefixity-estimate** input safety ceiling. This is a
+/// conservative local estimate and is NOT a provider billing/tokenizer
+/// guarantee.
+pub const DEFAULT_MAX_ESTIMATED_INPUT_TOKENS: u64 = 50_000;
 /// Default per-request timeout in milliseconds.
 pub const DEFAULT_TIMEOUT_MS: u64 = 60_000;
 /// Default runs directory.
@@ -81,9 +83,10 @@ pub struct LiveRunOptions {
     /// Request-count guard (default 3, hard ceiling 10).
     #[arg(long, default_value_t = DEFAULT_MAX_REQUESTS)]
     pub max_requests: usize,
-    /// Local input-token safety ceiling.
-    #[arg(long, default_value_t = DEFAULT_MAX_INPUT_TOKENS)]
-    pub max_input_tokens: u64,
+    /// Conservative LOCAL Prefixity-estimate input safety ceiling. This is
+    /// NOT a provider billing/tokenizer guarantee.
+    #[arg(long, default_value_t = DEFAULT_MAX_ESTIMATED_INPUT_TOKENS)]
+    pub max_estimated_input_tokens: u64,
     /// Per-request timeout in milliseconds.
     #[arg(long, default_value_t = DEFAULT_TIMEOUT_MS)]
     pub timeout_ms: u64,
@@ -159,8 +162,10 @@ fn build_config(opts: &LiveRunOptions) -> Result<ExperimentConfig, LiveError> {
             "--target-prefix-tokens must be at least 1",
         ));
     }
-    if opts.max_input_tokens == 0 {
-        return Err(LiveError::argument("--max-input-tokens must be at least 1"));
+    if opts.max_estimated_input_tokens == 0 {
+        return Err(LiveError::argument(
+            "--max-estimated-input-tokens must be at least 1",
+        ));
     }
     if opts.timeout_ms == 0 {
         return Err(LiveError::argument("--timeout-ms must be at least 1"));
@@ -183,7 +188,7 @@ fn build_config(opts: &LiveRunOptions) -> Result<ExperimentConfig, LiveError> {
         seed: opts.seed,
         target_prefix_tokens: opts.target_prefix_tokens,
         max_requests: opts.max_requests,
-        max_input_tokens: opts.max_input_tokens,
+        max_estimated_input_tokens: opts.max_estimated_input_tokens,
         timeout_ms: opts.timeout_ms,
         runs_dir,
         experiment_id,
@@ -202,20 +207,96 @@ fn default_experiment_id(provider: &str, scenario: &Scenario) -> Result<String, 
 
 /// Print a dry-run report. Contains no credential value.
 fn print_dry_run(info: &DryRunInfo) {
-    println!("=== Prefixity Phase 0B dry run ===");
-    println!("provider:             {}", info.provider);
-    println!("model:                {}", info.model);
-    println!("scenario:             {}", info.scenario);
-    println!("planned requests:     {}", info.request_count);
-    println!("estimated bytes:      {}", info.estimated_bytes);
-    println!("estimated tokens:     {}", info.estimated_tokens);
-    println!("artifact destination: {}", info.artifact_dir.display());
-    println!("required environment: {}", info.required_env_var);
-    println!("max requests (guard): {}", info.max_requests);
-    println!("max input tokens:     {}", info.max_input_tokens);
+    print!("{}", format_dry_run(info));
+}
+
+/// Build the dry-run report text. Contains no credential value.
+fn format_dry_run(info: &DryRunInfo) -> String {
+    let mut lines = Vec::new();
+    lines.push("=== Prefixity Phase 0B dry run ===".to_string());
+    lines.push(format!("provider:             {}", info.provider));
+    lines.push(format!("model:                {}", info.model));
+    lines.push(format!("scenario:             {}", info.scenario));
+    lines.push(format!("planned requests:     {}", info.request_count));
+    lines.push(format!("estimated bytes:      {}", info.estimated_bytes));
+    lines.push(format!("estimated tokens:     {}", info.estimated_tokens));
+    lines.push(format!(
+        "artifact destination: {}",
+        info.artifact_dir.display()
+    ));
+    lines.push(format!("required environment: {}", info.required_env_var));
+    lines.push(format!("max requests (guard): {}", info.max_requests));
+    lines.push(format!(
+        "max estimated input tokens: {} (conservative local Prefixity estimate; not a provider billing/tokenizer guarantee)",
+        info.max_estimated_input_tokens
+    ));
     match &info.guard_reason {
-        Some(reason) => println!("guard: REFUSED — {reason}"),
-        None => println!("guard: ok"),
+        Some(reason) => lines.push(format!("guard: REFUSED — {reason}")),
+        None => lines.push("guard: ok".to_string()),
     }
-    println!("NO NETWORK REQUESTS WERE MADE.");
+    lines.push("NO NETWORK REQUESTS WERE MADE.".to_string());
+    lines.join("\n") + "\n"
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Parser;
+
+    #[test]
+    fn cli_exposes_max_estimated_input_tokens_not_max_input_tokens() {
+        let cli = Cli::try_parse_from([
+            "prefixity-live",
+            "dry-run",
+            "--provider",
+            "deepseek",
+            "--model",
+            "deepseek-v4-flash",
+            "--scenario",
+            "schema-smoke",
+            "--max-estimated-input-tokens",
+            "5000",
+        ])
+        .unwrap();
+        let opts = match &cli.command {
+            LiveCommand::DryRun { opts } => opts,
+            _ => unreachable!(),
+        };
+        assert_eq!(opts.max_estimated_input_tokens, 5000);
+        // The old, misleading name must be rejected by the CLI.
+        assert!(Cli::try_parse_from([
+            "prefixity-live",
+            "dry-run",
+            "--provider",
+            "deepseek",
+            "--model",
+            "deepseek-v4-flash",
+            "--scenario",
+            "schema-smoke",
+            "--max-input-tokens",
+            "5000",
+        ])
+        .is_err());
+    }
+
+    #[test]
+    fn dry_run_report_labels_the_value_as_estimated() {
+        let info = DryRunInfo {
+            provider: "deepseek".to_string(),
+            model: "deepseek-v4-flash".to_string(),
+            scenario: "schema-smoke".to_string(),
+            request_count: 1,
+            estimated_bytes: 2246,
+            estimated_tokens: 563,
+            artifact_dir: std::path::PathBuf::from("experiments/runs/x"),
+            required_env_var: "DEEPSEEK_API_KEY",
+            max_requests: 1,
+            max_estimated_input_tokens: 2000,
+            guard_reason: None,
+        };
+        let report = format_dry_run(&info);
+        assert!(report.contains("max estimated input tokens"));
+        assert!(report.contains("2000"));
+        assert!(report.contains("not a provider billing/tokenizer guarantee"));
+    }
 }

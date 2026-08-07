@@ -1,0 +1,59 @@
+{
+  "format_version": 2,
+  "request_id": "17-deepseek-live-schema-smoke",
+  "session_id": "deepseek-schema-smoke-01",
+  "timestamp": "2026-08-07T13:19:34Z",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "blocks": [
+    {
+      "id": "prefix-header",
+      "source": "timestamp",
+      "position": 0,
+      "content_hash": "c616e237376600010e1bd608e33dc3d9fa7fd561f57edcfe6fd7919d7493446f",
+      "token_count": 15,
+      "byte_count": 58,
+      "semantic_zone": "system",
+      "structural_path": "messages[0]",
+      "role": "system"
+    },
+    {
+      "id": "synthetic-prefix",
+      "source": "system_policy",
+      "position": 1,
+      "content_hash": "d987fc4650bf64ee57ca7050acc0543c0c0319019221c22efa860782527128ba",
+      "token_count": 536,
+      "byte_count": 2141,
+      "semantic_zone": "system",
+      "structural_path": "messages[1]",
+      "role": "system"
+    },
+    {
+      "id": "tail",
+      "source": "user_request",
+      "position": 2,
+      "content_hash": "cd08e27d7125d8bde0c954d6a8b43c08a9e642aff4e65ce4a571849bff1b88e8",
+      "token_count": 12,
+      "byte_count": 47,
+      "semantic_zone": "messages",
+      "structural_path": "messages[2]",
+      "role": "user"
+    }
+  ],
+  "usage": {
+    "provider_schema": "deepseek-chat-completions-v1",
+    "raw": {
+      "completion_tokens": 1,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 1215,
+      "prompt_tokens": 1215,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 1216
+    }
+  },
+  "metadata": {
+    "note": "Sanitized fixture derived from the Phase 0B live DeepSeek schema-smoke (2026-08-07, deepseek-v4-flash, HTTP 200). Contains ONLY safe usage/accounting values for normalizer regression; no credentials, no authorization headers, no provider request id, no full provider response. Prefixity estimate was 563 tokens; provider reported 1215 input tokens."
+  }
+}

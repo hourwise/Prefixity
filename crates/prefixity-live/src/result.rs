@@ -1,10 +1,13 @@
 //! Experiment result and conservative conclusion classification.
 //!
 //! The classification compares **observed structural prefix reuse** (from
-//! `prefixity-core::compare`) with **provider-reported cache reuse** (from
-//! normalized usage). A single MATCH proves very little; the classification
-//! is deliberately conservative and documented in
-//! `docs/phase-0/PHASE_0B_LIVE_VALIDATION.md`.
+//! `prefixity-core::compare`, in Prefixity's estimated-token unit) with
+//! **provider-reported cache reuse** (from normalized usage, in the
+//! provider's token unit) through their **proportions**. Absolute token
+//! counts from different tokenizers are never subtracted from each other. A
+//! single MATCH proves very little; the classification is deliberately
+//! conservative and documented in `docs/phase-0/PHASE_0B_LIVE_VALIDATION.md`
+//! and `docs/phase-0/PHASE_0B_FINDINGS.md`.
 
 use prefixity_core::usage::{NormalizedUsage, SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1};
 use serde::Serialize;
@@ -71,20 +74,45 @@ pub struct RequestResult {
 }
 
 /// Per consecutive-request-pair comparison.
+///
+/// Two measurement systems are preserved explicitly and are **never**
+/// subtracted from each other:
+///
+/// * **Prefixity estimated unit** — Prefixity's chars/4 estimate
+///   (`*_estimated_tokens` fields).
+/// * **Provider token unit** — tokens reported by the provider
+///   (`provider_reported_*` fields).
+///
+/// Classification compares the two reuse **proportions** (each relative to
+/// its own denominator), not the absolute counts.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct PairResult {
     /// 1-based turn numbers of the pair.
     pub request_a: usize,
     pub request_b: usize,
-    /// Observed structural reusable-prefix tokens (estimated tokens).
-    pub observed_structural_reuse_tokens: u64,
+    // --- Prefixity estimated unit (chars/4) ---
+    /// Observed structurally reusable prefix, in Prefixity estimated tokens.
+    pub observed_structural_reuse_estimated_tokens: u64,
+    /// Request B's total input, in Prefixity estimated tokens.
+    pub request_b_prefixity_estimated_input_tokens: u64,
+    /// `observed_structural_reuse_estimated_tokens / request_b_prefixity_estimated_input_tokens`.
+    pub structural_reuse_ratio: Option<f64>,
+    // --- Provider token unit ---
     /// Provider-reported cache-read tokens for request B (normalized), if any.
     pub provider_reported_cache_read_tokens: Option<u64>,
-    /// `reported - observed` when both are available.
-    pub difference: Option<i64>,
-    /// Per-pair conclusion.
+    /// Provider-reported total input tokens for request B (normalized), if any.
+    pub provider_reported_total_input_tokens: Option<u64>,
+    /// `provider_reported_cache_read_tokens / provider_reported_total_input_tokens`.
+    pub provider_cache_reuse_ratio: Option<f64>,
+    // --- Proportion comparison ---
+    /// `|structural_reuse_ratio - provider_cache_reuse_ratio|` when both are
+    /// available. Replaces the old cross-tokenizer `difference` field, which
+    /// subtracted provider tokens from Prefixity estimated tokens and mixed
+    /// incompatible units.
+    pub reuse_ratio_difference: Option<f64>,
+    /// Per-pair conclusion (proportion-based).
     pub conclusion: Conclusion,
-    /// Human-readable note.
+    /// Human-readable note, with measurement bases labelled.
     pub note: String,
 }
 
@@ -114,36 +142,65 @@ pub struct ExperimentResult {
     pub error: Option<String>,
 }
 
-/// Tolerance for treating provider-reported cache reads as matching observed
-/// structural reuse, expressed as a ratio of the difference to the observed
-/// value.
-pub const MATCH_RATIO_TOLERANCE: f64 = 0.25;
+/// Phase 0B **experimental** threshold: the maximum absolute reuse-ratio
+/// distance (in percentage points; 0.10 = 10 points) between the structural
+/// and provider reuse proportions that is still classified as MATCH. This is
+/// a research threshold, not a scientifically validated tolerance.
+pub const REUSE_RATIO_MATCH_TOLERANCE: f64 = 0.10;
 
-/// Classify one pair from provider-reported cache reads vs observed
-/// structural reuse.
+/// A reuse proportion at or below this value is treated as "effectively
+/// zero" (no meaningful reuse on that side).
+pub const REUSE_RATIO_EFFECTIVELY_ZERO: f64 = 0.05;
+
+/// A reuse proportion at or above this value is treated as "clearly
+/// substantial" reuse.
+pub const REUSE_RATIO_SUBSTANTIAL: f64 = 0.20;
+
+/// `numerator / denominator`, or `None` when the denominator is zero (no
+/// meaningful proportion exists).
+pub fn reuse_ratio(numerator: u64, denominator: u64) -> Option<f64> {
+    if denominator == 0 {
+        None
+    } else {
+        Some(numerator as f64 / denominator as f64)
+    }
+}
+
+/// Classify one pair from the two reuse proportions.
+///
+/// `structural_reuse_ratio` is the observed structural reuse as a proportion
+/// of Prefixity's estimated request input; `provider_cache_reuse_ratio` is
+/// the provider-reported cache read as a proportion of the provider's
+/// reported total input. Absolute token counts from different tokenizers are
+/// not directly comparable, so classification uses proportions only. If
+/// either proportion is unavailable (missing provider figure or a zero
+/// Prefixity denominator), the result is INCONCLUSIVE.
 pub fn classify_pair(
-    reported_cache_read: Option<u64>,
-    observed_structural_reuse: u64,
+    structural_reuse_ratio: Option<f64>,
+    provider_cache_reuse_ratio: Option<f64>,
 ) -> Conclusion {
-    let Some(reported) = reported_cache_read else {
+    let (Some(structural), Some(provider)) = (structural_reuse_ratio, provider_cache_reuse_ratio)
+    else {
+        // Missing provider figure, or zero Prefixity denominator.
         return Conclusion::Inconclusive;
     };
-    if reported == 0 && observed_structural_reuse == 0 {
+    // Both effectively zero: consistent "no reuse" observations.
+    if structural <= REUSE_RATIO_EFFECTIVELY_ZERO && provider <= REUSE_RATIO_EFFECTIVELY_ZERO {
+        return Conclusion::Match;
+    }
+    // One side effectively zero while the other is clearly substantial.
+    if structural <= REUSE_RATIO_EFFECTIVELY_ZERO && provider >= REUSE_RATIO_SUBSTANTIAL {
+        return Conclusion::NoMatch;
+    }
+    if provider <= REUSE_RATIO_EFFECTIVELY_ZERO && structural >= REUSE_RATIO_SUBSTANTIAL {
+        return Conclusion::NoMatch;
+    }
+    // Otherwise compare the absolute (percentage-point) ratio distance.
+    let distance = (structural - provider).abs();
+    if distance <= REUSE_RATIO_MATCH_TOLERANCE {
         Conclusion::Match
-    } else if reported == 0 {
-        // We predicted structural reuse, but the provider reports none.
-        Conclusion::NoMatch
-    } else if observed_structural_reuse == 0 {
-        // Provider reports reuse where no structural reuse was observed.
-        Conclusion::NoMatch
     } else {
-        let difference = reported.abs_diff(observed_structural_reuse);
-        let ratio = difference as f64 / observed_structural_reuse as f64;
-        if ratio <= MATCH_RATIO_TOLERANCE {
-            Conclusion::Match
-        } else {
-            Conclusion::PartialMatch
-        }
+        Conclusion::PartialMatch
     }
 }
 
@@ -236,20 +293,58 @@ mod tests {
     use super::*;
 
     #[test]
-    fn pair_classification_is_conservative() {
-        // Both zero -> Match.
-        assert_eq!(classify_pair(Some(0), 0), Conclusion::Match);
-        // Predicted reuse, provider none -> NoMatch.
-        assert_eq!(classify_pair(Some(0), 1000), Conclusion::NoMatch);
-        // Provider reuse, predicted none -> NoMatch.
-        assert_eq!(classify_pair(Some(1000), 0), Conclusion::NoMatch);
-        // Close match -> Match.
-        assert_eq!(classify_pair(Some(1000), 1000), Conclusion::Match);
-        assert_eq!(classify_pair(Some(1100), 1000), Conclusion::Match);
-        // Material difference -> PartialMatch.
-        assert_eq!(classify_pair(Some(500), 1000), Conclusion::PartialMatch);
-        // No provider data -> Inconclusive.
-        assert_eq!(classify_pair(None, 1000), Conclusion::Inconclusive);
+    fn reuse_ratio_computes_proportions() {
+        assert_eq!(reuse_ratio(7600, 8000), Some(0.95));
+        assert_eq!(reuse_ratio(16150, 17000), Some(0.95));
+        assert_eq!(reuse_ratio(0, 8000), Some(0.0));
+        // Zero denominators have no meaningful proportion.
+        assert_eq!(reuse_ratio(0, 0), None);
+        assert_eq!(reuse_ratio(100, 0), None);
+    }
+
+    #[test]
+    fn pair_classification_uses_ratios_not_absolute_counts() {
+        // 1. Same proportional reuse with very different absolute token
+        // counts -> MATCH (7600/8000 and 16150/17000 are both 0.95).
+        assert_eq!(classify_pair(Some(0.95), Some(0.95)), Conclusion::Match);
+        // 2. Structural high reuse but provider zero -> NO_MATCH.
+        assert_eq!(classify_pair(Some(0.95), Some(0.0)), Conclusion::NoMatch);
+        // 3. Provider high reuse but structural zero -> NO_MATCH.
+        assert_eq!(classify_pair(Some(0.0), Some(0.95)), Conclusion::NoMatch);
+        // 4. Material but nonzero ratio disagreement -> PARTIAL_MATCH.
+        assert_eq!(
+            classify_pair(Some(0.95), Some(0.55)),
+            Conclusion::PartialMatch
+        );
+        // 5. Missing provider figure -> INCONCLUSIVE.
+        assert_eq!(classify_pair(Some(0.95), None), Conclusion::Inconclusive);
+        assert_eq!(classify_pair(None, Some(0.95)), Conclusion::Inconclusive);
+        // 6. Zero estimated denominator -> ratio is None -> INCONCLUSIVE.
+        assert_eq!(
+            classify_pair(reuse_ratio(1000, 0), Some(0.5)),
+            Conclusion::Inconclusive
+        );
+        assert_eq!(
+            classify_pair(reuse_ratio(0, 0), Some(0.5)),
+            Conclusion::Inconclusive
+        );
+    }
+
+    #[test]
+    fn pair_classification_tolerance_and_zero_edges() {
+        // Both effectively zero -> MATCH (consistent no-reuse observation).
+        assert_eq!(classify_pair(Some(0.0), Some(0.0)), Conclusion::Match);
+        // Small non-zero provider reuse within tolerance of zero structural
+        // reuse is not "substantial", so distance applies -> MATCH.
+        assert_eq!(classify_pair(Some(0.0), Some(0.08)), Conclusion::Match);
+        // Within the 0.10 experimental tolerance -> MATCH.
+        assert_eq!(classify_pair(Some(0.95), Some(0.97)), Conclusion::Match);
+        assert_eq!(classify_pair(Some(0.95), Some(0.87)), Conclusion::Match);
+        // Just over the tolerance with both sides meaningful -> PARTIAL_MATCH.
+        assert_eq!(
+            classify_pair(Some(0.95), Some(0.84)),
+            Conclusion::PartialMatch
+        );
     }
 
     #[test]
@@ -319,9 +414,13 @@ mod tests {
         let pair = PairResult {
             request_a: 1,
             request_b: 2,
-            observed_structural_reuse_tokens: 100,
-            provider_reported_cache_read_tokens: Some(100),
-            difference: Some(0),
+            observed_structural_reuse_estimated_tokens: 7600,
+            request_b_prefixity_estimated_input_tokens: 8000,
+            structural_reuse_ratio: Some(0.95),
+            provider_reported_cache_read_tokens: Some(16150),
+            provider_reported_total_input_tokens: Some(17000),
+            provider_cache_reuse_ratio: Some(0.95),
+            reuse_ratio_difference: Some(0.0),
             conclusion: Conclusion::Match,
             note: "n".to_string(),
         };

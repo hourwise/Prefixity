@@ -19,7 +19,8 @@ Concretely, can Prefixity:
 5. compare consecutive requests structurally;
 6. distinguish **prefixity candidates**, **observed structural prefix reuse**,
    and **provider-reported cache reuse**;
-7. explain disagreement between those quantities?
+7. reconcile those quantities **by proportion** while keeping their distinct
+   measurement bases explicit (see "Measurement units" below)?
 
 A result showing Prefixity's predictions do **not** correspond to provider
 behaviour is valuable evidence. Phase 0B does **not** need to show cost
@@ -91,11 +92,51 @@ These shapes are assumptions to be **falsified** by schema-smoke, not facts.
 - No command makes a call without `--execute-live`.
 - `--max-requests` default 3, hard ceiling 10 (values above 10 are
   rejected).
-- `--max-input-tokens` is a local safety ceiling; the run refuses **before
-  any call** if the estimated input would exceed it.
+- `--max-estimated-input-tokens` is a conservative **local Prefixity
+  estimate** (chars/4) safety ceiling; the run refuses **before any call**
+  if the estimated input would exceed it. It is **NOT** a provider
+  billing/tokenizer guarantee — the first live run measured 563 Prefixity
+  estimated tokens against 1215 provider tokens for the same request.
 - Requests within an experiment are sequential; there is no concurrency.
 - No automatic retry. A timeout or server error returns an error and **stops**.
 - These are research guardrails, not a billing guarantee.
+
+## Measurement units
+
+Absolute token counts from different tokenizers are **not directly
+comparable**. Prefixity preserves both systems explicitly and never silently
+converts one into the other:
+
+- **Prefixity estimated unit** — Prefixity's chars/4 estimate
+  (fields such as `prefixity_estimated_tokens`,
+  `observed_structural_reuse_estimated_tokens`).
+- **Provider token unit** — tokens reported by the provider
+  (fields such as `provider_reported_total_input_tokens`,
+  `provider_reported_cache_read_tokens`).
+
+Pair reconciliation therefore compares **proportions**, each relative to its
+own denominator. For request B:
+
+```
+structural_reuse_ratio =
+    observed_structural_reuse_estimated_tokens
+    / prefixity_estimated_input_tokens_for_request_B
+
+provider_cache_reuse_ratio =
+    provider_reported_cache_read_tokens
+    / provider_reported_total_input_tokens_for_request_B
+```
+
+Reports phrase this as e.g. "structural reuse 97.8% of Prefixity-estimated
+request context" and "provider cache reuse 96.9% of provider-reported input
+tokens" — never as "7,800 Prefixity tokens equals 16,900 provider tokens".
+
+**Remaining limitation:** ratio comparison is better than absolute
+cross-tokenizer comparison but is still not exact. Provider total input may
+include serialization/tokenization overhead not represented by Prefixity's
+three structural blocks, and the two proportions are still measured in
+different units. This is documented Phase 0B research, not a validated
+metric (see `PHASE_0B_FINDINGS.md`).
 
 ## Scenarios (A–D only)
 
@@ -149,14 +190,29 @@ sanitized result later.
 ## Results and classification
 
 `result.json` contains per-request results, per-pair comparisons, and a
-conservative conclusion:
+conservative conclusion. Per-pair comparisons record both measurement bases
+and the two reuse **proportions**, plus their absolute difference
+(`reuse_ratio_difference`). The old field that subtracted provider tokens
+from Prefixity estimated tokens (mixing incompatible units) has been
+removed.
 
-- **MATCH** — provider behaviour broadly corresponds to the structural
-  prediction.
-- **PARTIAL_MATCH** — some reuse appears but differs materially.
-- **NO_MATCH** — provider behaviour contradicts the structural prediction.
-- **INCONCLUSIVE** — not enough provider data.
+Classification is **proportion-based** with Phase 0B experimental
+thresholds (`REUSE_RATIO_MATCH_TOLERANCE = 0.10` absolute percentage-point
+distance; effectively-zero ≤ 0.05; clearly-substantial ≥ 0.20):
+
+- **MATCH** — both proportions effectively zero, or the absolute
+  proportion distance is within the 0.10 threshold.
+- **PARTIAL_MATCH** — material but nonzero proportion disagreement (> 0.10)
+  with meaningful reuse on both sides.
+- **NO_MATCH** — one side effectively zero while the other is clearly
+  substantial.
+- **INCONCLUSIVE** — provider cache-read or total-input unavailable, or the
+  Prefixity estimated input denominator is zero.
 - **SCHEMA_MISMATCH** — the response does not fit our normalizer.
+
+These thresholds are research defaults, not scientifically validated; see
+`PHASE_0B_FINDINGS.md` for the live evidence that motivated the
+proportion-based approach.
 
 One successful run proves very little: providers vary by model, region,
 cache state, and time. Repeated, documented runs across providers are

@@ -10,7 +10,10 @@ Hashes are well-formed 64-char hex strings but are **not** digests of real
 content; they are deliberately patterned (e.g. `1111...`, `2a2a...`) so
 fixtures are obviously synthetic and easy to eyeball. The exceptions are
 fixtures **12** and **13**, which embed a tiny shared string with its *real*
-SHA-256 digest to demonstrate structural-fingerprint behaviour.
+SHA-256 digest to demonstrate structural-fingerprint behaviour, and
+**17**, which is a **sanitized copy of the first real DeepSeek live
+schema-smoke** (safe usage/accounting values only — no credentials, no
+authorization headers, no provider request id, no full provider response).
 
 ## Scenario map
 
@@ -32,6 +35,7 @@ SHA-256 digest to demonstrate structural-fingerprint behaviour.
 | `14-first-request-no-observed-reuse.json` | Single trace, no provider usage; high scores are candidates only | `analyse --provider-profile ...` (cache read = 0, all billed fresh; recommendation says a single trace cannot prove reuse) |
 | `15-history-proves-prefix-reuse.json` / `15-history-proves-prefix-reuse-turn2.json` | History proves observed reuse (5200) while the provider reports a different figure (5000) | `compare` (observed reuse kept separate from provider-reported cache read) |
 | `16-global-reorder-would-be-unsafe.json` | A naive global stable-first sort would cross zones / reorder messages | `simulate --policy stable-prefix` (no safe relocation; unsafe moves deferred) |
+| `17-deepseek-live-schema-smoke.json` | **Sanitized** real DeepSeek live schema-smoke (2026-08-07, `deepseek-v4-flash`): hit 0 + miss 1215 = total 1215, cache read 0, output 1 | `analyse` (normalized total = 1215, fresh = 1215, read = 0, output = 1) |
 
 ## Quick command examples (run from the repository root)
 

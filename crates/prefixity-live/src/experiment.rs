@@ -12,8 +12,8 @@ use crate::error::LiveError;
 use crate::manifest::{build_manifest, iso8601_utc_now, ManifestInput};
 use crate::providers::{provider_from_id, LiveProvider};
 use crate::result::{
-    classify_pair, classify_schema_smoke, overall_conclusion, Conclusion, ExperimentResult,
-    PairResult, RequestResult,
+    classify_pair, classify_schema_smoke, overall_conclusion, reuse_ratio, Conclusion,
+    ExperimentResult, PairResult, RequestResult,
 };
 use crate::scenario::Scenario;
 use crate::trace::{build_trace, RequestRecord};
@@ -40,8 +40,9 @@ pub struct ExperimentConfig {
     pub target_prefix_tokens: u64,
     /// Request-count guard (default 3; hard ceiling 10 enforced by the CLI).
     pub max_requests: usize,
-    /// Input-token safety ceiling.
-    pub max_input_tokens: u64,
+    /// Conservative **local Prefixity-estimate** input ceiling. This is NOT a
+    /// provider billing/tokenizer guarantee.
+    pub max_estimated_input_tokens: u64,
     /// Per-request timeout in milliseconds.
     pub timeout_ms: u64,
     /// Runs directory (default `experiments/runs`).
@@ -61,7 +62,10 @@ impl fmt::Debug for ExperimentConfig {
             .field("scenario", &self.scenario.as_str())
             .field("seed", &self.seed)
             .field("max_requests", &self.max_requests)
-            .field("max_input_tokens", &self.max_input_tokens)
+            .field(
+                "max_estimated_input_tokens",
+                &self.max_estimated_input_tokens,
+            )
             .field("experiment_id", &self.experiment_id)
             .finish()
     }
@@ -166,10 +170,10 @@ pub fn apply_guards(config: &ExperimentConfig, plan: &ExperimentPlan) -> Result<
         let tokens = estimate_tokens(&turn.header)
             + estimate_tokens(&turn.prefix)
             + estimate_tokens(&turn.tail);
-        if tokens > config.max_input_tokens {
+        if tokens > config.max_estimated_input_tokens {
             return Err(LiveError::guard(format!(
-                "request {} estimated input of {} tokens exceeds --max-input-tokens {}",
-                turn.turn, tokens, config.max_input_tokens
+                "request {} estimated input of {} tokens exceeds --max-estimated-input-tokens {} (a conservative local Prefixity estimate, not a provider guarantee)",
+                turn.turn, tokens, config.max_estimated_input_tokens
             )));
         }
     }
@@ -197,8 +201,9 @@ pub struct DryRunInfo {
     pub required_env_var: &'static str,
     /// `--max-requests` in force.
     pub max_requests: usize,
-    /// `--max-input-tokens` in force.
-    pub max_input_tokens: u64,
+    /// `--max-estimated-input-tokens` in force (conservative local Prefixity
+    /// estimate; not a provider tokenizer/billing guarantee).
+    pub max_estimated_input_tokens: u64,
     /// Set when a guard would refuse the run.
     pub guard_reason: Option<String>,
 }
@@ -222,7 +227,7 @@ pub fn describe_dry_run(config: &ExperimentConfig) -> Result<DryRunInfo, LiveErr
         artifact_dir: plan.artifact_dir,
         required_env_var: plan.provider.credential_env_var(),
         max_requests: config.max_requests,
-        max_input_tokens: config.max_input_tokens,
+        max_estimated_input_tokens: config.max_estimated_input_tokens,
         guard_reason,
     })
 }
@@ -263,7 +268,7 @@ pub fn execute_live_experiment(
         request_count: plan.turns.len(),
         notes: config.notes.clone(),
         max_requests: config.max_requests,
-        max_input_tokens: config.max_input_tokens,
+        max_estimated_input_tokens: config.max_estimated_input_tokens,
         timeout_ms: config.timeout_ms,
     });
     artifacts::write_json(&plan.artifact_dir.join("manifest.json"), &manifest)?;
@@ -421,7 +426,9 @@ pub fn execute_live_experiment(
         });
     }
 
-    // Reconciliation: compare consecutive traces and provider-reported usage.
+    // Reconciliation: compare consecutive traces and provider-reported usage
+    // through PROPORTIONS. Absolute token counts from different tokenizers
+    // (Prefixity chars/4 vs provider tokens) are never subtracted.
     let mut pairs: Vec<PairResult> = Vec::new();
     for i in 0..traces.len().saturating_sub(1) {
         let comparison = compare_traces(&traces[i], &traces[i + 1], None).map_err(|e| {
@@ -430,21 +437,44 @@ pub fn execute_live_experiment(
             }
         })?;
         let observed = comparison.observed_reusable_prefix_tokens;
-        let reported = requests[i + 1].normalized_usage.cache_read_tokens;
-        let difference = reported.map(|r| r as i64 - observed as i64);
-        let conclusion = classify_pair(reported, observed);
-        let note = match reported {
-            Some(reported) => format!(
-                "observed structural reuse {observed} (estimated tokens) vs provider-reported cache read {reported}"
+        let request_b = &requests[i + 1];
+        let prefixity_input = request_b.prefixity_estimated_tokens;
+        let provider_cache_read = request_b.normalized_usage.cache_read_tokens;
+        let provider_total = request_b.normalized_usage.total_input_tokens;
+
+        // Each proportion is relative to its own denominator.
+        let structural_ratio = reuse_ratio(observed, prefixity_input);
+        let provider_ratio = match (provider_cache_read, provider_total) {
+            (Some(read), Some(total)) => reuse_ratio(read, total),
+            _ => None,
+        };
+        let reuse_ratio_difference = match (structural_ratio, provider_ratio) {
+            (Some(s), Some(p)) => Some((s - p).abs()),
+            _ => None,
+        };
+        let conclusion = classify_pair(structural_ratio, provider_ratio);
+        let note = match (provider_cache_read, provider_total) {
+            (Some(read), Some(_)) => format!(
+                "structural reuse {} of Prefixity-estimated request input ({} estimated tokens) vs provider cache reuse {} of provider-reported input ({} provider tokens); ratio difference {} => {}",
+                pct(structural_ratio),
+                observed,
+                pct(provider_ratio),
+                read,
+                ratio_diff_str(reuse_ratio_difference),
+                conclusion.as_str(),
             ),
-            None => "provider reported no cache-read figure".to_string(),
+            _ => "provider reported no cache-read or total-input figure".to_string(),
         };
         pairs.push(PairResult {
             request_a: requests[i].turn,
-            request_b: requests[i + 1].turn,
-            observed_structural_reuse_tokens: observed,
-            provider_reported_cache_read_tokens: reported,
-            difference,
+            request_b: request_b.turn,
+            observed_structural_reuse_estimated_tokens: observed,
+            request_b_prefixity_estimated_input_tokens: prefixity_input,
+            structural_reuse_ratio: structural_ratio,
+            provider_reported_cache_read_tokens: provider_cache_read,
+            provider_reported_total_input_tokens: provider_total,
+            provider_cache_reuse_ratio: provider_ratio,
+            reuse_ratio_difference,
             conclusion,
             note,
         });
@@ -513,10 +543,12 @@ fn build_summary(
     }
     for pair in pairs {
         lines.push(format!(
-            "  pair {}->{}: observed_reuse={} reported_cache_read={} => {}",
+            "  pair {}->{}: structural_reuse_ratio={} ({} estimated tokens) provider_cache_reuse_ratio={} ({} provider tokens) => {}",
             pair.request_a,
             pair.request_b,
-            pair.observed_structural_reuse_tokens,
+            pct(pair.structural_reuse_ratio),
+            pair.observed_structural_reuse_estimated_tokens,
+            pct(pair.provider_cache_reuse_ratio),
             pair.provider_reported_cache_read_tokens
                 .map(|v| v.to_string())
                 .unwrap_or_else(|| "?".to_string()),
@@ -528,6 +560,22 @@ fn build_summary(
     }
     lines.push(format!("conclusion: {}", conclusion.as_str()));
     lines.join("\n")
+}
+
+/// Format a reuse proportion as a percentage for human-readable output.
+fn pct(ratio: Option<f64>) -> String {
+    match ratio {
+        Some(r) => format!("{:.1}%", r * 100.0),
+        None => "unavailable".to_string(),
+    }
+}
+
+/// Format the reuse-ratio difference for human-readable output.
+fn ratio_diff_str(diff: Option<f64>) -> String {
+    match diff {
+        Some(d) => format!("{:.3}", d),
+        None => "unavailable".to_string(),
+    }
 }
 
 #[cfg(test)]
@@ -542,7 +590,7 @@ mod tests {
             seed: 42,
             target_prefix_tokens: 8000,
             max_requests: 10,
-            max_input_tokens: 50_000,
+            max_estimated_input_tokens: 50_000,
             timeout_ms: 5_000,
             runs_dir: std::env::temp_dir().join("prefixity-live-plan-test"),
             experiment_id: "plan-test".to_string(),
