@@ -1,0 +1,65 @@
+{
+  "format_version": 1,
+  "request_id": "08-unsafe-pruning",
+  "session_id": "session-08",
+  "timestamp": "2026-08-07T17:00:00Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800,
+      "sensitivity": "public",
+      "required": true
+    },
+    {
+      "id": "tool-defs",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "token_count": 4000,
+      "byte_count": 16000
+    },
+    {
+      "id": "project-instructions",
+      "source": "project_instructions",
+      "position": 2,
+      "content_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "token_count": 2500,
+      "byte_count": 10000
+    },
+    {
+      "id": "critical-config",
+      "source": "tool_result",
+      "position": 3,
+      "content_hash": "8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b",
+      "token_count": 50000,
+      "byte_count": 200000,
+      "optional": true,
+      "stale": true,
+      "required": true
+    },
+    {
+      "id": "user-request",
+      "source": "user_request",
+      "position": 4,
+      "content_hash": "9999999999999999999999999999999999999999999999999999999999999999",
+      "token_count": 150,
+      "byte_count": 600
+    }
+  ],
+  "usage": {
+    "input_tokens": 57850,
+    "cache_read_tokens": 7700,
+    "cache_write_tokens": 0,
+    "output_tokens": 100
+  },
+  "metadata": {
+    "scenario": "08-unsafe-pruning-example",
+    "note": "Synthetic fixture: a large block is marked optional AND stale but is required. Policies must never remove it."
+  }
+}

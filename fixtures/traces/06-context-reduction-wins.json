@@ -1,0 +1,89 @@
+{
+  "format_version": 1,
+  "request_id": "06-context-reduction",
+  "session_id": "session-06",
+  "timestamp": "2026-08-07T15:00:00Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800,
+      "sensitivity": "public"
+    },
+    {
+      "id": "tool-defs",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "token_count": 4000,
+      "byte_count": 16000
+    },
+    {
+      "id": "project-instructions",
+      "source": "project_instructions",
+      "position": 2,
+      "content_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "token_count": 2500,
+      "byte_count": 10000
+    },
+    {
+      "id": "git-status",
+      "source": "git_status",
+      "position": 3,
+      "content_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+      "token_count": 200,
+      "byte_count": 800
+    },
+    {
+      "id": "repo-map",
+      "source": "repository_map",
+      "position": 4,
+      "content_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "token_count": 1800,
+      "byte_count": 7200
+    },
+    {
+      "id": "old-session-summary",
+      "source": "file_content",
+      "position": 5,
+      "content_hash": "6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c",
+      "token_count": 12000,
+      "byte_count": 48000,
+      "optional": true,
+      "stale": true
+    },
+    {
+      "id": "stale-tool-output",
+      "source": "tool_result",
+      "position": 6,
+      "content_hash": "8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a",
+      "token_count": 8000,
+      "byte_count": 32000,
+      "optional": true,
+      "stale": true
+    },
+    {
+      "id": "user-request",
+      "source": "user_request",
+      "position": 7,
+      "content_hash": "9999999999999999999999999999999999999999999999999999999999999999",
+      "token_count": 150,
+      "byte_count": 600
+    }
+  ],
+  "usage": {
+    "input_tokens": 29850,
+    "cache_read_tokens": 7700,
+    "cache_write_tokens": 0,
+    "output_tokens": 200
+  },
+  "metadata": {
+    "scenario": "06-context-reduction-wins",
+    "note": "Synthetic fixture: removing explicitly optional/stale material saves more than improving cache placement."
+  }
+}

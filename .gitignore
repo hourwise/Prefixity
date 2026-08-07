@@ -1,0 +1,16 @@
+# Rust build output
+/target
+
+# Environment files (must never be committed)
+.env
+.env.*
+*.env
+
+# Local editor/OS noise
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local tooling scratch
+*.local.json

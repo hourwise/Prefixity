@@ -1,0 +1,11 @@
+{
+  "name": "synthetic-cache-write-expensive",
+  "version": 1,
+  "synthetic": true,
+  "currency": "USD",
+  "input_price_per_1m": 2.50,
+  "cache_read_price_per_1m": 0.10,
+  "cache_write_price_per_1m": 10.00,
+  "output_price_per_1m": 10.00,
+  "notes": "SYNTHETIC profile where cache writes are expensive relative to input. Used by fixture 05 to show when caching is not economic."
+}

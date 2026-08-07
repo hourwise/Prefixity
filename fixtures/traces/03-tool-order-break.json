@@ -1,0 +1,77 @@
+{
+  "format_version": 1,
+  "request_id": "03-turn-1",
+  "session_id": "session-03",
+  "timestamp": "2026-08-07T12:00:00Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800,
+      "sensitivity": "public"
+    },
+    {
+      "id": "tool-def-a",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a",
+      "token_count": 800,
+      "byte_count": 3200
+    },
+    {
+      "id": "tool-def-b",
+      "source": "tool_definition",
+      "position": 2,
+      "content_hash": "2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b",
+      "token_count": 900,
+      "byte_count": 3600
+    },
+    {
+      "id": "tool-def-c",
+      "source": "tool_definition",
+      "position": 3,
+      "content_hash": "2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c",
+      "token_count": 700,
+      "byte_count": 2800
+    },
+    {
+      "id": "project-instructions",
+      "source": "project_instructions",
+      "position": 4,
+      "content_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "token_count": 2500,
+      "byte_count": 10000
+    },
+    {
+      "id": "repo-map",
+      "source": "repository_map",
+      "position": 5,
+      "content_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "token_count": 1800,
+      "byte_count": 7200
+    },
+    {
+      "id": "user-request",
+      "source": "user_request",
+      "position": 6,
+      "content_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+      "token_count": 150,
+      "byte_count": 600
+    }
+  ],
+  "usage": {
+    "input_tokens": 8050,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 7900,
+    "output_tokens": 180
+  },
+  "metadata": {
+    "scenario": "03-tool-order-break",
+    "note": "Synthetic fixture: the same logical tools appear in one order (A, B, C)."
+  }
+}

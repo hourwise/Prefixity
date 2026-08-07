@@ -1,0 +1,53 @@
+{
+  "format_version": 1,
+  "request_id": "05-turn-2",
+  "session_id": "session-05",
+  "timestamp": "2026-08-07T14:00:10Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800,
+      "sensitivity": "public"
+    },
+    {
+      "id": "tool-defs",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "token_count": 2000,
+      "byte_count": 8000
+    },
+    {
+      "id": "large-doc-b",
+      "source": "file_content",
+      "position": 2,
+      "content_hash": "6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b",
+      "token_count": 20000,
+      "byte_count": 80000
+    },
+    {
+      "id": "user-request",
+      "source": "user_request",
+      "position": 3,
+      "content_hash": "5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b",
+      "token_count": 100,
+      "byte_count": 400
+    }
+  ],
+  "usage": {
+    "input_tokens": 23300,
+    "cache_read_tokens": 3200,
+    "cache_write_tokens": 0,
+    "output_tokens": 200
+  },
+  "metadata": {
+    "scenario": "05-cache-write-not-economic",
+    "note": "Synthetic fixture: only a small stable prefix (system + tool defs) is reusable; the large document changed again."
+  }
+}

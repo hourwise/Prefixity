@@ -1,0 +1,11 @@
+{
+  "name": "synthetic-example",
+  "version": 1,
+  "synthetic": true,
+  "currency": "USD",
+  "input_price_per_1m": 2.50,
+  "cache_read_price_per_1m": 0.10,
+  "cache_write_price_per_1m": 2.50,
+  "output_price_per_1m": 10.00,
+  "notes": "SYNTHETIC example profile for deterministic tests. NOT real provider pricing."
+}

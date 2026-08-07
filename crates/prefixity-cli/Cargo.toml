@@ -1,0 +1,17 @@
+[package]
+name = "prefixity-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "CLI for the Prefixity Phase 0 offline context-efficiency profiler (experimental research software)."
+
+[[bin]]
+name = "prefixity"
+path = "src/main.rs"
+
+[dependencies]
+prefixity-core = { path = "../prefixity-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { workspace = true }

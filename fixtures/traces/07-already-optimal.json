@@ -1,0 +1,69 @@
+{
+  "format_version": 1,
+  "request_id": "07-already-optimal",
+  "session_id": "session-07",
+  "timestamp": "2026-08-07T16:00:00Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800,
+      "sensitivity": "public"
+    },
+    {
+      "id": "tool-defs",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "token_count": 4000,
+      "byte_count": 16000
+    },
+    {
+      "id": "project-instructions",
+      "source": "project_instructions",
+      "position": 2,
+      "content_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "token_count": 2500,
+      "byte_count": 10000
+    },
+    {
+      "id": "conversation-history",
+      "source": "conversation",
+      "position": 3,
+      "content_hash": "aaaaaaaabbbbbbbbccccccccddddddddeeeeeeeeffffffff1111111122222222",
+      "token_count": 5000,
+      "byte_count": 20000
+    },
+    {
+      "id": "repo-map",
+      "source": "repository_map",
+      "position": 4,
+      "content_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "token_count": 1800,
+      "byte_count": 7200
+    },
+    {
+      "id": "user-request",
+      "source": "user_request",
+      "position": 5,
+      "content_hash": "9999999999999999999999999999999999999999999999999999999999999999",
+      "token_count": 150,
+      "byte_count": 600
+    }
+  ],
+  "usage": {
+    "input_tokens": 14650,
+    "cache_read_tokens": 14500,
+    "cache_write_tokens": 0,
+    "output_tokens": 150
+  },
+  "metadata": {
+    "scenario": "07-already-optimal",
+    "note": "Synthetic fixture: layout is already stable-first with no removable material. Prefixity should recommend no structural change."
+  }
+}

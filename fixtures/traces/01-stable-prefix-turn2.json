@@ -1,0 +1,65 @@
+{
+  "format_version": 1,
+  "request_id": "01-turn-2",
+  "session_id": "session-01",
+  "timestamp": "2026-08-07T10:00:05Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800,
+      "sensitivity": "public"
+    },
+    {
+      "id": "tool-defs",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "token_count": 4000,
+      "byte_count": 16000
+    },
+    {
+      "id": "project-instructions",
+      "source": "project_instructions",
+      "position": 2,
+      "content_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "token_count": 2500,
+      "byte_count": 10000
+    },
+    {
+      "id": "repo-map",
+      "source": "repository_map",
+      "position": 3,
+      "content_hash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "token_count": 1800,
+      "byte_count": 7200
+    },
+    {
+      "id": "user-request",
+      "source": "user_request",
+      "position": 4,
+      "content_hash": "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+      "token_count": 200,
+      "byte_count": 800
+    }
+  ],
+  "usage": {
+    "input_tokens": 9700,
+    "cache_read_tokens": 9500,
+    "cache_write_tokens": 0,
+    "output_tokens": 250
+  },
+  "latency": {
+    "time_to_first_token_ms": 60,
+    "total_ms": 700
+  },
+  "metadata": {
+    "scenario": "01-stable-prefix",
+    "note": "Synthetic fixture: identical stable prefix as turn 1; only the user request changed."
+  }
+}

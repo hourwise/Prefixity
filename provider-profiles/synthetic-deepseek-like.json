@@ -1,0 +1,11 @@
+{
+  "name": "synthetic-deepseek-like",
+  "version": 1,
+  "synthetic": true,
+  "currency": "USD",
+  "input_price_per_1m": 0.27,
+  "cache_read_price_per_1m": 0.07,
+  "cache_write_price_per_1m": 0.27,
+  "output_price_per_1m": 1.10,
+  "notes": "SYNTHETIC shape only; does NOT represent current DeepSeek pricing. Prices are fabricated for deterministic experiments."
+}
