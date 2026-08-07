@@ -104,7 +104,8 @@ pub fn build_plan(config: &ExperimentConfig) -> Result<ExperimentPlan, LiveError
     }
     let id = artifacts::sanitize_experiment_id(&config.experiment_id)?;
 
-    let request_count = provider.request_count(config.scenario);
+    let turn_plan = provider.plan_turns(config.scenario);
+    let request_count = turn_plan.turns;
     let prefix = generate_prefix(config.seed, config.target_prefix_tokens);
     let header_base = header_for(&id, config.seed);
 
@@ -113,8 +114,14 @@ pub fn build_plan(config: &ExperimentConfig) -> Result<ExperimentPlan, LiveError
     let mut estimated_tokens = 0u64;
     for turn in 1..=request_count {
         // Early-divergence changes a block near the beginning (the header)
-        // on every turn after the first.
-        let header = if config.scenario == Scenario::EarlyDivergence && turn > 1 {
+        // from the plan's configured divergence turn onward. For DeepSeek
+        // this is turn C (A and B first establish the common prefix); for
+        // OpenAI/Anthropic it is turn B.
+        let header = if config.scenario == Scenario::EarlyDivergence
+            && turn_plan
+                .header_diverges_from
+                .is_some_and(|first| turn >= first)
+        {
             format!("{header_base} CHANGED")
         } else {
             header_base.clone()
@@ -350,6 +357,19 @@ pub fn execute_live_experiment(
             schema_mismatch = true;
             break;
         }
+        // Schema-smoke additionally requires the endpoint schema's defining
+        // fields to be derivable (e.g. DeepSeek needs the input/cache
+        // categories; completion/output tokens alone are not evidence).
+        if config.scenario == Scenario::SchemaSmoke
+            && classify_schema_smoke(&normalized) == Conclusion::SchemaMismatch
+        {
+            error = Some(format!(
+                "request {} schema-smoke failed: required fields for schema '{}' were not derivable: {}",
+                turn.turn, raw_usage.provider_schema, normalized.explanation
+            ));
+            schema_mismatch = true;
+            break;
+        }
 
         let record = RequestRecord {
             turn: turn.turn,
@@ -508,4 +528,81 @@ fn build_summary(
     }
     lines.push(format!("conclusion: {}", conclusion.as_str()));
     lines.join("\n")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_config(provider: &str, scenario: Scenario) -> ExperimentConfig {
+        ExperimentConfig {
+            provider_id: provider.to_string(),
+            model: "deepseek-v4-flash".to_string(),
+            scenario,
+            seed: 42,
+            target_prefix_tokens: 8000,
+            max_requests: 10,
+            max_input_tokens: 50_000,
+            timeout_ms: 5_000,
+            runs_dir: std::env::temp_dir().join("prefixity-live-plan-test"),
+            experiment_id: "plan-test".to_string(),
+            notes: None,
+        }
+    }
+
+    #[test]
+    fn deepseek_stable_prefix_plan_is_a_b_c_with_common_prefix() {
+        let plan = build_plan(&test_config("deepseek", Scenario::StablePrefix)).unwrap();
+        assert_eq!(plan.turns.len(), 3);
+        // A, B, C share the same header and prefix; only the tails differ.
+        assert_eq!(plan.turns[0].header, plan.turns[1].header);
+        assert_eq!(plan.turns[1].header, plan.turns[2].header);
+        assert_eq!(plan.turns[0].prefix, plan.turns[1].prefix);
+        assert_eq!(plan.turns[1].prefix, plan.turns[2].prefix);
+        assert_ne!(plan.turns[0].tail, plan.turns[1].tail);
+        assert_ne!(plan.turns[1].tail, plan.turns[2].tail);
+    }
+
+    #[test]
+    fn deepseek_late_divergence_plan_changes_tail_at_c_only() {
+        let plan = build_plan(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
+        assert_eq!(plan.turns.len(), 3);
+        // A/B/C keep the same header and prefix; C uses a changed tail.
+        assert_eq!(plan.turns[0].header, plan.turns[1].header);
+        assert_eq!(plan.turns[1].header, plan.turns[2].header);
+        assert_eq!(plan.turns[0].prefix, plan.turns[2].prefix);
+        assert_ne!(plan.turns[1].tail, plan.turns[2].tail);
+    }
+
+    #[test]
+    fn deepseek_early_divergence_keeps_header_stable_until_c() {
+        let plan = build_plan(&test_config("deepseek", Scenario::EarlyDivergence)).unwrap();
+        assert_eq!(plan.turns.len(), 3);
+        // The early header must NOT change on turn B: A and B first
+        // establish the common prefix. Only C diverges the header.
+        assert_eq!(plan.turns[0].header, plan.turns[1].header);
+        assert_ne!(plan.turns[1].header, plan.turns[2].header);
+        assert!(plan.turns[2].header.ends_with("CHANGED"));
+        assert!(!plan.turns[1].header.ends_with("CHANGED"));
+        // The prefix is identical across all three requests.
+        assert_eq!(plan.turns[0].prefix, plan.turns[2].prefix);
+    }
+
+    #[test]
+    fn openai_early_divergence_still_changes_header_at_b() {
+        let plan = build_plan(&test_config("openai", Scenario::EarlyDivergence)).unwrap();
+        assert_eq!(plan.turns.len(), 2);
+        assert_ne!(plan.turns[0].header, plan.turns[1].header);
+        assert!(plan.turns[1].header.ends_with("CHANGED"));
+    }
+
+    #[test]
+    fn openai_and_anthropic_non_smoke_scenarios_stay_two_requests() {
+        for provider in ["openai", "anthropic"] {
+            let plan = build_plan(&test_config(provider, Scenario::StablePrefix)).unwrap();
+            assert_eq!(plan.turns.len(), 2);
+            let plan = build_plan(&test_config(provider, Scenario::LateDivergence)).unwrap();
+            assert_eq!(plan.turns.len(), 2);
+        }
+    }
 }

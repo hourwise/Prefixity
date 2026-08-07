@@ -87,9 +87,6 @@ pub struct LiveRunOptions {
     /// Per-request timeout in milliseconds.
     #[arg(long, default_value_t = DEFAULT_TIMEOUT_MS)]
     pub timeout_ms: u64,
-    /// Runs output directory (default experiments/runs).
-    #[arg(long)]
-    pub runs_dir: Option<PathBuf>,
     /// Experiment id (sanitized). Default is generated.
     #[arg(long)]
     pub experiment_id: Option<String>,
@@ -174,10 +171,10 @@ fn build_config(opts: &LiveRunOptions) -> Result<ExperimentConfig, LiveError> {
         Some(id) => crate::artifacts::sanitize_experiment_id(id)?,
         None => default_experiment_id(&opts.provider, &scenario)?,
     };
-    let runs_dir = opts
-        .runs_dir
-        .clone()
-        .unwrap_or_else(|| PathBuf::from(DEFAULT_RUNS_DIR));
+    // The public CLI always writes under the Phase 0B artifact root; there
+    // is no user-selectable runs directory. Tests inject temporary roots
+    // through `ExperimentConfig` directly.
+    let runs_dir = PathBuf::from(DEFAULT_RUNS_DIR);
 
     Ok(ExperimentConfig {
         provider_id: opts.provider.trim().to_string(),

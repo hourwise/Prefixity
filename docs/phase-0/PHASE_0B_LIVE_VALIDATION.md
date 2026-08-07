@@ -66,9 +66,9 @@ normalization.
 
 | Provider | API-surface schema | Raw fields | Notes |
 | --- | --- | --- | --- |
-| OpenAI | `openai-chat-completions-v1` | `prompt_tokens`, `completion_tokens`, `prompt_tokens_details.cached_tokens` | `prompt_tokens` = total input; cached tokens nested. No explicit cache control in baseline. |
+| DeepSeek | `deepseek-chat-completions-v1` | `prompt_cache_hit_tokens`, `prompt_cache_miss_tokens` | **First live provider for the current validation sequence.** Model: `deepseek-v4-flash` (never the retired `deepseek-chat` / `deepseek-reasoner` aliases). Thinking is explicitly disabled (`thinking.type=disabled`) so the run measures prompt/cache behaviour, not reasoning; temperature stays 0. Cache construction may need a prior completed request, so B–D each prime with A then B and measure the third request. |
+| OpenAI | `openai-chat-completions-v1` | `prompt_tokens`, `completion_tokens`, `prompt_tokens_details.cached_tokens` | `prompt_tokens` = total input; cached tokens nested. No explicit cache control in baseline. No `thinking` field is sent. |
 | Anthropic | `anthropic-messages-v1` | `input_tokens`, `cache_read_input_tokens`, `cache_creation_input_tokens` | `input_tokens` = uncached remainder; total is the sum of the three. Explicit `cache_control` on the large prefix block. |
-| DeepSeek | `deepseek-chat-completions-v1` | `prompt_cache_hit_tokens`, `prompt_cache_miss_tokens` | Cache construction may require a prior completed request; the stable-prefix scenario plans three requests and preserves observed behaviour. |
 
 The OpenAI Responses API surface (`openai-responses-v1`) is **reserved** but
 not implemented: no live adapter emits it yet, and no unknown `openai-*`
@@ -101,10 +101,20 @@ These shapes are assumptions to be **falsified** by schema-smoke, not facts.
 
 | Id | Scenario | Requests | What it measures |
 | --- | --- | --- | --- |
-| A | `schema-smoke` | 1 | Does one real response match our usage schema? STOP for that provider if not. |
-| B | `stable-prefix` | 2 (3 for DeepSeek) | Provider behaviour when consecutive requests share the same large prefix. |
-| C | `early-divergence` | 2 | Change a block near the beginning of request B; Prefixity predicts sharply reduced structural reuse. |
-| D | `late-divergence` | 2 | Keep the whole large prefix; change only a small tail; Prefixity observes a large structurally identical prefix. |
+| A | `schema-smoke` | 1 | Does one real response match our usage schema? The endpoint schema's defining fields must be derivable — for `deepseek-chat-completions-v1` that is `total_input_tokens`, `fresh_input_tokens` and `cache_read_tokens` (i.e. hit + miss input semantics). Completion/output tokens **alone are not a match**. STOP for that provider if not. |
+| B | `stable-prefix` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | Provider behaviour when consecutive requests share the same large prefix. DeepSeek primes with A then B and measures the third request (C). |
+| C | `early-divergence` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | Change a block near the beginning. OpenAI/Anthropic change the header at B. DeepSeek keeps the header unchanged through A and B (they establish the common prefix) and changes it only at C; the important comparison is B → C. |
+| D | `late-divergence` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | Keep the whole large prefix; change only a small tail. DeepSeek runs A, B, C with the tail changed at C; the important comparison is B → C. |
+
+DeepSeek's B–D priming sequence (per provider/scenario plan, not hidden
+arithmetic):
+
+```
+stable-prefix:   A = prefix + tail A;  B = prefix + tail B;  C = prefix + tail C
+late-divergence: A = prefix + tail A;  B = prefix + tail B;  C = prefix + changed tail C
+early-divergence:A = header + prefix + tail A;  B = header + prefix + tail B;
+                 C = CHANGED header + prefix + tail C
+```
 
 Cache-expiry/TTL experiments are **not** part of Phase 0B baseline.
 
@@ -116,7 +126,11 @@ artificial concurrency.
 
 ## Artifacts
 
-Live runs write to `experiments/runs/<experiment-id>/` (gitignored):
+Live runs always write to `experiments/runs/<experiment-id>/` (gitignored).
+The public CLI has **no** user-selectable runs directory: the artifact root
+is fixed, so a live run can never be pointed at an arbitrary filesystem
+destination. An existing experiment destination that is a symlink is
+rejected. (Tests inject temporary roots internally.)
 
 ```
 manifest.json
@@ -150,21 +164,29 @@ required before any claim.
 
 ## Manual procedure for the first live test (schema-smoke)
 
-1. Set the provider credential in your shell, e.g.:
-   `$env:OPENAI_API_KEY = "<your key>"` (never typed into a fixture or file).
-2. Dry-run first (zero network, prints exactly what would be sent):
+1. The first live provider in the current validation sequence is **DeepSeek**
+   with model **`deepseek-v4-flash`**. Do not use the retired
+   `deepseek-chat` / `deepseek-reasoner` aliases.
+2. Enter the credential **interactively into the process environment** — do
+   **not** type the key into a command line that may be retained in shell
+   history. The exact Windows procedure will be supplied immediately before
+   the live test.
+3. Dry-run first (zero network, prints exactly what would be sent):
    ```
-   cargo run -p prefixity-live -- dry-run --provider openai --model <model> --scenario schema-smoke
+   cargo run -p prefixity-live -- dry-run --provider deepseek --model deepseek-v4-flash --scenario schema-smoke
    ```
-3. Run the single request with explicit opt-in:
+4. Run the single request with explicit opt-in:
    ```
-   cargo run -p prefixity-live -- run --provider openai --model <model> --scenario schema-smoke --execute-live
+   cargo run -p prefixity-live -- run --provider deepseek --model deepseek-v4-flash --scenario schema-smoke --execute-live
    ```
-4. Inspect `experiments/runs/<experiment-id>/result.json`. The conclusion
+5. Inspect `experiments/runs/<experiment-id>/result.json`. The conclusion
    must be `MATCH` (or `SCHEMA_MISMATCH`, which means **stop** for that
    provider and report the discrepancy — do not silently adapt unknown
-   fields during a paid run).
-5. Repeat steps 1–4 for `anthropic` and `deepseek` before running scenarios
+   fields during a paid run). For DeepSeek, `MATCH` requires the
+   `total_input_tokens` / `fresh_input_tokens` / `cache_read_tokens`
+   categories to have been derived from hit + miss; completion tokens alone
+   are not a match.
+6. Repeat steps 2–5 for `anthropic` and `openai` before running scenarios
    B–D.
 
 ### How to abort
@@ -188,6 +210,10 @@ required before any claim.
 ## Do not
 
 - Do not run scenarios B–D before each provider's schema-smoke passes.
+- Do not use `deepseek-chat` or `deepseek-reasoner` aliases for live runs;
+  use `deepseek-v4-flash` with thinking explicitly disabled.
+- Do not type a real API key into any command line that could be retained in
+  shell history; enter it interactively into the process environment.
 - Do not enable OpenAI explicit caching in the baseline; we first observe
   native/default behaviour.
 - Do not add Anthropic 1-hour TTL or cache-diagnostics requirements yet.

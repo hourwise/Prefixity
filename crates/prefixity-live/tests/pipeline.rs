@@ -296,6 +296,26 @@ fn http_error_stops_and_errors_never_expose_credentials() {
 }
 
 #[test]
+fn redirect_status_stops_without_following_or_retrying() {
+    // A 302 must stop the run: no redirect is followed, no retry occurs, and
+    // the 3xx body is never parsed as provider JSON.
+    let key = test_key();
+    let runs = common::temp_dir("redirect");
+    let cfg = config("openai", Scenario::StablePrefix, runs.clone(), "redirect-1");
+    let mock = MockTransport::new(vec![
+        ok_response(302, "<html>redirect</html>"),
+        // A success response that must never be consumed.
+        ok_response(200, &common::openai_ok(8100, 8, Some(8000))),
+    ]);
+    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    assert_eq!(mock.call_count(), 1);
+    assert!(result.error.is_some());
+    assert!(result.error.unwrap().contains("302"));
+    assert_eq!(result.conclusion, Conclusion::Inconclusive);
+    std::fs::remove_dir_all(&runs).ok();
+}
+
+#[test]
 fn schema_mismatch_is_classified_as_schema_mismatch() {
     let key = test_key();
     let runs = common::temp_dir("schema");
@@ -316,6 +336,28 @@ fn missing_usage_stops_with_schema_mismatch() {
     let mock = MockTransport::single(200, &common::no_usage());
     let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
     assert_eq!(result.conclusion, Conclusion::SchemaMismatch);
+    std::fs::remove_dir_all(&runs).ok();
+}
+
+#[test]
+fn deepseek_completion_only_is_schema_mismatch() {
+    // DeepSeek raw usage that reports completion_tokens but lacks
+    // prompt_cache_hit_tokens / prompt_cache_miss_tokens must be
+    // SCHEMA_MISMATCH, not MATCH: the input/cache categories that define the
+    // schema were never derivable.
+    let key = test_key();
+    let runs = common::temp_dir("dscomp");
+    let cfg = config(
+        "deepseek",
+        Scenario::SchemaSmoke,
+        runs.clone(),
+        "deepseek-completion-only",
+    );
+    let mock = MockTransport::single(200, &common::deepseek_completion_only());
+    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    assert_eq!(mock.call_count(), 1);
+    assert_eq!(result.conclusion, Conclusion::SchemaMismatch);
+    assert!(result.error.is_some());
     std::fs::remove_dir_all(&runs).ok();
 }
 

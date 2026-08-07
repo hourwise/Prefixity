@@ -6,7 +6,7 @@
 //! is deliberately conservative and documented in
 //! `docs/phase-0/PHASE_0B_LIVE_VALIDATION.md`.
 
-use prefixity_core::usage::NormalizedUsage;
+use prefixity_core::usage::{NormalizedUsage, SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1};
 use serde::Serialize;
 
 /// Conservative conclusion classification.
@@ -147,11 +147,65 @@ pub fn classify_pair(
     }
 }
 
+/// A normalized usage category that a schema-smoke run may require for a
+/// specific endpoint schema.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RequiredField {
+    TotalInputTokens,
+    FreshInputTokens,
+    CacheReadTokens,
+    CacheWriteTokens,
+    OutputTokens,
+}
+
+/// The endpoint-schema-specific fields a schema-smoke must successfully
+/// derive for a schema to be a MATCH.
+///
+/// The default (empty) set keeps the base behaviour — any successful
+/// derivation counts — so later endpoint schemas can tighten their own
+/// requirements here without changing the classifier. The DeepSeek
+/// Chat Completions schema requires its defining input/cache categories;
+/// completion/output tokens alone are not evidence that the schema matches.
+pub fn schema_smoke_required_fields(schema: &str) -> &'static [RequiredField] {
+    match schema {
+        SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1 => &[
+            RequiredField::TotalInputTokens,
+            RequiredField::FreshInputTokens,
+            RequiredField::CacheReadTokens,
+        ],
+        _ => &[],
+    }
+}
+
+/// Whether `normalized` successfully derived the given field.
+fn required_field_derived(field: RequiredField, normalized: &NormalizedUsage) -> bool {
+    match field {
+        RequiredField::TotalInputTokens => normalized.total_input_tokens.is_some(),
+        RequiredField::FreshInputTokens => normalized.fresh_input_tokens.is_some(),
+        RequiredField::CacheReadTokens => normalized.cache_read_tokens.is_some(),
+        RequiredField::CacheWriteTokens => normalized.cache_write_tokens.is_some(),
+        RequiredField::OutputTokens => normalized.output_tokens.is_some(),
+    }
+}
+
 /// Classify a schema-smoke run from the normalized usage.
 pub fn classify_schema_smoke(normalized: &NormalizedUsage) -> Conclusion {
     if normalized.normalization_source == "unknown-schema" {
         return Conclusion::SchemaMismatch;
     }
+    let required = schema_smoke_required_fields(&normalized.normalization_source);
+    if !required.is_empty() {
+        // Endpoint schema with explicit requirements: ALL must be derived.
+        if required
+            .iter()
+            .all(|field| required_field_derived(*field, normalized))
+        {
+            return Conclusion::Match;
+        }
+        return Conclusion::SchemaMismatch;
+    }
+    // Base requirement for schemas without a specific set: any successful
+    // derivation counts as a smoke match.
     let anything_derived = normalized.total_input_tokens.is_some()
         || normalized.fresh_input_tokens.is_some()
         || normalized.cache_read_tokens.is_some()
@@ -227,6 +281,37 @@ mod tests {
             explanation: "nothing derivable".to_string(),
         };
         assert_eq!(classify_schema_smoke(&empty), Conclusion::SchemaMismatch);
+    }
+
+    #[test]
+    fn deepseek_schema_smoke_requires_input_and_cache_fields() {
+        // completion/output tokens ALONE are not enough for the DeepSeek
+        // schema: the defining hit/miss input categories must be derivable.
+        let completion_only = NormalizedUsage {
+            total_input_tokens: None,
+            fresh_input_tokens: None,
+            cache_read_tokens: None,
+            cache_write_tokens: None,
+            output_tokens: Some(8),
+            normalization_source: SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1.to_string(),
+            explanation: "completion only".to_string(),
+        };
+        assert_eq!(
+            classify_schema_smoke(&completion_only),
+            Conclusion::SchemaMismatch
+        );
+
+        // Once hit + miss derive the input/cache categories, it is a MATCH.
+        let complete = NormalizedUsage {
+            total_input_tokens: Some(5000),
+            fresh_input_tokens: Some(1000),
+            cache_read_tokens: Some(4000),
+            cache_write_tokens: None,
+            output_tokens: Some(8),
+            normalization_source: SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1.to_string(),
+            explanation: "hit + miss".to_string(),
+        };
+        assert_eq!(classify_schema_smoke(&complete), Conclusion::Match);
     }
 
     #[test]

@@ -79,6 +79,21 @@ pub fn deepseek_ok(hit: u64, miss: u64, completion: u64) -> String {
     .unwrap()
 }
 
+/// A DeepSeek-shaped response whose usage reports completion tokens but
+/// lacks the defining `prompt_cache_hit_tokens` / `prompt_cache_miss_tokens`
+/// input categories.
+pub fn deepseek_completion_only() -> String {
+    serde_json::to_string(&serde_json::json!({
+        "id": "deepseek-test",
+        "model": "deepseek-test-model",
+        "choices": [
+            { "index": 0, "message": { "role": "assistant", "content": "OK" }, "finish_reason": "stop" }
+        ],
+        "usage": { "completion_tokens": 8 }
+    }))
+    .unwrap()
+}
+
 /// A response whose usage object contains only unknown fields.
 pub fn usage_only_unknown_fields() -> String {
     serde_json::to_string(&serde_json::json!({

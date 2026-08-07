@@ -42,13 +42,25 @@ pub fn sanitize_experiment_id(id: &str) -> Result<String, LiveError> {
 
 /// The artifact directory for an experiment, guaranteed to be a child of
 /// `runs_dir`.
+///
+/// An **existing** destination that is a symlink is rejected: artifact
+/// writes must never be redirected through a link to an arbitrary
+/// filesystem location.
 pub fn artifact_dir(runs_dir: &Path, experiment_id: &str) -> Result<PathBuf, LiveError> {
     let id = sanitize_experiment_id(experiment_id)?;
     let dir = runs_dir.join(&id);
     if !dir.starts_with(runs_dir) {
         return Err(LiveError::guard("artifact path escapes the runs directory"));
     }
-    Ok(dir)
+    match std::fs::symlink_metadata(&dir) {
+        Ok(meta) if meta.file_type().is_symlink() => Err(LiveError::guard(format!(
+            "artifact destination is a symlink and will not be written through: {}",
+            dir.display()
+        ))),
+        // Exists as a regular file/directory (write handles that) or does
+        // not exist yet.
+        _ => Ok(dir),
+    }
 }
 
 /// Write a JSON value to `path` (pretty-printed), creating parent
@@ -113,6 +125,29 @@ mod tests {
         assert_eq!(dir, runs.join("exp-1"));
         // A hostile id must be rejected before path building.
         assert!(artifact_dir(&runs, "../escape").is_err());
+        std::fs::remove_dir_all(&runs).ok();
+    }
+
+    #[test]
+    fn artifact_dir_rejects_existing_symlink_destination() {
+        let runs = temp_dir("symlink");
+        let target = runs.join("real-target");
+        std::fs::create_dir_all(&target).unwrap();
+        let link = runs.join("exp-symlink");
+        #[cfg(unix)]
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+        #[cfg(windows)]
+        {
+            // Symlink creation needs privileges/developer mode; skip the
+            // test when the environment cannot create one.
+            if std::os::windows::fs::symlink_dir(&target, &link).is_err() {
+                std::fs::remove_dir_all(&runs).ok();
+                return;
+            }
+        }
+        let err = artifact_dir(&runs, "exp-symlink").unwrap_err();
+        assert!(matches!(err, LiveError::Guard { .. }));
+        assert!(err.to_string().contains("symlink"));
         std::fs::remove_dir_all(&runs).ok();
     }
 

@@ -44,6 +44,33 @@ const SAFE_RESPONSE_HEADERS: &[&str] = &[
     "openai-organization",
 ];
 
+/// Conservative Phase 0B ceiling on a provider response body. No unbounded
+/// `read_to_end` is ever called on an arbitrary provider response; a body
+/// over this ceiling is rejected with a safe error that never includes it.
+pub const MAX_RESPONSE_BODY_BYTES: usize = 2 * 1024 * 1024;
+
+/// Append bytes from `reader` to `out` up to `limit` bytes total, rejecting
+/// anything larger with a safe error that never includes the body.
+fn append_body_bounded(
+    reader: &mut impl Read,
+    out: &mut Vec<u8>,
+    limit: usize,
+) -> Result<(), LiveError> {
+    let mut buf = [0u8; 8192];
+    loop {
+        let n = reader.read(&mut buf).map_err(|e| LiveError::Network {
+            message: format!("failed to read response body: {e}"),
+        })?;
+        if n == 0 {
+            return Ok(());
+        }
+        if out.len() + n > limit {
+            return Err(LiveError::ResponseTooLarge { limit_bytes: limit });
+        }
+        out.extend_from_slice(&buf[..n]);
+    }
+}
+
 /// A minimal POST-JSON transport. The mock implementation lets CI exercise
 /// the full pipeline without network access.
 pub trait LiveHttpTransport: Send + Sync {
@@ -114,6 +141,13 @@ impl LiveHttpTransport for ReqwestTransport {
         let time_to_headers_ms = start.elapsed().as_millis() as u64;
         let status = response.status().as_u16();
 
+        // Treat every status outside 200..=299 as an HTTP error and STOP:
+        // redirects are already not followed, no retry happens, and a 3xx
+        // body is never parsed as provider JSON (it is not even read).
+        if !(200..=299).contains(&status) {
+            return Err(LiveError::HttpStatus { status });
+        }
+
         let mut safe_headers = BTreeMap::new();
         for name in SAFE_RESPONSE_HEADERS {
             if let Some(value) = response.headers().get(*name) {
@@ -123,29 +157,23 @@ impl LiveHttpTransport for ReqwestTransport {
             }
         }
 
-        // Read the body in two steps to approximate time-to-first-byte.
+        // Read the body in two steps to approximate time-to-first-byte, with
+        // a hard ceiling. No unbounded read_to_end on a provider response.
+        let mut body_bytes = Vec::new();
         let mut first = [0u8; 64];
         let n = response.read(&mut first).map_err(|e| LiveError::Network {
             message: format!("failed to read response body: {e}"),
         })?;
         let time_to_first_body_byte_ms = Some(start.elapsed().as_millis() as u64);
-        let mut rest = Vec::new();
-        response
-            .read_to_end(&mut rest)
-            .map_err(|e| LiveError::Network {
-                message: format!("failed to read response body: {e}"),
-            })?;
-        let total_ms = start.elapsed().as_millis() as u64;
-
-        let mut body_bytes = Vec::with_capacity(n + rest.len());
-        body_bytes.extend_from_slice(&first[..n]);
-        body_bytes.extend_from_slice(&rest);
-        let body = String::from_utf8_lossy(&body_bytes).into_owned();
-
-        if status >= 400 {
-            // STOP: no automatic retry. Body is deliberately not included.
-            return Err(LiveError::HttpStatus { status });
+        if n > MAX_RESPONSE_BODY_BYTES {
+            return Err(LiveError::ResponseTooLarge {
+                limit_bytes: MAX_RESPONSE_BODY_BYTES,
+            });
         }
+        body_bytes.extend_from_slice(&first[..n]);
+        append_body_bounded(&mut response, &mut body_bytes, MAX_RESPONSE_BODY_BYTES)?;
+        let total_ms = start.elapsed().as_millis() as u64;
+        let body = String::from_utf8_lossy(&body_bytes).into_owned();
 
         Ok(HttpResponse {
             status,
@@ -219,6 +247,14 @@ impl LiveHttpTransport for MockTransport {
             timeout,
         });
         match self.responses.lock().unwrap().pop_front() {
+            // Mirror the real transport's status policy: any status outside
+            // 200..=299 is an HTTP error and the body is never returned (so
+            // a 3xx body can never be parsed as provider JSON).
+            Some(Ok(response)) if !(200..=299).contains(&response.status) => {
+                Err(LiveError::HttpStatus {
+                    status: response.status,
+                })
+            }
             Some(result) => result,
             None => Err(LiveError::Network {
                 message: "mock transport exhausted its canned responses".to_string(),
@@ -247,6 +283,7 @@ pub fn err_response(error: LiveError) -> Result<HttpResponse, LiveError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Write;
 
     #[test]
     fn mock_serves_canned_responses_in_order() {
@@ -306,5 +343,93 @@ mod tests {
         assert!(calls[0].body.contains("a"));
         // The recorded call must never contain the credential header value.
         assert!(!format!("{:?}", calls).contains("SUPER-SECRET"));
+    }
+
+    #[test]
+    fn response_just_under_limit_succeeds() {
+        let data = vec![b'x'; MAX_RESPONSE_BODY_BYTES - 1];
+        let mut cursor = std::io::Cursor::new(data);
+        let mut out = Vec::new();
+        append_body_bounded(&mut cursor, &mut out, MAX_RESPONSE_BODY_BYTES).unwrap();
+        assert_eq!(out.len(), MAX_RESPONSE_BODY_BYTES - 1);
+    }
+
+    #[test]
+    fn oversized_response_is_rejected_without_body() {
+        let data = vec![b'x'; MAX_RESPONSE_BODY_BYTES + 1];
+        let mut cursor = std::io::Cursor::new(data);
+        let mut out = Vec::new();
+        let err = append_body_bounded(&mut cursor, &mut out, MAX_RESPONSE_BODY_BYTES).unwrap_err();
+        // A clear, safe error that never includes the response body: it is
+        // a short message, not a 2 MiB echo.
+        assert!(matches!(err, LiveError::ResponseTooLarge { .. }));
+        let text = err.to_string();
+        assert!(text.contains("ceiling"));
+        assert!(
+            text.len() < 256,
+            "error must not embed the body, got {text}"
+        );
+        // Whatever prefix was streamed before detection never exceeds the
+        // ceiling, and the oversized body is never fully consumed.
+        assert!(out.len() <= MAX_RESPONSE_BODY_BYTES);
+        assert!(out.len() < MAX_RESPONSE_BODY_BYTES + 1);
+    }
+
+    #[test]
+    fn response_exactly_at_limit_succeeds() {
+        let data = vec![b'x'; MAX_RESPONSE_BODY_BYTES];
+        let mut cursor = std::io::Cursor::new(data);
+        let mut out = Vec::new();
+        append_body_bounded(&mut cursor, &mut out, MAX_RESPONSE_BODY_BYTES).unwrap();
+        assert_eq!(out.len(), MAX_RESPONSE_BODY_BYTES);
+    }
+
+    #[test]
+    fn redirect_status_is_an_error_and_is_not_followed() {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let url = format!("http://{addr}/start");
+        let requests = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let counter = requests.clone();
+        let handle = std::thread::spawn(move || {
+            // Accept at most one connection and then stop. If a redirect
+            // WERE followed, the client's second connection would be refused
+            // (server already gone), so the client would see a network error
+            // instead of the 302 — failing the assertion below.
+            if let Some(stream) = listener.incoming().next() {
+                let Ok(mut stream) = stream else { return };
+                counter.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                let mut req = [0u8; 512];
+                let _ = stream.read(&mut req);
+                let response = "HTTP/1.1 302 Found\r\nLocation: http://127.0.0.1:1/redirected\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
+                let _ = stream.write_all(response.as_bytes());
+            }
+        });
+        let transport = ReqwestTransport::new().unwrap();
+        let err = transport
+            .post_json(&url, &BTreeMap::new(), "{}", Duration::from_secs(5))
+            .unwrap_err();
+        assert!(matches!(err, LiveError::HttpStatus { status: 302 }));
+        handle.join().unwrap();
+        // Exactly one request hit the server: no redirect was followed.
+        assert_eq!(requests.load(std::sync::atomic::Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn mock_treats_3xx_as_http_error_and_never_returns_the_body() {
+        let mock = MockTransport::new(vec![
+            ok_response(302, "<html>redirect</html>"),
+            ok_response(200, r#"{"ok":true}"#),
+        ]);
+        let headers = BTreeMap::new();
+        let err = mock
+            .post_json("u", &headers, "{}", Duration::from_secs(1))
+            .unwrap_err();
+        assert!(matches!(err, LiveError::HttpStatus { status: 302 }));
+        // The redirect body is never returned, so it can never be parsed.
+        let second = mock
+            .post_json("u", &headers, "{}", Duration::from_secs(1))
+            .unwrap();
+        assert_eq!(second.status, 200);
     }
 }

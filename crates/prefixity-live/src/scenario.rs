@@ -8,11 +8,14 @@ use crate::error::LiveError;
 pub enum Scenario {
     /// One harmless request; verifies the usage schema matches our normalizer.
     SchemaSmoke,
-    /// Two (or three for DeepSeek) sequential requests sharing a large prefix.
+    /// Sequential requests sharing a large prefix (2 for OpenAI/Anthropic,
+    /// 3 for DeepSeek, which primes the cache with A and B).
     StablePrefix,
-    /// A block near the beginning changes in request B.
+    /// A block near the beginning changes (turn B for OpenAI/Anthropic,
+    /// turn C for DeepSeek so A and B first establish the common prefix).
     EarlyDivergence,
-    /// The large prefix is unchanged; only a small tail changes.
+    /// The large prefix is unchanged; only a small tail changes (2 requests
+    /// for OpenAI/Anthropic, 3 for DeepSeek).
     LateDivergence,
 }
 

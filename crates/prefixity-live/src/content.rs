@@ -71,7 +71,8 @@ pub fn generate_prefix(seed: u64, target_tokens: u64) -> String {
 }
 
 /// The experiment header block text (identical across turns, except for
-/// early-divergence turn B which appends a marker).
+/// early-divergence, where it diverges from the plan's configured turn
+/// onward: turn B for OpenAI/Anthropic, turn C for DeepSeek).
 pub fn header_for(experiment_id: &str, seed: u64) -> String {
     format!("prefixity-live experiment {experiment_id} seed {seed}")
 }

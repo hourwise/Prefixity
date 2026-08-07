@@ -15,6 +15,37 @@ use prefixity_core::usage::{
 use serde_json::Value;
 use std::collections::BTreeMap;
 
+/// The explicit per-provider, per-scenario request plan.
+///
+/// Kept explicit (rather than hidden special-case arithmetic) so each
+/// provider/scenario combination is auditable.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ProviderTurnPlan {
+    /// Number of requests the scenario runs for this provider.
+    pub turns: usize,
+    /// First turn (1-based, inclusive) whose early header is diverged, for
+    /// `early-divergence`. `None` means the header is never diverged.
+    pub header_diverges_from: Option<usize>,
+}
+
+impl ProviderTurnPlan {
+    /// A plan with no early-header divergence.
+    pub fn stable(turns: usize) -> ProviderTurnPlan {
+        ProviderTurnPlan {
+            turns,
+            header_diverges_from: None,
+        }
+    }
+
+    /// An early-divergence plan where the early header diverges at `turn`.
+    pub fn diverging(turns: usize, turn: usize) -> ProviderTurnPlan {
+        ProviderTurnPlan {
+            turns,
+            header_diverges_from: Some(turn),
+        }
+    }
+}
+
 /// Common research interface for a live provider.
 pub trait LiveProvider: Send + Sync + std::fmt::Debug {
     /// Canonical provider id (`openai`, `anthropic`, `deepseek`).
@@ -54,8 +85,12 @@ pub trait LiveProvider: Send + Sync + std::fmt::Debug {
     fn prefix_structural_path(&self) -> &'static str;
     /// Structural path of the tail block in the wire message.
     fn tail_structural_path(&self) -> &'static str;
-    /// Number of requests the given scenario plans for this provider.
-    fn request_count(&self, scenario: Scenario) -> usize;
+    /// The explicit per-provider, per-scenario turn plan: how many requests
+    /// run and, for `early-divergence`, the first turn (1-based, inclusive)
+    /// whose early header is diverged. OpenAI and Anthropic diverge at turn
+    /// B; DeepSeek runs A/B/C and diverges only at turn C so that A and B
+    /// first establish the common prefix.
+    fn plan_turns(&self, scenario: Scenario) -> ProviderTurnPlan;
 }
 
 /// Shared helper: extract the `usage` object verbatim.
@@ -86,6 +121,24 @@ fn chat_completions_body(model: &str, header: &str, prefix: &str, tail: &str) ->
         "max_tokens": 8,
         "temperature": 0,
         "stream": false
+    })
+}
+
+fn deepseek_chat_completions_body(model: &str, header: &str, prefix: &str, tail: &str) -> Value {
+    // Phase 0B measures prompt/cache behaviour, not reasoning: thinking is
+    // explicitly disabled so request cost is dominated by the prefix. The
+    // model is never hard-coded; it always comes from the CLI.
+    serde_json::json!({
+        "model": model,
+        "messages": [
+            { "role": "system", "content": header },
+            { "role": "system", "content": prefix },
+            { "role": "user", "content": tail }
+        ],
+        "max_tokens": 8,
+        "temperature": 0,
+        "stream": false,
+        "thinking": { "type": "disabled" }
     })
 }
 
@@ -146,10 +199,11 @@ impl LiveProvider for OpenAiProvider {
     fn tail_structural_path(&self) -> &'static str {
         "messages[2]"
     }
-    fn request_count(&self, scenario: Scenario) -> usize {
+    fn plan_turns(&self, scenario: Scenario) -> ProviderTurnPlan {
         match scenario {
-            Scenario::SchemaSmoke => 1,
-            _ => 2,
+            Scenario::SchemaSmoke => ProviderTurnPlan::stable(1),
+            Scenario::EarlyDivergence => ProviderTurnPlan::diverging(2, 2),
+            _ => ProviderTurnPlan::stable(2),
         }
     }
 }
@@ -222,10 +276,11 @@ impl LiveProvider for AnthropicProvider {
     fn tail_structural_path(&self) -> &'static str {
         "messages[0]"
     }
-    fn request_count(&self, scenario: Scenario) -> usize {
+    fn plan_turns(&self, scenario: Scenario) -> ProviderTurnPlan {
         match scenario {
-            Scenario::SchemaSmoke => 1,
-            _ => 2,
+            Scenario::SchemaSmoke => ProviderTurnPlan::stable(1),
+            Scenario::EarlyDivergence => ProviderTurnPlan::diverging(2, 2),
+            _ => ProviderTurnPlan::stable(2),
         }
     }
 }
@@ -233,10 +288,12 @@ impl LiveProvider for AnthropicProvider {
 /// DeepSeek adapter.
 ///
 /// DeepSeek documentation describes cache construction as potentially
-/// requiring a prior completed request, so the stable-prefix scenario plans
-/// **three** requests for this provider (A, B, C) and the observed behaviour
-/// is preserved rather than assumed. The plan is still bounded by
-/// `--max-requests`.
+/// requiring a prior completed request, so every non-schema-smoke scenario
+/// plans **three** requests (A, B, C): A and B first establish the common
+/// prefix, and the C request is the one whose reuse is measured. For
+/// `early-divergence` the early header is only diverged at C, never at B.
+/// The plan is still bounded by `--max-requests`. Thinking is explicitly
+/// disabled (see [`DeepSeekProvider::build_request_body`]).
 #[derive(Debug, Default)]
 pub struct DeepSeekProvider;
 
@@ -272,7 +329,7 @@ impl LiveProvider for DeepSeekProvider {
         prefix: &str,
         tail: &str,
     ) -> Result<Value, LiveError> {
-        Ok(chat_completions_body(model, header, prefix, tail))
+        Ok(deepseek_chat_completions_body(model, header, prefix, tail))
     }
     fn extract_raw_usage(&self, body: &Value) -> Option<RawUsage> {
         usage_from_body(body).map(|mut u| {
@@ -292,11 +349,15 @@ impl LiveProvider for DeepSeekProvider {
     fn tail_structural_path(&self) -> &'static str {
         "messages[2]"
     }
-    fn request_count(&self, scenario: Scenario) -> usize {
+    fn plan_turns(&self, scenario: Scenario) -> ProviderTurnPlan {
         match scenario {
-            Scenario::SchemaSmoke => 1,
-            Scenario::StablePrefix => 3, // documented: cache construction may need a prior request
-            _ => 2,
+            Scenario::SchemaSmoke => ProviderTurnPlan::stable(1),
+            // A and B first establish the common prefix; the early header
+            // only diverges at C. The important comparison is B -> C.
+            Scenario::EarlyDivergence => ProviderTurnPlan::diverging(3, 3),
+            // Documented: cache construction may require a prior completed
+            // request, so B and D also run A, B, C.
+            _ => ProviderTurnPlan::stable(3),
         }
     }
 }
@@ -373,12 +434,72 @@ mod tests {
     }
 
     #[test]
-    fn deepseek_stable_prefix_plans_three_requests() {
+    fn deepseek_plans_three_requests_for_b_d_and_diverges_only_at_c() {
         let deepseek = DeepSeekProvider;
-        assert_eq!(deepseek.request_count(Scenario::StablePrefix), 3);
-        assert_eq!(deepseek.request_count(Scenario::SchemaSmoke), 1);
-        assert_eq!(deepseek.request_count(Scenario::EarlyDivergence), 2);
-        assert_eq!(deepseek.request_count(Scenario::LateDivergence), 2);
+        assert_eq!(
+            deepseek.plan_turns(Scenario::SchemaSmoke),
+            ProviderTurnPlan::stable(1)
+        );
+        // B, C, D all prime with A and B, then measure the third request.
+        assert_eq!(
+            deepseek.plan_turns(Scenario::StablePrefix),
+            ProviderTurnPlan::stable(3)
+        );
+        assert_eq!(
+            deepseek.plan_turns(Scenario::LateDivergence),
+            ProviderTurnPlan::stable(3)
+        );
+        // Early divergence only at turn C so A/B establish the prefix.
+        assert_eq!(
+            deepseek.plan_turns(Scenario::EarlyDivergence),
+            ProviderTurnPlan::diverging(3, 3)
+        );
+    }
+
+    #[test]
+    fn openai_and_anthropic_keep_two_request_plans() {
+        let openai = OpenAiProvider;
+        let anthropic = AnthropicProvider;
+        for provider in [&openai as &dyn LiveProvider, &anthropic] {
+            assert_eq!(
+                provider.plan_turns(Scenario::SchemaSmoke),
+                ProviderTurnPlan::stable(1)
+            );
+            assert_eq!(
+                provider.plan_turns(Scenario::StablePrefix),
+                ProviderTurnPlan::stable(2)
+            );
+            assert_eq!(
+                provider.plan_turns(Scenario::LateDivergence),
+                ProviderTurnPlan::stable(2)
+            );
+            // Two-request early divergence changes the header at turn B.
+            assert_eq!(
+                provider.plan_turns(Scenario::EarlyDivergence),
+                ProviderTurnPlan::diverging(2, 2)
+            );
+        }
+    }
+
+    #[test]
+    fn deepseek_request_body_explicitly_disables_thinking() {
+        // The model stays explicit (never hard-coded in the adapter);
+        // thinking is disabled and temperature stays 0.
+        let body = DeepSeekProvider
+            .build_request_body("deepseek-v4-flash", "h", "p", "t")
+            .unwrap();
+        assert_eq!(body["model"], "deepseek-v4-flash");
+        assert_eq!(body["temperature"], 0);
+        assert_eq!(body["thinking"]["type"], "disabled");
+    }
+
+    #[test]
+    fn openai_request_body_has_no_thinking_field() {
+        let body = OpenAiProvider
+            .build_request_body("gpt-test", "h", "p", "t")
+            .unwrap();
+        assert!(body.get("thinking").is_none());
+        assert_eq!(body["temperature"], 0);
     }
 
     #[test]

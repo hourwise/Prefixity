@@ -36,6 +36,14 @@ pub enum LiveError {
     #[error("request timed out")]
     Timeout,
 
+    /// The provider response body exceeded the Phase 0B size ceiling. The
+    /// body is never included in the error (see module docs).
+    #[error("provider response body exceeded the {limit_bytes} byte ceiling")]
+    ResponseTooLarge {
+        /// The ceiling in bytes.
+        limit_bytes: usize,
+    },
+
     /// The provider response could not be parsed.
     #[error("invalid provider response: {message}")]
     InvalidResponse {
