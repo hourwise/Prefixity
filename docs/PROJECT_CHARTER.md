@@ -21,7 +21,7 @@ Phase 0 is an **offline research/analysis harness**. It answers:
 
 - What context blocks were sent?
 - Which blocks changed between consecutive requests?
-- Where did the reusable prefix first diverge?
+- Where did the observed reusable prefix first diverge (trace-to-trace)?
 - How much context theoretically remained reusable?
 - What cache usage did the provider report, if supplied in the trace?
 - What portion was cache-read, cache-written and fresh?
@@ -35,9 +35,7 @@ access is required.
 
 ## Out of scope for Phase 0 (explicit non-goals)
 
-- Creating/publishing a GitHub repository (the repository stays local).
-- Publishing crates/packages.
-- Committing (unless explicitly asked).
+- Publishing crates/packages or release artifacts.
 - Secrets, paid API calls, telemetry.
 - Background daemon, localhost LLM proxy, GUI/dashboard, authentication.
 - SQLite (unless an unavoidable requirement is demonstrated).
@@ -45,6 +43,12 @@ access is required.
 - Automated context mutation of live requests.
 - Automatic compression (a reserved policy/interface only).
 - Live provider calls (deferred to a later Phase 0B live harness).
+
+Phase 0A.1 adds an explicit conceptual separation: the **prefixity score**
+(experimental heuristic), **observed prefix reuse** (trace-to-trace
+comparison), and **provider-reported cache reuse** (normalized provider
+usage) are distinct concepts and are never conflated in output. A single
+trace can never prove reuse.
 
 ## Source-of-truth principles
 

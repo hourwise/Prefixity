@@ -125,45 +125,58 @@ pub fn print_analysis(cli: &crate::cli::Cli, analysis: &TraceAnalysis) {
     );
     println!();
 
-    if let Some(usage) = &analysis.usage {
-        println!("Provider-reported usage:");
-        println!("  input          {}", opt_comma(usage.input_tokens));
-        println!("  cache read     {}", opt_comma(usage.cache_read_tokens));
-        println!("  cache write    {}", opt_comma(usage.cache_write_tokens));
-        println!("  output         {}", opt_comma(usage.output_tokens));
+    if let Some(normalized) = &analysis.normalized_usage {
+        println!(
+            "Provider-reported usage (normalized from schema '{}'):",
+            sanitize_for_terminal(&normalized.normalization_source)
+        );
+        println!(
+            "  total input   {}",
+            opt_comma(normalized.total_input_tokens)
+        );
+        println!(
+            "  fresh input   {}",
+            opt_comma(normalized.fresh_input_tokens)
+        );
+        println!(
+            "  cache read    {}",
+            opt_comma(normalized.cache_read_tokens)
+        );
+        println!(
+            "  cache write   {}",
+            opt_comma(normalized.cache_write_tokens)
+        );
+        println!("  output        {}", opt_comma(normalized.output_tokens));
+        println!("  note: {}", sanitize_for_terminal(&normalized.explanation));
         if let Some(rec) = &analysis.reconciliation {
-            println!("  fresh (derived) {}", opt_comma(rec.reported_fresh_tokens));
             println!();
-            println!("Reconciliation (theoretical vs reported):");
+            println!("Reconciliation (provider-reported vs heuristic candidates):");
             println!(
-                "  theoretical reusable prefix: {}",
-                comma(rec.theoretical_reusable_prefix_tokens)
+                "  leading stable-prefix candidate tokens: {} (heuristic, NOT observed reuse)",
+                comma(rec.leading_stable_prefix_candidate_tokens)
             );
             println!("  note: {}", sanitize_for_terminal(&rec.note));
         }
         println!();
     }
 
-    println!("Theoretical context accounting (estimates):");
+    println!("Heuristic stable-prefix candidates (single trace; NOT observed reuse):");
     println!(
-        "  stable tokens    {} ({:.1}%)",
-        comma(analysis.theoretical_stable_tokens),
+        "  candidate tokens  {} ({:.1}%)",
+        comma(analysis.stable_prefix_candidate_tokens),
         fraction(
-            analysis.theoretical_stable_tokens,
+            analysis.stable_prefix_candidate_tokens,
             analysis.total_estimated_tokens
         )
     );
     println!(
-        "  volatile tokens  {} ({:.1}%)",
-        comma(analysis.theoretical_volatile_tokens),
-        fraction(
-            analysis.theoretical_volatile_tokens,
-            analysis.total_estimated_tokens
-        )
+        "  volatile tokens   {} ({:.1}%)",
+        comma(analysis.volatile_tokens),
+        fraction(analysis.volatile_tokens, analysis.total_estimated_tokens)
     );
     println!(
-        "  theoretical reusable prefix: {}",
-        comma(analysis.theoretical_reusable_prefix_tokens)
+        "  leading candidate prefix: {}",
+        comma(analysis.leading_stable_prefix_candidate_tokens)
     );
     println!();
 
@@ -205,9 +218,10 @@ pub fn print_analysis(cli: &crate::cli::Cli, analysis: &TraceAnalysis) {
                 "external"
             }
         );
+        println!("  total input  {} tok", comma(cost.total_input_tokens));
         println!(
             "  fresh input  {} tok  -> {:.6}",
-            comma(cost.fresh_tokens),
+            comma(cost.fresh_input_tokens),
             cost.fresh_input_cost
         );
         println!(
@@ -226,6 +240,10 @@ pub fn print_analysis(cli: &crate::cli::Cli, analysis: &TraceAnalysis) {
             cost.output_cost
         );
         println!("  total                = {:.6}", cost.total_cost);
+        println!(
+            "  fresh derivation: {}",
+            sanitize_for_terminal(&cost.fresh_input_derivation)
+        );
         println!();
     } else {
         println!("Cost: not computed (supply --provider-profile to estimate cost).");
@@ -264,9 +282,23 @@ pub fn print_comparison(cli: &crate::cli::Cli, comparison: &Comparison) {
         comparison.unchanged_block_count
     );
     println!(
-        "  theoretical cache-write tokens: {}",
-        comma(comparison.theoretical_cache_write_tokens)
+        "  observed reusable prefix tokens (structural): {}",
+        comma(comparison.observed_reusable_prefix_tokens)
     );
+    println!(
+        "  estimated changed tokens: {}",
+        comma(comparison.estimated_changed_tokens)
+    );
+    match comparison.provider_reported_cache_read_tokens {
+        Some(reported) => println!(
+            "  provider-reported cache read (trace B): {}",
+            comma(reported)
+        ),
+        None => println!("  provider-reported cache read (trace B): (not reported)"),
+    }
+    if let Some(note) = &comparison.reuse_reconciliation_note {
+        println!("  {}", sanitize_for_terminal(note));
+    }
 
     if let Some(economics) = &comparison.cache_economics {
         println!();
@@ -313,18 +345,18 @@ pub fn print_simulation(cli: &crate::cli::Cli, result: &SimulationResult) {
     println!("  difference  {}", signed_i64(result.token_difference));
     println!();
 
-    println!("Theoretical reusable prefix:");
+    println!("Stable-prefix candidate tokens (heuristic, NOT observed reuse):");
     println!(
         "  original    {}",
-        comma(result.original_reusable_prefix_tokens)
+        comma(result.original_stable_prefix_candidate_tokens)
     );
     println!(
         "  simulated   {}",
-        comma(result.simulated_reusable_prefix_tokens)
+        comma(result.simulated_stable_prefix_candidate_tokens)
     );
     println!(
         "  difference  {}",
-        signed_i64(result.reusable_prefix_difference)
+        signed_i64(result.stable_prefix_candidate_difference)
     );
     println!();
 
@@ -345,14 +377,25 @@ pub fn print_simulation(cli: &crate::cli::Cli, result: &SimulationResult) {
     if result.relocated_blocks.is_empty() {
         println!("Relocated blocks: (none)");
     } else {
-        println!("Relocated blocks:");
+        println!("Relocated blocks (EXPERIMENTAL — reordering may affect semantics):");
         for relocation in &result.relocated_blocks {
+            let label = match &relocation.safety {
+                prefixity_core::policy::RelocationSafety::Safe => "SAFE",
+                prefixity_core::policy::RelocationSafety::Experimental(_) => "EXPERIMENTAL",
+            };
             println!(
-                "  {}  {} -> {}",
+                "  {}  {} -> {}  [{}]",
                 sanitize_for_terminal(&relocation.id),
                 relocation.from_position,
-                relocation.to_position
+                relocation.to_position,
+                label
             );
+        }
+    }
+    if !result.unsafe_transformations_deferred.is_empty() {
+        println!("Unsafe transformations deferred (NOT applied):");
+        for item in &result.unsafe_transformations_deferred {
+            println!("  - {}", sanitize_for_terminal(item));
         }
     }
     println!();

@@ -1,5 +1,5 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "request_id": "02-turn-1",
   "session_id": "session-02",
   "timestamp": "2026-08-07T11:00:00Z",
@@ -57,10 +57,13 @@
     }
   ],
   "usage": {
-    "input_tokens": 9660,
-    "cache_read_tokens": 0,
-    "cache_write_tokens": 9500,
-    "output_tokens": 200
+    "provider_schema": "synthetic",
+    "raw": {
+      "input_tokens": 9660,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 9500,
+      "output_tokens": 200
+    }
   },
   "metadata": {
     "scenario": "02-early-timestamp-break",

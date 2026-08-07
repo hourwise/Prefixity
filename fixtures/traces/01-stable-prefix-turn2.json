@@ -1,5 +1,5 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "request_id": "01-turn-2",
   "session_id": "session-01",
   "timestamp": "2026-08-07T10:00:05Z",
@@ -49,10 +49,13 @@
     }
   ],
   "usage": {
-    "input_tokens": 9700,
-    "cache_read_tokens": 9500,
-    "cache_write_tokens": 0,
-    "output_tokens": 250
+    "provider_schema": "synthetic",
+    "raw": {
+      "input_tokens": 9700,
+      "cache_read_tokens": 9500,
+      "cache_write_tokens": 0,
+      "output_tokens": 250
+    }
   },
   "latency": {
     "time_to_first_token_ms": 60,

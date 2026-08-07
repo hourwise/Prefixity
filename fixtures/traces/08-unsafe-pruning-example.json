@@ -1,5 +1,5 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "request_id": "08-unsafe-pruning",
   "session_id": "session-08",
   "timestamp": "2026-08-07T17:00:00Z",
@@ -53,10 +53,13 @@
     }
   ],
   "usage": {
-    "input_tokens": 57850,
-    "cache_read_tokens": 7700,
-    "cache_write_tokens": 0,
-    "output_tokens": 100
+    "provider_schema": "synthetic",
+    "raw": {
+      "input_tokens": 57850,
+      "cache_read_tokens": 7700,
+      "cache_write_tokens": 0,
+      "output_tokens": 100
+    }
   },
   "metadata": {
     "scenario": "08-unsafe-pruning-example",

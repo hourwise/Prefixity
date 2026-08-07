@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "request_id": "13-same-content-different-zone",
+  "session_id": "session-13",
+  "timestamp": "2026-08-07T18:20:00Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "b-system",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "b3d070f35b1fe426b69a8e363db1a398aba8803c94bb53b6d49e791d4706dfd9",
+      "token_count": 5,
+      "byte_count": 14,
+      "content": "same text here",
+      "semantic_zone": "system",
+      "structural_path": "system[0]",
+      "role": "system"
+    },
+    {
+      "id": "b-tools",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "b3d070f35b1fe426b69a8e363db1a398aba8803c94bb53b6d49e791d4706dfd9",
+      "token_count": 5,
+      "byte_count": 14,
+      "content": "same text here",
+      "semantic_zone": "tools",
+      "structural_path": "tools[0]",
+      "role": "tool"
+    }
+  ],
+  "metadata": {
+    "scenario": "13-same-content-different-zone",
+    "note": "Identical text in different semantic zones: content hashes match, structural fingerprints must differ."
+  }
+}

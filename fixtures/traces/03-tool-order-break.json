@@ -1,5 +1,5 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "request_id": "03-turn-1",
   "session_id": "session-03",
   "timestamp": "2026-08-07T12:00:00Z",
@@ -65,10 +65,13 @@
     }
   ],
   "usage": {
-    "input_tokens": 8050,
-    "cache_read_tokens": 0,
-    "cache_write_tokens": 7900,
-    "output_tokens": 180
+    "provider_schema": "synthetic",
+    "raw": {
+      "input_tokens": 8050,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 7900,
+      "output_tokens": 180
+    }
   },
   "metadata": {
     "scenario": "03-tool-order-break",

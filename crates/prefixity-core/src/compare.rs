@@ -1,21 +1,31 @@
 //! Comparison of two consecutive requests.
 //!
-//! Deterministically detects where the reusable prefix first diverges,
-//! classifies every differing position (changed / added / removed /
-//! reordered), and estimates the theoretically reusable tokens. When a cost
-//! profile is supplied, a theoretical cache-economics evaluation is included.
+//! Deterministically detects where the **observed** reusable prefix first
+//! diverges, classifies every differing position (changed / added / removed /
+//! reordered) using the **structural fingerprint**, and estimates the
+//! observed reusable prefix tokens.
+//!
+//! Three concepts stay distinct:
+//!
+//! * **observed structural reuse** — this module (trace-to-trace);
+//! * **provider-reported cache reuse** — normalized from raw usage
+//!   ([`crate::usage`]), kept separate and authoritative;
+//! * **prefixity score** — the heuristic estimate ([`crate::prefixity_score`]),
+//!   never used here to claim reuse.
 
 use crate::analysis::TraceRef;
 use crate::cost::{evaluate_cache_economics, CacheEconomics};
 use crate::error::PrefixityError;
 use crate::model::RequestTrace;
+use crate::structure::structural_fingerprint;
 use crate::tokens::block_token_estimate;
+use crate::usage::normalize_usage;
 use crate::validation::validate_trace;
 
 /// How a position differs between two traces.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub enum DiffKind {
-    /// The block at this position is identical in both traces.
+    /// The block at this position is structurally identical in both traces.
     Unchanged,
     /// The block content changed in place.
     Changed,
@@ -36,10 +46,14 @@ pub struct DivergencePoint {
     pub previous_block_id: String,
     /// The block ID in the later trace, if any.
     pub current_block_id: String,
-    /// The earlier trace's hash at this position, if any.
+    /// The earlier trace's content hash at this position, if any.
     pub previous_hash: String,
-    /// The later trace's hash at this position, if any.
+    /// The later trace's content hash at this position, if any.
     pub current_hash: String,
+    /// The earlier trace's structural fingerprint at this position, if any.
+    pub previous_fingerprint: String,
+    /// The later trace's structural fingerprint at this position, if any.
+    pub current_fingerprint: String,
     /// What kind of divergence this is.
     pub kind: DiffKind,
     /// Human-readable explanation.
@@ -57,10 +71,14 @@ pub struct BlockDiff {
     pub previous_block_id: Option<String>,
     /// The later trace's block ID at this position, if any.
     pub current_block_id: Option<String>,
-    /// The earlier trace's hash at this position, if any.
+    /// The earlier trace's content hash at this position, if any.
     pub previous_hash: Option<String>,
-    /// The later trace's hash at this position, if any.
+    /// The later trace's content hash at this position, if any.
     pub current_hash: Option<String>,
+    /// The earlier trace's structural fingerprint at this position, if any.
+    pub previous_fingerprint: Option<String>,
+    /// The later trace's structural fingerprint at this position, if any.
+    pub current_fingerprint: Option<String>,
     /// Human-readable explanation.
     pub explanation: String,
 }
@@ -84,13 +102,18 @@ pub struct Comparison {
     pub changed_blocks: Vec<BlockDiff>,
     /// Number of positions that matched.
     pub unchanged_block_count: usize,
-    /// Estimated tokens of the matching prefix (theoretical cache-read).
-    pub reusable_prefix_tokens: u64,
+    /// Estimated tokens of the matching structural prefix (**observed** reuse,
+    /// from trace-to-trace comparison).
+    pub observed_reusable_prefix_tokens: u64,
     /// Estimated tokens of trace B from the first divergence onward.
     pub tokens_after_divergence: u64,
-    /// Estimated tokens of trace B at differing positions (theoretical
-    /// cache-write).
-    pub theoretical_cache_write_tokens: u64,
+    /// Estimated tokens of trace B at differing positions.
+    pub estimated_changed_tokens: u64,
+    /// Provider-reported cache-read tokens for trace B, normalized from raw
+    /// usage (authoritative per source-of-truth principle 7), if available.
+    pub provider_reported_cache_read_tokens: Option<u64>,
+    /// Note reconciling observed structural reuse vs provider-reported reuse.
+    pub reuse_reconciliation_note: Option<String>,
     /// Cache-economics evaluation, when a profile was supplied.
     pub cache_economics: Option<CacheEconomics>,
     /// Non-fatal findings (e.g. provider/model mismatch).
@@ -101,8 +124,8 @@ pub struct Comparison {
 
 /// Compare trace `b` (later) against trace `a` (earlier).
 ///
-/// Blocks are compared position by position. `profile`, if supplied, adds the
-/// `cache_economics` section.
+/// Blocks are compared position by position using their **structural
+/// fingerprint**. `profile`, if supplied, adds the `cache_economics` section.
 pub fn compare_traces(
     a: &RequestTrace,
     b: &RequestTrace,
@@ -130,7 +153,7 @@ pub fn compare_traces(
     let mut diffs: Vec<BlockDiff> = Vec::new();
     let mut unchanged_count = 0usize;
     let mut first_divergence: Option<DivergencePoint> = None;
-    let mut reusable_prefix_tokens = 0u64;
+    let mut observed_reusable_prefix_tokens = 0u64;
     let mut identical = a.blocks.len() == b.blocks.len();
 
     for position in 0..max_len {
@@ -139,7 +162,7 @@ pub fn compare_traces(
             unchanged_count += 1;
             if first_divergence.is_none() {
                 if let Some(block) = b.blocks.get(position) {
-                    reusable_prefix_tokens = reusable_prefix_tokens
+                    observed_reusable_prefix_tokens = observed_reusable_prefix_tokens
                         .saturating_add(block_token_estimate(block).unwrap_or(0));
                 }
             }
@@ -154,6 +177,8 @@ pub fn compare_traces(
                     current_block_id: current.map(|x| x.id.clone()).unwrap_or_default(),
                     previous_hash: previous.map(|x| x.content_hash.clone()).unwrap_or_default(),
                     current_hash: current.map(|x| x.content_hash.clone()).unwrap_or_default(),
+                    previous_fingerprint: previous.map(structural_fingerprint).unwrap_or_default(),
+                    current_fingerprint: current.map(structural_fingerprint).unwrap_or_default(),
                     kind,
                     explanation: explanation.clone(),
                 });
@@ -165,6 +190,8 @@ pub fn compare_traces(
                 current_block_id: current.map(|x| x.id.clone()),
                 previous_hash: previous.map(|x| x.content_hash.clone()),
                 current_hash: current.map(|x| x.content_hash.clone()),
+                previous_fingerprint: previous.map(structural_fingerprint),
+                current_fingerprint: current.map(structural_fingerprint),
                 explanation,
             });
         }
@@ -178,12 +205,26 @@ pub fn compare_traces(
         None => 0,
     };
 
-    let theoretical_cache_write_tokens = diffs
+    let estimated_changed_tokens = diffs
         .iter()
         .filter(|d| d.kind != DiffKind::Removed)
         .filter_map(|d| b.blocks.get(d.position))
         .map(|block| block_token_estimate(block).unwrap_or(0))
         .sum();
+
+    // Provider-reported cache reuse: normalized from trace B's raw usage and
+    // kept separate from the observed structural figure.
+    let provider_reported_cache_read_tokens = b
+        .usage
+        .as_ref()
+        .map(normalize_usage)
+        .and_then(|n| n.cache_read_tokens);
+    let reuse_reconciliation_note = provider_reported_cache_read_tokens.map(|reported| {
+        format!(
+            "provider reported {reported} cache-read tokens for the later request; observed structural prefix reuse is {observed} tokens. Per source-of-truth principle 7, provider-reported values outrank the observed estimate when they conflict.",
+            observed = observed_reusable_prefix_tokens
+        )
+    });
 
     let cache_economics = profile.map(|p| {
         let input_b: u64 = b
@@ -193,8 +234,8 @@ pub fn compare_traces(
             .sum();
         evaluate_cache_economics(
             input_b,
-            reusable_prefix_tokens,
-            theoretical_cache_write_tokens,
+            observed_reusable_prefix_tokens,
+            estimated_changed_tokens,
             p,
         )
     });
@@ -204,7 +245,7 @@ pub fn compare_traces(
         b,
         &first_divergence,
         &diffs,
-        reusable_prefix_tokens,
+        observed_reusable_prefix_tokens,
         tokens_after_divergence,
     );
 
@@ -217,9 +258,11 @@ pub fn compare_traces(
         first_divergence,
         changed_blocks: diffs,
         unchanged_block_count: unchanged_count,
-        reusable_prefix_tokens,
+        observed_reusable_prefix_tokens,
         tokens_after_divergence,
-        theoretical_cache_write_tokens,
+        estimated_changed_tokens,
+        provider_reported_cache_read_tokens,
+        reuse_reconciliation_note,
         cache_economics,
         warnings,
         explanation,
@@ -228,19 +271,23 @@ pub fn compare_traces(
 
 /// Classify the difference (if any) at `position` between `a` and `b`.
 ///
-/// Reordering is detected by searching the *full* other trace for the same
-/// block (by hash), so swaps like `A,B,C -> A,C,B` are classified as
-/// reorders at both affected positions. When a hash occurs more than once,
-/// the first occurrence is used (acceptable for Phase 0).
+/// Equality uses the **structural fingerprint**, not content hash alone: the
+/// same text in a different semantic role or zone is a different block for
+/// prefix purposes. Reordering is detected by searching the *full* other
+/// trace for the same fingerprint, so swaps like `A,B,C -> A,C,B` are
+/// classified as reorders at both affected positions.
 fn classify(a: &RequestTrace, b: &RequestTrace, position: usize) -> (DiffKind, String) {
     match (a.blocks.get(position), b.blocks.get(position)) {
         (Some(x), Some(y)) => {
-            if x.content_hash == y.content_hash {
-                (DiffKind::Unchanged, "identical".to_string())
+            if structural_fingerprint(x) == structural_fingerprint(y) {
+                (
+                    DiffKind::Unchanged,
+                    "identical (structural fingerprint)".to_string(),
+                )
             } else if let Some(from) = a
                 .blocks
                 .iter()
-                .position(|blk| blk.content_hash == y.content_hash)
+                .position(|blk| structural_fingerprint(blk) == structural_fingerprint(y))
             {
                 // The current B block exists elsewhere in A: it moved here.
                 (
@@ -253,7 +300,7 @@ fn classify(a: &RequestTrace, b: &RequestTrace, position: usize) -> (DiffKind, S
             } else if let Some(to) = b
                 .blocks
                 .iter()
-                .position(|blk| blk.content_hash == x.content_hash)
+                .position(|blk| structural_fingerprint(blk) == structural_fingerprint(x))
             {
                 // The current A block exists elsewhere in B: it moved away.
                 (
@@ -266,7 +313,10 @@ fn classify(a: &RequestTrace, b: &RequestTrace, position: usize) -> (DiffKind, S
             } else {
                 (
                     DiffKind::Changed,
-                    format!("content changed in block '{}' at position {position}", y.id),
+                    format!(
+                        "structural identity changed in block '{}' at position {position}",
+                        y.id
+                    ),
                 )
             }
         }
@@ -288,11 +338,11 @@ fn build_explanation(
     b: &RequestTrace,
     first: &Option<DivergencePoint>,
     diffs: &[BlockDiff],
-    reusable: u64,
+    observed_reusable: u64,
     after: u64,
 ) -> String {
     let mut lines = Vec::new();
-    lines.push("Cache divergence:".to_string());
+    lines.push("Prefix divergence (observed structural):".to_string());
     lines.push(format!("request {} -> {}", a.request_id, b.request_id));
     lines.push(String::new());
 
@@ -301,14 +351,14 @@ fn build_explanation(
             lines.push("First changed block:".to_string());
             lines.push(format!("{}[{}]", d.current_block_id, d.position));
             lines.push(String::new());
-            lines.push("Previous hash:".to_string());
-            lines.push(short_hash(&d.previous_hash));
+            lines.push("Previous structural fingerprint:".to_string());
+            lines.push(short_hash(&d.previous_fingerprint));
             lines.push(String::new());
-            lines.push("Current hash:".to_string());
-            lines.push(short_hash(&d.current_hash));
+            lines.push("Current structural fingerprint:".to_string());
+            lines.push(short_hash(&d.current_fingerprint));
             lines.push(String::new());
-            lines.push("Reusable tokens before divergence:".to_string());
-            lines.push(comma(reusable));
+            lines.push("Observed reusable prefix tokens (structural):".to_string());
+            lines.push(comma(observed_reusable));
             lines.push(String::new());
             lines.push("Tokens after divergence:".to_string());
             lines.push(comma(after));
@@ -325,7 +375,7 @@ fn build_explanation(
             }
         }
         None => {
-            lines.push("No divergence: the two traces are identical.".to_string());
+            lines.push("No divergence: the two traces are structurally identical.".to_string());
         }
     }
     lines.join("\n")
@@ -369,6 +419,9 @@ mod tests {
             token_count: Some(tokens),
             byte_count: content.len() as u64,
             content: Some(content.to_string()),
+            semantic_zone: None,
+            structural_path: None,
+            role: None,
             sensitivity: None,
             dependencies: Vec::new(),
             lifetime: None,
@@ -407,7 +460,7 @@ mod tests {
         let c = compare_traces(&t1, &t2, None).unwrap();
         assert!(c.identical);
         assert!(c.first_divergence.is_none());
-        assert_eq!(c.reusable_prefix_tokens, 30);
+        assert_eq!(c.observed_reusable_prefix_tokens, 30);
         assert_eq!(c.tokens_after_divergence, 0);
     }
 
@@ -434,8 +487,28 @@ mod tests {
         let d = c.first_divergence.unwrap();
         assert_eq!(d.position, 1);
         assert_eq!(d.kind, DiffKind::Changed);
-        assert_eq!(c.reusable_prefix_tokens, 10);
+        assert_eq!(c.observed_reusable_prefix_tokens, 10);
         assert_eq!(c.tokens_after_divergence, 55);
+    }
+
+    #[test]
+    fn same_content_different_role_is_a_divergence() {
+        // Identical text but different semantic role must NOT match as a
+        // prefix block: structural fingerprints differ.
+        let mut a = block("a", 0, "identical text", 10);
+        a.semantic_zone = Some("messages".to_string());
+        a.role = Some("user".to_string());
+        a.structural_path = Some("messages[0]".to_string());
+        let mut b = block("b", 0, "identical text", 10);
+        b.semantic_zone = Some("messages".to_string());
+        b.role = Some("assistant".to_string());
+        b.structural_path = Some("messages[1]".to_string());
+        let t1 = trace("a", vec![a]);
+        let t2 = trace("b", vec![b]);
+        let c = compare_traces(&t1, &t2, None).unwrap();
+        assert!(!c.identical);
+        assert_eq!(c.first_divergence.unwrap().kind, DiffKind::Changed);
+        assert_eq!(c.observed_reusable_prefix_tokens, 0);
     }
 
     #[test]
@@ -460,7 +533,7 @@ mod tests {
         let d = c.first_divergence.unwrap();
         assert_eq!(d.position, 1);
         assert_eq!(d.kind, DiffKind::Reordered);
-        assert_eq!(c.reusable_prefix_tokens, 10);
+        assert_eq!(c.observed_reusable_prefix_tokens, 10);
         assert!(d.explanation.contains("moved from position 2 to 1"));
         assert!(c.explanation.contains("ordering changed"));
     }

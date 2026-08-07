@@ -1,10 +1,10 @@
 {
   "format_version": 2,
-  "request_id": "01-turn-1",
-  "session_id": "session-01",
-  "timestamp": "2026-08-07T10:00:00Z",
-  "provider": "synthetic",
-  "model": "synthetic-model",
+  "request_id": "09-anthropic-usage",
+  "session_id": "session-09",
+  "timestamp": "2026-08-07T18:00:00Z",
+  "provider": "anthropic",
+  "model": "synthetic-anthropic-model",
   "blocks": [
     {
       "id": "system-policy",
@@ -12,8 +12,7 @@
       "position": 0,
       "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
       "token_count": 1200,
-      "byte_count": 4800,
-      "sensitivity": "public"
+      "byte_count": 4800
     },
     {
       "id": "tool-defs",
@@ -32,37 +31,25 @@
       "byte_count": 10000
     },
     {
-      "id": "repo-map",
-      "source": "repository_map",
-      "position": 3,
-      "content_hash": "4444444444444444444444444444444444444444444444444444444444444444",
-      "token_count": 1800,
-      "byte_count": 7200
-    },
-    {
       "id": "user-request",
       "source": "user_request",
-      "position": 4,
+      "position": 3,
       "content_hash": "5555555555555555555555555555555555555555555555555555555555555555",
       "token_count": 150,
       "byte_count": 600
     }
   ],
   "usage": {
-    "provider_schema": "synthetic",
+    "provider_schema": "anthropic",
     "raw": {
-      "input_tokens": 9650,
-      "cache_read_tokens": 9500,
-      "cache_write_tokens": 0,
-      "output_tokens": 300
+      "input_tokens": 500,
+      "cache_read_input_tokens": 4000,
+      "cache_creation_input_tokens": 500,
+      "output_tokens": 120
     }
   },
-  "latency": {
-    "time_to_first_token_ms": 120,
-    "total_ms": 900
-  },
   "metadata": {
-    "scenario": "01-stable-prefix",
-    "note": "Synthetic fixture: large stable prefix remains identical between turns."
+    "scenario": "09-anthropic-usage-semantics",
+    "note": "Anthropic-shaped raw usage: input_tokens is the UNCACHED remainder; total input is the sum of the three input categories."
   }
 }

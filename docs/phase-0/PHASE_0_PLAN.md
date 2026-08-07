@@ -7,7 +7,7 @@ and from trace files only:
 
 - What context blocks were sent?
 - Which blocks changed between consecutive requests?
-- Where did the reusable prefix first diverge?
+- Where did the observed reusable prefix first diverge (trace-to-trace)?
 - How much context theoretically remained reusable?
 - What cache usage did the provider report, if supplied in the trace?
 - What portion was cache-read, cache-written and fresh?
@@ -26,7 +26,7 @@ engineering effort is spent.
    - `prefixity-cli` — thin CLI over that logic.
 2. A versioned trace format (`docs/phase-0/TRACE_FORMAT.md`).
 3. Analysis functions: validation, ordered comparison, first-prefix-divergence,
-   reusable-prefix estimation, changed/unchanged accounting, fresh-context
+   reusable-prefix estimation (observed, trace-to-trace), changed/unchanged accounting, fresh-context
    accounting, provider-usage reconciliation, cost calculation, and
    human-readable explanations of lost reuse.
 4. An offline policy simulator with five policies (`baseline`,

@@ -1,0 +1,47 @@
+{
+  "format_version": 2,
+  "request_id": "15-turn-2",
+  "session_id": "session-15",
+  "timestamp": "2026-08-07T18:30:05Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800
+    },
+    {
+      "id": "tool-defs",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "token_count": 4000,
+      "byte_count": 16000
+    },
+    {
+      "id": "user-request",
+      "source": "user_request",
+      "position": 2,
+      "content_hash": "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+      "token_count": 200,
+      "byte_count": 800
+    }
+  ],
+  "usage": {
+    "provider_schema": "synthetic",
+    "raw": {
+      "input_tokens": 5400,
+      "cache_read_tokens": 5000,
+      "cache_write_tokens": 0,
+      "output_tokens": 120
+    }
+  },
+  "metadata": {
+    "scenario": "15-history-proves-prefix-reuse",
+    "note": "Second turn: the stable prefix is structurally identical to turn 1 (observed reuse 5200), but the provider reports 5000 cache-read tokens — the two figures are distinct concepts."
+  }
+}

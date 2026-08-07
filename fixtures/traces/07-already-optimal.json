@@ -1,5 +1,5 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "request_id": "07-already-optimal",
   "session_id": "session-07",
   "timestamp": "2026-08-07T16:00:00Z",
@@ -57,10 +57,13 @@
     }
   ],
   "usage": {
-    "input_tokens": 14650,
-    "cache_read_tokens": 14500,
-    "cache_write_tokens": 0,
-    "output_tokens": 150
+    "provider_schema": "synthetic",
+    "raw": {
+      "input_tokens": 14650,
+      "cache_read_tokens": 14500,
+      "cache_write_tokens": 0,
+      "output_tokens": 150
+    }
   },
   "metadata": {
     "scenario": "07-already-optimal",

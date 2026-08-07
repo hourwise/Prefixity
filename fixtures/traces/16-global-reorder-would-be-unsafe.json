@@ -1,0 +1,58 @@
+{
+  "format_version": 2,
+  "request_id": "16-global-reorder-unsafe",
+  "session_id": "session-16",
+  "timestamp": "2026-08-07T18:35:00Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800,
+      "semantic_zone": "system",
+      "structural_path": "system[0]",
+      "role": "system"
+    },
+    {
+      "id": "user-context",
+      "source": "user_request",
+      "position": 1,
+      "content_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+      "token_count": 5000,
+      "byte_count": 20000,
+      "semantic_zone": "messages",
+      "structural_path": "messages[0]",
+      "role": "user"
+    },
+    {
+      "id": "tools",
+      "source": "tool_definition",
+      "position": 2,
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "token_count": 4000,
+      "byte_count": 16000,
+      "semantic_zone": "tools",
+      "structural_path": "tools[0]",
+      "role": "tool"
+    },
+    {
+      "id": "tool-result",
+      "source": "tool_result",
+      "position": 3,
+      "content_hash": "8888888888888888888888888888888888888888888888888888888888888888",
+      "token_count": 3000,
+      "byte_count": 12000,
+      "semantic_zone": "messages",
+      "structural_path": "messages[1]",
+      "role": "tool_result"
+    }
+  ],
+  "metadata": {
+    "scenario": "16-global-reorder-would-be-unsafe",
+    "note": "A naive global stable-first sort would move 'tools' ahead of 'messages' (cross-zone) and reorder chronological messages. A zone-constrained policy must defer these and report no safe relocation."
+  }
+}

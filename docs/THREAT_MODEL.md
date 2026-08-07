@@ -63,9 +63,11 @@ human output. Control characters (other than `\n`/`\t`) are replaced, so
 escape-sequence injection into the terminal is prevented.
 
 ### Untrusted provider metadata
-`ProviderUsage::provider_raw` and `metadata` are preserved verbatim as JSON
-for forward compatibility. They are treated as untrusted data: never
-interpreted, only displayed sanitised (or emitted as JSON).
+`RawUsage::raw` and `metadata` are preserved verbatim as JSON for forward
+compatibility. They are treated as untrusted data: never interpreted, only
+displayed sanitised (or emitted as JSON). Normalization is opt-in and
+schema-aware (see `docs/phase-0/TRACE_FORMAT.md`); unknown schemas are never
+interpreted.
 
 ## Privacy stance
 

@@ -1,15 +1,29 @@
-//! Core data model for the versioned Prefixity trace format (Phase 0).
+//! Core data model for the versioned Prefixity trace format (Phase 0A).
 //!
 //! See `docs/phase-0/TRACE_FORMAT.md` for the normative description of the
 //! on-disk format. The structs here mirror that document.
+//!
+//! Phase 0A.1 correction: the model distinguishes three concepts that must
+//! never be conflated:
+//!
+//! * **prefixity score** — an experimental deterministic estimate of whether
+//!   a block looks suitable for stable-prefix placement (see
+//!   [`crate::prefixity_score`]);
+//! * **observed prefix reuse** — exact structural prefix equality between
+//!   consecutive recorded requests (see [`crate::compare`]);
+//! * **provider-reported cache reuse** — tokens the provider explicitly
+//!   reports, captured as raw usage and normalised by [`crate::usage`].
+//!
+//! A single isolated trace cannot prove that any tokens were reused.
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 /// The trace format version this crate reads and writes.
 ///
-/// Bump this whenever the on-disk trace format changes incompatibly.
-pub const TRACE_FORMAT_VERSION: u32 = 1;
+/// Bumped to 2 in Phase 0A.1: `usage` became [`RawUsage`] (schema + verbatim
+/// fields) and [`ContextBlock`] gained structural identity fields.
+pub const TRACE_FORMAT_VERSION: u32 = 2;
 
 /// The provider-profile format version this crate reads.
 pub const PROVIDER_PROFILE_FORMAT_VERSION: u32 = 1;
@@ -43,9 +57,11 @@ pub struct RequestTrace {
     pub model: String,
     /// Ordered context blocks exactly as sent to the model.
     pub blocks: Vec<ContextBlock>,
-    /// Provider-reported usage, when the recording captured it.
+    /// Provider-specific raw usage, preserved verbatim. Normalisation is a
+    /// separate step (see [`crate::usage`]); the raw capture is never
+    /// reinterpreted in place.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub usage: Option<ProviderUsage>,
+    pub usage: Option<RawUsage>,
     /// Optional latency information.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub latency: Option<LatencyInfo>,
@@ -60,8 +76,12 @@ pub struct RequestTrace {
 /// `position` must equal the index of the block in `RequestTrace::blocks`
 /// (contiguous, starting at 0) — this is enforced by validation.
 ///
-/// `content_hash` is a SHA-256 hex digest. If `content` is present,
-/// validation verifies that `content_hash` matches it.
+/// `content_hash` is a SHA-256 hex digest and identifies the *content*. It is
+/// **not** sufficient for provider prefix comparison: two blocks may contain
+/// identical text but occupy different semantic positions. The structural
+/// identity fields (`semantic_zone`, `structural_path`, `role`) combined with
+/// `content_hash` form the structural fingerprint used for prefix comparison
+/// (see [`crate::structure`]).
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ContextBlock {
     /// Stable unique ID within the trace.
@@ -78,12 +98,27 @@ pub struct ContextBlock {
     /// heuristic when `content` is present.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub token_count: Option<u64>,
-    /// Byte count of the block content.
+    /// Byte count of the block content. When `content` is present, validation
+    /// requires this to equal the UTF-8 byte length of `content`.
     pub byte_count: u64,
     /// Optional actual content. Phase 0 fixtures generally omit this and keep
     /// hashes only, to avoid storing complete prompt content.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub content: Option<String>,
+    /// Provider-independent semantic zone, e.g. `tools`, `system`,
+    /// `messages`, `other`. Used by zone-aware policies and the structural
+    /// fingerprint. Absent blocks are treated as zone `other`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub semantic_zone: Option<String>,
+    /// Structural path within the wire message, e.g. `tools[3]`,
+    /// `system[0]`, `messages[7].content[1]`. Informational and part of the
+    /// structural fingerprint.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub structural_path: Option<String>,
+    /// Semantic role/type where applicable, e.g. `system`, `user`,
+    /// `assistant`, `tool`, `tool_result`. Part of the structural fingerprint.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub role: Option<String>,
     /// Optional sensitivity classification (e.g. `public`, `confidential`).
     /// Informational only in Phase 0.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -111,28 +146,25 @@ pub struct ContextBlock {
     pub metadata: BTreeMap<String, serde_json::Value>,
 }
 
-/// Provider-reported usage information for one request.
+/// Provider-specific raw usage for one request, preserved verbatim.
 ///
-/// Every field is optional because providers report different subsets of
-/// these figures. Per the source-of-truth principles, when present these
-/// values **outrank** Prefixity's theoretical estimates.
+/// The `provider_schema` names the semantics of the `raw` fields (for example
+/// `synthetic`, `anthropic`, `deepseek`, `openai`). The `raw` map is opaque
+/// to the rest of the model: it is never reinterpreted in place. A normalizer
+/// (see [`crate::usage`]) converts known schemas into a
+/// [`crate::usage::NormalizedUsage`].
+///
+/// Provider field semantics are **not interchangeable**. For example,
+/// Anthropic's `input_tokens` means *uncached* tokens, while the synthetic
+/// schema's `input_tokens` means *total* input.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
-pub struct ProviderUsage {
-    /// Total input tokens, if reported.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub input_tokens: Option<u64>,
-    /// Tokens served from the provider's cache, if reported.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cache_read_tokens: Option<u64>,
-    /// Tokens written to the provider's cache, if reported.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cache_write_tokens: Option<u64>,
-    /// Output tokens, if reported.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output_tokens: Option<u64>,
-    /// Provider-specific raw usage fields preserved verbatim.
+pub struct RawUsage {
+    /// Which usage schema the `raw` fields follow.
     #[serde(default)]
-    pub provider_raw: BTreeMap<String, serde_json::Value>,
+    pub provider_schema: String,
+    /// Provider-specific raw usage fields, preserved verbatim.
+    #[serde(default)]
+    pub raw: BTreeMap<String, serde_json::Value>,
 }
 
 /// Optional latency information for one request.

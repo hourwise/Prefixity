@@ -8,13 +8,22 @@
 //!
 //! 1. [`model`] — the versioned trace format and provider cost profiles.
 //! 2. [`validation`] — structural validation of traces.
-//! 3. [`prefixity_score`] — the experimental, explainable "prefixity" score.
-//! 4. [`analysis`] — accounting, reconciliation and recommendations for a
-//!    single trace.
-//! 5. [`compare`] — divergence detection and reusable-prefix estimation
-//!    between two consecutive requests.
-//! 6. [`cost`] — cost arithmetic over an externally supplied [`CostProfile`].
-//! 7. [`policy`] — offline policy simulation that never mutates its input.
+//! 3. [`structure`] — structural/wire identity (zones, fingerprints).
+//! 4. [`usage`] — offline provider usage normalizers (raw -> normalized).
+//! 5. [`prefixity_score`] — the experimental, explainable "prefixity" score.
+//! 6. [`analysis`] — single-trace accounting (candidate/heuristic only; a
+//!    single trace cannot prove reuse).
+//! 7. [`compare`] — observed prefix reuse between two recorded requests.
+//! 8. [`cost`] — cost arithmetic over an externally supplied
+//!    [`CostProfile`], consuming explicit normalized categories.
+//! 9. [`policy`] — offline, zone-constrained policy simulation that never
+//!    mutates its input.
+//!
+//! Three concepts are kept strictly separate (Phase 0A.1):
+//!
+//! * **prefixity score** (experimental heuristic);
+//! * **observed prefix reuse** (trace-to-trace comparison);
+//! * **provider-reported cache reuse** (raw usage normalised per schema).
 //!
 //! See [`model::RequestTrace`] and `docs/phase-0/TRACE_FORMAT.md` for the
 //! on-disk format, and `docs/phase-0/PHASE_0_PLAN.md` for the Phase 0 goals.
@@ -28,9 +37,11 @@ pub mod limits;
 pub mod model;
 pub mod policy;
 pub mod prefixity_score;
+pub mod structure;
 pub mod terminal;
 pub mod tokens;
+pub mod usage;
 pub mod validation;
 
 pub use error::PrefixityError;
-pub use model::{CostProfile, ProviderUsage, RequestTrace};
+pub use model::{CostProfile, RawUsage, RequestTrace};

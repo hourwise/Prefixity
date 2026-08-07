@@ -8,12 +8,15 @@
 //! * blocks are contiguous and correctly positioned;
 //! * block IDs are unique;
 //! * content hashes are well-formed and (when content is present) correct;
-//! * input size limits are respected;
-//! * provider-reported usage is internally consistent (soft warnings).
+//! * `byte_count` matches the actual UTF-8 length of `content` when present;
+//! * input size limits are respected.
 //!
 //! Hard problems return [`PrefixityError::Validation`] (or
 //! [`PrefixityError::UnsupportedFormatVersion`]); soft problems are collected
 //! as warnings in [`ValidationReport`].
+//!
+//! Raw provider usage is intentionally opaque here: field consistency is the
+//! job of the normalizers (see [`crate::usage`]).
 
 use crate::error::PrefixityError;
 use crate::hash;
@@ -40,7 +43,7 @@ pub fn validate_trace(
     path: Option<&Path>,
 ) -> Result<ValidationReport, PrefixityError> {
     let path = path.unwrap_or_else(|| Path::new("<in-memory>"));
-    let mut warnings = Vec::new();
+    let warnings = Vec::new();
 
     if trace.format_version != TRACE_FORMAT_VERSION {
         return Err(PrefixityError::UnsupportedFormatVersion {
@@ -141,6 +144,16 @@ pub fn validate_trace(
                     format!("{block_path} content_hash does not match its content"),
                 ));
             }
+            let actual_bytes = content.len() as u64;
+            if block.byte_count != actual_bytes {
+                return Err(PrefixityError::validation(
+                    path,
+                    format!(
+                        "{block_path} byte_count ({}) does not match the UTF-8 length of its content ({actual_bytes})",
+                        block.byte_count
+                    ),
+                ));
+            }
         }
         if block.metadata.len() > limits::MAX_METADATA_ENTRIES {
             return Err(PrefixityError::validation(
@@ -162,34 +175,6 @@ pub fn validate_trace(
         }
     }
 
-    if let Some(usage) = &trace.usage {
-        if let (Some(input), Some(read)) = (usage.input_tokens, usage.cache_read_tokens) {
-            if read > input {
-                warnings.push(format!(
-                    "provider usage inconsistent: cache_read ({read}) > input ({input})"
-                ));
-            }
-        }
-        if let (Some(input), Some(write)) = (usage.input_tokens, usage.cache_write_tokens) {
-            if write > input {
-                warnings.push(format!(
-                    "provider usage inconsistent: cache_write ({write}) > input ({input})"
-                ));
-            }
-        }
-        if let (Some(input), Some(read), Some(write)) = (
-            usage.input_tokens,
-            usage.cache_read_tokens,
-            usage.cache_write_tokens,
-        ) {
-            if read + write > input {
-                warnings.push(format!(
-                    "provider usage inconsistent: cache_read + cache_write ({read} + {write}) > input ({input})"
-                ));
-            }
-        }
-    }
-
     Ok(ValidationReport { warnings })
 }
 
@@ -197,7 +182,7 @@ pub fn validate_trace(
 mod tests {
     use super::*;
     use crate::hash::hash_content;
-    use crate::model::{ContextBlock, ProviderUsage, RequestTrace};
+    use crate::model::{ContextBlock, RequestTrace};
     use std::collections::BTreeMap;
 
     fn block(id: &str, position: usize, content: &str) -> ContextBlock {
@@ -209,6 +194,9 @@ mod tests {
             token_count: Some(10),
             byte_count: content.len() as u64,
             content: Some(content.to_string()),
+            semantic_zone: None,
+            structural_path: None,
+            role: None,
             sensitivity: None,
             dependencies: Vec::new(),
             lifetime: None,
@@ -299,16 +287,27 @@ mod tests {
     }
 
     #[test]
-    fn warns_on_inconsistent_usage() {
-        let mut t = trace(vec![block("a", 0, "hello"), block("b", 1, "world")]);
-        t.usage = Some(ProviderUsage {
-            input_tokens: Some(100),
-            cache_read_tokens: Some(150),
-            cache_write_tokens: None,
-            output_tokens: None,
-            provider_raw: BTreeMap::new(),
-        });
-        let report = validate_trace(&t, None).unwrap();
-        assert!(!report.warnings.is_empty());
+    fn rejects_byte_count_mismatch_with_content() {
+        let mut b = block("a", 0, "hello");
+        b.byte_count = 999;
+        let t = trace(vec![b]);
+        let err = validate_trace(&t, None).unwrap_err();
+        assert!(err.to_string().contains("byte_count"));
+    }
+
+    #[test]
+    fn accepts_content_with_matching_byte_count() {
+        let t = trace(vec![block("a", 0, "hello")]);
+        assert!(validate_trace(&t, None).is_ok());
+    }
+
+    #[test]
+    fn utf8_byte_count_uses_bytes_not_chars() {
+        let content = "héllo wörld"; // multi-byte characters
+        let mut b = block("a", 0, content);
+        // Correct byte length: content.len() counts UTF-8 bytes.
+        b.byte_count = content.len() as u64;
+        let t = trace(vec![b]);
+        assert!(validate_trace(&t, None).is_ok());
     }
 }

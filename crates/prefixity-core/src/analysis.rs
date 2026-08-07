@@ -1,15 +1,25 @@
 //! Single-trace analysis.
 //!
 //! Given one valid trace, produce deterministic accounting: per-block
-//! summaries with prefixity scores, theoretical stable/volatile split,
-//! provider-reported usage reconciliation, fresh-context attribution, an
-//! optional cost breakdown, and a conservative recommendation.
+//! summaries with prefixity scores, **heuristic** stable-prefix candidates,
+//! provider usage normalisation and reconciliation, fresh-context
+//! attribution, an optional cost breakdown, and a conservative
+//! recommendation.
+//!
+//! IMPORTANT (Phase 0A.1): a single isolated trace **cannot prove that any
+//! tokens were reused**. All figures derived from the prefixity score here
+//! are labelled "candidate"/"heuristic" — never "reusable" or "cache-read".
+//! Observed reuse requires a trace-to-trace comparison (see [`crate::compare`]);
+//! provider-reported reuse requires normalized provider usage (see
+//! [`crate::usage`]).
 
-use crate::cost::{compute_cost, CostBreakdown};
+use crate::cost::{compute_cost, compute_cost_normalized, CostBreakdown};
 use crate::error::PrefixityError;
-use crate::model::{ProviderUsage, RequestTrace};
+use crate::model::{RawUsage, RequestTrace};
 use crate::prefixity_score::{prefixity_score, PrefixityScore, STABLE_THRESHOLD};
+use crate::structure::structural_fingerprint;
 use crate::tokens::block_token_estimate;
+use crate::usage::{normalize_usage, NormalizedUsage};
 use crate::validation::validate_trace;
 
 /// Lightweight identity of a trace, used in analysis and comparison output.
@@ -46,6 +56,10 @@ pub struct BlockSummary {
     pub id: String,
     /// Block source/type.
     pub source: String,
+    /// Semantic zone (explicit, or `other` when absent).
+    pub semantic_zone: String,
+    /// Structural fingerprint used for prefix comparison.
+    pub structural_fingerprint: String,
     /// Estimated tokens (may use the documented heuristic).
     pub tokens: u64,
     /// Recorded byte count.
@@ -58,11 +72,15 @@ pub struct BlockSummary {
     pub stale: bool,
     /// The experimental prefixity score.
     pub prefixity: f64,
-    /// `true` when the score is at or above [`STABLE_THRESHOLD`].
+    /// `true` when the score is at or above [`STABLE_THRESHOLD`] (a
+    /// stable-prefix *candidate* — not observed reuse).
     pub stable: bool,
 }
 
 /// One contributor to fresh (non-cached) context, ordered by token weight.
+///
+/// This is a *heuristic* attribution based on the prefixity score; it does
+/// not claim provider cache behavior.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct FreshBlockContribution {
     /// Position within the trace.
@@ -73,33 +91,38 @@ pub struct FreshBlockContribution {
     pub source: String,
     /// Estimated tokens.
     pub tokens: u64,
-    /// Whether the block is considered stable.
+    /// Whether the block is considered a stable-prefix candidate.
     pub stable: bool,
-    /// Why this block is a fresh-input driver.
+    /// Why this block is a fresh-input driver (heuristic).
     pub explanation: String,
 }
 
-/// Reconciliation between provider-reported usage and Prefixity's
-/// theoretical estimates. Per the source-of-truth principles, reported
-/// values outrank theoretical ones when both exist.
+/// Reconciliation between provider-reported usage and Prefixity's heuristic
+/// stable-prefix candidates. Per the source-of-truth principles, reported
+/// values outrank candidates when both exist, and a single trace can never
+/// prove reuse.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct UsageReconciliation {
-    /// Provider-reported input tokens, if any.
-    pub reported_input_tokens: Option<u64>,
-    /// Provider-reported cache-read tokens, if any.
+    /// Normalized provider-reported total input tokens, if any.
+    pub reported_total_input_tokens: Option<u64>,
+    /// Normalized provider-reported fresh input tokens, if any.
+    pub reported_fresh_input_tokens: Option<u64>,
+    /// Normalized provider-reported cache-read tokens, if any.
     pub reported_cache_read_tokens: Option<u64>,
-    /// Provider-reported cache-write tokens, if any.
+    /// Normalized provider-reported cache-write tokens, if any.
     pub reported_cache_write_tokens: Option<u64>,
-    /// Provider-reported output tokens, if any.
+    /// Normalized provider-reported output tokens, if any.
     pub reported_output_tokens: Option<u64>,
-    /// Fresh tokens derived from provider-reported figures, if derivable.
-    pub reported_fresh_tokens: Option<u64>,
-    /// Sum of estimated tokens of stable blocks.
-    pub theoretical_stable_tokens: u64,
+    /// Which schema produced the normalized figures.
+    pub normalization_source: String,
+    /// Sum of estimated tokens of blocks scoring at/above the threshold
+    /// (HEURISTIC stable-prefix candidates).
+    pub stable_prefix_candidate_tokens: u64,
     /// Sum of estimated tokens of volatile blocks.
-    pub theoretical_volatile_tokens: u64,
-    /// Longest leading run of stable blocks (theoretical reusable prefix).
-    pub theoretical_reusable_prefix_tokens: u64,
+    pub volatile_tokens: u64,
+    /// Longest leading run of stable-scoring blocks (HEURISTIC candidate
+    /// prefix — NOT observed reuse).
+    pub leading_stable_prefix_candidate_tokens: u64,
     /// Human-readable note about how the two views relate.
     pub note: String,
 }
@@ -119,16 +142,21 @@ pub struct TraceAnalysis {
     pub used_heuristic_token_estimates: bool,
     /// Sum of recorded byte counts.
     pub total_bytes: u64,
-    /// Provider-reported usage, if present.
-    pub usage: Option<ProviderUsage>,
-    /// Reconciliation of reported vs theoretical figures, if usage is present.
+    /// Raw provider usage, preserved verbatim, if captured.
+    pub raw_usage: Option<RawUsage>,
+    /// Normalized provider usage, if raw usage was captured and a schema
+    /// normalizer could derive values.
+    pub normalized_usage: Option<NormalizedUsage>,
+    /// Reconciliation of provider-reported vs heuristic candidate figures.
     pub reconciliation: Option<UsageReconciliation>,
-    /// Sum of estimated tokens of stable blocks.
-    pub theoretical_stable_tokens: u64,
-    /// Sum of estimated tokens of volatile blocks.
-    pub theoretical_volatile_tokens: u64,
-    /// Longest leading run of stable blocks (theoretical reusable prefix).
-    pub theoretical_reusable_prefix_tokens: u64,
+    /// Estimated tokens of blocks scoring at/above the stable threshold
+    /// (HEURISTIC candidates — NOT observed reuse).
+    pub stable_prefix_candidate_tokens: u64,
+    /// Estimated tokens of blocks scoring below the stable threshold.
+    pub volatile_tokens: u64,
+    /// Longest leading run of stable-scoring blocks (HEURISTIC candidate
+    /// prefix — NOT observed reuse).
+    pub leading_stable_prefix_candidate_tokens: u64,
     /// Per-block summaries in position order.
     pub blocks: Vec<BlockSummary>,
     /// Volatile blocks ordered by estimated tokens (fresh-input drivers).
@@ -146,9 +174,12 @@ pub struct TraceAnalysis {
 /// Analyse a single trace.
 ///
 /// The trace is validated first; an invalid trace is an error. `profile`, if
-/// supplied, produces the `cost` section. If the trace carries provider
-/// usage, reported figures are used for the cost breakdown; otherwise
-/// theoretical estimates are used.
+/// supplied, produces the `cost` section.
+///
+/// All stable-prefix figures are **heuristic candidates**. Without provider
+/// usage, cost bills every input token as fresh input — candidates are never
+/// silently billed at cache-read prices. With raw provider usage, cost uses
+/// the normalized categories.
 pub fn analyze_trace(
     trace: &RequestTrace,
     profile: Option<&crate::model::CostProfile>,
@@ -164,7 +195,7 @@ pub fn analyze_trace(
     let mut stable_tokens = 0u64;
     let mut volatile_tokens = 0u64;
     let mut leading_run_stable = true;
-    let mut reusable_prefix_tokens = 0u64;
+    let mut leading_candidate_tokens = 0u64;
 
     for block in &trace.blocks {
         let estimate = block_token_estimate(block);
@@ -195,7 +226,7 @@ pub fn analyze_trace(
         }
         if leading_run_stable {
             if stable {
-                reusable_prefix_tokens = reusable_prefix_tokens.saturating_add(tokens);
+                leading_candidate_tokens = leading_candidate_tokens.saturating_add(tokens);
             } else {
                 leading_run_stable = false;
             }
@@ -205,6 +236,8 @@ pub fn analyze_trace(
             position: block.position,
             id: block.id.clone(),
             source: block.source.clone(),
+            semantic_zone: crate::structure::zone_of(block).as_str().to_string(),
+            structural_fingerprint: structural_fingerprint(block),
             tokens,
             bytes: block.byte_count,
             optional: block.optional,
@@ -226,23 +259,39 @@ pub fn analyze_trace(
             tokens: b.tokens,
             stable: b.stable,
             explanation: format!(
-                "volatile block (prefixity {:.2} < threshold {:.2})",
+                "volatile block (prefixity {:.2} < threshold {:.2}; heuristic)",
                 b.prefixity, STABLE_THRESHOLD
             ),
         })
         .collect();
     top_fresh_blocks.sort_by(|x, y| y.tokens.cmp(&x.tokens).then(x.position.cmp(&y.position)));
 
-    let usage = trace.usage.clone();
-    let reconciliation = usage
+    let raw_usage = trace.usage.clone();
+    let normalized_usage = raw_usage.as_ref().map(normalize_usage);
+    if let Some(normalized) = &normalized_usage {
+        if normalized.normalization_source == "unknown-schema" {
+            warnings.push(normalized.explanation.clone());
+        }
+        if let (Some(total), Some(read)) =
+            (normalized.total_input_tokens, normalized.cache_read_tokens)
+        {
+            if read > total {
+                warnings.push(format!(
+                    "normalized usage inconsistent: cache_read ({read}) > total input ({total})"
+                ));
+            }
+        }
+    }
+
+    let reconciliation = normalized_usage
         .as_ref()
-        .map(|u| reconcile_usage(u, stable_tokens, volatile_tokens, reusable_prefix_tokens));
+        .map(|n| reconcile_usage(n, stable_tokens, volatile_tokens, leading_candidate_tokens));
 
     let cost = profile.map(|p| {
         cost_for_analysis(
             total_estimated_tokens,
-            reusable_prefix_tokens,
-            usage.as_ref(),
+            leading_candidate_tokens,
+            normalized_usage.as_ref(),
             p,
         )
     });
@@ -261,11 +310,12 @@ pub fn analyze_trace(
         total_estimated_tokens,
         used_heuristic_token_estimates,
         total_bytes,
-        usage,
+        raw_usage,
+        normalized_usage,
         reconciliation,
-        theoretical_stable_tokens: stable_tokens,
-        theoretical_volatile_tokens: volatile_tokens,
-        theoretical_reusable_prefix_tokens: reusable_prefix_tokens,
+        stable_prefix_candidate_tokens: stable_tokens,
+        volatile_tokens,
+        leading_stable_prefix_candidate_tokens: leading_candidate_tokens,
         blocks,
         top_fresh_blocks,
         prefixity_scores,
@@ -277,68 +327,59 @@ pub fn analyze_trace(
 
 /// Build the reconciliation note and figures.
 fn reconcile_usage(
-    usage: &ProviderUsage,
+    normalized: &NormalizedUsage,
     stable_tokens: u64,
     volatile_tokens: u64,
-    reusable_prefix_tokens: u64,
+    leading_candidate_tokens: u64,
 ) -> UsageReconciliation {
-    let reported_fresh_tokens = match (
-        usage.input_tokens,
-        usage.cache_read_tokens,
-        usage.cache_write_tokens,
-    ) {
-        (Some(input), Some(read), Some(write)) => Some(input.saturating_sub(read + write)),
-        (Some(input), Some(read), None) => Some(input.saturating_sub(read)),
-        _ => None,
-    };
-    let note = match (usage.cache_read_tokens, usage.input_tokens) {
-        (Some(read), Some(input)) if input > 0 => {
-            let fraction = read as f64 / input as f64 * 100.0;
-            format!(
-                "provider reported {read} cache-read tokens ({fraction:.1}% of input). \
-                 Per source-of-truth principle 7, provider-reported usage outranks Prefixity's \
-                 theoretical estimate of {reusable_prefix_tokens} reusable-prefix tokens."
-            )
-        }
-        _ => format!(
-            "provider reported no cache-read figure; Prefixity's theoretical estimate of \
-             {reusable_prefix_tokens} reusable-prefix tokens stands."
+    let note = match normalized.cache_read_tokens {
+        Some(read) => format!(
+            "provider reported {read} cache-read tokens (normalized from schema '{}'). \
+             A single trace cannot prove reuse: the {leading_candidate_tokens} leading stable-prefix \
+             candidate tokens are heuristic only. Per source-of-truth principle 7, provider-reported \
+             values outrank candidates when determining what actually happened.",
+            normalized.normalization_source
+        ),
+        None => format!(
+            "provider reported no cache-read figure. A single trace cannot prove reuse: the \
+             {leading_candidate_tokens} leading stable-prefix candidate tokens are heuristic only."
         ),
     };
     UsageReconciliation {
-        reported_input_tokens: usage.input_tokens,
-        reported_cache_read_tokens: usage.cache_read_tokens,
-        reported_cache_write_tokens: usage.cache_write_tokens,
-        reported_output_tokens: usage.output_tokens,
-        reported_fresh_tokens,
-        theoretical_stable_tokens: stable_tokens,
-        theoretical_volatile_tokens: volatile_tokens,
-        theoretical_reusable_prefix_tokens: reusable_prefix_tokens,
+        reported_total_input_tokens: normalized.total_input_tokens,
+        reported_fresh_input_tokens: normalized.fresh_input_tokens,
+        reported_cache_read_tokens: normalized.cache_read_tokens,
+        reported_cache_write_tokens: normalized.cache_write_tokens,
+        reported_output_tokens: normalized.output_tokens,
+        normalization_source: normalized.normalization_source.clone(),
+        stable_prefix_candidate_tokens: stable_tokens,
+        volatile_tokens,
+        leading_stable_prefix_candidate_tokens: leading_candidate_tokens,
         note,
     }
 }
 
-/// Choose the token figures used for the cost breakdown: provider-reported
-/// when available, otherwise theoretical.
+/// Choose the token figures used for the cost breakdown.
+///
+/// With normalized provider usage, explicit normalized categories are billed
+/// (never the `total - read - write` assumption). Without provider usage, all
+/// input is billed as fresh input — stable-prefix candidates are **not**
+/// billed at cache-read prices because a single trace cannot prove reuse.
 fn cost_for_analysis(
     total_estimated_tokens: u64,
-    reusable_prefix_tokens: u64,
-    usage: Option<&ProviderUsage>,
+    _leading_candidate_tokens: u64,
+    normalized: Option<&NormalizedUsage>,
     profile: &crate::model::CostProfile,
 ) -> CostBreakdown {
-    match usage {
-        Some(u) => compute_cost(
-            u.input_tokens.unwrap_or(total_estimated_tokens),
-            u.cache_read_tokens.unwrap_or(reusable_prefix_tokens),
-            u.cache_write_tokens.unwrap_or(0),
-            u.output_tokens.unwrap_or(0),
-            profile,
-        ),
+    match normalized {
+        Some(n) => compute_cost_normalized(n, profile),
         None => compute_cost(
             total_estimated_tokens,
-            reusable_prefix_tokens,
+            total_estimated_tokens,
             0,
             0,
+            0,
+            "no provider usage; all input billed as fresh input (candidates are NOT billed at cache-read prices)",
             profile,
         ),
     }
@@ -369,7 +410,7 @@ fn build_recommendation(
     if !has_removable && !has_required_flagged && volatile_fraction < 0.10 {
         parts.push(format!(
             "no structural change recommended: layout is already effectively stable-first \
-             ({stable_tokens} estimated stable tokens)"
+             ({stable_tokens} estimated stable-prefix candidate tokens)"
         ));
     } else {
         if has_removable {
@@ -391,5 +432,9 @@ fn build_recommendation(
             ));
         }
     }
+    parts.push(
+        "single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates"
+            .to_string(),
+    );
     parts.join("; ")
 }

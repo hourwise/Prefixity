@@ -1,5 +1,5 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "request_id": "05-turn-1",
   "session_id": "session-05",
   "timestamp": "2026-08-07T14:00:00Z",
@@ -41,10 +41,13 @@
     }
   ],
   "usage": {
-    "input_tokens": 23300,
-    "cache_read_tokens": 0,
-    "cache_write_tokens": 3200,
-    "output_tokens": 200
+    "provider_schema": "synthetic",
+    "raw": {
+      "input_tokens": 23300,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 3200,
+      "output_tokens": 200
+    }
   },
   "metadata": {
     "scenario": "05-cache-write-not-economic",

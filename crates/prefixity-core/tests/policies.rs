@@ -105,7 +105,37 @@ fn combined_removes_and_reorders() {
     let result = simulate_policy(&trace, &CombinedPolicy, &default_synthetic_profile()).unwrap();
     assert_eq!(result.token_difference, -20000);
     assert_eq!(result.removed_blocks.len(), 2);
-    assert_eq!(result.reusable_prefix_difference, 1800);
+    assert_eq!(result.stable_prefix_candidate_difference, 1800);
+}
+
+#[test]
+fn stable_prefix_relocations_are_labelled_experimental() {
+    let trace = common::load_fixture("06-context-reduction-wins.json");
+    let result =
+        simulate_policy(&trace, &StablePrefixPolicy, &default_synthetic_profile()).unwrap();
+    assert!(!result.relocated_blocks.is_empty());
+    assert!(result.relocated_blocks.iter().all(|r| matches!(
+        r.safety,
+        prefixity_core::policy::RelocationSafety::Experimental(_)
+    )));
+}
+
+#[test]
+fn unsafe_cross_zone_reorder_is_deferred() {
+    let trace = common::load_fixture("16-global-reorder-would-be-unsafe.json");
+    let result =
+        simulate_policy(&trace, &StablePrefixPolicy, &default_synthetic_profile()).unwrap();
+    // The numerically attractive but semantically unsafe reorder is not applied.
+    assert!(result.relocated_blocks.is_empty());
+    assert!(!result.unsafe_transformations_deferred.is_empty());
+    assert!(result
+        .unsafe_transformations_deferred
+        .iter()
+        .any(|d| d.contains("cross-zone")));
+    assert!(result
+        .warnings
+        .iter()
+        .any(|w| w.contains("No safe relocation")));
 }
 
 #[test]

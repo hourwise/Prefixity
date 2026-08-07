@@ -1,5 +1,5 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "request_id": "06-context-reduction",
   "session_id": "session-06",
   "timestamp": "2026-08-07T15:00:00Z",
@@ -77,10 +77,13 @@
     }
   ],
   "usage": {
-    "input_tokens": 29850,
-    "cache_read_tokens": 7700,
-    "cache_write_tokens": 0,
-    "output_tokens": 200
+    "provider_schema": "synthetic",
+    "raw": {
+      "input_tokens": 29850,
+      "cache_read_tokens": 7700,
+      "cache_write_tokens": 0,
+      "output_tokens": 200
+    }
   },
   "metadata": {
     "scenario": "06-context-reduction-wins",

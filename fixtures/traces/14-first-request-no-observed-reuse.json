@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "request_id": "14-first-request",
+  "session_id": "session-14",
+  "timestamp": "2026-08-07T18:25:00Z",
+  "provider": "synthetic",
+  "model": "synthetic-model",
+  "blocks": [
+    {
+      "id": "system-policy",
+      "source": "system_policy",
+      "position": 0,
+      "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "token_count": 1200,
+      "byte_count": 4800
+    },
+    {
+      "id": "tool-defs",
+      "source": "tool_definition",
+      "position": 1,
+      "content_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "token_count": 4000,
+      "byte_count": 16000
+    },
+    {
+      "id": "user-request",
+      "source": "user_request",
+      "position": 2,
+      "content_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+      "token_count": 150,
+      "byte_count": 600
+    }
+  ],
+  "metadata": {
+    "scenario": "14-first-request-no-observed-reuse",
+    "note": "A single isolated trace with NO provider usage. High prefixity scores must NOT be treated as observed cache reuse."
+  }
+}
