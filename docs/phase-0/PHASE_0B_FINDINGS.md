@@ -5,7 +5,6 @@ Evidence collected from controlled live validation runs. Each entry is a
 claim.
 
 ## Finding 1 — DeepSeek schema-smoke (2026-08-07)
-
 | Field | Value |
 | --- | --- |
 | Date | 2026-08-07 |
@@ -56,3 +55,18 @@ The DeepSeek normalizer reads only the cache hit/miss and completion fields;
 the OpenAI-shaped fields are preserved verbatim but unused by that schema.
 See the sanitized regression fixture
 `fixtures/traces/17-deepseek-live-schema-smoke.json`.
+
+## Cache settling control (design note, 2026-08-07)
+
+Official DeepSeek Context Caching documentation describes cache construction
+as asynchronous/best-effort and taking seconds, with common-prefix
+persistence possibly established after multiple requests. To avoid a false
+negative (C arriving before best-effort cache persistence completes), Phase
+0B applies a conservative **10-second settle period after B and before C**
+(`pre_request_delay_ms`: A=0, B=0, C=10000) for all DeepSeek B–D scenarios.
+
+This is an experimental control, not a provider SLA or a required value, and
+not a validated optimum. B is deliberately not delayed (A/B establish the
+common prefix), and the experiment encodes no expectation that B must report
+zero cache reuse. A zero cache hit after settling remains evidence to
+investigate, not automatic proof that structural reuse is incorrect.

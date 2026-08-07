@@ -102,7 +102,8 @@ pub fn tail_for(scenario: Scenario, turn: usize) -> String {
     }
 }
 
-fn turn_label(turn: usize) -> &'static str {
+/// Single-letter label for a turn (A/B/C) used in content and reports.
+pub fn turn_label(turn: usize) -> &'static str {
     match turn {
         1 => "A",
         2 => "B",

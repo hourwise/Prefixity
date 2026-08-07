@@ -15,6 +15,13 @@ use prefixity_core::usage::{
 use serde_json::Value;
 use std::collections::BTreeMap;
 
+/// Conservative Phase 0B experimental settle delay (ms) applied **before
+/// DeepSeek's final request** so best-effort, asynchronous cache persistence
+/// has time to complete after A and B establish the common prefix. This is
+/// an experimental control, NOT an official DeepSeek requirement or a
+/// scientifically validated optimum.
+pub const DEEPSEEK_SETTLE_DELAY_MS: u64 = 10_000;
+
 /// The explicit per-provider, per-scenario request plan.
 ///
 /// Kept explicit (rather than hidden special-case arithmetic) so each
@@ -26,14 +33,19 @@ pub struct ProviderTurnPlan {
     /// First turn (1-based, inclusive) whose early header is diverged, for
     /// `early-divergence`. `None` means the header is never diverged.
     pub header_diverges_from: Option<usize>,
+    /// Experimental settle delay (ms) applied **before the final turn** (for
+    /// example, before DeepSeek's C request, after A and B have established
+    /// the common prefix). Zero for OpenAI/Anthropic and schema-smoke.
+    pub settle_delay_ms: u64,
 }
 
 impl ProviderTurnPlan {
-    /// A plan with no early-header divergence.
+    /// A plan with no early-header divergence and no settle delay.
     pub fn stable(turns: usize) -> ProviderTurnPlan {
         ProviderTurnPlan {
             turns,
             header_diverges_from: None,
+            settle_delay_ms: 0,
         }
     }
 
@@ -42,6 +54,26 @@ impl ProviderTurnPlan {
         ProviderTurnPlan {
             turns,
             header_diverges_from: Some(turn),
+            settle_delay_ms: 0,
+        }
+    }
+
+    /// A DeepSeek plan: three requests with the experimental settle delay
+    /// applied before the final (third) turn.
+    pub fn deepseek(header_diverges_from: Option<usize>) -> ProviderTurnPlan {
+        ProviderTurnPlan {
+            turns: 3,
+            header_diverges_from,
+            settle_delay_ms: DEEPSEEK_SETTLE_DELAY_MS,
+        }
+    }
+
+    /// The pre-request delay (ms) to apply before the given 1-based turn.
+    pub fn pre_request_delay_ms(&self, turn: usize) -> u64 {
+        if self.settle_delay_ms > 0 && turn == self.turns {
+            self.settle_delay_ms
+        } else {
+            0
         }
     }
 }
@@ -352,12 +384,12 @@ impl LiveProvider for DeepSeekProvider {
     fn plan_turns(&self, scenario: Scenario) -> ProviderTurnPlan {
         match scenario {
             Scenario::SchemaSmoke => ProviderTurnPlan::stable(1),
-            // A and B first establish the common prefix; the early header
-            // only diverges at C. The important comparison is B -> C.
-            Scenario::EarlyDivergence => ProviderTurnPlan::diverging(3, 3),
-            // Documented: cache construction may require a prior completed
-            // request, so B and D also run A, B, C.
-            _ => ProviderTurnPlan::stable(3),
+            // A and B first establish the common prefix; a conservative 10s
+            // settle delay is applied before C so best-effort async cache
+            // persistence can complete. The early header only diverges at C.
+            Scenario::EarlyDivergence => ProviderTurnPlan::deepseek(Some(3)),
+            // B and D also run A, B, C with the same settle delay before C.
+            _ => ProviderTurnPlan::deepseek(None),
         }
     }
 }
@@ -440,20 +472,39 @@ mod tests {
             deepseek.plan_turns(Scenario::SchemaSmoke),
             ProviderTurnPlan::stable(1)
         );
-        // B, C, D all prime with A and B, then measure the third request.
+        // B, C, D all prime with A and B, then measure the third request
+        // with a settle delay before it.
         assert_eq!(
             deepseek.plan_turns(Scenario::StablePrefix),
-            ProviderTurnPlan::stable(3)
+            ProviderTurnPlan::deepseek(None)
         );
         assert_eq!(
             deepseek.plan_turns(Scenario::LateDivergence),
-            ProviderTurnPlan::stable(3)
+            ProviderTurnPlan::deepseek(None)
         );
         // Early divergence only at turn C so A/B establish the prefix.
         assert_eq!(
             deepseek.plan_turns(Scenario::EarlyDivergence),
-            ProviderTurnPlan::diverging(3, 3)
+            ProviderTurnPlan::deepseek(Some(3))
         );
+    }
+
+    #[test]
+    fn deepseek_settle_delay_applies_before_c_only() {
+        for scenario in [
+            Scenario::StablePrefix,
+            Scenario::EarlyDivergence,
+            Scenario::LateDivergence,
+        ] {
+            let plan = DeepSeekProvider.plan_turns(scenario);
+            assert_eq!(plan.pre_request_delay_ms(1), 0);
+            assert_eq!(plan.pre_request_delay_ms(2), 0);
+            assert_eq!(plan.pre_request_delay_ms(3), DEEPSEEK_SETTLE_DELAY_MS);
+        }
+        // schema-smoke has no settle delay.
+        let smoke = DeepSeekProvider.plan_turns(Scenario::SchemaSmoke);
+        assert_eq!(smoke.settle_delay_ms, 0);
+        assert_eq!(smoke.pre_request_delay_ms(1), 0);
     }
 
     #[test]
@@ -478,6 +529,24 @@ mod tests {
                 provider.plan_turns(Scenario::EarlyDivergence),
                 ProviderTurnPlan::diverging(2, 2)
             );
+        }
+    }
+
+    #[test]
+    fn openai_and_anthropic_plans_are_delay_free() {
+        for provider in [&OpenAiProvider as &dyn LiveProvider, &AnthropicProvider] {
+            for scenario in [
+                Scenario::SchemaSmoke,
+                Scenario::StablePrefix,
+                Scenario::EarlyDivergence,
+                Scenario::LateDivergence,
+            ] {
+                let plan = provider.plan_turns(scenario);
+                assert_eq!(plan.settle_delay_ms, 0);
+                for turn in 1..=plan.turns {
+                    assert_eq!(plan.pre_request_delay_ms(turn), 0);
+                }
+            }
         }
     }
 

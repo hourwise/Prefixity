@@ -67,7 +67,7 @@ normalization.
 
 | Provider | API-surface schema | Raw fields | Notes |
 | --- | --- | --- | --- |
-| DeepSeek | `deepseek-chat-completions-v1` | `prompt_cache_hit_tokens`, `prompt_cache_miss_tokens` | **First live provider for the current validation sequence.** Model: `deepseek-v4-flash` (never the retired `deepseek-chat` / `deepseek-reasoner` aliases). Thinking is explicitly disabled (`thinking.type=disabled`) so the run measures prompt/cache behaviour, not reasoning; temperature stays 0. Cache construction may need a prior completed request, so B–D each prime with A then B and measure the third request. |
+| DeepSeek | `deepseek-chat-completions-v1` | `prompt_cache_hit_tokens`, `prompt_cache_miss_tokens` | **First live provider for the current validation sequence.** Model: `deepseek-v4-flash` (never the retired `deepseek-chat` / `deepseek-reasoner` aliases). Thinking is explicitly disabled (`thinking.type=disabled`) so the run measures prompt/cache behaviour, not reasoning; temperature stays 0. Cache construction is async/best-effort and may need a prior completed request, so B–D each prime with A then B and apply a 10 s settle delay before the measured third request (see "Cache settling"). |
 | OpenAI | `openai-chat-completions-v1` | `prompt_tokens`, `completion_tokens`, `prompt_tokens_details.cached_tokens` | `prompt_tokens` = total input; cached tokens nested. No explicit cache control in baseline. No `thinking` field is sent. |
 | Anthropic | `anthropic-messages-v1` | `input_tokens`, `cache_read_input_tokens`, `cache_creation_input_tokens` | `input_tokens` = uncached remainder; total is the sum of the three. Explicit `cache_control` on the large prefix block. |
 
@@ -156,6 +156,28 @@ late-divergence: A = prefix + tail A;  B = prefix + tail B;  C = prefix + change
 early-divergence:A = header + prefix + tail A;  B = header + prefix + tail B;
                  C = CHANGED header + prefix + tail C
 ```
+
+### Cache settling (DeepSeek)
+
+Official DeepSeek Context Caching documentation states that cache
+construction is **asynchronous and best-effort** and can take seconds, and
+that common-prefix persistence may be established after multiple requests.
+Phase 0B therefore applies a conservative **10-second settle period after
+request B and before request C** for every DeepSeek B–D scenario:
+
+```
+pre_request_delay_ms:  A = 0;  B = 0;  C = 10000
+```
+
+This is an **experimental control**, not a provider SLA or a required value,
+and it is not a scientifically validated optimum. A zero cache hit after
+settling remains evidence to investigate — it does **not** automatically
+prove that structural reuse is incorrect. B is deliberately given no delay:
+A/B must first establish the common prefix, and the experiment must not
+encode an assumption that B must report zero reuse.
+
+Dry runs report the full per-request delay plan but **never sleep** and make
+zero network requests.
 
 Cache-expiry/TTL experiments are **not** part of Phase 0B baseline.
 

@@ -10,13 +10,37 @@ mod common;
 
 use prefixity_live::credentials::Credentials;
 use prefixity_live::error::LiveError;
-use prefixity_live::experiment::{describe_dry_run, execute_live_experiment, ExperimentConfig};
+use prefixity_live::experiment::{
+    describe_dry_run, execute_live_experiment, ExperimentConfig, Sleep,
+};
 use prefixity_live::result::Conclusion;
 use prefixity_live::scenario::Scenario;
 use prefixity_live::transport::{err_response, ok_response, MockTransport};
 use std::path::PathBuf;
 
 const TEST_KEY_VALUE: &str = "sk-test-secret-value";
+
+/// A no-op sleeper so integration tests never wait real seconds.
+struct NoopSleeper;
+impl Sleep for NoopSleeper {
+    fn sleep(&self, _millis: u64) {}
+}
+
+/// A sleeper that records every requested delay (ms) for assertions.
+#[derive(Default)]
+struct RecordingSleeper {
+    calls: std::sync::Mutex<Vec<u64>>,
+}
+impl RecordingSleeper {
+    fn calls(&self) -> Vec<u64> {
+        self.calls.lock().unwrap().clone()
+    }
+}
+impl Sleep for RecordingSleeper {
+    fn sleep(&self, millis: u64) {
+        self.calls.lock().unwrap().push(millis);
+    }
+}
 
 /// A fake credential read from a constant test env var.
 fn test_key() -> Credentials {
@@ -94,7 +118,7 @@ fn openai_stable_prefix_full_pipeline_with_mock() {
         ok_response(200, &common::openai_ok(8100, 8, Some(8000))),
     ]);
 
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert_eq!(mock.call_count(), 2);
     assert!(result.error.is_none());
     assert_eq!(result.request_count, 2);
@@ -144,7 +168,7 @@ fn openai_stable_prefix_full_pipeline_with_mock() {
         serde_json::from_str(&std::fs::read_to_string(dir.join("manifest.json")).unwrap()).unwrap();
     assert_eq!(manifest["model"], "test-model");
     assert_eq!(manifest["scenario"], "stable-prefix");
-    assert_eq!(manifest["experiment_format_version"], 2);
+    assert_eq!(manifest["experiment_format_version"], 3);
     assert_eq!(manifest["max_estimated_input_tokens"], 50_000);
 
     std::fs::remove_dir_all(&runs).ok();
@@ -162,7 +186,7 @@ fn anthropic_schema_smoke_normalizes_three_categories() {
     );
     let mock = MockTransport::single(200, &common::anthropic_ok(500, 8, 100, 7500));
 
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert_eq!(mock.call_count(), 1);
     assert!(result.error.is_none());
     assert_eq!(result.conclusion, Conclusion::Match);
@@ -192,9 +216,12 @@ fn deepseek_stable_prefix_plans_three_requests_and_reports_pairs() {
         ok_response(200, &common::deepseek_ok(0, 8100, 8)),
         ok_response(200, &common::deepseek_ok(8000, 100, 8)),
     ]);
+    let sleeper = RecordingSleeper::default();
 
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &sleeper).unwrap();
     assert_eq!(mock.call_count(), 3);
+    // The experimental settle delay is applied exactly once, before C.
+    assert_eq!(sleeper.calls(), vec![10_000]);
     assert_eq!(result.request_count, 3);
     assert_eq!(result.pairs.len(), 2);
     // Pair (1,2): provider reports no reuse despite an identical prefix.
@@ -229,7 +256,7 @@ fn late_divergence_observes_large_structural_reuse() {
         ok_response(200, &common::openai_ok(8100, 8, None)),
         ok_response(200, &common::openai_ok(8100, 8, Some(8000))),
     ]);
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert!(
         result.pairs[0].observed_structural_reuse_estimated_tokens > 7_000,
         "late divergence should keep a large prefix reusable"
@@ -249,7 +276,7 @@ fn early_divergence_observes_no_structural_reuse() {
         // prediction that an early change destroys the prefix.
         ok_response(200, &common::openai_ok(8100, 8, Some(0))),
     ]);
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert_eq!(
         result.pairs[0].observed_structural_reuse_estimated_tokens,
         0
@@ -265,7 +292,7 @@ fn max_request_guard_refuses_before_any_call() {
     let mut cfg = config("deepseek", Scenario::StablePrefix, runs.clone(), "guard-1");
     cfg.max_requests = 2; // deepseek stable-prefix plans 3
     let mock = MockTransport::new(Vec::new());
-    let err = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap_err();
+    let err = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap_err();
     assert!(matches!(err, LiveError::Guard { .. }));
     assert_eq!(mock.call_count(), 0);
     std::fs::remove_dir_all(&runs).ok();
@@ -278,7 +305,7 @@ fn token_ceiling_refuses_before_any_call() {
     let mut cfg = config("openai", Scenario::StablePrefix, runs.clone(), "tokens-1");
     cfg.max_estimated_input_tokens = 100; // the ~8k prefix far exceeds this
     let mock = MockTransport::new(Vec::new());
-    let err = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap_err();
+    let err = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap_err();
     assert!(matches!(err, LiveError::Guard { .. }));
     assert!(err.to_string().contains("max-estimated-input-tokens"));
     assert_eq!(mock.call_count(), 0);
@@ -291,7 +318,7 @@ fn no_retry_on_timeout() {
     let runs = common::temp_dir("retry");
     let cfg = config("openai", Scenario::StablePrefix, runs.clone(), "retry-1");
     let mock = MockTransport::new(vec![err_response(LiveError::Timeout)]);
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     // Exactly one call: no automatic retry.
     assert_eq!(mock.call_count(), 1);
     assert!(result.error.is_some());
@@ -308,7 +335,7 @@ fn http_error_stops_and_errors_never_expose_credentials() {
     let runs = common::temp_dir("http");
     let cfg = config("openai", Scenario::StablePrefix, runs.clone(), "http-1");
     let mock = MockTransport::new(vec![err_response(LiveError::HttpStatus { status: 401 })]);
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert_eq!(mock.call_count(), 1);
     let error = result.error.unwrap();
     assert!(error.contains("401"));
@@ -329,7 +356,7 @@ fn redirect_status_stops_without_following_or_retrying() {
         // A success response that must never be consumed.
         ok_response(200, &common::openai_ok(8100, 8, Some(8000))),
     ]);
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert_eq!(mock.call_count(), 1);
     assert!(result.error.is_some());
     assert!(result.error.unwrap().contains("302"));
@@ -343,7 +370,7 @@ fn schema_mismatch_is_classified_as_schema_mismatch() {
     let runs = common::temp_dir("schema");
     let cfg = config("openai", Scenario::StablePrefix, runs.clone(), "schema-1");
     let mock = MockTransport::single(200, &common::usage_only_unknown_fields());
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert_eq!(result.conclusion, Conclusion::SchemaMismatch);
     assert!(result.error.unwrap().contains("does not fit"));
     assert_no_credential_in_dir(&runs.join("schema-1"));
@@ -356,7 +383,7 @@ fn missing_usage_stops_with_schema_mismatch() {
     let runs = common::temp_dir("nousage");
     let cfg = config("openai", Scenario::SchemaSmoke, runs.clone(), "nousage-1");
     let mock = MockTransport::single(200, &common::no_usage());
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert_eq!(result.conclusion, Conclusion::SchemaMismatch);
     std::fs::remove_dir_all(&runs).ok();
 }
@@ -376,7 +403,7 @@ fn deepseek_completion_only_is_schema_mismatch() {
         "deepseek-completion-only",
     );
     let mock = MockTransport::single(200, &common::deepseek_completion_only());
-    let result = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     assert_eq!(mock.call_count(), 1);
     assert_eq!(result.conclusion, Conclusion::SchemaMismatch);
     assert!(result.error.is_some());
@@ -388,7 +415,7 @@ fn missing_credential_is_rejected_before_any_call() {
     let runs = common::temp_dir("nocred");
     let cfg = config("openai", Scenario::SchemaSmoke, runs.clone(), "nocred-1");
     let mock = MockTransport::new(Vec::new());
-    let err = execute_live_experiment(&cfg, &mock, None).unwrap_err();
+    let err = execute_live_experiment(&cfg, &mock, None, &NoopSleeper).unwrap_err();
     assert!(matches!(err, LiveError::MissingCredential { .. }));
     assert_eq!(mock.call_count(), 0);
     std::fs::remove_dir_all(&runs).ok();
@@ -400,7 +427,7 @@ fn hostile_experiment_id_is_rejected_before_any_call() {
     let runs = common::temp_dir("hostile");
     let cfg = config("openai", Scenario::SchemaSmoke, runs.clone(), "../escape");
     let mock = MockTransport::new(Vec::new());
-    let err = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap_err();
+    let err = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap_err();
     assert!(matches!(err, LiveError::InvalidArgument { .. }));
     assert_eq!(mock.call_count(), 0);
     // Nothing was created outside the runs directory.
@@ -431,7 +458,7 @@ fn requests_are_sequential_in_plan_order() {
         ok_response(200, &common::deepseek_ok(0, 8100, 8)),
         ok_response(200, &common::deepseek_ok(8000, 100, 8)),
     ]);
-    let _ = execute_live_experiment(&cfg, &mock, Some(&key)).unwrap();
+    let _ = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
     let calls = mock.calls();
     assert_eq!(calls.len(), 3);
     // The same allowlisted URL is used each time; bodies are distinct tails.
@@ -440,5 +467,49 @@ fn requests_are_sequential_in_plan_order() {
         .all(|c| c.url.starts_with("https://api.deepseek.com")));
     assert_ne!(calls[0].body, calls[1].body);
     assert_ne!(calls[1].body, calls[2].body);
+    std::fs::remove_dir_all(&runs).ok();
+}
+
+#[test]
+fn deepseek_execution_sleeps_once_for_settle_before_c() {
+    let key = test_key();
+    let runs = common::temp_dir("ds-settle");
+    let cfg = config(
+        "deepseek",
+        Scenario::StablePrefix,
+        runs.clone(),
+        "ds-settle-1",
+    );
+    let mock = MockTransport::new(vec![
+        ok_response(200, &common::deepseek_ok(0, 8100, 8)),
+        ok_response(200, &common::deepseek_ok(0, 8100, 8)),
+        ok_response(200, &common::deepseek_ok(8000, 100, 8)),
+    ]);
+    let sleeper = RecordingSleeper::default();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &sleeper).unwrap();
+    // Exactly one sleep (before C), with the configured settle period; no
+    // sleep before A/B and none after the final request.
+    assert_eq!(sleeper.calls(), vec![10_000]);
+    assert_eq!(result.request_count, 3);
+    // Each request records its planned pre-delay.
+    let delays: Vec<u64> = result
+        .requests
+        .iter()
+        .map(|r| r.pre_request_delay_ms)
+        .collect();
+    assert_eq!(delays, vec![0, 0, 10_000]);
+    std::fs::remove_dir_all(&runs).ok();
+}
+
+#[test]
+fn deepseek_dry_run_exposes_settle_delay_without_sleeping() {
+    let runs = common::temp_dir("ds-dry");
+    let cfg = config("deepseek", Scenario::StablePrefix, runs.clone(), "ds-dry-1");
+    let start = std::time::Instant::now();
+    let info = describe_dry_run(&cfg).unwrap();
+    // Dry-run never sleeps: it returns quickly even though C plans 10s.
+    assert!(start.elapsed().as_millis() < 5_000);
+    let delays: Vec<u64> = info.turns.iter().map(|t| t.pre_request_delay_ms).collect();
+    assert_eq!(delays, vec![0, 0, 10_000]);
     std::fs::remove_dir_all(&runs).ok();
 }

@@ -82,6 +82,9 @@ pub struct TurnSpec {
     pub prefix: String,
     /// Per-turn tail instruction.
     pub tail: String,
+    /// Pre-request delay (ms) applied before this request (experimental
+    /// settle control; 0 for most requests).
+    pub pre_request_delay_ms: u64,
 }
 
 /// The resolved experiment plan (before guard checks).
@@ -140,6 +143,7 @@ pub fn build_plan(config: &ExperimentConfig) -> Result<ExperimentPlan, LiveError
             header,
             prefix: prefix.clone(),
             tail,
+            pre_request_delay_ms: turn_plan.pre_request_delay_ms(turn),
         });
     }
 
@@ -180,6 +184,23 @@ pub fn apply_guards(config: &ExperimentConfig, plan: &ExperimentPlan) -> Result<
     Ok(())
 }
 
+/// A minimal delay executor so execution can apply experimental settle
+/// delays without coupling unit/integration tests to real multi-second
+/// sleeps.
+pub trait Sleep: Send + Sync {
+    /// Block for at least `millis` milliseconds on the current thread.
+    fn sleep(&self, millis: u64);
+}
+
+/// The real implementation: blocks the current thread for the duration.
+pub struct StdThreadSleeper;
+
+impl Sleep for StdThreadSleeper {
+    fn sleep(&self, millis: u64) {
+        std::thread::sleep(Duration::from_millis(millis));
+    }
+}
+
 /// Information printed by a dry run. Contains no credential value.
 #[derive(Debug, Clone)]
 pub struct DryRunInfo {
@@ -191,6 +212,8 @@ pub struct DryRunInfo {
     pub scenario: String,
     /// Planned request count.
     pub request_count: usize,
+    /// The planned request descriptors (turn, label, pre-delay).
+    pub turns: Vec<TurnSpec>,
     /// Estimated bytes across all requests.
     pub estimated_bytes: u64,
     /// Estimated tokens across all requests.
@@ -222,6 +245,7 @@ pub fn describe_dry_run(config: &ExperimentConfig) -> Result<DryRunInfo, LiveErr
         model: config.model.clone(),
         scenario: config.scenario.as_str().to_string(),
         request_count: plan.turns.len(),
+        turns: plan.turns.clone(),
         estimated_bytes: plan.estimated_bytes,
         estimated_tokens: plan.estimated_tokens,
         artifact_dir: plan.artifact_dir,
@@ -243,6 +267,7 @@ pub fn execute_live_experiment(
     config: &ExperimentConfig,
     transport: &dyn LiveHttpTransport,
     credential: Option<&Credentials>,
+    sleeper: &dyn Sleep,
 ) -> Result<ExperimentResult, LiveError> {
     let plan = build_plan(config)?;
     apply_guards(config, &plan)?;
@@ -266,6 +291,7 @@ pub fn execute_live_experiment(
         seed: config.seed,
         target_prefix_tokens: config.target_prefix_tokens,
         request_count: plan.turns.len(),
+        request_pre_delays_ms: plan.turns.iter().map(|t| t.pre_request_delay_ms).collect(),
         notes: config.notes.clone(),
         max_requests: config.max_requests,
         max_estimated_input_tokens: config.max_estimated_input_tokens,
@@ -279,6 +305,13 @@ pub fn execute_live_experiment(
     let mut schema_mismatch = false;
 
     for turn in &plan.turns {
+        // Experimental settle delay before this request (e.g. DeepSeek's 10s
+        // period before C, after B has fully completed, so best-effort async
+        // cache persistence can finish). No delay is applied after the final
+        // request.
+        if turn.pre_request_delay_ms > 0 {
+            sleeper.sleep(turn.pre_request_delay_ms);
+        }
         let body = match provider.build_request_body(
             &config.model,
             &turn.header,
@@ -415,6 +448,7 @@ pub fn execute_live_experiment(
             time_to_headers_ms: response.time_to_headers_ms,
             time_to_first_body_byte_ms: response.time_to_first_body_byte_ms,
             total_ms: response.total_ms,
+            pre_request_delay_ms: turn.pre_request_delay_ms,
             generated_bytes: (turn.header.len() + turn.prefix.len() + turn.tail.len()) as u64,
             prefixity_estimated_tokens: estimate_tokens(&turn.header)
                 + estimate_tokens(&turn.prefix)
@@ -532,11 +566,12 @@ fn build_summary(
     ));
     for request in requests {
         lines.push(format!(
-            "  request {}: http={} total_ms={} estimated_tokens={} normalized_total_input={} cache_read={}",
+            "  request {}: http={} total_ms={} estimated_tokens={} pre_delay_ms={} normalized_total_input={} cache_read={}",
             request.turn,
             request.http_status,
             request.total_ms,
             request.prefixity_estimated_tokens,
+            request.pre_request_delay_ms,
             request.normalized_usage.total_input_tokens.map(|v| v.to_string()).unwrap_or_else(|| "?".to_string()),
             request.normalized_usage.cache_read_tokens.map(|v| v.to_string()).unwrap_or_else(|| "?".to_string()),
         ));
@@ -652,5 +687,55 @@ mod tests {
             let plan = build_plan(&test_config(provider, Scenario::LateDivergence)).unwrap();
             assert_eq!(plan.turns.len(), 2);
         }
+    }
+
+    #[test]
+    fn deepseek_settle_delay_is_recorded_in_turn_specs() {
+        // B, C, D: A=0, B=0, C=10000.
+        for scenario in [
+            Scenario::StablePrefix,
+            Scenario::EarlyDivergence,
+            Scenario::LateDivergence,
+        ] {
+            let plan = build_plan(&test_config("deepseek", scenario)).unwrap();
+            assert_eq!(plan.turns.len(), 3);
+            assert_eq!(plan.turns[0].pre_request_delay_ms, 0);
+            assert_eq!(plan.turns[1].pre_request_delay_ms, 0);
+            assert_eq!(plan.turns[2].pre_request_delay_ms, 10_000);
+        }
+        // schema-smoke has no delay.
+        let smoke = build_plan(&test_config("deepseek", Scenario::SchemaSmoke)).unwrap();
+        assert_eq!(smoke.turns[0].pre_request_delay_ms, 0);
+        // OpenAI/Anthropic remain delay-free.
+        for provider in ["openai", "anthropic"] {
+            for scenario in [
+                Scenario::SchemaSmoke,
+                Scenario::StablePrefix,
+                Scenario::EarlyDivergence,
+                Scenario::LateDivergence,
+            ] {
+                let plan = build_plan(&test_config(provider, scenario)).unwrap();
+                assert!(
+                    plan.turns.iter().all(|t| t.pre_request_delay_ms == 0),
+                    "{} {} must be delay-free",
+                    provider,
+                    scenario.as_str()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn dry_run_exposes_delays_and_never_sleeps() {
+        // describe_dry_run takes no sleeper, so it structurally cannot wait;
+        // additionally prove it returns quickly.
+        let start = std::time::Instant::now();
+        let info = describe_dry_run(&test_config("deepseek", Scenario::StablePrefix)).unwrap();
+        let delays: Vec<u64> = info.turns.iter().map(|t| t.pre_request_delay_ms).collect();
+        assert_eq!(delays, vec![0, 0, 10_000]);
+        assert!(
+            start.elapsed().as_millis() < 5_000,
+            "dry-run must not actually sleep for the settle period"
+        );
     }
 }

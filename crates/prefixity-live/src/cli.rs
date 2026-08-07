@@ -6,7 +6,9 @@
 
 use crate::credentials::Credentials;
 use crate::error::LiveError;
-use crate::experiment::{describe_dry_run, execute_live_experiment, DryRunInfo, ExperimentConfig};
+use crate::experiment::{
+    describe_dry_run, execute_live_experiment, DryRunInfo, ExperimentConfig, StdThreadSleeper,
+};
 use crate::scenario::Scenario;
 use crate::transport::ReqwestTransport;
 use clap::{Args, Parser, Subcommand};
@@ -122,7 +124,8 @@ pub fn run(cli: &Cli) -> Result<(), LiveError> {
             let provider = crate::providers::provider_from_id(&config.provider_id)?;
             let credential = Credentials::from_env(provider.credential_env_var())?;
             let transport = ReqwestTransport::new()?;
-            let result = execute_live_experiment(&config, &transport, Some(&credential))?;
+            let result =
+                execute_live_experiment(&config, &transport, Some(&credential), &StdThreadSleeper)?;
             if *json {
                 let text = serde_json::to_string_pretty(&result).map_err(|e| {
                     LiveError::InvalidResponse {
@@ -218,6 +221,14 @@ fn format_dry_run(info: &DryRunInfo) -> String {
     lines.push(format!("model:                {}", info.model));
     lines.push(format!("scenario:             {}", info.scenario));
     lines.push(format!("planned requests:     {}", info.request_count));
+    for turn in &info.turns {
+        lines.push(format!(
+            "request {} ({}): pre-delay {} ms",
+            turn.turn,
+            crate::content::turn_label(turn.turn),
+            turn.pre_request_delay_ms
+        ));
+    }
     lines.push(format!("estimated bytes:      {}", info.estimated_bytes));
     lines.push(format!("estimated tokens:     {}", info.estimated_tokens));
     lines.push(format!(
@@ -241,6 +252,7 @@ fn format_dry_run(info: &DryRunInfo) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::experiment::TurnSpec;
     use clap::Parser;
 
     #[test]
@@ -284,19 +296,45 @@ mod tests {
         let info = DryRunInfo {
             provider: "deepseek".to_string(),
             model: "deepseek-v4-flash".to_string(),
-            scenario: "schema-smoke".to_string(),
-            request_count: 1,
+            scenario: "stable-prefix".to_string(),
+            request_count: 3,
+            turns: vec![
+                TurnSpec {
+                    turn: 1,
+                    header: "h".to_string(),
+                    prefix: "p".to_string(),
+                    tail: "t1".to_string(),
+                    pre_request_delay_ms: 0,
+                },
+                TurnSpec {
+                    turn: 2,
+                    header: "h".to_string(),
+                    prefix: "p".to_string(),
+                    tail: "t2".to_string(),
+                    pre_request_delay_ms: 0,
+                },
+                TurnSpec {
+                    turn: 3,
+                    header: "h".to_string(),
+                    prefix: "p".to_string(),
+                    tail: "t3".to_string(),
+                    pre_request_delay_ms: 10_000,
+                },
+            ],
             estimated_bytes: 2246,
             estimated_tokens: 563,
             artifact_dir: std::path::PathBuf::from("experiments/runs/x"),
             required_env_var: "DEEPSEEK_API_KEY",
-            max_requests: 1,
-            max_estimated_input_tokens: 2000,
+            max_requests: 3,
+            max_estimated_input_tokens: 25_000,
             guard_reason: None,
         };
         let report = format_dry_run(&info);
         assert!(report.contains("max estimated input tokens"));
-        assert!(report.contains("2000"));
+        assert!(report.contains("25000"));
         assert!(report.contains("not a provider billing/tokenizer guarantee"));
+        // The per-request settle plan is visible.
+        assert!(report.contains("request 1 (A): pre-delay 0 ms"));
+        assert!(report.contains("request 3 (C): pre-delay 10000 ms"));
     }
 }

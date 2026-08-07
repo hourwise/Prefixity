@@ -8,10 +8,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 /// The Phase 0B experiment manifest format version.
 ///
-/// v2: `max_input_tokens` renamed to `max_estimated_input_tokens` (the
-/// value is a conservative local Prefixity estimate, not a provider
-/// billing/tokenizer guarantee).
-pub const EXPERIMENT_FORMAT_VERSION: u32 = 2;
+/// * v2: `max_input_tokens` renamed to `max_estimated_input_tokens` (a
+///   conservative local Prefixity estimate, not a provider billing/tokenizer
+///   guarantee).
+/// * v3: added `request_pre_delays_ms` (per-request pre-delay plan, e.g.
+///   DeepSeek's 10s experimental settle before C).
+pub const EXPERIMENT_FORMAT_VERSION: u32 = 3;
 
 /// Describes one Phase 0B experiment. Serialized to `manifest.json`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -39,6 +41,9 @@ pub struct ExperimentManifest {
     pub target_prefix_tokens: u64,
     /// Planned request count.
     pub request_count: usize,
+    /// Planned pre-request delay (ms) per request, in turn order (e.g.
+    /// DeepSeek's 10s experimental settle before C; 0 elsewhere).
+    pub request_pre_delays_ms: Vec<u64>,
     /// Creation time (ISO-8601 UTC).
     pub created_at: String,
     /// Prefixity commit SHA at run time, when resolvable locally.
@@ -77,6 +82,8 @@ pub struct ManifestInput {
     pub target_prefix_tokens: u64,
     /// Planned request count.
     pub request_count: usize,
+    /// Planned pre-request delay (ms) per request, in turn order.
+    pub request_pre_delays_ms: Vec<u64>,
     /// Optional notes.
     pub notes: Option<String>,
     /// `--max-requests` in force.
@@ -101,6 +108,7 @@ pub fn build_manifest(input: &ManifestInput) -> ExperimentManifest {
         stable_prefix_seed: input.seed,
         target_prefix_tokens: input.target_prefix_tokens,
         request_count: input.request_count,
+        request_pre_delays_ms: input.request_pre_delays_ms.clone(),
         created_at: iso8601_utc_now(),
         commit_sha: detect_commit_sha(),
         notes: input.notes.clone(),
@@ -179,7 +187,8 @@ mod tests {
             scenario: "schema-smoke".to_string(),
             seed: 42,
             target_prefix_tokens: 8000,
-            request_count: 1,
+            request_count: 3,
+            request_pre_delays_ms: vec![0, 0, 10_000],
             notes: None,
             max_requests: 3,
             max_estimated_input_tokens: 50_000,
@@ -197,6 +206,7 @@ mod tests {
         );
         assert_eq!(manifest.api_surface, "openai-chat-completions-v1");
         assert!(manifest.endpoint.starts_with("https://"));
+        assert_eq!(manifest.request_pre_delays_ms, vec![0, 0, 10_000]);
     }
 
     #[test]
