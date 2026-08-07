@@ -36,6 +36,7 @@ authorization headers, no provider request id, no full provider response).
 | `15-history-proves-prefix-reuse.json` / `15-history-proves-prefix-reuse-turn2.json` | History proves observed reuse (5200) while the provider reports a different figure (5000) | `compare` (observed reuse kept separate from provider-reported cache read) |
 | `16-global-reorder-would-be-unsafe.json` | A naive global stable-first sort would cross zones / reorder messages | `simulate --policy stable-prefix` (no safe relocation; unsafe moves deferred) |
 | `17-deepseek-live-schema-smoke.json` | **Sanitized** real DeepSeek live schema-smoke (2026-08-07, `deepseek-v4-flash`): hit 0 + miss 1215 = total 1215, cache read 0, output 1 | `analyse` (normalized total = 1215, fresh = 1215, read = 0, output = 1) |
+| `18-deepseek-live-stable-prefix.json` | **Sanitized** real DeepSeek live stable-prefix, request B (2026-08-07, `deepseek-v4-flash`): hit 18048 + miss 13 = total 18061, output 1 | `analyse` (normalized total = 18061, fresh = 13, read = 18048); live reconciliation MATCH (structural 0.9983 vs provider 0.9993) |
 
 ## Quick command examples (run from the repository root)
 

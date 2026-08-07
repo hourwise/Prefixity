@@ -220,6 +220,15 @@ fn format_dry_run(info: &DryRunInfo) -> String {
     lines.push(format!("provider:             {}", info.provider));
     lines.push(format!("model:                {}", info.model));
     lines.push(format!("scenario:             {}", info.scenario));
+    if let Some(ld) = &info.late_divergence {
+        lines.push("late divergence:".to_string());
+        lines.push(format!("    stable core target: {}%", ld.core_percent));
+        lines.push(format!("    mutable suffix target: {}%", ld.suffix_percent));
+        lines.push(format!(
+            "    mutation turn: {}",
+            crate::content::turn_label(ld.mutation_turn)
+        ));
+    }
     lines.push(format!("planned requests:     {}", info.request_count));
     for turn in &info.turns {
         lines.push(format!(
@@ -303,6 +312,7 @@ mod tests {
                     turn: 1,
                     header: "h".to_string(),
                     prefix: "p".to_string(),
+                    suffix: None,
                     tail: "t1".to_string(),
                     pre_request_delay_ms: 0,
                 },
@@ -310,6 +320,7 @@ mod tests {
                     turn: 2,
                     header: "h".to_string(),
                     prefix: "p".to_string(),
+                    suffix: None,
                     tail: "t2".to_string(),
                     pre_request_delay_ms: 0,
                 },
@@ -317,10 +328,12 @@ mod tests {
                     turn: 3,
                     header: "h".to_string(),
                     prefix: "p".to_string(),
+                    suffix: None,
                     tail: "t3".to_string(),
                     pre_request_delay_ms: 10_000,
                 },
             ],
+            late_divergence: None,
             estimated_bytes: 2246,
             estimated_tokens: 563,
             artifact_dir: std::path::PathBuf::from("experiments/runs/x"),

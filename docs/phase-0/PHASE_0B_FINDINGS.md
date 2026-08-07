@@ -70,3 +70,52 @@ not a validated optimum. B is deliberately not delayed (A/B establish the
 common prefix), and the experiment encodes no expectation that B must report
 zero cache reuse. A zero cache hit after settling remains evidence to
 investigate, not automatic proof that structural reuse is incorrect.
+
+## Finding 2 — first live DeepSeek stable-prefix cache validation (2026-08-07)
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-08-07 |
+| Provider | DeepSeek |
+| Model | `deepseek-v4-flash` |
+| Scenario | `stable-prefix` |
+| Commit | `2f69dd6` |
+| Requests | 3 (A/B/C), settle delay 10 s before C |
+| HTTP | 200 |
+| Conclusion | **MATCH** |
+
+Important observations:
+
+1. Request A was a complete cache miss (total 18061, read 0, fresh 18061).
+2. Request B immediately reported **18048 cache-hit tokens / 13 cache-miss
+   tokens** out of **18061 total input tokens** — a hit without any settle
+   delay.
+3. Request C, after the controlled 10-second settle, reported **exactly the
+   same cache accounting**.
+4. Prefixity independently identified **8048 / 8062 estimated tokens
+   reusable = 99.826% structural reuse**.
+5. DeepSeek reported **18048 / 18061 provider tokens cached = 99.928%
+   provider cache reuse**.
+6. The absolute tokenizer counts are very different (8048 vs 18048), but the
+   reuse **proportions differ by only about 0.10 percentage points**
+   (ratio difference ≈ 0.0010), so the ratio-based reconciliation is MATCH.
+
+Interpretation:
+
+This is strong evidence that Prefixity's structural-prefix observation can
+correspond closely to real provider cache reuse for this controlled stable
+prefix. It is **one** observation, not proof across models, providers, or
+workloads.
+
+Also recorded:
+
+- B already hit without the 10-second settle, so the delay was **not
+  required** for this particular stable-prefix run.
+- Retaining the delay for C remains a valid conservative experimental
+  control.
+- We do **not** claim that 10 seconds is necessary.
+
+See the sanitized regression fixture
+`fixtures/traces/18-deepseek-live-stable-prefix.json` (request B shape) and
+the reconciliation values under `experiments/runs/deepseek-stable-prefix-01/`
+(gitignored).

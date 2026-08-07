@@ -33,6 +33,11 @@ pub struct ProviderTurnPlan {
     /// First turn (1-based, inclusive) whose early header is diverged, for
     /// `early-divergence`. `None` means the header is never diverged.
     pub header_diverges_from: Option<usize>,
+    /// First turn (1-based, inclusive) whose **late mutable suffix** is
+    /// changed, for `late-divergence`. `None` for scenarios without a late
+    /// suffix. Keeps `late-divergence` structurally distinct from
+    /// `stable-prefix`.
+    pub late_suffix_mutates_from: Option<usize>,
     /// Experimental settle delay (ms) applied **before the final turn** (for
     /// example, before DeepSeek's C request, after A and B have established
     /// the common prefix). Zero for OpenAI/Anthropic and schema-smoke.
@@ -45,6 +50,7 @@ impl ProviderTurnPlan {
         ProviderTurnPlan {
             turns,
             header_diverges_from: None,
+            late_suffix_mutates_from: None,
             settle_delay_ms: 0,
         }
     }
@@ -54,6 +60,18 @@ impl ProviderTurnPlan {
         ProviderTurnPlan {
             turns,
             header_diverges_from: Some(turn),
+            late_suffix_mutates_from: None,
+            settle_delay_ms: 0,
+        }
+    }
+
+    /// A late-divergence plan where the late mutable suffix changes from
+    /// `turn` onward (header and core stay identical).
+    pub fn late(turns: usize, turn: usize) -> ProviderTurnPlan {
+        ProviderTurnPlan {
+            turns,
+            header_diverges_from: None,
+            late_suffix_mutates_from: Some(turn),
             settle_delay_ms: 0,
         }
     }
@@ -64,6 +82,18 @@ impl ProviderTurnPlan {
         ProviderTurnPlan {
             turns: 3,
             header_diverges_from,
+            late_suffix_mutates_from: None,
+            settle_delay_ms: DEEPSEEK_SETTLE_DELAY_MS,
+        }
+    }
+
+    /// A DeepSeek late-divergence plan: three requests, the settle delay
+    /// before C, and the late mutable suffix changing only at C.
+    pub fn deepseek_late() -> ProviderTurnPlan {
+        ProviderTurnPlan {
+            turns: 3,
+            header_diverges_from: None,
+            late_suffix_mutates_from: Some(3),
             settle_delay_ms: DEEPSEEK_SETTLE_DELAY_MS,
         }
     }
@@ -75,6 +105,17 @@ impl ProviderTurnPlan {
         } else {
             0
         }
+    }
+
+    /// Whether the late mutable suffix is changed on the given 1-based turn.
+    pub fn late_suffix_mutates(&self, turn: usize) -> bool {
+        self.late_suffix_mutates_from
+            .is_some_and(|first| turn >= first)
+    }
+
+    /// The first turn (1-based) whose late suffix mutates, if any.
+    pub fn late_mutation_turn(&self) -> Option<usize> {
+        self.late_suffix_mutates_from
     }
 }
 
@@ -98,12 +139,15 @@ pub trait LiveProvider: Send + Sync + std::fmt::Debug {
     fn auth_header_value(&self, key: &str) -> String;
     /// Provider-specific static headers (e.g. `anthropic-version`).
     fn extra_headers(&self) -> Vec<(&'static str, &'static str)>;
-    /// Build the request JSON body for one request.
+    /// Build the request JSON body for one request. `suffix` is the optional
+    /// late mutable suffix (present only for `late-divergence`); when set it
+    /// is emitted as a separate wire block between the prefix and the tail.
     fn build_request_body(
         &self,
         model: &str,
         header: &str,
         prefix: &str,
+        suffix: Option<&str>,
         tail: &str,
     ) -> Result<Value, LiveError>;
     /// Extract the full safe usage object as `RawUsage`, or `None` if the
@@ -113,10 +157,13 @@ pub trait LiveProvider: Send + Sync + std::fmt::Debug {
     fn request_id(&self, body: &Value) -> Option<String>;
     /// Structural path of the header block in the wire message.
     fn header_structural_path(&self) -> &'static str;
-    /// Structural path of the prefix block in the wire message.
+    /// Structural path of the prefix (core) block in the wire message.
     fn prefix_structural_path(&self) -> &'static str;
-    /// Structural path of the tail block in the wire message.
-    fn tail_structural_path(&self) -> &'static str;
+    /// Structural path of the late mutable suffix block in the wire message.
+    fn suffix_structural_path(&self) -> &'static str;
+    /// Structural path of the tail block in the wire message. `has_suffix`
+    /// shifts the tail position on chat-completions-style message arrays.
+    fn tail_structural_path(&self, has_suffix: bool) -> &'static str;
     /// The explicit per-provider, per-scenario turn plan: how many requests
     /// run and, for `early-divergence`, the first turn (1-based, inclusive)
     /// whose early header is diverged. OpenAI and Anthropic diverge at turn
@@ -142,36 +189,45 @@ fn id_from_body(body: &Value) -> Option<String> {
     body.get("id").and_then(Value::as_str).map(str::to_string)
 }
 
-fn chat_completions_body(model: &str, header: &str, prefix: &str, tail: &str) -> Value {
+fn chat_completions_body(
+    model: &str,
+    header: &str,
+    prefix: &str,
+    suffix: Option<&str>,
+    tail: &str,
+) -> Value {
+    let mut messages = vec![
+        serde_json::json!({ "role": "system", "content": header }),
+        serde_json::json!({ "role": "system", "content": prefix }),
+    ];
+    if let Some(suffix) = suffix {
+        // Late-divergence only: a real separate wire block for the mutable
+        // suffix, between the stable core and the tail.
+        messages.push(serde_json::json!({ "role": "system", "content": suffix }));
+    }
+    messages.push(serde_json::json!({ "role": "user", "content": tail }));
     serde_json::json!({
         "model": model,
-        "messages": [
-            { "role": "system", "content": header },
-            { "role": "system", "content": prefix },
-            { "role": "user", "content": tail }
-        ],
+        "messages": messages,
         "max_tokens": 8,
         "temperature": 0,
         "stream": false
     })
 }
 
-fn deepseek_chat_completions_body(model: &str, header: &str, prefix: &str, tail: &str) -> Value {
+fn deepseek_chat_completions_body(
+    model: &str,
+    header: &str,
+    prefix: &str,
+    suffix: Option<&str>,
+    tail: &str,
+) -> Value {
     // Phase 0B measures prompt/cache behaviour, not reasoning: thinking is
     // explicitly disabled so request cost is dominated by the prefix. The
     // model is never hard-coded; it always comes from the CLI.
-    serde_json::json!({
-        "model": model,
-        "messages": [
-            { "role": "system", "content": header },
-            { "role": "system", "content": prefix },
-            { "role": "user", "content": tail }
-        ],
-        "max_tokens": 8,
-        "temperature": 0,
-        "stream": false,
-        "thinking": { "type": "disabled" }
-    })
+    let mut body = chat_completions_body(model, header, prefix, suffix, tail);
+    body["thinking"] = serde_json::json!({ "type": "disabled" });
+    body
 }
 
 /// OpenAI adapter. Baseline uses the default/native caching behaviour; no
@@ -209,9 +265,10 @@ impl LiveProvider for OpenAiProvider {
         model: &str,
         header: &str,
         prefix: &str,
+        suffix: Option<&str>,
         tail: &str,
     ) -> Result<Value, LiveError> {
-        Ok(chat_completions_body(model, header, prefix, tail))
+        Ok(chat_completions_body(model, header, prefix, suffix, tail))
     }
     fn extract_raw_usage(&self, body: &Value) -> Option<RawUsage> {
         usage_from_body(body).map(|mut u| {
@@ -228,13 +285,23 @@ impl LiveProvider for OpenAiProvider {
     fn prefix_structural_path(&self) -> &'static str {
         "messages[1]"
     }
-    fn tail_structural_path(&self) -> &'static str {
+    fn suffix_structural_path(&self) -> &'static str {
         "messages[2]"
+    }
+    fn tail_structural_path(&self, has_suffix: bool) -> &'static str {
+        if has_suffix {
+            "messages[3]"
+        } else {
+            "messages[2]"
+        }
     }
     fn plan_turns(&self, scenario: Scenario) -> ProviderTurnPlan {
         match scenario {
             Scenario::SchemaSmoke => ProviderTurnPlan::stable(1),
             Scenario::EarlyDivergence => ProviderTurnPlan::diverging(2, 2),
+            // Late-divergence mutates the late suffix on the measurement
+            // turn (B); StablePrefix keeps a single prefix block.
+            Scenario::LateDivergence => ProviderTurnPlan::late(2, 2),
             _ => ProviderTurnPlan::stable(2),
         }
     }
@@ -276,15 +343,26 @@ impl LiveProvider for AnthropicProvider {
         model: &str,
         header: &str,
         prefix: &str,
+        suffix: Option<&str>,
         tail: &str,
     ) -> Result<Value, LiveError> {
+        let mut system = vec![
+            serde_json::json!({ "type": "text", "text": header }),
+            serde_json::json!({
+                "type": "text",
+                "text": prefix,
+                "cache_control": { "type": "ephemeral" }
+            }),
+        ];
+        if let Some(suffix) = suffix {
+            // Late-divergence only: a real separate system text block for the
+            // mutable suffix, after the cached core.
+            system.push(serde_json::json!({ "type": "text", "text": suffix }));
+        }
         Ok(serde_json::json!({
             "model": model,
             "max_tokens": 8,
-            "system": [
-                { "type": "text", "text": header },
-                { "type": "text", "text": prefix, "cache_control": { "type": "ephemeral" } }
-            ],
+            "system": system,
             "messages": [
                 { "role": "user", "content": tail }
             ]
@@ -305,13 +383,19 @@ impl LiveProvider for AnthropicProvider {
     fn prefix_structural_path(&self) -> &'static str {
         "system[1]"
     }
-    fn tail_structural_path(&self) -> &'static str {
+    fn suffix_structural_path(&self) -> &'static str {
+        "system[2]"
+    }
+    fn tail_structural_path(&self, _has_suffix: bool) -> &'static str {
+        // Anthropic's tail lives in the separate `messages` array, so its
+        // position is independent of the system-block count.
         "messages[0]"
     }
     fn plan_turns(&self, scenario: Scenario) -> ProviderTurnPlan {
         match scenario {
             Scenario::SchemaSmoke => ProviderTurnPlan::stable(1),
             Scenario::EarlyDivergence => ProviderTurnPlan::diverging(2, 2),
+            Scenario::LateDivergence => ProviderTurnPlan::late(2, 2),
             _ => ProviderTurnPlan::stable(2),
         }
     }
@@ -359,9 +443,12 @@ impl LiveProvider for DeepSeekProvider {
         model: &str,
         header: &str,
         prefix: &str,
+        suffix: Option<&str>,
         tail: &str,
     ) -> Result<Value, LiveError> {
-        Ok(deepseek_chat_completions_body(model, header, prefix, tail))
+        Ok(deepseek_chat_completions_body(
+            model, header, prefix, suffix, tail,
+        ))
     }
     fn extract_raw_usage(&self, body: &Value) -> Option<RawUsage> {
         usage_from_body(body).map(|mut u| {
@@ -378,8 +465,15 @@ impl LiveProvider for DeepSeekProvider {
     fn prefix_structural_path(&self) -> &'static str {
         "messages[1]"
     }
-    fn tail_structural_path(&self) -> &'static str {
+    fn suffix_structural_path(&self) -> &'static str {
         "messages[2]"
+    }
+    fn tail_structural_path(&self, has_suffix: bool) -> &'static str {
+        if has_suffix {
+            "messages[3]"
+        } else {
+            "messages[2]"
+        }
     }
     fn plan_turns(&self, scenario: Scenario) -> ProviderTurnPlan {
         match scenario {
@@ -388,7 +482,9 @@ impl LiveProvider for DeepSeekProvider {
             // settle delay is applied before C so best-effort async cache
             // persistence can complete. The early header only diverges at C.
             Scenario::EarlyDivergence => ProviderTurnPlan::deepseek(Some(3)),
-            // B and D also run A, B, C with the same settle delay before C.
+            // Late-divergence mutates the late suffix only at C (after the
+            // same 10s settle); StablePrefix keeps a single prefix block.
+            Scenario::LateDivergence => ProviderTurnPlan::deepseek_late(),
             _ => ProviderTurnPlan::deepseek(None),
         }
     }
@@ -442,7 +538,7 @@ mod tests {
     #[test]
     fn openai_request_body_is_deterministic_and_has_no_key() {
         let body = OpenAiProvider
-            .build_request_body("gpt-test", "h", "p", "t")
+            .build_request_body("gpt-test", "h", "p", None, "t")
             .unwrap();
         let text = body_str(&body);
         assert!(text.contains("\"gpt-test\""));
@@ -455,7 +551,7 @@ mod tests {
     #[test]
     fn anthropic_request_body_uses_cache_control_on_prefix_only() {
         let body = AnthropicProvider
-            .build_request_body("claude-test", "h", "p", "t")
+            .build_request_body("claude-test", "h", "p", None, "t")
             .unwrap();
         let text = body_str(&body);
         // cache_control is on the prefix system block only; the credential
@@ -478,9 +574,10 @@ mod tests {
             deepseek.plan_turns(Scenario::StablePrefix),
             ProviderTurnPlan::deepseek(None)
         );
+        // Late-divergence mutates the late suffix only at C.
         assert_eq!(
             deepseek.plan_turns(Scenario::LateDivergence),
-            ProviderTurnPlan::deepseek(None)
+            ProviderTurnPlan::deepseek_late()
         );
         // Early divergence only at turn C so A/B establish the prefix.
         assert_eq!(
@@ -520,9 +617,11 @@ mod tests {
                 provider.plan_turns(Scenario::StablePrefix),
                 ProviderTurnPlan::stable(2)
             );
+            // Late-divergence mutates the late suffix on the measurement
+            // turn (B), keeping it distinct from StablePrefix.
             assert_eq!(
                 provider.plan_turns(Scenario::LateDivergence),
-                ProviderTurnPlan::stable(2)
+                ProviderTurnPlan::late(2, 2)
             );
             // Two-request early divergence changes the header at turn B.
             assert_eq!(
@@ -555,7 +654,7 @@ mod tests {
         // The model stays explicit (never hard-coded in the adapter);
         // thinking is disabled and temperature stays 0.
         let body = DeepSeekProvider
-            .build_request_body("deepseek-v4-flash", "h", "p", "t")
+            .build_request_body("deepseek-v4-flash", "h", "p", None, "t")
             .unwrap();
         assert_eq!(body["model"], "deepseek-v4-flash");
         assert_eq!(body["temperature"], 0);
@@ -565,10 +664,84 @@ mod tests {
     #[test]
     fn openai_request_body_has_no_thinking_field() {
         let body = OpenAiProvider
-            .build_request_body("gpt-test", "h", "p", "t")
+            .build_request_body("gpt-test", "h", "p", None, "t")
             .unwrap();
         assert!(body.get("thinking").is_none());
         assert_eq!(body["temperature"], 0);
+    }
+
+    #[test]
+    fn late_divergence_plan_mutates_suffix_at_the_measurement_turn() {
+        // DeepSeek: A/B establish context, C mutates the late suffix.
+        let deepseek_plan = DeepSeekProvider.plan_turns(Scenario::LateDivergence);
+        assert_eq!(deepseek_plan.late_mutation_turn(), Some(3));
+        assert!(!deepseek_plan.late_suffix_mutates(1));
+        assert!(!deepseek_plan.late_suffix_mutates(2));
+        assert!(deepseek_plan.late_suffix_mutates(3));
+        // OpenAI/Anthropic: B is the measurement turn.
+        for provider in [&OpenAiProvider as &dyn LiveProvider, &AnthropicProvider] {
+            let plan = provider.plan_turns(Scenario::LateDivergence);
+            assert_eq!(plan.late_mutation_turn(), Some(2));
+            assert!(!plan.late_suffix_mutates(1));
+            assert!(plan.late_suffix_mutates(2));
+            // StablePrefix never mutates a suffix.
+            assert_eq!(
+                provider
+                    .plan_turns(Scenario::StablePrefix)
+                    .late_mutation_turn(),
+                None
+            );
+        }
+        assert_eq!(
+            DeepSeekProvider
+                .plan_turns(Scenario::StablePrefix)
+                .late_mutation_turn(),
+            None
+        );
+    }
+
+    #[test]
+    fn late_divergence_bodies_emit_separate_suffix_wire_block() {
+        // OpenAI/DeepSeek: four messages; the suffix is a separate system
+        // message between core and tail.
+        let openai = OpenAiProvider
+            .build_request_body("m", "h", "core", Some("suffix"), "tail")
+            .unwrap();
+        let messages = openai["messages"].as_array().unwrap();
+        assert_eq!(messages.len(), 4);
+        assert_eq!(messages[0]["content"], "h");
+        assert_eq!(messages[1]["content"], "core");
+        assert_eq!(messages[2]["content"], "suffix");
+        assert_eq!(messages[3]["content"], "tail");
+
+        let deepseek = DeepSeekProvider
+            .build_request_body("m", "h", "core", Some("suffix"), "tail")
+            .unwrap();
+        assert_eq!(deepseek["messages"].as_array().unwrap().len(), 4);
+        assert_eq!(deepseek["messages"][2]["content"], "suffix");
+        assert_eq!(deepseek["thinking"]["type"], "disabled");
+
+        // Anthropic: a separate system text block for the suffix.
+        let anthropic = AnthropicProvider
+            .build_request_body("m", "h", "core", Some("suffix"), "tail")
+            .unwrap();
+        let system = anthropic["system"].as_array().unwrap();
+        assert_eq!(system.len(), 3);
+        assert_eq!(system[0]["text"], "h");
+        assert_eq!(system[1]["text"], "core");
+        assert_eq!(system[2]["text"], "suffix");
+    }
+
+    #[test]
+    fn stable_prefix_bodies_have_no_suffix_block() {
+        let openai = OpenAiProvider
+            .build_request_body("m", "h", "p", None, "tail")
+            .unwrap();
+        assert_eq!(openai["messages"].as_array().unwrap().len(), 3);
+        let anthropic = AnthropicProvider
+            .build_request_body("m", "h", "p", None, "tail")
+            .unwrap();
+        assert_eq!(anthropic["system"].as_array().unwrap().len(), 2);
     }
 
     #[test]

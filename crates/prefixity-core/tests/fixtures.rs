@@ -36,6 +36,7 @@ const ALL_FIXTURES: &[&str] = &[
     "15-history-proves-prefix-reuse-turn2.json",
     "16-global-reorder-would-be-unsafe.json",
     "17-deepseek-live-schema-smoke.json",
+    "18-deepseek-live-stable-prefix.json",
 ];
 
 #[test]
@@ -73,6 +74,39 @@ fn scenario_17_deepseek_live_schema_smoke_normalizes() {
         .unwrap();
     let lower = raw.to_lowercase();
     for forbidden in ["api_key", "bearer", "sk-", "48883131"] {
+        assert!(
+            !lower.contains(forbidden),
+            "fixture must not contain '{forbidden}'"
+        );
+    }
+}
+
+#[test]
+fn scenario_18_deepseek_live_stable_prefix_normalizes() {
+    // Sanitized fixture from the first real Phase 0B DeepSeek live
+    // stable-prefix run (2026-08-07, deepseek-v4-flash). Request B shape.
+    let trace = common::load_fixture("18-deepseek-live-stable-prefix.json");
+    let usage = trace.usage.as_ref().expect("fixture must carry usage");
+    assert_eq!(usage.provider_schema, "deepseek-chat-completions-v1");
+    let normalized = normalize_usage(usage);
+    assert_eq!(
+        normalized.normalization_source,
+        "deepseek-chat-completions-v1"
+    );
+    // Observed live values for B (and C): hit 18048 + miss 13 = total 18061.
+    assert_eq!(normalized.total_input_tokens, Some(18061));
+    assert_eq!(normalized.fresh_input_tokens, Some(13));
+    assert_eq!(normalized.cache_read_tokens, Some(18048));
+    assert_eq!(normalized.output_tokens, Some(1));
+
+    // Safe only: no credentials, no authorization headers, no provider
+    // request ids.
+    let raw = std::fs::read_to_string(common::fixture_path("18-deepseek-live-stable-prefix.json"))
+        .unwrap();
+    let lower = raw.to_lowercase();
+    for forbidden in [
+        "api_key", "bearer", "sk-", "2ede2c23", "8aca13db", "77bfc238",
+    ] {
         assert!(
             !lower.contains(forbidden),
             "fixture must not contain '{forbidden}'"

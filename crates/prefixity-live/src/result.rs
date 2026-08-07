@@ -351,6 +351,23 @@ mod tests {
     }
 
     #[test]
+    fn deepseek_live_stable_prefix_reconciliation_is_match() {
+        // Values from the first real DeepSeek stable-prefix run
+        // (2026-08-07): very different absolute token bases, nearly equal
+        // reuse proportions. Tolerance-based, not brittle string matching.
+        let structural = reuse_ratio(8048, 8062).unwrap();
+        let provider = reuse_ratio(18048, 18061).unwrap();
+        let difference = (structural - provider).abs();
+        assert!((structural - 0.9982634582).abs() < 1e-6, "got {structural}");
+        assert!((provider - 0.9992802170).abs() < 1e-6, "got {provider}");
+        assert!((difference - 0.0010167588).abs() < 1e-6, "got {difference}");
+        assert_eq!(
+            classify_pair(Some(structural), Some(provider)),
+            Conclusion::Match
+        );
+    }
+
+    #[test]
     fn schema_smoke_classification() {
         let mut normalized = NormalizedUsage {
             total_input_tokens: Some(100),

@@ -145,17 +145,42 @@ metric (see `PHASE_0B_FINDINGS.md`).
 | A | `schema-smoke` | 1 | Does one real response match our usage schema? The endpoint schema's defining fields must be derivable — for `deepseek-chat-completions-v1` that is `total_input_tokens`, `fresh_input_tokens` and `cache_read_tokens` (i.e. hit + miss input semantics). Completion/output tokens **alone are not a match**. STOP for that provider if not. |
 | B | `stable-prefix` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | Provider behaviour when consecutive requests share the same large prefix. DeepSeek primes with A then B and measures the third request (C). |
 | C | `early-divergence` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | Change a block near the beginning. OpenAI/Anthropic change the header at B. DeepSeek keeps the header unchanged through A and B (they establish the common prefix) and changes it only at C; the important comparison is B → C. |
-| D | `late-divergence` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | Keep the whole large prefix; change only a small tail. DeepSeek runs A, B, C with the tail changed at C; the important comparison is B → C. |
+| D | `late-divergence` | 2 (OpenAI/Anthropic); 3 (DeepSeek) | The prefix is split into a stable core (~90%) and a late mutable suffix (~10%) as **separate structural and wire blocks**. The suffix changes on the measurement turn (B for OpenAI/Anthropic; C for DeepSeek); the header and core stay identical. Asks: does the observed reusable-prefix proportion track the provider's cached-prefix proportion when content changes late? |
 
 DeepSeek's B–D priming sequence (per provider/scenario plan, not hidden
 arithmetic):
 
 ```
 stable-prefix:   A = prefix + tail A;  B = prefix + tail B;  C = prefix + tail C
-late-divergence: A = prefix + tail A;  B = prefix + tail B;  C = prefix + changed tail C
 early-divergence:A = header + prefix + tail A;  B = header + prefix + tail B;
                  C = CHANGED header + prefix + tail C
+late-divergence: A = header + core + suffix_orig + tail A;
+                 B = header + core + suffix_orig + tail B;
+                 C = header + core + CHANGED suffix + tail C
 ```
+
+### Late-divergence split
+
+`late-divergence` is a **genuinely distinct experiment** from
+`stable-prefix` (which previously duplicated it apart from scenario text).
+The approximately `target-prefix-tokens` synthetic prefix is split
+conceptually and on the wire into:
+
+- **stable prefix core** — 90% (`late_divergence_core_percent`), a separate
+  Prefixity structural block and a separate provider message/block;
+- **late mutable suffix** — 10% (`late_divergence_suffix_percent`), a
+  separate structural and wire block that changes on the measurement turn.
+
+The 90/10 split is a Phase 0B **experimental test split**, not a
+scientifically optimized value. Both sections are generated deterministically
+from the experiment seed (derived sub-seeds for the original and changed
+suffix), so a repeated configuration produces byte-identical content.
+
+The first meaningful structural divergence for DeepSeek B → C is therefore
+the changed late suffix; Prefixity observes reuse through header + core. The
+expected structural reuse is materially below the ~99.8% stable-prefix
+result and broadly around the intended split. No provider cache ratio is
+hard-coded.
 
 ### Cache settling (DeepSeek)
 

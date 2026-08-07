@@ -168,7 +168,7 @@ fn openai_stable_prefix_full_pipeline_with_mock() {
         serde_json::from_str(&std::fs::read_to_string(dir.join("manifest.json")).unwrap()).unwrap();
     assert_eq!(manifest["model"], "test-model");
     assert_eq!(manifest["scenario"], "stable-prefix");
-    assert_eq!(manifest["experiment_format_version"], 3);
+    assert_eq!(manifest["experiment_format_version"], 4);
     assert_eq!(manifest["max_estimated_input_tokens"], 50_000);
 
     std::fs::remove_dir_all(&runs).ok();
@@ -257,10 +257,14 @@ fn late_divergence_observes_large_structural_reuse() {
         ok_response(200, &common::openai_ok(8100, 8, Some(8000))),
     ]);
     let result = execute_live_experiment(&cfg, &mock, Some(&key), &NoopSleeper).unwrap();
+    // Late-divergence retains header + stable core (~90% split): still high,
+    // but materially below the ~99.8% stable-prefix reuse.
+    let reuse = result.pairs[0].observed_structural_reuse_estimated_tokens;
     assert!(
-        result.pairs[0].observed_structural_reuse_estimated_tokens > 7_000,
-        "late divergence should keep a large prefix reusable"
+        reuse > 6_500 && reuse < 8_000,
+        "late-divergence reuse {reuse} should sit around the 90/10 split"
     );
+    assert_eq!(result.pairs[0].conclusion, Conclusion::Match);
     assert_eq!(result.conclusion, Conclusion::Match);
     std::fs::remove_dir_all(&runs).ok();
 }
@@ -498,6 +502,50 @@ fn deepseek_execution_sleeps_once_for_settle_before_c() {
         .map(|r| r.pre_request_delay_ms)
         .collect();
     assert_eq!(delays, vec![0, 0, 10_000]);
+    std::fs::remove_dir_all(&runs).ok();
+}
+
+#[test]
+fn deepseek_late_divergence_pipeline_mutates_suffix_and_reconciles() {
+    let key = test_key();
+    let runs = common::temp_dir("ds-late");
+    let cfg = config(
+        "deepseek",
+        Scenario::LateDivergence,
+        runs.clone(),
+        "ds-late-1",
+    );
+    // A and B share the original late suffix; C changes it and the provider
+    // reports cache reuse matching the stable core (~7200 of 8100).
+    let mock = MockTransport::new(vec![
+        ok_response(200, &common::deepseek_ok(0, 8100, 8)),
+        ok_response(200, &common::deepseek_ok(0, 8100, 8)),
+        ok_response(200, &common::deepseek_ok(7200, 900, 8)),
+    ]);
+    let sleeper = RecordingSleeper::default();
+    let result = execute_live_experiment(&cfg, &mock, Some(&key), &sleeper).unwrap();
+    assert_eq!(mock.call_count(), 3);
+    assert_eq!(sleeper.calls(), vec![10_000]);
+
+    // Every late-divergence trace has 4 real structural blocks.
+    let dir = runs.join("ds-late-1");
+    let trace_c: prefixity_core::model::RequestTrace =
+        serde_json::from_str(&std::fs::read_to_string(dir.join("request-03.trace.json")).unwrap())
+            .unwrap();
+    assert_eq!(trace_c.blocks.len(), 4);
+    let ids: Vec<&str> = trace_c.blocks.iter().map(|b| b.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        vec!["prefix-header", "synthetic-prefix", "late-suffix", "tail"]
+    );
+    // B -> C is the measured pair: reuse is high but below stable-prefix,
+    // and reconciles to MATCH against the provider's reported cache ratio.
+    let last = &result.pairs[1];
+    assert_eq!(last.conclusion, Conclusion::Match);
+    let structural = last.structural_reuse_ratio.unwrap();
+    assert!(structural > 0.80 && structural < 0.95, "got {structural}");
+    assert!(last.reuse_ratio_difference.unwrap() < 0.10);
+    assert_eq!(result.conclusion, Conclusion::Match);
     std::fs::remove_dir_all(&runs).ok();
 }
 

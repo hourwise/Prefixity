@@ -13,7 +13,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 ///   guarantee).
 /// * v3: added `request_pre_delays_ms` (per-request pre-delay plan, e.g.
 ///   DeepSeek's 10s experimental settle before C).
-pub const EXPERIMENT_FORMAT_VERSION: u32 = 3;
+/// * v4: added `late_divergence_core_percent` / `late_divergence_suffix_percent`
+///   (the Phase 0B experimental late-divergence split).
+pub const EXPERIMENT_FORMAT_VERSION: u32 = 4;
 
 /// Describes one Phase 0B experiment. Serialized to `manifest.json`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -44,6 +46,12 @@ pub struct ExperimentManifest {
     /// Planned pre-request delay (ms) per request, in turn order (e.g.
     /// DeepSeek's 10s experimental settle before C; 0 elsewhere).
     pub request_pre_delays_ms: Vec<u64>,
+    /// Late-divergence experimental split: percentage of the prefix kept as
+    /// the stable core. `None` for non-late-divergence scenarios.
+    pub late_divergence_core_percent: Option<u64>,
+    /// Late-divergence experimental split: percentage in the late mutable
+    /// suffix. `None` for non-late-divergence scenarios.
+    pub late_divergence_suffix_percent: Option<u64>,
     /// Creation time (ISO-8601 UTC).
     pub created_at: String,
     /// Prefixity commit SHA at run time, when resolvable locally.
@@ -84,6 +92,11 @@ pub struct ManifestInput {
     pub request_count: usize,
     /// Planned pre-request delay (ms) per request, in turn order.
     pub request_pre_delays_ms: Vec<u64>,
+    /// Late-divergence experimental split: core percentage, if late-divergence.
+    pub late_divergence_core_percent: Option<u64>,
+    /// Late-divergence experimental split: suffix percentage, if
+    /// late-divergence.
+    pub late_divergence_suffix_percent: Option<u64>,
     /// Optional notes.
     pub notes: Option<String>,
     /// `--max-requests` in force.
@@ -109,6 +122,8 @@ pub fn build_manifest(input: &ManifestInput) -> ExperimentManifest {
         target_prefix_tokens: input.target_prefix_tokens,
         request_count: input.request_count,
         request_pre_delays_ms: input.request_pre_delays_ms.clone(),
+        late_divergence_core_percent: input.late_divergence_core_percent,
+        late_divergence_suffix_percent: input.late_divergence_suffix_percent,
         created_at: iso8601_utc_now(),
         commit_sha: detect_commit_sha(),
         notes: input.notes.clone(),
@@ -189,6 +204,8 @@ mod tests {
             target_prefix_tokens: 8000,
             request_count: 3,
             request_pre_delays_ms: vec![0, 0, 10_000],
+            late_divergence_core_percent: None,
+            late_divergence_suffix_percent: None,
             notes: None,
             max_requests: 3,
             max_estimated_input_tokens: 50_000,

@@ -6,7 +6,11 @@
 //! (partial artifacts remain reviewable).
 
 use crate::artifacts;
-use crate::content::{estimate_tokens, generate_prefix, header_for, tail_for};
+use crate::content::{
+    estimate_tokens, generate_changed_late_suffix, generate_late_divergence_prefix,
+    generate_prefix, header_for, tail_for, LATE_DIVERGENCE_CORE_PERCENT,
+    LATE_DIVERGENCE_SUFFIX_PERCENT,
+};
 use crate::credentials::Credentials;
 use crate::error::LiveError;
 use crate::manifest::{build_manifest, iso8601_utc_now, ManifestInput};
@@ -78,8 +82,10 @@ pub struct TurnSpec {
     pub turn: usize,
     /// Header block content.
     pub header: String,
-    /// Large synthetic prefix content.
+    /// Large synthetic prefix (stable core) content.
     pub prefix: String,
+    /// Late mutable suffix content, if any (`late-divergence` only).
+    pub suffix: Option<String>,
     /// Per-turn tail instruction.
     pub tail: String,
     /// Pre-request delay (ms) applied before this request (experimental
@@ -113,7 +119,21 @@ pub fn build_plan(config: &ExperimentConfig) -> Result<ExperimentPlan, LiveError
 
     let turn_plan = provider.plan_turns(config.scenario);
     let request_count = turn_plan.turns;
-    let prefix = generate_prefix(config.seed, config.target_prefix_tokens);
+    // Late-divergence splits the prefix into a stable core (90%) and a late
+    // mutable suffix (10%); other scenarios keep a single prefix block.
+    let (prefix, original_suffix) = if config.scenario == Scenario::LateDivergence {
+        generate_late_divergence_prefix(config.seed, config.target_prefix_tokens)
+    } else {
+        (
+            generate_prefix(config.seed, config.target_prefix_tokens),
+            String::new(),
+        )
+    };
+    let changed_suffix = if config.scenario == Scenario::LateDivergence {
+        generate_changed_late_suffix(config.seed, config.target_prefix_tokens)
+    } else {
+        String::new()
+    };
     let header_base = header_for(&id, config.seed);
 
     let mut turns = Vec::with_capacity(request_count);
@@ -134,14 +154,30 @@ pub fn build_plan(config: &ExperimentConfig) -> Result<ExperimentPlan, LiveError
             header_base.clone()
         };
         let tail = tail_for(config.scenario, turn);
-        let bytes = (header.len() + prefix.len() + tail.len()) as u64;
-        let tokens = estimate_tokens(&header) + estimate_tokens(&prefix) + estimate_tokens(&tail);
+        // Late-divergence: the original suffix until the plan's mutation
+        // turn, then the changed suffix (a distinct deterministic block).
+        let suffix = if config.scenario == Scenario::LateDivergence {
+            if turn_plan.late_suffix_mutates(turn) {
+                Some(changed_suffix.clone())
+            } else {
+                Some(original_suffix.clone())
+            }
+        } else {
+            None
+        };
+        let suffix_text = suffix.as_deref().unwrap_or("");
+        let bytes = (header.len() + prefix.len() + suffix_text.len() + tail.len()) as u64;
+        let tokens = estimate_tokens(&header)
+            + estimate_tokens(&prefix)
+            + estimate_tokens(suffix_text)
+            + estimate_tokens(&tail);
         estimated_bytes = estimated_bytes.saturating_add(bytes);
         estimated_tokens = estimated_tokens.saturating_add(tokens);
         turns.push(TurnSpec {
             turn,
             header,
             prefix: prefix.clone(),
+            suffix,
             tail,
             pre_request_delay_ms: turn_plan.pre_request_delay_ms(turn),
         });
@@ -201,6 +237,18 @@ impl Sleep for StdThreadSleeper {
     }
 }
 
+/// Late-divergence experimental split, exposed so dry runs and manifests are
+/// auditable.
+#[derive(Debug, Clone)]
+pub struct LateDivergenceInfo {
+    /// Percentage of the prefix kept as the stable core.
+    pub core_percent: u64,
+    /// Percentage of the prefix in the late mutable suffix.
+    pub suffix_percent: u64,
+    /// The 1-based turn on which the late suffix first mutates.
+    pub mutation_turn: usize,
+}
+
 /// Information printed by a dry run. Contains no credential value.
 #[derive(Debug, Clone)]
 pub struct DryRunInfo {
@@ -214,6 +262,8 @@ pub struct DryRunInfo {
     pub request_count: usize,
     /// The planned request descriptors (turn, label, pre-delay).
     pub turns: Vec<TurnSpec>,
+    /// Late-divergence split, when the scenario is `late-divergence`.
+    pub late_divergence: Option<LateDivergenceInfo>,
     /// Estimated bytes across all requests.
     pub estimated_bytes: u64,
     /// Estimated tokens across all requests.
@@ -240,12 +290,23 @@ pub fn describe_dry_run(config: &ExperimentConfig) -> Result<DryRunInfo, LiveErr
         Err(LiveError::Guard { message }) => Some(message),
         Err(other) => return Err(other),
     };
+    let late_divergence = if config.scenario == Scenario::LateDivergence {
+        let turn_plan = plan.provider.plan_turns(config.scenario);
+        Some(LateDivergenceInfo {
+            core_percent: LATE_DIVERGENCE_CORE_PERCENT,
+            suffix_percent: LATE_DIVERGENCE_SUFFIX_PERCENT,
+            mutation_turn: turn_plan.late_mutation_turn().unwrap_or(0),
+        })
+    } else {
+        None
+    };
     Ok(DryRunInfo {
         provider: config.provider_id.clone(),
         model: config.model.clone(),
         scenario: config.scenario.as_str().to_string(),
         request_count: plan.turns.len(),
         turns: plan.turns.clone(),
+        late_divergence,
         estimated_bytes: plan.estimated_bytes,
         estimated_tokens: plan.estimated_tokens,
         artifact_dir: plan.artifact_dir,
@@ -292,6 +353,10 @@ pub fn execute_live_experiment(
         target_prefix_tokens: config.target_prefix_tokens,
         request_count: plan.turns.len(),
         request_pre_delays_ms: plan.turns.iter().map(|t| t.pre_request_delay_ms).collect(),
+        late_divergence_core_percent: (config.scenario == Scenario::LateDivergence)
+            .then_some(LATE_DIVERGENCE_CORE_PERCENT),
+        late_divergence_suffix_percent: (config.scenario == Scenario::LateDivergence)
+            .then_some(LATE_DIVERGENCE_SUFFIX_PERCENT),
         notes: config.notes.clone(),
         max_requests: config.max_requests,
         max_estimated_input_tokens: config.max_estimated_input_tokens,
@@ -316,6 +381,7 @@ pub fn execute_live_experiment(
             &config.model,
             &turn.header,
             &turn.prefix,
+            turn.suffix.as_deref(),
             &turn.tail,
         ) {
             Ok(value) => value,
@@ -413,6 +479,7 @@ pub fn execute_live_experiment(
             turn: turn.turn,
             header: turn.header.clone(),
             prefix: turn.prefix.clone(),
+            suffix: turn.suffix.clone(),
             tail: turn.tail.clone(),
             raw_usage: raw_usage.clone(),
             provider_request_id: provider.request_id(&response_body),
@@ -449,9 +516,13 @@ pub fn execute_live_experiment(
             time_to_first_body_byte_ms: response.time_to_first_body_byte_ms,
             total_ms: response.total_ms,
             pre_request_delay_ms: turn.pre_request_delay_ms,
-            generated_bytes: (turn.header.len() + turn.prefix.len() + turn.tail.len()) as u64,
+            generated_bytes: (turn.header.len()
+                + turn.prefix.len()
+                + turn.suffix.as_deref().unwrap_or("").len()
+                + turn.tail.len()) as u64,
             prefixity_estimated_tokens: estimate_tokens(&turn.header)
                 + estimate_tokens(&turn.prefix)
+                + estimate_tokens(turn.suffix.as_deref().unwrap_or(""))
                 + estimate_tokens(&turn.tail),
             normalized_usage: normalized.clone(),
             normalizer_warnings: vec![normalized.explanation.clone()],
@@ -616,6 +687,10 @@ fn ratio_diff_str(diff: Option<f64>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::providers::DeepSeekProvider;
+    use prefixity_core::compare::compare_traces;
+    use prefixity_core::model::RawUsage;
+    use std::collections::BTreeMap;
 
     fn test_config(provider: &str, scenario: Scenario) -> ExperimentConfig {
         ExperimentConfig {
@@ -644,17 +719,179 @@ mod tests {
         assert_eq!(plan.turns[1].prefix, plan.turns[2].prefix);
         assert_ne!(plan.turns[0].tail, plan.turns[1].tail);
         assert_ne!(plan.turns[1].tail, plan.turns[2].tail);
+        // StablePrefix has no late mutable suffix.
+        assert!(plan.turns.iter().all(|t| t.suffix.is_none()));
     }
 
     #[test]
-    fn deepseek_late_divergence_plan_changes_tail_at_c_only() {
+    fn deepseek_late_divergence_plan_mutates_late_suffix_at_c() {
         let plan = build_plan(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
         assert_eq!(plan.turns.len(), 3);
-        // A/B/C keep the same header and prefix; C uses a changed tail.
+        // A and B: header, core and suffix identical; tails distinct.
         assert_eq!(plan.turns[0].header, plan.turns[1].header);
+        assert_eq!(plan.turns[0].prefix, plan.turns[1].prefix);
+        assert_eq!(plan.turns[0].suffix, plan.turns[1].suffix);
+        assert_ne!(plan.turns[0].tail, plan.turns[1].tail);
+        // C: header and core unchanged, late suffix CHANGED, tail distinct.
         assert_eq!(plan.turns[1].header, plan.turns[2].header);
-        assert_eq!(plan.turns[0].prefix, plan.turns[2].prefix);
+        assert_eq!(plan.turns[1].prefix, plan.turns[2].prefix);
+        assert_ne!(plan.turns[1].suffix, plan.turns[2].suffix);
         assert_ne!(plan.turns[1].tail, plan.turns[2].tail);
+        // Every late-divergence turn carries a suffix.
+        assert!(plan.turns.iter().all(|t| t.suffix.is_some()));
+    }
+
+    #[test]
+    fn late_divergence_is_not_equivalent_to_stable_prefix() {
+        let stable = build_plan(&test_config("deepseek", Scenario::StablePrefix)).unwrap();
+        let late = build_plan(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
+        // StablePrefix has no late suffix; LateDivergence does.
+        assert!(stable.turns.iter().all(|t| t.suffix.is_none()));
+        assert!(late.turns.iter().all(|t| t.suffix.is_some()));
+        // The prefix content differs too: stable generates the full target,
+        // late generates the 90% core.
+        assert_ne!(stable.turns[0].prefix, late.turns[0].prefix);
+        // The plans are not equal.
+        assert_ne!(
+            DeepSeekProvider.plan_turns(Scenario::StablePrefix),
+            DeepSeekProvider.plan_turns(Scenario::LateDivergence)
+        );
+    }
+
+    #[test]
+    fn openai_and_anthropic_late_divergence_mutate_suffix_at_b() {
+        for provider in ["openai", "anthropic"] {
+            let plan = build_plan(&test_config(provider, Scenario::LateDivergence)).unwrap();
+            assert_eq!(plan.turns.len(), 2);
+            // A: original suffix; B: changed suffix; header/core identical.
+            assert_eq!(plan.turns[0].header, plan.turns[1].header);
+            assert_eq!(plan.turns[0].prefix, plan.turns[1].prefix);
+            assert!(plan.turns[0].suffix.is_some() && plan.turns[1].suffix.is_some());
+            assert_ne!(plan.turns[0].suffix, plan.turns[1].suffix);
+        }
+    }
+
+    #[test]
+    fn late_divergence_structural_compare_stops_at_the_suffix() {
+        let config = test_config("deepseek", Scenario::LateDivergence);
+        let plan = build_plan(&config).unwrap();
+        let provider = plan.provider.as_ref();
+        let model = &config.model;
+        let experiment_id = &config.experiment_id;
+        let trace_b = build_trace(provider, model, experiment_id, &record_for(&plan.turns[1]));
+        let trace_c = build_trace(provider, model, experiment_id, &record_for(&plan.turns[2]));
+        let comparison = compare_traces(&trace_b, &trace_c, None).unwrap();
+        // The first meaningful divergence is the late mutable suffix.
+        assert_eq!(
+            comparison.first_divergence.as_ref().map(|d| d.position),
+            Some(2)
+        );
+        // Reuse retains header + stable core only.
+        let expected_reuse =
+            estimate_tokens(&plan.turns[1].header) + estimate_tokens(&plan.turns[1].prefix);
+        assert_eq!(comparison.observed_reusable_prefix_tokens, expected_reuse);
+        let total = estimate_tokens(&plan.turns[1].header)
+            + estimate_tokens(&plan.turns[1].prefix)
+            + estimate_tokens(plan.turns[1].suffix.as_deref().unwrap())
+            + estimate_tokens(&plan.turns[1].tail);
+        let ratio = expected_reuse as f64 / total as f64;
+        // Materially below stable-prefix (~0.998) but still high, broadly
+        // consistent with the experimental ~90/10 late split.
+        assert!(
+            ratio > 0.80 && ratio < 0.95,
+            "late-divergence reuse ratio {ratio} should sit around the 90/10 split"
+        );
+    }
+
+    #[test]
+    fn late_divergence_structural_compare_shows_lower_reuse_than_stable_prefix() {
+        let stable_config = test_config("deepseek", Scenario::StablePrefix);
+        let late_config = test_config("deepseek", Scenario::LateDivergence);
+        let stable = build_plan(&stable_config).unwrap();
+        let late = build_plan(&late_config).unwrap();
+        let stable_provider = stable.provider.as_ref();
+        let late_provider = late.provider.as_ref();
+
+        // StablePrefix: reuse through header + full prefix (B -> C).
+        let sb = build_trace(
+            stable_provider,
+            &stable_config.model,
+            &stable_config.experiment_id,
+            &record_for(&stable.turns[1]),
+        );
+        let sc = build_trace(
+            stable_provider,
+            &stable_config.model,
+            &stable_config.experiment_id,
+            &record_for(&stable.turns[2]),
+        );
+        let stable_compare = compare_traces(&sb, &sc, None).unwrap();
+        let stable_total = estimate_tokens(&stable.turns[1].header)
+            + estimate_tokens(&stable.turns[1].prefix)
+            + estimate_tokens(&stable.turns[1].tail);
+        let stable_ratio =
+            stable_compare.observed_reusable_prefix_tokens as f64 / stable_total as f64;
+
+        // LateDivergence: reuse through header + core only.
+        let lb = build_trace(
+            late_provider,
+            &late_config.model,
+            &late_config.experiment_id,
+            &record_for(&late.turns[1]),
+        );
+        let lc = build_trace(
+            late_provider,
+            &late_config.model,
+            &late_config.experiment_id,
+            &record_for(&late.turns[2]),
+        );
+        let late_compare = compare_traces(&lb, &lc, None).unwrap();
+        let late_total = estimate_tokens(&late.turns[1].header)
+            + estimate_tokens(&late.turns[1].prefix)
+            + estimate_tokens(late.turns[1].suffix.as_deref().unwrap())
+            + estimate_tokens(&late.turns[1].tail);
+        let late_ratio = late_compare.observed_reusable_prefix_tokens as f64 / late_total as f64;
+
+        assert!(stable_ratio > 0.99, "stable ratio {stable_ratio}");
+        assert!(
+            late_ratio < stable_ratio - 0.03,
+            "late ratio {late_ratio} must be materially below stable {stable_ratio}"
+        );
+        assert!(late_ratio > 0.80, "late ratio {late_ratio}");
+    }
+
+    #[test]
+    fn dry_run_exposes_late_divergence_split_and_never_sleeps() {
+        let start = std::time::Instant::now();
+        let info = describe_dry_run(&test_config("deepseek", Scenario::LateDivergence)).unwrap();
+        let ld = info.late_divergence.as_ref().expect("late-divergence info");
+        assert_eq!(ld.core_percent, 90);
+        assert_eq!(ld.suffix_percent, 10);
+        assert_eq!(ld.mutation_turn, 3);
+        let delays: Vec<u64> = info.turns.iter().map(|t| t.pre_request_delay_ms).collect();
+        assert_eq!(delays, vec![0, 0, 10_000]);
+        assert!(start.elapsed().as_millis() < 5_000);
+    }
+
+    /// Build a minimal RequestRecord from a turn spec for trace comparison.
+    fn record_for(turn: &TurnSpec) -> RequestRecord {
+        RequestRecord {
+            turn: turn.turn,
+            header: turn.header.clone(),
+            prefix: turn.prefix.clone(),
+            suffix: turn.suffix.clone(),
+            tail: turn.tail.clone(),
+            raw_usage: RawUsage {
+                provider_schema: "synthetic".to_string(),
+                raw: BTreeMap::new(),
+            },
+            provider_request_id: None,
+            http_status: 200,
+            started_at: "2026-08-07T00:00:00Z".to_string(),
+            time_to_headers_ms: 1,
+            time_to_first_body_byte_ms: Some(1),
+            total_ms: 1,
+        }
     }
 
     #[test]

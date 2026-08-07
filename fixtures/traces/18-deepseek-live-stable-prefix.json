@@ -1,0 +1,59 @@
+{
+  "format_version": 2,
+  "request_id": "18-deepseek-live-stable-prefix",
+  "session_id": "deepseek-stable-prefix-01",
+  "timestamp": "2026-08-07T15:14:55Z",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "blocks": [
+    {
+      "id": "prefix-header",
+      "source": "timestamp",
+      "position": 0,
+      "content_hash": "69a29fc8c7fc22df97fee2b26f2028ca6187f6cd4b2fe0a2662c79f88c0431ed",
+      "token_count": 15,
+      "byte_count": 59,
+      "semantic_zone": "system",
+      "structural_path": "messages[0]",
+      "role": "system"
+    },
+    {
+      "id": "synthetic-prefix",
+      "source": "system_policy",
+      "position": 1,
+      "content_hash": "3eaea931175ecb15584c663c872ddcaf1361fe637525fb2d1695c2f73ba5ff5f",
+      "token_count": 8033,
+      "byte_count": 32129,
+      "semantic_zone": "system",
+      "structural_path": "messages[1]",
+      "role": "system"
+    },
+    {
+      "id": "tail",
+      "source": "user_request",
+      "position": 2,
+      "content_hash": "e1868f4671b038787cc54e2c7ff22a0d32ae618a0f72a9e821a1074b70157014",
+      "token_count": 14,
+      "byte_count": 55,
+      "semantic_zone": "messages",
+      "structural_path": "messages[2]",
+      "role": "user"
+    }
+  ],
+  "usage": {
+    "provider_schema": "deepseek-chat-completions-v1",
+    "raw": {
+      "completion_tokens": 1,
+      "prompt_cache_hit_tokens": 18048,
+      "prompt_cache_miss_tokens": 13,
+      "prompt_tokens": 18061,
+      "prompt_tokens_details": {
+        "cached_tokens": 18048
+      },
+      "total_tokens": 18062
+    }
+  },
+  "metadata": {
+    "note": "Sanitized fixture derived from the Phase 0B live DeepSeek stable-prefix run (2026-08-07, deepseek-v4-flash, commit 2f69dd6, HTTP 200). Request B shape: cache read 18048, fresh 13, total 18061. Contains ONLY safe usage/accounting and reconciliation evidence; no credentials, no authorization headers, no provider request ids, no full provider responses. Live reconciliation: structural ratio 0.9983 (8048/8062 estimated tokens) vs provider cache ratio 0.9993 (18048/18061 provider tokens), MATCH."
+  }
+}

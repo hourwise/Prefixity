@@ -20,8 +20,10 @@ pub struct RequestRecord {
     pub turn: usize,
     /// Header block content.
     pub header: String,
-    /// Large synthetic prefix block content.
+    /// Large synthetic prefix (stable core) block content.
     pub prefix: String,
+    /// Late mutable suffix block content, if any (`late-divergence` only).
+    pub suffix: Option<String>,
     /// Per-turn tail instruction content.
     pub tail: String,
     /// Raw provider usage (schema + verbatim fields).
@@ -77,7 +79,7 @@ pub fn build_trace(
     experiment_id: &str,
     record: &RequestRecord,
 ) -> RequestTrace {
-    let blocks = vec![
+    let mut blocks = vec![
         block(
             0,
             "prefix-header",
@@ -96,16 +98,27 @@ pub fn build_trace(
             provider.prefix_structural_path(),
             &record.prefix,
         ),
-        block(
-            2,
-            "tail",
-            "user_request",
-            "messages",
-            "user",
-            provider.tail_structural_path(),
-            &record.tail,
-        ),
     ];
+    if let Some(suffix) = &record.suffix {
+        blocks.push(block(
+            blocks.len(),
+            "late-suffix",
+            "system_policy",
+            "system",
+            "system",
+            provider.suffix_structural_path(),
+            suffix,
+        ));
+    }
+    blocks.push(block(
+        blocks.len(),
+        "tail",
+        "user_request",
+        "messages",
+        "user",
+        provider.tail_structural_path(record.suffix.is_some()),
+        &record.tail,
+    ));
 
     let mut metadata = BTreeMap::new();
     metadata.insert(
