@@ -31,3 +31,23 @@ jobs:
 
       - name: Test
         run: cargo test --workspace
+
+  # Verify the declared minimum supported Rust version stays buildable. The
+  # declared MSRV (see workspace Cargo.toml rust-version) is driven by the
+  # locked dependency graph (e.g. idna_adapter/icu require rustc 1.86), not
+  # by Prefixity's own source, which remains Edition 2021. No clippy or
+  # rustfmt is required here.
+  msrv:
+    name: MSRV (Rust 1.86.0, cargo check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust 1.86.0
+        uses: dtolnay/rust-toolchain@1.86.0
+
+      - name: Cache cargo registry and target
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check at MSRV (locked)
+        run: cargo check --workspace --locked

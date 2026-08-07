@@ -34,6 +34,21 @@ pub const SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1: &str = "deepseek-chat-completions
 /// as Chat Completions.
 pub const SCHEMA_OPENAI_RESPONSES_V1: &str = "openai-responses-v1";
 
+/// Legacy Phase 0A.1 trace-v2 generic provider name, accepted READ-ONLY as
+/// a compatibility alias for [`SCHEMA_OPENAI_CHAT_COMPLETIONS_V1`].
+///
+/// Historical trace-v2 files written before Phase 0B used the bare provider
+/// name as `provider_schema`. These aliases exist **solely** so that existing
+/// valid trace-v2 data produced by Phase 0A.1 continues to normalize after
+/// the Phase 0B schema change. Writers MUST NOT emit these generic names.
+pub const LEGACY_SCHEMA_OPENAI: &str = "openai";
+/// Legacy Phase 0A.1 trace-v2 generic provider name, accepted READ-ONLY as
+/// a compatibility alias for [`SCHEMA_ANTHROPIC_MESSAGES_V1`].
+pub const LEGACY_SCHEMA_ANTHROPIC: &str = "anthropic";
+/// Legacy Phase 0A.1 trace-v2 generic provider name, accepted READ-ONLY as
+/// a compatibility alias for [`SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1`].
+pub const LEGACY_SCHEMA_DEEPSEEK: &str = "deepseek";
+
 /// A provider-independent, normalised view of one request's usage.
 ///
 /// Every field is optional: normalizers never manufacture values that cannot
@@ -243,10 +258,18 @@ pub fn available_schemas() -> &'static [&'static str] {
     ]
 }
 
-/// Normalise a raw usage capture by dispatching on its versioned
-/// `provider_schema` (an explicit API-surface identifier).
+/// Normalise a raw usage capture by dispatching on its `provider_schema`.
 ///
-/// Unknown schemas — including generic provider names and the reserved
+/// The canonical schemas are explicit versioned API-surface identifiers
+/// (`openai-chat-completions-v1`, `anthropic-messages-v1`,
+/// `deepseek-chat-completions-v1`, `synthetic`). In addition, the three
+/// **legacy Phase 0A.1 generic provider names** (`openai`, `anthropic`,
+/// `deepseek`) are accepted READ-ONLY as compatibility aliases for their
+/// versioned surfaces, so historical trace-v2 files written before Phase 0B
+/// keep normalizing. The aliases never affect what writers emit and are not
+/// advertised by [`available_schemas`].
+///
+/// Unknown schemas — including arbitrary provider names and the reserved
 /// `openai-responses-v1` surface — produce an all-`None` [`NormalizedUsage`]
 /// with a clear explanation. Values are never manufactured, and an unknown
 /// OpenAI schema is never silently interpreted as Chat Completions.
@@ -256,6 +279,18 @@ pub fn normalize_usage(raw: &RawUsage) -> NormalizedUsage {
         SCHEMA_OPENAI_CHAT_COMPLETIONS_V1 => OpenAiNormalizer.normalize(raw),
         SCHEMA_ANTHROPIC_MESSAGES_V1 => AnthropicNormalizer.normalize(raw),
         SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1 => DeepSeekNormalizer.normalize(raw),
+        // Legacy Phase 0A.1 trace-v2 compatibility aliases (read-only): the
+        // bare generic provider name meant the same usage surface as its
+        // versioned API-surface identifier.
+        LEGACY_SCHEMA_OPENAI => {
+            normalize_with_legacy_alias(&OpenAiNormalizer, raw, LEGACY_SCHEMA_OPENAI)
+        }
+        LEGACY_SCHEMA_ANTHROPIC => {
+            normalize_with_legacy_alias(&AnthropicNormalizer, raw, LEGACY_SCHEMA_ANTHROPIC)
+        }
+        LEGACY_SCHEMA_DEEPSEEK => {
+            normalize_with_legacy_alias(&DeepSeekNormalizer, raw, LEGACY_SCHEMA_DEEPSEEK)
+        }
         SCHEMA_OPENAI_RESPONSES_V1 => {
             let mut usage = NormalizedUsage::empty("unknown-schema");
             usage.explanation = "schema 'openai-responses-v1' is reserved for a later OpenAI \
@@ -273,6 +308,27 @@ pub fn normalize_usage(raw: &RawUsage) -> NormalizedUsage {
             usage
         }
     }
+}
+
+/// Normalise with `normalizer`, then annotate the explanation to record that
+/// a legacy Phase 0A.1 trace-v2 compatibility alias was consumed.
+///
+/// The `normalization_source` is the canonical versioned API-surface
+/// identifier (the normalizer already sets it); only the explanation is
+/// augmented so readers can see the historical generic name was used.
+fn normalize_with_legacy_alias(
+    normalizer: &dyn UsageNormalizer,
+    raw: &RawUsage,
+    legacy_alias: &str,
+) -> NormalizedUsage {
+    let mut usage = normalizer.normalize(raw);
+    usage.explanation = format!(
+        "{} (consumed legacy trace-v2 provider_schema '{legacy_alias}' as a Phase 0A.1 \
+         compatibility alias for '{}')",
+        usage.explanation,
+        normalizer.schema_name()
+    );
+    usage
 }
 
 #[cfg(test)]
@@ -411,11 +467,12 @@ mod tests {
 
     #[test]
     fn generic_and_reserved_schemas_are_not_interpreted() {
-        // A generic provider name is NOT a valid schema: dispatch must not
-        // guess the API surface.
-        let generic = normalize_usage(&raw("openai", &[("prompt_tokens", 100)]));
+        // A TRULY generic/unknown provider name is NOT a valid schema:
+        // dispatch must not guess the API surface.
+        let generic = normalize_usage(&raw("mystery-vendor", &[("prompt_tokens", 100)]));
         assert_eq!(generic.total_input_tokens, None);
         assert_eq!(generic.normalization_source, "unknown-schema");
+        assert!(generic.explanation.contains("no offline normalizer"));
 
         // The reserved Responses surface must not be read as Chat Completions.
         let reserved = normalize_usage(&raw(SCHEMA_OPENAI_RESPONSES_V1, &[("prompt_tokens", 100)]));
@@ -424,5 +481,129 @@ mod tests {
         assert!(reserved
             .explanation
             .contains("NOT interpreted as Chat Completions"));
+    }
+
+    #[test]
+    fn legacy_v2_generic_openai_alias_normalizes_like_phase_0a1() {
+        // The pre-Phase-0B generic provider name "openai" (as emitted by
+        // Phase 0A.1 trace-v2 files) must normalize exactly as its old
+        // meaning did — OpenAI Chat Completions v1 semantics — while the
+        // normalization_source is the canonical versioned identifier.
+        let usage = normalize_usage(&raw(
+            LEGACY_SCHEMA_OPENAI,
+            &[("prompt_tokens", 5000), ("completion_tokens", 120)],
+        ));
+        assert_eq!(usage.total_input_tokens, Some(5000));
+        assert_eq!(usage.output_tokens, Some(120));
+        // Nested cached_tokens is still read for the generic alias.
+        let mut map = BTreeMap::new();
+        map.insert("prompt_tokens".to_string(), serde_json::json!(5000));
+        map.insert(
+            "prompt_tokens_details".to_string(),
+            serde_json::json!({ "cached_tokens": 4000 }),
+        );
+        map.insert("completion_tokens".to_string(), serde_json::json!(120));
+        let usage = normalize_usage(&RawUsage {
+            provider_schema: LEGACY_SCHEMA_OPENAI.to_string(),
+            raw: map,
+        });
+        assert_eq!(usage.total_input_tokens, Some(5000));
+        assert_eq!(usage.fresh_input_tokens, Some(1000));
+        assert_eq!(usage.cache_read_tokens, Some(4000));
+        assert_eq!(usage.output_tokens, Some(120));
+        assert_eq!(
+            usage.normalization_source,
+            SCHEMA_OPENAI_CHAT_COMPLETIONS_V1
+        );
+        assert!(
+            usage
+                .explanation
+                .contains("legacy trace-v2 provider_schema 'openai'"),
+            "explanation must record the consumed alias: {}",
+            usage.explanation
+        );
+        assert!(usage
+            .explanation
+            .contains(SCHEMA_OPENAI_CHAT_COMPLETIONS_V1));
+    }
+
+    #[test]
+    fn legacy_v2_generic_anthropic_alias_normalizes_like_phase_0a1() {
+        // The pre-Phase-0B generic provider name "anthropic" maps to
+        // Anthropic Messages v1 semantics (the exact shape of main's old
+        // fixture 09-anthropic-usage-semantics.json).
+        let usage = normalize_usage(&raw(
+            LEGACY_SCHEMA_ANTHROPIC,
+            &[
+                ("input_tokens", 500),
+                ("cache_read_input_tokens", 4000),
+                ("cache_creation_input_tokens", 500),
+                ("output_tokens", 120),
+            ],
+        ));
+        assert_eq!(usage.total_input_tokens, Some(5000));
+        assert_eq!(usage.fresh_input_tokens, Some(500));
+        assert_eq!(usage.cache_read_tokens, Some(4000));
+        assert_eq!(usage.cache_write_tokens, Some(500));
+        assert_eq!(usage.output_tokens, Some(120));
+        assert_eq!(usage.normalization_source, SCHEMA_ANTHROPIC_MESSAGES_V1);
+        assert!(
+            usage
+                .explanation
+                .contains("legacy trace-v2 provider_schema 'anthropic'"),
+            "explanation must record the consumed alias: {}",
+            usage.explanation
+        );
+        assert!(usage.explanation.contains(SCHEMA_ANTHROPIC_MESSAGES_V1));
+    }
+
+    #[test]
+    fn legacy_v2_generic_deepseek_alias_normalizes_like_phase_0a1() {
+        // The pre-Phase-0B generic provider name "deepseek" maps to DeepSeek
+        // Chat Completions v1 semantics (the exact shape of main's old
+        // fixture 10-deepseek-usage-semantics.json).
+        let usage = normalize_usage(&raw(
+            LEGACY_SCHEMA_DEEPSEEK,
+            &[
+                ("prompt_cache_hit_tokens", 4000),
+                ("prompt_cache_miss_tokens", 1000),
+                ("completion_tokens", 120),
+            ],
+        ));
+        assert_eq!(usage.total_input_tokens, Some(5000));
+        assert_eq!(usage.fresh_input_tokens, Some(1000));
+        assert_eq!(usage.cache_read_tokens, Some(4000));
+        assert_eq!(usage.cache_write_tokens, None);
+        assert_eq!(usage.output_tokens, Some(120));
+        assert_eq!(
+            usage.normalization_source,
+            SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1
+        );
+        assert!(
+            usage
+                .explanation
+                .contains("legacy trace-v2 provider_schema 'deepseek'"),
+            "explanation must record the consumed alias: {}",
+            usage.explanation
+        );
+        assert!(usage
+            .explanation
+            .contains(SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1));
+    }
+
+    #[test]
+    fn available_schemas_advertise_only_canonical_versioned_ids() {
+        // The compatibility aliases must NOT be advertised: new writers and
+        // tooling should only ever see/emit explicit versioned API-surface
+        // identifiers.
+        let schemas = available_schemas();
+        assert!(schemas.contains(&SCHEMA_SYNTHETIC));
+        assert!(schemas.contains(&SCHEMA_OPENAI_CHAT_COMPLETIONS_V1));
+        assert!(schemas.contains(&SCHEMA_ANTHROPIC_MESSAGES_V1));
+        assert!(schemas.contains(&SCHEMA_DEEPSEEK_CHAT_COMPLETIONS_V1));
+        assert!(!schemas.contains(&LEGACY_SCHEMA_OPENAI));
+        assert!(!schemas.contains(&LEGACY_SCHEMA_ANTHROPIC));
+        assert!(!schemas.contains(&LEGACY_SCHEMA_DEEPSEEK));
+        assert!(!schemas.contains(&SCHEMA_OPENAI_RESPONSES_V1));
     }
 }

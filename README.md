@@ -25,7 +25,9 @@ A perfectly acceptable Phase 0 result is:
 
 - **Phase 0A** complete.
 - **Phase 0A.1** complete (semantic corrections; CI green on Linux/macOS/Windows).
-- **Phase 0B** harness under development / controlled live validation.
+- **Phase 0B** DeepSeek live validation complete: **PASS WITH RECORDED
+  LIMITATIONS** (see `docs/phase-0/PHASE_0B_DEEPSEEK_CLOSEOUT.md`).
+  OpenAI/Anthropic adapters remain offline-tested, not live-validated.
 - No daemon, no localhost proxy, no telemetry.
 - No semantic response caching, no KV-cache storage, no RAG, no automatic
   context mutation of live requests.
@@ -35,7 +37,7 @@ A perfectly acceptable Phase 0 result is:
 
 ## Requirements
 
-- Stable Rust (workspace is pinned to edition 2021, MSRV 1.75).
+- Rust 1.86+ (workspace source remains Edition 2021).
 - The offline analysis harness needs no network access.
 - The experimental `prefixity-live` harness needs network access **only**
   when `--execute-live` is passed, and reads credentials only from

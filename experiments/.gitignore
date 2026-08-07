@@ -1,3 +1,4 @@
 # Phase 0B live experiment artifacts (never commit; review before deliberate
-# inclusion).
-experiments/runs/
+# inclusion). Anchored to this directory: /runs/ below experiments/. The root
+# .gitignore also carries `experiments/runs/` as defense in depth.
+/runs/

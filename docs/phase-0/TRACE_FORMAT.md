@@ -80,6 +80,18 @@ remains content-level identity.
 | `provider_schema` | string | An **explicit versioned API-surface identifier** naming the exact endpoint/request schema the `raw` fields follow: `synthetic`, `openai-chat-completions-v1`, `anthropic-messages-v1`, `deepseek-chat-completions-v1`, or a custom versioned name. |
 | `raw` | object | Provider-specific raw usage fields, preserved verbatim and never reinterpreted in place. |
 
+### Trace-v2 legacy alias compatibility
+
+Historical trace-v2 files written before Phase 0B (Phase 0A.1) used the bare
+generic provider names `openai`, `anthropic` and `deepseek` as
+`provider_schema`. Readers accept these **read-only** as compatibility
+aliases for `openai-chat-completions-v1`, `anthropic-messages-v1` and
+`deepseek-chat-completions-v1` respectively, so existing valid trace-v2 data
+keeps normalizing after the Phase 0B schema change. Writers MUST emit
+explicit versioned API-surface identifiers; the generic aliases are never
+advertised and must not be emitted. `TRACE_FORMAT_VERSION` is unchanged by
+this compatibility layer.
+
 The provider name alone is **not sufficient** to interpret `raw`: a single
 provider can expose different usage semantics across different API surfaces
 (e.g. OpenAI's Chat Completions vs. the newer Responses API report tokens

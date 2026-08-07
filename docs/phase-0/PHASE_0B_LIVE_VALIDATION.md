@@ -1,6 +1,8 @@
 # Phase 0B — Controlled Live Validation
 
-Status: **harness under development / controlled live validation**. No paid
+Status: **controlled live validation harness**. The controlled **DeepSeek**
+live sequence is complete: **PASS WITH RECORDED LIMITATIONS**.
+OpenAI/Anthropic adapters remain offline-tested, not live-validated. No paid
 provider call may be made without explicit opt-in (see below).
 
 > **DeepSeek live sequence complete (2026-08-07).** The controlled DeepSeek

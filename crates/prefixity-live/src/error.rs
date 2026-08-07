@@ -17,6 +17,17 @@ pub enum LiveError {
         env_var: &'static str,
     },
 
+    /// A credential is present but not usable as an HTTP header value
+    /// (whitespace or control characters). The value itself is NEVER
+    /// included — only the environment variable name and a reason category.
+    #[error("invalid credential format in {env_var}: {reason}")]
+    InvalidCredential {
+        /// The name of the environment variable that held the bad value.
+        env_var: &'static str,
+        /// Why the value was rejected (never includes the value itself).
+        reason: &'static str,
+    },
+
     /// A transport-level failure (connect, TLS, etc.). Sanitized message.
     #[error("network error: {message}")]
     Network {
