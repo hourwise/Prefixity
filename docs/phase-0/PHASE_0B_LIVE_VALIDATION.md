@@ -3,6 +3,14 @@
 Status: **harness under development / controlled live validation**. No paid
 provider call may be made without explicit opt-in (see below).
 
+> **DeepSeek live sequence complete (2026-08-07).** The controlled DeepSeek
+> Phase 0B matrix is finished and closed out in
+> [`PHASE_0B_DEEPSEEK_CLOSEOUT.md`](PHASE_0B_DEEPSEEK_CLOSEOUT.md)
+> (**PASS WITH RECORDED LIMITATIONS**). A stopping rule applies: no further
+> DeepSeek Phase 0B repetitions solely to improve confidence or obtain
+> prettier ratios; additional provider calls require a new explicit research
+> question. OpenAI/Anthropic remain offline-tested but not live-validated.
+
 ## Purpose
 
 Phase 0B is a **falsification exercise**. It does not optimise real agent

@@ -235,6 +235,57 @@ See the sanitized regression fixture
 and the reconciliation values under
 `experiments/runs/deepseek-late-divergence-01/` (gitignored).
 
+## Finding 5 — final DeepSeek late-prefix persistence probe (2026-08-07)
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-08-07 |
+| Provider | DeepSeek |
+| Model | `deepseek-v4-flash` |
+| Scenario | `late-divergence` (four-turn A/B/C/D) |
+| Commit | `37463d1` |
+| Requests | 4 (A/B/C/D), settle delay 10 s before D |
+| HTTP | 200 |
+| Conclusion | **MATCH** |
+
+Sequence recorded accurately:
+
+1. **A** — initial complete miss: total 18062, cache read 0, fresh 18062.
+2. **B** — nearly complete realized cache hit: total 18062, cache read
+   18048, fresh 14. Pair A → B [diagnostic]: structural reuse potential
+   99.8% (8048/8063) vs realized provider cache reuse 99.9%
+   (18048/18062) → **MATCH**.
+3. **C** — first late-suffix divergence (changed suffix variant 1): total
+   18114, cache read 10496, fresh 7618. Pair B → C [diagnostic]:
+   structural reuse potential ~89.9% (7245/8063) vs realized provider
+   cache reuse ~57.9% (10496/18114) → **PARTIAL_MATCH**.
+4. **D** — a SECOND, distinct late-suffix variant (variant 2), sent after C
+   exposed the common-core boundary and after a controlled 10-second
+   settle: total 18070, cache read **16256**, fresh 1814. Pair C → D
+   **[PRIMARY]**: structural reuse potential ~89.855% (7245/8063 =
+   0.8985489272) vs realized provider cache reuse ~89.961%
+   (16256/18070 = 0.8996126176), realization/alignment gap ≈ 0.106
+   percentage points (0.0010636904) → **MATCH**. Overall: **MATCH**.
+
+Interpretation:
+
+This observation is **consistent with** the hypothesis that structural
+reusability can exist before a corresponding provider cache prefix is fully
+available/realized. After C exposed the shorter stable core, D was able to
+realize provider cache reuse extremely close to Prefixity's independently
+observed structural reuse potential.
+
+This **supports** (but does not prove causation): the experiment does not
+isolate whether persistence completed because of C completion, common-prefix
+detection, provider cache-unit construction, the waiting interval, or some
+combination. No claim is made that the 10-second delay caused the result.
+
+See the sanitized regression fixtures
+`fixtures/traces/21-deepseek-live-late-persistence-c.json` (request C) and
+`fixtures/traces/21-deepseek-live-late-persistence-d.json` (request D), and
+the reconciliation values under
+`experiments/runs/deepseek-late-persistence-01/` (gitignored).
+
 ## Remaining scientific uncertainty
 
 - These are **single observations** per scenario; providers vary by model,
@@ -244,7 +295,9 @@ and the reconciliation values under
   the exact provider cache-hit ratio; provider cache persistence is
   best-effort and asynchronous, so realized reuse can lag potential.
 - The 10-second settle delay is an experimental control, not a provider SLA
-  or a validated optimum.
+  or a validated optimum, and the persistence probe does not isolate which
+  mechanism (C completion, common-prefix detection, cache-unit construction,
+  the wait, or a combination) produced the later realization.
 - No provider tokenizer is implemented; no token multiplier is inferred from
   the observed absolute count differences (e.g. 8063 vs 18115). Only
   proportions are compared.

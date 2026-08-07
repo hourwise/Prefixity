@@ -522,6 +522,67 @@ mod tests {
     }
 
     #[test]
+    fn late_persistence_live_primary_pair_c_to_d_is_match() {
+        // Sanitized evidence from the FINAL Phase 0B DeepSeek live
+        // late-persistence run (deepseek-late-persistence-01, 2026-08-07,
+        // commit 37463d1). The primary C -> D pair:
+        //
+        //   C: total 18114, cache read 10496, fresh 7618 (suffix variant 1)
+        //   D: total 18070, cache read 16256, fresh 1814 (suffix variant 2)
+        //
+        // structural reuse POTENTIAL = 7245 / 8063 = 0.8985489272
+        // REALIZED provider cache reuse = 16256 / 18070 = 0.8996126176
+        // realization/alignment gap = 0.0010636904 => MATCH
+        //
+        // This is CONSISTENT WITH the hypothesis that structural reusability
+        // can exist before the corresponding provider cache prefix is fully
+        // realized: after C exposed the shorter stable core and a settle
+        // interval elapsed, D realized provider cache reuse extremely close
+        // to Prefixity's independently observed structural potential.
+        let structural = reuse_ratio(7245, 8063).unwrap();
+        let provider = reuse_ratio(16256, 18070).unwrap();
+        let difference = (structural - provider).abs();
+        // Numeric tolerance, not brittle string equality.
+        assert!(
+            (structural - 0.8985489271983133).abs() < 1e-9,
+            "structural potential {structural}"
+        );
+        assert!(
+            (provider - 0.8996126175982291).abs() < 1e-9,
+            "provider realized {provider}"
+        );
+        assert!(
+            (difference - 0.0010636903999158287).abs() < 1e-9,
+            "realization gap {difference}"
+        );
+        assert_eq!(
+            classify_pair(Some(structural), Some(provider)),
+            Conclusion::Match
+        );
+        // The gap is well inside the Phase 0B MATCH tolerance.
+        assert!(difference < REUSE_RATIO_MATCH_TOLERANCE);
+
+        // The same run's B -> C first-divergence pair remained
+        // PARTIAL_MATCH (structural 0.8985 vs realized 0.5794 on 18114).
+        let bc_structural = reuse_ratio(7245, 8063).unwrap();
+        let bc_provider = reuse_ratio(10496, 18114).unwrap();
+        assert!((bc_provider - 0.5794413161090869).abs() < 1e-9);
+        assert_eq!(
+            classify_pair(Some(bc_structural), Some(bc_provider)),
+            Conclusion::PartialMatch
+        );
+        // The A -> B stable pair of the same run was a MATCH.
+        let ab_structural = reuse_ratio(8048, 8063).unwrap();
+        let ab_provider = reuse_ratio(18048, 18062).unwrap();
+        assert!((ab_structural - 0.9981396502542478).abs() < 1e-9);
+        assert!((ab_provider - 0.9992248920385339).abs() < 1e-9);
+        assert_eq!(
+            classify_pair(Some(ab_structural), Some(ab_provider)),
+            Conclusion::Match
+        );
+    }
+
+    #[test]
     fn schema_smoke_classification() {
         let mut normalized = NormalizedUsage {
             total_input_tokens: Some(100),

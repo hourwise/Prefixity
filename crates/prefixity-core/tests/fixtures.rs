@@ -39,6 +39,8 @@ const ALL_FIXTURES: &[&str] = &[
     "18-deepseek-live-stable-prefix.json",
     "19-deepseek-live-early-divergence.json",
     "20-deepseek-live-late-divergence.json",
+    "21-deepseek-live-late-persistence-c.json",
+    "21-deepseek-live-late-persistence-d.json",
 ];
 
 #[test]
@@ -196,6 +198,130 @@ fn scenario_20_deepseek_live_late_divergence_normalizes() {
     let lower = raw.to_lowercase();
     for forbidden in [
         "api_key", "bearer", "sk-", "f30d9fd1", "939849ad", "b829802d",
+    ] {
+        assert!(
+            !lower.contains(forbidden),
+            "fixture must not contain '{forbidden}'"
+        );
+    }
+}
+
+#[test]
+fn scenario_21_deepseek_live_late_persistence_c_normalizes() {
+    // Sanitized fixture from the final Phase 0B DeepSeek live
+    // late-persistence run (2026-08-07, deepseek-v4-flash, commit 37463d1).
+    // Request C shape: first late-suffix divergence (suffix variant 1).
+    let trace = common::load_fixture("21-deepseek-live-late-persistence-c.json");
+    let usage = trace.usage.as_ref().expect("fixture must carry usage");
+    assert_eq!(usage.provider_schema, "deepseek-chat-completions-v1");
+    let normalized = normalize_usage(usage);
+    assert_eq!(
+        normalized.normalization_source,
+        "deepseek-chat-completions-v1"
+    );
+    // Observed live values for C: hit 10496 + miss 7618 = total 18114.
+    assert_eq!(normalized.total_input_tokens, Some(18114));
+    assert_eq!(normalized.fresh_input_tokens, Some(7618));
+    assert_eq!(normalized.cache_read_tokens, Some(10496));
+    assert_eq!(normalized.output_tokens, Some(1));
+
+    // Late-divergence shape: header + stable core + late suffix + tail.
+    assert_eq!(trace.blocks.len(), 4);
+    let ids: Vec<&str> = trace.blocks.iter().map(|b| b.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        vec!["prefix-header", "synthetic-prefix", "late-suffix", "tail"]
+    );
+
+    // Safe only: no credentials, no authorization headers, no provider
+    // request ids (the live request id was 6613194b-0411-4393-b811-25509c99e93b).
+    let raw = std::fs::read_to_string(common::fixture_path(
+        "21-deepseek-live-late-persistence-c.json",
+    ))
+    .unwrap();
+    let lower = raw.to_lowercase();
+    for forbidden in [
+        "api_key", "bearer", "sk-", "6613194b", "04114393", "b8112550",
+    ] {
+        assert!(
+            !lower.contains(forbidden),
+            "fixture must not contain '{forbidden}'"
+        );
+    }
+}
+
+#[test]
+fn scenario_21_deepseek_live_late_persistence_d_normalizes() {
+    // Sanitized fixture from the final Phase 0B DeepSeek live
+    // late-persistence run (2026-08-07, deepseek-v4-flash, commit 37463d1).
+    // Request D shape: a SECOND distinct late-suffix variant (variant 2),
+    // the primary persistence measurement.
+    let trace = common::load_fixture("21-deepseek-live-late-persistence-d.json");
+    let usage = trace.usage.as_ref().expect("fixture must carry usage");
+    assert_eq!(usage.provider_schema, "deepseek-chat-completions-v1");
+    let normalized = normalize_usage(usage);
+    assert_eq!(
+        normalized.normalization_source,
+        "deepseek-chat-completions-v1"
+    );
+    // Observed live values for D: hit 16256 + miss 1814 = total 18070.
+    assert_eq!(normalized.total_input_tokens, Some(18070));
+    assert_eq!(normalized.fresh_input_tokens, Some(1814));
+    assert_eq!(normalized.cache_read_tokens, Some(16256));
+    assert_eq!(normalized.output_tokens, Some(1));
+
+    // Late-divergence shape: header + stable core + late suffix + tail.
+    assert_eq!(trace.blocks.len(), 4);
+    let ids: Vec<&str> = trace.blocks.iter().map(|b| b.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        vec!["prefix-header", "synthetic-prefix", "late-suffix", "tail"]
+    );
+
+    // D's late-suffix content hash differs from C's (fixture 21-c uses
+    // variant 1; D uses variant 2), so D could NOT hit C's complete request
+    // by re-sending identical suffix content.
+    let c = common::load_fixture("21-deepseek-live-late-persistence-c.json");
+    let d_late_suffix = trace
+        .blocks
+        .iter()
+        .find(|b| b.id == "late-suffix")
+        .expect("late-suffix block");
+    let c_late_suffix = c
+        .blocks
+        .iter()
+        .find(|b| b.id == "late-suffix")
+        .expect("late-suffix block");
+    assert_ne!(d_late_suffix.content_hash, c_late_suffix.content_hash);
+    // Header and stable core are identical across C and D.
+    let d_header = trace
+        .blocks
+        .iter()
+        .find(|b| b.id == "prefix-header")
+        .unwrap();
+    let c_header = c.blocks.iter().find(|b| b.id == "prefix-header").unwrap();
+    assert_eq!(d_header.content_hash, c_header.content_hash);
+    let d_core = trace
+        .blocks
+        .iter()
+        .find(|b| b.id == "synthetic-prefix")
+        .unwrap();
+    let c_core = c
+        .blocks
+        .iter()
+        .find(|b| b.id == "synthetic-prefix")
+        .unwrap();
+    assert_eq!(d_core.content_hash, c_core.content_hash);
+
+    // Safe only: no credentials, no authorization headers, no provider
+    // request ids (the live request id was eb8266f0-0f81-47e9-9745-c9299e049344).
+    let raw = std::fs::read_to_string(common::fixture_path(
+        "21-deepseek-live-late-persistence-d.json",
+    ))
+    .unwrap();
+    let lower = raw.to_lowercase();
+    for forbidden in [
+        "api_key", "bearer", "sk-", "eb8266f0", "0f8147e9", "9745c929",
     ] {
         assert!(
             !lower.contains(forbidden),

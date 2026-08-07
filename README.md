@@ -173,6 +173,8 @@ Prefixity/
 - `docs/phase-0/EXPERIMENTS.md` — the three future experimental groups.
 - `docs/phase-0/PHASE_0B_LIVE_VALIDATION.md` — controlled live validation
   (purpose, guardrails, scenarios A–D, procedure, stop conditions).
+- `docs/phase-0/PHASE_0B_DEEPSEEK_CLOSEOUT.md` — DeepSeek Phase 0B closeout:
+  evidence matrix, decision (PASS WITH RECORDED LIMITATIONS), stopping rule.
 - `docs/phase-0/SUCCESS_CRITERIA.md` — success/failure criteria and stop
   conditions.
 

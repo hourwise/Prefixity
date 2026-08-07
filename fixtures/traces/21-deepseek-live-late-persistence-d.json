@@ -1,0 +1,70 @@
+{
+  "format_version": 2,
+  "request_id": "21-deepseek-live-late-persistence-d",
+  "session_id": "deepseek-late-persistence-01",
+  "timestamp": "2026-08-07T17:25:14Z",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "blocks": [
+    {
+      "id": "prefix-header",
+      "source": "timestamp",
+      "position": 0,
+      "content_hash": "6c87e6d67b03c6e8046ebcdd4b06d9dfe1e8266c59adfe61979e5cf088fe30d8",
+      "token_count": 16,
+      "byte_count": 62,
+      "semantic_zone": "system",
+      "structural_path": "messages[0]",
+      "role": "system"
+    },
+    {
+      "id": "synthetic-prefix",
+      "source": "system_policy",
+      "position": 1,
+      "content_hash": "417a095716699e7c67655b62af406d58b5db73528f09fa0407d2510e31b2b822",
+      "token_count": 7229,
+      "byte_count": 28916,
+      "semantic_zone": "system",
+      "structural_path": "messages[1]",
+      "role": "system"
+    },
+    {
+      "id": "late-suffix",
+      "source": "system_policy",
+      "position": 2,
+      "content_hash": "e9e4fdede6c97b6a9b8a69a455c41c9e388585882625689bceef42b933834451",
+      "token_count": 803,
+      "byte_count": 3212,
+      "semantic_zone": "system",
+      "structural_path": "messages[2]",
+      "role": "system"
+    },
+    {
+      "id": "tail",
+      "source": "user_request",
+      "position": 3,
+      "content_hash": "7ef1d2914dcc8c4069dcfae5074bf556e71733af35dd83ab22647e1ccd5ea697",
+      "token_count": 15,
+      "byte_count": 57,
+      "semantic_zone": "messages",
+      "structural_path": "messages[3]",
+      "role": "user"
+    }
+  ],
+  "usage": {
+    "provider_schema": "deepseek-chat-completions-v1",
+    "raw": {
+      "completion_tokens": 1,
+      "prompt_cache_hit_tokens": 16256,
+      "prompt_cache_miss_tokens": 1814,
+      "prompt_tokens": 18070,
+      "prompt_tokens_details": {
+        "cached_tokens": 16256
+      },
+      "total_tokens": 18071
+    }
+  },
+  "metadata": {
+    "note": "Sanitized fixture derived from the final Phase 0B live DeepSeek late-persistence run (2026-08-07, deepseek-v4-flash, commit 37463d1, HTTP 200). Request D shape: a SECOND, distinct late-suffix variant (different from both the original and C's variant 1; note the changed late-suffix content hash), sent after C exposed the common-core boundary and after the controlled 10-second settle. Cache read 16256, fresh 1814, total 18070; Prefixity estimate 8063. Live C->D PRIMARY reconciliation: structural reuse POTENTIAL 89.9% (7245/8063) vs REALIZED provider cache reuse 90.0% (16256/18070); realization gap ~0.001 => MATCH. Companion fixture 21-deepseek-live-late-persistence-c.json carries request C. Contains ONLY safe usage/accounting and reconciliation evidence; no credentials, no authorization headers, no provider request ids, no full provider responses."
+  }
+}
