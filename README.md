@@ -28,6 +28,8 @@ A perfectly acceptable Phase 0 result is:
 - **Phase 0B** DeepSeek live validation complete: **PASS WITH RECORDED
   LIMITATIONS** (see `docs/phase-0/PHASE_0B_DEEPSEEK_CLOSEOUT.md`).
   OpenAI/Anthropic adapters remain offline-tested, not live-validated.
+- **Phase 1** design set added; **design gate only** — no Phase 1 runtime
+  implementation is authorized (see `docs/phase-1/PHASE_1_PLAN.md`).
 - No daemon, no localhost proxy, no telemetry.
 - No semantic response caching, no KV-cache storage, no RAG, no automatic
   context mutation of live requests.
@@ -179,6 +181,16 @@ Prefixity/
   evidence matrix, decision (PASS WITH RECORDED LIMITATIONS), stopping rule.
 - `docs/phase-0/SUCCESS_CRITERIA.md` — success/failure criteria and stop
   conditions.
+- `docs/phase-1/PHASE_1_PLAN.md` — the Phase 1 plan: real-workload
+  observation and quality-gated context decisions (1A/1B/1C, design gate).
+- `docs/phase-1/QUALITY_GATE.md` — Phase 1 quality gate, evidence tiers and
+  intervention rules.
+- `docs/phase-1/SUCCESS_CRITERIA.md` — Phase 1 success/failure and pivot
+  criteria.
+- `docs/phase-1/WORKLOAD_CORPUS.md` — Phase 1 workload corpus and provenance
+  requirements.
+- `docs/phase-1/PRIOR_ART_DECISIONS.md` — Phase 1 prior-art decisions
+  (reuse/integrate/differentiate).
 
 ## License
 
