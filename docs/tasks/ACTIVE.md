@@ -1,35 +1,111 @@
-# Active Task
+# Active Task — Phase 1A Corpus Validation Spike
 
-Status: final context-efficiency review complete; no product implementation
-started and no Phase 1A work started.
+Status: ready for implementation.
 
-## Recommended next task
+## Objective
 
-Run the offline Phase 1A corpus-validation spike described by:
+Test whether Prefixity's existing offline observer produces useful and
+defensible observations on a small slice of a real workload corpus.
 
-- [`phase-1/PHASE_1_PLAN.md`](../phase-1/PHASE_1_PLAN.md), section **Phase 1A -
-  Real-workload ingestion and observation**, plus **Phase boundaries**;
-- [`phase-1/WORKLOAD_CORPUS.md`](../phase-1/WORKLOAD_CORPUS.md), sections
-  **Primary candidate: ContextBench**, **Initial slice**, **Corpus acceptance
-  checklist**, **Provenance requirements**, **Evaluation leakage rule** and
-  **Phase 1A exit condition**;
-- [`phase-1/QUALITY_GATE.md`](../phase-1/QUALITY_GATE.md), sections **Evidence
-  tiers**, **Hard safety failures** and **Fail-open principle**; and
-- [`phase-1/SUCCESS_CRITERIA.md`](../phase-1/SUCCESS_CRITERIA.md), section
-  **Phase 1A pass**.
+This is an evidence-gathering task, not a runtime/product-expansion task.
 
-The task should verify the exact corpus revision, licence and redistribution
-terms; select a representative 20-50-task slice; preserve task/trajectory and
-source-event provenance; keep evaluation labels out of decision inputs; run
-the existing observer offline; and report positive, negative and `DO_NOTHING`
-cases. Do not begin Phase 1B pruning/compression or Phase 1C replay.
+## Required context
 
-## Current validation record
+Read only the relevant sections of:
 
-- `C:\Users\USER\.cargo\bin\cargo.exe fmt --all -- --check` passed.
-- `C:\Users\USER\.cargo\bin\cargo.exe test --workspace` passed: all
-  workspace suites passed with no failures.
-- `C:\Users\USER\.cargo\bin\cargo.exe clippy --workspace --all-targets
-  --all-features -- -D warnings` passed.
-- Checks emitted only the non-fatal warning that `D:\Users\fleur` could not be
-  canonicalized. No live provider command was run.
+- `../phase-1/PHASE_1_PLAN.md`
+  - Phase 1A — Real-workload ingestion and observation
+  - Phase boundaries
+- `../phase-1/WORKLOAD_CORPUS.md`
+  - Primary candidate: ContextBench
+  - Initial slice
+  - Corpus acceptance checklist
+  - Provenance requirements
+  - Evaluation leakage rule
+  - Phase 1A exit condition
+- `../phase-1/QUALITY_GATE.md`
+  - Evidence tiers
+  - Hard safety failures
+  - Fail-open principle
+- `../phase-1/SUCCESS_CRITERIA.md`
+  - Phase 1A pass
+
+Follow `../SOURCE_OF_TRUTH.md` and `../RESEARCH.md` only where needed to
+resolve project-state or evidence questions.
+
+## Work
+
+1. Verify and record the exact selected corpus revision.
+2. Verify licence and redistribution terms before importing corpus material.
+3. Select a representative 20–50 task slice using a deterministic,
+   documented selection method.
+4. Preserve provenance from corpus source through task, trajectory and
+   source-event representation.
+5. Keep evaluation labels and other post-hoc information out of Prefixity
+   decision inputs.
+6. Import/represent the selected trajectories deterministically.
+7. Run the existing Prefixity observer offline over the selected slice.
+8. Record examples covering:
+   - positive intervention candidates;
+   - negative/non-useful candidates;
+   - `DO_NOTHING` decisions.
+9. Report observed evidence without converting structural reuse potential
+   into claims of realised provider cache reuse or monetary savings.
+
+## Required outputs
+
+Produce repository-native evidence sufficient to reproduce the spike,
+including:
+
+- corpus identity/revision and licence/provenance record;
+- deterministic slice definition;
+- imported trajectory/source-event representation;
+- observer output/results;
+- concise Phase 1A findings.
+
+Reuse existing project structures where suitable rather than creating
+parallel documentation systems.
+
+## Acceptance criteria
+
+The task is complete when:
+
+- the selected corpus and exact revision are identifiable;
+- licence/redistribution status is explicitly recorded;
+- selection of the 20–50 task slice is reproducible;
+- provenance survives import;
+- evaluation labels cannot influence observer decisions;
+- the existing observer successfully processes the intended slice offline;
+- results include positive, negative and `DO_NOTHING` cases;
+- evidence and interpretation are clearly distinguished;
+- relevant tests/checks pass; and
+- results are sufficient to assess the documented Phase 1A pass criteria.
+
+If the corpus cannot legally or technically satisfy the required conditions,
+record that as a Phase 1A result rather than weakening the requirements.
+
+## Stop conditions
+
+Do not:
+
+- begin Phase 1B pruning/compression;
+- begin Phase 1C replay;
+- perform live provider calls;
+- claim realised cache savings from structural observations;
+- tune corpus selection to improve Prefixity results;
+- redesign the Prefixity runtime;
+- begin another phase after completing this task.
+
+## Completion record
+
+On completion, update this file with:
+
+- work completed;
+- corpus and slice used;
+- tests/checks run;
+- evidence produced;
+- Phase 1A pass/fail/insufficient-evidence assessment;
+- remaining uncertainties;
+- recommended next task.
+
+Do not begin the recommended next task.
