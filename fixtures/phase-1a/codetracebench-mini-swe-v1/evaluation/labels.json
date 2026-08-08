@@ -1,0 +1,843 @@
+{
+  "records": [
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 6,
+      "step_count": 44,
+      "task_name": "build-pmars",
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e"
+    },
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 5,
+      "step_count": 23,
+      "task_name": "git-workflow-hack",
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            5,
+            6,
+            9
+          ],
+          "stage_id": 2,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 5
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 6
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 9
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 4,
+      "step_count": 21,
+      "task_name": "install-windows-xp",
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            24
+          ],
+          "stage_id": 7,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 24
+            }
+          ],
+          "unuseful_step_ids": []
+        },
+        {
+          "incorrect_step_ids": [
+            25
+          ],
+          "stage_id": 8,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 25
+            },
+            {
+              "labels": [
+                "unuseful"
+              ],
+              "step_id": 26
+            }
+          ],
+          "unuseful_step_ids": [
+            26
+          ]
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 8,
+      "step_count": 26,
+      "task_name": "neuron-to-jaxley-conversion",
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19"
+    },
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 7,
+      "step_count": 47,
+      "task_name": "path-tracing",
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-path-tracing-79ade2b0"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            5,
+            6,
+            7
+          ],
+          "stage_id": 2,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 5
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 6
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 7
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 8,
+      "step_count": 43,
+      "task_name": "reshard-c4-data",
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301"
+    },
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 4,
+      "step_count": 28,
+      "task_name": "train-bpe-tokenizer",
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-train-bpe-tokenizer-2df9c860"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            30,
+            32,
+            34
+          ],
+          "stage_id": 5,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 30
+            },
+            {
+              "labels": [
+                "unuseful"
+              ],
+              "step_id": 31
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 32
+            },
+            {
+              "labels": [
+                "unuseful"
+              ],
+              "step_id": 33
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 34
+            },
+            {
+              "labels": [
+                "unuseful"
+              ],
+              "step_id": 35
+            }
+          ],
+          "unuseful_step_ids": [
+            31,
+            33,
+            35
+          ]
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 6,
+      "step_count": 36,
+      "task_name": "vul-flask",
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "stage_id": 3,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 13
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 14
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 15
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 16
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 5,
+      "step_count": 24,
+      "task_name": "cartpole-rl-training",
+      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            6
+          ],
+          "stage_id": 3,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 6
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 6,
+      "step_count": 21,
+      "task_name": "merge-diff-arc-agi-task",
+      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd"
+    },
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 4,
+      "step_count": 24,
+      "task_name": "query-optimize",
+      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-query-optimize-3b3e2297"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            28,
+            29,
+            30,
+            32,
+            36
+          ],
+          "stage_id": 5,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 28
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 29
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 30
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 32
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 36
+            }
+          ],
+          "unuseful_step_ids": []
+        },
+        {
+          "incorrect_step_ids": [
+            38,
+            40,
+            41,
+            44,
+            46,
+            47,
+            48
+          ],
+          "stage_id": 6,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 38
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 40
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 41
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 44
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 46
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 47
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 48
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 7,
+      "step_count": 49,
+      "task_name": "schemelike-metacircular-eval",
+      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e"
+    },
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 4,
+      "step_count": 41,
+      "task_name": "clap-rs__clap-2758",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-clap-rs__clap-2758-8f87bc0d"
+    },
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 3,
+      "step_count": 24,
+      "task_name": "clap-rs__clap-2895",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-clap-rs__clap-2895-928269b9"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            7,
+            8
+          ],
+          "stage_id": 2,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 7
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 8
+            }
+          ],
+          "unuseful_step_ids": []
+        },
+        {
+          "incorrect_step_ids": [
+            19
+          ],
+          "stage_id": 4,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 19
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 4,
+      "step_count": 20,
+      "task_name": "django__django-14999",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-django__django-14999-5d6ca542"
+    },
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 6,
+      "step_count": 44,
+      "task_name": "facebook__zstd-1733",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-facebook__zstd-1733-786102c1"
+    },
+    {
+      "incorrect_stages": [],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 3,
+      "step_count": 22,
+      "task_name": "instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a-f7c2004c"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            21,
+            22
+          ],
+          "stage_id": 4,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 21
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 22
+            }
+          ],
+          "unuseful_step_ids": []
+        },
+        {
+          "incorrect_step_ids": [
+            29
+          ],
+          "stage_id": 6,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 29
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 6,
+      "step_count": 30,
+      "task_name": "instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan-dc9947f9"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            29
+          ],
+          "stage_id": 4,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 29
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 4,
+      "step_count": 30,
+      "task_name": "instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818-78872a1e"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            19
+          ],
+          "stage_id": 5,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 19
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 5,
+      "step_count": 20,
+      "task_name": "keras-team__keras-19484",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-keras-team__keras-19484-2bd0f0db"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            27,
+            28
+          ],
+          "stage_id": 4,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 27
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 28
+            }
+          ],
+          "unuseful_step_ids": []
+        },
+        {
+          "incorrect_step_ids": [
+            31
+          ],
+          "stage_id": 5,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 31
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 5,
+      "step_count": 32,
+      "task_name": "ponylang__ponyc-2205",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-ponylang__ponyc-2205-2a662253"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            10,
+            12,
+            14,
+            15
+          ],
+          "stage_id": 2,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 10
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 12
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 14
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 15
+            }
+          ],
+          "unuseful_step_ids": []
+        },
+        {
+          "incorrect_step_ids": [
+            20
+          ],
+          "stage_id": 4,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 20
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 4,
+      "step_count": 21,
+      "task_name": "prettier__prettier-12930",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-prettier__prettier-12930-d76c2178"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            8,
+            10
+          ],
+          "stage_id": 2,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 8
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 10
+            }
+          ],
+          "unuseful_step_ids": []
+        },
+        {
+          "incorrect_step_ids": [
+            16,
+            17,
+            19,
+            20
+          ],
+          "stage_id": 4,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 16
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 17
+            },
+            {
+              "labels": [
+                "unuseful"
+              ],
+              "step_id": 18
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 19
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 20
+            }
+          ],
+          "unuseful_step_ids": [
+            18
+          ]
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": false,
+      "stage_count": 4,
+      "step_count": 20,
+      "task_name": "sphinx-doc__sphinx-8638",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-sphinx-doc__sphinx-8638-0bbaf886"
+    },
+    {
+      "incorrect_stages": [
+        {
+          "incorrect_step_ids": [
+            23,
+            24,
+            26
+          ],
+          "stage_id": 4,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 23
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 24
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 26
+            }
+          ],
+          "unuseful_step_ids": []
+        },
+        {
+          "incorrect_step_ids": [
+            28,
+            29
+          ],
+          "stage_id": 6,
+          "steps": [
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 28
+            },
+            {
+              "labels": [
+                "incorrect"
+              ],
+              "step_id": 29
+            }
+          ],
+          "unuseful_step_ids": []
+        }
+      ],
+      "label_source": "manifest; evaluation-only; not included in trace input",
+      "solved": true,
+      "stage_count": 6,
+      "step_count": 29,
+      "task_name": "sveltejs__svelte-10608",
+      "trajectory_id": "miniswe-OpenAI__GPT-5-sveltejs__svelte-10608-2fe6d098"
+    }
+  ],
+  "schema_version": 1
+}

@@ -25,7 +25,7 @@
 | [`phase-1/PHASE_1_PLAN.md`](phase-1/PHASE_1_PLAN.md) | Phase 1A/1B/1C design gate and boundaries. | Any proposed Phase 1 work. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
-| [`phase-1/PHASE_1A_TRACEBENCH_SPIKE.md`](phase-1/PHASE_1A_TRACEBENCH_SPIKE.md) | Phase 1A offline corpus/import/observer evidence and limitations. | Reviewing the completed Phase 1A spike. |
+| [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
 | [`phase-1/PRIOR_ART_DECISIONS.md`](phase-1/PRIOR_ART_DECISIONS.md) | Reuse, integration and differentiation decisions. | Considering external systems or architecture. |
 
 ## Implementation locations
@@ -51,8 +51,9 @@
 | [`../experiments/runs`](../experiments/runs) | Local ignored live artifacts, not tracked benchmarks. | Auditing recorded live runs if present. |
 | [`phase-0/SUCCESS_CRITERIA.md`](phase-0/SUCCESS_CRITERIA.md) and [`phase-0/EXPERIMENTS.md`](phase-0/EXPERIMENTS.md) | Offline acceptance mapping and proposed experiment groups. | Distinguishing harness checks from future experiments. |
 
-There is currently no `benches/` directory, public-corpus importer or tracked
-end-to-end quality report.
+There is currently no `benches/` directory, Phase 1B decision layer or tracked
+end-to-end quality report. The Phase 1A corpus/import evidence is documented in
+the closeout above.
 
 For history, use `git log` and [`research/PRIOR_ART.md`](research/PRIOR_ART.md)
 when the task requires provenance or prior-art context.

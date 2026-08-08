@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "corpus": "NJU-LINK/CodeTraceBench",
+  "corpus_revision": "aa213b84ffb6690fc37ca15766d6ca174ec36d4d",
+  "retrieved": "2026-08-08",
+  "authoritative_sources": {
+    "dataset_page": "https://huggingface.co/datasets/NJU-LINK/CodeTraceBench/tree/aa213b84ffb6690fc37ca15766d6ca174ec36d4d",
+    "dataset_metadata": "https://huggingface.co/api/datasets/NJU-LINK/CodeTraceBench/revision/aa213b84ffb6690fc37ca15766d6ca174ec36d4d",
+    "readme": "https://huggingface.co/datasets/NJU-LINK/CodeTraceBench/raw/aa213b84ffb6690fc37ca15766d6ca174ec36d4d/README.md",
+    "verified_manifest": "https://huggingface.co/datasets/NJU-LINK/CodeTraceBench/resolve/aa213b84ffb6690fc37ca15766d6ca174ec36d4d/bench_manifest.verified.jsonl?download=true"
+  },
+  "source_hashes": {
+    "readme_sha256": "040b8eeecea41bf7d6c8e1ed67c91ee2993e71b352fb7b762",
+    "verified_manifest_sha256": "bd02d3da145146567e87f7d55b158ef0dd30043d4a4c2c03e631c2056ff92e"
+  },
+  "license_decision": {
+    "declared_license": "MIT",
+    "statement_source": "The exact revision metadata declares mit; the exact primary README describes bench_artifacts/full/*.tar.zst as compressed trajectory artifacts and states that the dataset is released under the MIT License.",
+    "applies_to_artifacts": true,
+    "root_license_file_present_at_revision": false,
+    "raw_artifacts_retained_in_repository": false,
+    "derived_evidence_retained": "hashes, metadata, provenance and evaluation IDs/labels only",
+    "limitation": "The README links LICENSE, but no LICENSE file is present in the exact revision root; no missing license text is inferred or recreated."
+  }
+}

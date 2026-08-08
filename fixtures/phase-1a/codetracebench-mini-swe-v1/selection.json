@@ -1,0 +1,473 @@
+{
+  "cells": [
+    {
+      "length_band": "short",
+      "population_count": 27,
+      "selected_traj_ids": [
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+        "miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd",
+        "miniswe-OpenAI__GPT-5-instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a-f7c2004c",
+        "miniswe-OpenAI__GPT-5-sphinx-doc__sphinx-8638-0bbaf886"
+      ],
+      "solved": false
+    },
+    {
+      "length_band": "medium",
+      "population_count": 25,
+      "selected_traj_ids": [
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+        "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+        "miniswe-DeepSeek__DeepSeek-V3.2-query-optimize-3b3e2297",
+        "miniswe-OpenAI__GPT-5-instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818-78872a1e"
+      ],
+      "solved": false
+    },
+    {
+      "length_band": "long",
+      "population_count": 31,
+      "selected_traj_ids": [
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e",
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-path-tracing-79ade2b0",
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+        "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e"
+      ],
+      "solved": false
+    },
+    {
+      "length_band": "short",
+      "population_count": 23,
+      "selected_traj_ids": [
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43",
+        "miniswe-OpenAI__GPT-5-django__django-14999-5d6ca542",
+        "miniswe-OpenAI__GPT-5-keras-team__keras-19484-2bd0f0db",
+        "miniswe-OpenAI__GPT-5-prettier__prettier-12930-d76c2178"
+      ],
+      "solved": true
+    },
+    {
+      "length_band": "medium",
+      "population_count": 24,
+      "selected_traj_ids": [
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-train-bpe-tokenizer-2df9c860",
+        "miniswe-OpenAI__GPT-5-clap-rs__clap-2895-928269b9",
+        "miniswe-OpenAI__GPT-5-instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan-dc9947f9",
+        "miniswe-OpenAI__GPT-5-sveltejs__svelte-10608-2fe6d098"
+      ],
+      "solved": true
+    },
+    {
+      "length_band": "long",
+      "population_count": 18,
+      "selected_traj_ids": [
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+        "miniswe-OpenAI__GPT-5-clap-rs__clap-2758-8f87bc0d",
+        "miniswe-OpenAI__GPT-5-facebook__zstd-1733-786102c1",
+        "miniswe-OpenAI__GPT-5-ponylang__ponyc-2205-2a662253"
+      ],
+      "solved": true
+    }
+  ],
+  "corpus": "NJU-LINK/CodeTraceBench",
+  "corpus_revision": "aa213b84ffb6690fc37ca15766d6ca174ec36d4d",
+  "population_count": 148,
+  "records": [
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "medium",
+      "length_band": "long",
+      "model": "Anthropic/Claude-Sonnet-4-20250514-Thinking",
+      "solved": false,
+      "source_relpath": "miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/build-pmars/build-pmars.1-of-1.claude-sonnet-4-20250514-thinking",
+      "stage_count": 6,
+      "step_count": 44,
+      "task_name": "build-pmars",
+      "task_slug": "build-pmars-23413a0e",
+      "traj_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43.tar.zst",
+      "category": "security",
+      "difficulty": "easy",
+      "length_band": "short",
+      "model": "Anthropic/Claude-Sonnet-4-20250514-Thinking",
+      "solved": true,
+      "source_relpath": "miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/git-workflow-hack/git-workflow-hack.1-of-1.claude-sonnet-4-20250514-thinking",
+      "stage_count": 5,
+      "step_count": 23,
+      "task_name": "git-workflow-hack",
+      "task_slug": "git-workflow-hack-15e07e43",
+      "traj_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096.tar.zst",
+      "category": "system-administration",
+      "difficulty": "hard",
+      "length_band": "short",
+      "model": "Anthropic/Claude-Sonnet-4-20250514-Thinking",
+      "solved": false,
+      "source_relpath": "miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/install-windows-xp/install-windows-xp.1-of-1.claude-sonnet-4-20250514-thinking",
+      "stage_count": 4,
+      "step_count": 21,
+      "task_name": "install-windows-xp",
+      "task_slug": "install-windows-xp-edd35096",
+      "traj_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19.tar.zst",
+      "category": "scientific-computing",
+      "difficulty": "hard",
+      "length_band": "medium",
+      "model": "Anthropic/Claude-Sonnet-4-20250514-Thinking",
+      "solved": false,
+      "source_relpath": "miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/neuron-to-jaxley-conversion/neuron-to-jaxley-conversion.1-of-1.claude-sonnet-4-20250514-thinking",
+      "stage_count": 8,
+      "step_count": 26,
+      "task_name": "neuron-to-jaxley-conversion",
+      "task_slug": "neuron-to-jaxley-conversion-87200f19",
+      "traj_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-path-tracing-79ade2b0.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "hard",
+      "length_band": "long",
+      "model": "Anthropic/Claude-Sonnet-4-20250514-Thinking",
+      "solved": false,
+      "source_relpath": "miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/path-tracing/path-tracing.1-of-1.claude-sonnet-4-20250514-thinking",
+      "stage_count": 7,
+      "step_count": 47,
+      "task_name": "path-tracing",
+      "task_slug": "path-tracing-79ade2b0",
+      "traj_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-path-tracing-79ade2b0"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301.tar.zst",
+      "category": "data-science",
+      "difficulty": "medium",
+      "length_band": "long",
+      "model": "Anthropic/Claude-Sonnet-4-20250514-Thinking",
+      "solved": true,
+      "source_relpath": "miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/reshard-c4-data/reshard-c4-data.1-of-1.claude-sonnet-4-20250514-thinking",
+      "stage_count": 8,
+      "step_count": 43,
+      "task_name": "reshard-c4-data",
+      "task_slug": "reshard-c4-data-f4ff7301",
+      "traj_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-train-bpe-tokenizer-2df9c860.tar.zst",
+      "category": "model-training",
+      "difficulty": "medium",
+      "length_band": "medium",
+      "model": "Anthropic/Claude-Sonnet-4-20250514-Thinking",
+      "solved": true,
+      "source_relpath": "miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/train-bpe-tokenizer/train-bpe-tokenizer.1-of-1.claude-sonnet-4-20250514-thinking",
+      "stage_count": 4,
+      "step_count": 28,
+      "task_name": "train-bpe-tokenizer",
+      "task_slug": "train-bpe-tokenizer-2df9c860",
+      "traj_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-train-bpe-tokenizer-2df9c860"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9.tar.zst",
+      "category": "security",
+      "difficulty": "medium",
+      "length_band": "long",
+      "model": "Anthropic/Claude-Sonnet-4-20250514-Thinking",
+      "solved": false,
+      "source_relpath": "miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking",
+      "stage_count": 6,
+      "step_count": 36,
+      "task_name": "vul-flask",
+      "task_slug": "vul-flask-4946dda9",
+      "traj_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16.tar.zst",
+      "category": "model-training",
+      "difficulty": "hard",
+      "length_band": "medium",
+      "model": "DeepSeek/DeepSeek-V3.2",
+      "solved": false,
+      "source_relpath": "miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training",
+      "stage_count": 5,
+      "step_count": 24,
+      "task_name": "cartpole-rl-training",
+      "task_slug": "cartpole-rl-training-74a92a16",
+      "traj_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd.tar.zst",
+      "category": "debugging",
+      "difficulty": "medium",
+      "length_band": "short",
+      "model": "DeepSeek/DeepSeek-V3.2",
+      "solved": false,
+      "source_relpath": "miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/merge-diff-arc-agi-task",
+      "stage_count": 6,
+      "step_count": 21,
+      "task_name": "merge-diff-arc-agi-task",
+      "task_slug": "merge-diff-arc-agi-task-cb5aafdd",
+      "traj_id": "miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-DeepSeek__DeepSeek-V3.2-query-optimize-3b3e2297.tar.zst",
+      "category": "data-science",
+      "difficulty": "medium",
+      "length_band": "medium",
+      "model": "DeepSeek/DeepSeek-V3.2",
+      "solved": false,
+      "source_relpath": "miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/query-optimize",
+      "stage_count": 4,
+      "step_count": 24,
+      "task_name": "query-optimize",
+      "task_slug": "query-optimize-3b3e2297",
+      "traj_id": "miniswe-DeepSeek__DeepSeek-V3.2-query-optimize-3b3e2297"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "medium",
+      "length_band": "long",
+      "model": "DeepSeek/DeepSeek-V3.2",
+      "solved": false,
+      "source_relpath": "miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval",
+      "stage_count": 7,
+      "step_count": 49,
+      "task_name": "schemelike-metacircular-eval",
+      "task_slug": "schemelike-metacircular-eval-e73a741e",
+      "traj_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-clap-rs__clap-2758-8f87bc0d.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "hard",
+      "length_band": "long",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__multi/clap-rs__clap-2758",
+      "stage_count": 4,
+      "step_count": 41,
+      "task_name": "clap-rs__clap-2758",
+      "task_slug": "clap-rs__clap-2758-8f87bc0d",
+      "traj_id": "miniswe-OpenAI__GPT-5-clap-rs__clap-2758-8f87bc0d"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-clap-rs__clap-2895-928269b9.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "hard",
+      "length_band": "medium",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__multi/clap-rs__clap-2895",
+      "stage_count": 3,
+      "step_count": 24,
+      "task_name": "clap-rs__clap-2895",
+      "task_slug": "clap-rs__clap-2895-928269b9",
+      "traj_id": "miniswe-OpenAI__GPT-5-clap-rs__clap-2895-928269b9"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-django__django-14999-5d6ca542.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "medium",
+      "length_band": "short",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__verified/django__django-14999",
+      "stage_count": 4,
+      "step_count": 20,
+      "task_name": "django__django-14999",
+      "task_slug": "django__django-14999-5d6ca542",
+      "traj_id": "miniswe-OpenAI__GPT-5-django__django-14999-5d6ca542"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-facebook__zstd-1733-786102c1.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "hard",
+      "length_band": "long",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__multi/facebook__zstd-1733",
+      "stage_count": 6,
+      "step_count": 44,
+      "task_name": "facebook__zstd-1733",
+      "task_slug": "facebook__zstd-1733-786102c1",
+      "traj_id": "miniswe-OpenAI__GPT-5-facebook__zstd-1733-786102c1"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a-f7c2004c.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "medium",
+      "length_band": "short",
+      "model": "OpenAI/GPT-5",
+      "solved": false,
+      "source_relpath": "swe_raw/mini_swe_agent__pro/instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a",
+      "stage_count": 3,
+      "step_count": 22,
+      "task_name": "instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a",
+      "task_slug": "instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a-f7c2004c",
+      "traj_id": "miniswe-OpenAI__GPT-5-instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a-f7c2004c"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan-dc9947f9.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "hard",
+      "length_band": "medium",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__pro/instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan",
+      "stage_count": 6,
+      "step_count": 30,
+      "task_name": "instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan",
+      "task_slug": "instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan-dc9947f9",
+      "traj_id": "miniswe-OpenAI__GPT-5-instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan-dc9947f9"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818-78872a1e.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "hard",
+      "length_band": "medium",
+      "model": "OpenAI/GPT-5",
+      "solved": false,
+      "source_relpath": "swe_raw/mini_swe_agent__pro/instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818",
+      "stage_count": 4,
+      "step_count": 30,
+      "task_name": "instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818",
+      "task_slug": "instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818-78872a1e",
+      "traj_id": "miniswe-OpenAI__GPT-5-instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818-78872a1e"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-keras-team__keras-19484-2bd0f0db.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "easy",
+      "length_band": "short",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__poly/keras-team__keras-19484",
+      "stage_count": 5,
+      "step_count": 20,
+      "task_name": "keras-team__keras-19484",
+      "task_slug": "keras-team__keras-19484-2bd0f0db",
+      "traj_id": "miniswe-OpenAI__GPT-5-keras-team__keras-19484-2bd0f0db"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-ponylang__ponyc-2205-2a662253.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "hard",
+      "length_band": "long",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__multi/ponylang__ponyc-2205",
+      "stage_count": 5,
+      "step_count": 32,
+      "task_name": "ponylang__ponyc-2205",
+      "task_slug": "ponylang__ponyc-2205-2a662253",
+      "traj_id": "miniswe-OpenAI__GPT-5-ponylang__ponyc-2205-2a662253"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-prettier__prettier-12930-d76c2178.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "medium",
+      "length_band": "short",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__poly/prettier__prettier-12930",
+      "stage_count": 4,
+      "step_count": 21,
+      "task_name": "prettier__prettier-12930",
+      "task_slug": "prettier__prettier-12930-d76c2178",
+      "traj_id": "miniswe-OpenAI__GPT-5-prettier__prettier-12930-d76c2178"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-sphinx-doc__sphinx-8638-0bbaf886.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "easy",
+      "length_band": "short",
+      "model": "OpenAI/GPT-5",
+      "solved": false,
+      "source_relpath": "swe_raw/mini_swe_agent__verified/sphinx-doc__sphinx-8638",
+      "stage_count": 4,
+      "step_count": 20,
+      "task_name": "sphinx-doc__sphinx-8638",
+      "task_slug": "sphinx-doc__sphinx-8638-0bbaf886",
+      "traj_id": "miniswe-OpenAI__GPT-5-sphinx-doc__sphinx-8638-0bbaf886"
+    },
+    {
+      "agent": "mini-SWE-agent",
+      "artifact_path": "bench_artifacts/full/miniswe-OpenAI__GPT-5-sveltejs__svelte-10608-2fe6d098.tar.zst",
+      "category": "software-engineering",
+      "difficulty": "hard",
+      "length_band": "medium",
+      "model": "OpenAI/GPT-5",
+      "solved": true,
+      "source_relpath": "swe_raw/mini_swe_agent__multi/sveltejs__svelte-10608",
+      "stage_count": 6,
+      "step_count": 29,
+      "task_name": "sveltejs__svelte-10608",
+      "task_slug": "sveltejs__svelte-10608-2fe6d098",
+      "traj_id": "miniswe-OpenAI__GPT-5-sveltejs__svelte-10608-2fe6d098"
+    }
+  ],
+  "schema_version": 1,
+  "selected_count": 24,
+  "selection_method": {
+    "agent_filter": "mini-SWE-agent",
+    "cell_order": [
+      {
+        "length_band": "short",
+        "solved": false
+      },
+      {
+        "length_band": "medium",
+        "solved": false
+      },
+      {
+        "length_band": "long",
+        "solved": false
+      },
+      {
+        "length_band": "short",
+        "solved": true
+      },
+      {
+        "length_band": "medium",
+        "solved": true
+      },
+      {
+        "length_band": "long",
+        "solved": true
+      }
+    ],
+    "count_per_cell": 4,
+    "description": "Filter to artifact-bearing mini-SWE-agent rows, sort by (step_count, traj_id), assign equal-ranked short/medium/long bands, then choose count_per_cell evenly spaced rows in each solved x length-band cell. No trajectory contents or observer outputs are used.",
+    "excluded_traj_ids": [
+      "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-hf-model-inference-f200d460",
+      "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-play-zork-easy-8c77a548"
+    ]
+  },
+  "split": "verified"
+}

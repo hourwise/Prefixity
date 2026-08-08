@@ -12,9 +12,10 @@ harness is implemented, and the controlled DeepSeek sequence is closed as
 `PASS WITH RECORDED LIMITATIONS`. OpenAI and Anthropic adapters are tested
 offline but have not been live-validated.
 
-Phase 1 is a design gate only. No Phase 1 runtime, real-workload importer or
-automatic live prompt mutation is present or authorized by the current Phase 1
-plan.
+Phase 1A corpus validation is implemented and closed as `PASS` for the accepted
+CodeTraceBench evidence path. The thin importer/adapter and offline observer
+evidence are present. Phase 1B decision-layer and Phase 1C replay/runtime work
+remain unimplemented and are not authorized by the current task.
 
 ## Product definition
 
@@ -43,9 +44,10 @@ decisions testable by answering, for an observed workload:
 - whether an apparent optimization is economically negative; and
 - when the evidence is too weak and `DO_NOTHING` is the correct result.
 
-The repository does not yet establish that this approach is useful on natural
-agent workloads, preserves task quality under intervention, or produces
-end-to-end savings.
+The Phase 1A CodeTraceBench run establishes only that the observer can process
+one accepted natural multi-turn trajectory slice offline and emit heuristic
+structural observations. It does not establish intervention safety, preserve
+task quality under intervention, or produce end-to-end savings.
 
 ## Current architecture
 
@@ -66,6 +68,10 @@ The workspace has three crates:
    responses into trace v2, preserves raw usage, reconciles pair ratios and
    writes sanitized local artifacts. It delegates analysis and normalization
    to `prefixity-core`.
+
+Phase 1A tooling is repository-level evidence tooling rather than a new runtime
+crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
+preserves source provenance and keeps evaluation labels outside observer inputs.
 
 The trace format is version 2. Blocks carry ordered structural metadata,
 content hashes, optional token/content data, flags and dependencies. Raw usage
@@ -106,11 +112,18 @@ not interpreted.
   trace files (including sanitized DeepSeek-derived fixtures), synthetic
   profiles, unit/integration tests, mock-transport live-pipeline tests and
   recorded DeepSeek artifacts that are ignored by Git.
+- Phase 1A corpus evidence: the existing thin importer/adapter accepted the
+  `NJU-LINK/CodeTraceBench` `verified` slice at revision
+  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`. Deterministic import,
+  provenance and evaluation-label separation passed; 24 trajectories produced
+  719 offline request traces, the observer processed 719/719 successfully,
+  and 712 structural candidates plus 7 `DO_NOTHING` cases were observed.
+  These are heuristic structural observations only, not validated safe
+  interventions, provider cache reuse, monetary savings, latency improvement
+  or task-quality preservation.
 
 ## Incomplete and not established
 
-- No Phase 1A public-workload importer, provenance-preserving corpus adapter or
-  ContextBench evaluation path exists.
 - No Phase 1B decision layer with `KEEP`, `DEFER`, `PRUNE`,
   `RELOCATE_CANDIDATE`, `COMPRESS_CANDIDATE` and `DO_NOTHING` recommendations
   exists beyond the narrower Phase 0 policy simulator.
@@ -120,27 +133,34 @@ not interpreted.
   their adapters are exercised with mocks/offline schemas only.
 - OpenAI Responses usage normalization/live adapter is reserved and absent.
 - No audited current provider pricing profiles, provider tokenizer, universal
-  token conversion, latency benchmark, performance benchmark or natural-agent
-  workload result exists.
+  token conversion, latency benchmark, performance benchmark, intervention
+  quality result or end-to-end natural-agent workload benefit result exists.
 - The live evidence is one controlled DeepSeek sequence per scenario on a
   synthetic corpus. It does not prove production value, causation,
   determinism, cross-provider behavior, model generality or cost savings.
 
 ## Accepted near-term direction
 
-The accepted design direction is Phase 1A only after the Phase 1 design set is
-reviewed: use a narrow, verified subset of a public agent-workload corpus,
-preserve task/trajectory provenance, keep evaluation labels separate from
-decision inputs, and produce deterministic offline observations before any
-mutation or replay.
+Phase 1A is complete for the accepted `NJU-LINK/CodeTraceBench` artifact-bearing
+dataset revision `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`: use a narrow,
+verified subset of a public agent-workload corpus, preserve task/trajectory
+provenance, keep evaluation labels separate from decision inputs, and produce
+deterministic offline observations before any mutation or replay. The Phase 1
+plan's Phase 1B prerequisites for ingestion, provenance, label separation and
+deterministic offline observation are now met. Phase 1B itself remains
+separately authorized work and has not started.
 
 The next phase should validate the central decision hypothesis rather than
 expand the feature surface. The Phase 1 quality gate requires structural
 safety, required/dependency retention, reproducibility, task-quality evidence
 and end-to-end accounting. `DO_NOTHING` is a valid success outcome.
 
-This direction is a design target. It is not evidence that a particular corpus
-is licensed, available or already integrated.
+The accepted corpus declaration and exact source revision are recorded in the
+Phase 1A closeout and fixture provenance. The missing README-linked `LICENSE`
+file remains a licence-evidence limitation; its text was not recreated or
+inferred. The observed candidates remain heuristic and do not establish
+provider cache reuse, monetary savings, latency improvement or task-quality
+preservation.
 
 ## Explicitly deferred
 
@@ -153,8 +173,9 @@ is licensed, available or already integrated.
 - Token-conversion multipliers and hard-coded current provider pricing.
 - OpenAI Responses support until its exact versioned schema is implemented and
   validated.
-- Phase 1B/1C work until Phase 1A ingestion, provenance and quality-gate
-  prerequisites are met.
+- Phase 1B/1C runtime, decision and replay work remains deferred until
+  separately authorized after the Phase 1A closeout; the Phase 1A ingestion,
+  provenance and label-separation prerequisites are now met.
 
 ## Constraints and invariants
 
@@ -202,9 +223,12 @@ is licensed, available or already integrated.
   with the existing adapters.
 - Whether a provider-neutral decision layer offers material value beyond
   provider-native diagnostics and overlapping pruning/compression/cache tools.
-- Which public corpus, licence/version and external labels can support Phase
-  1A. The repository records ContextBench as the preferred candidate, but does
-  not record a completed acquisition or licence audit.
+- Whether the missing README-linked `LICENSE` file at the accepted
+  CodeTraceBench revision can be recovered from upstream without inference;
+  the exact revision, metadata declaration and README evidence are recorded,
+  and the missing text has not been recreated.
+- Whether the 712 structural candidates survive intervention-quality,
+  provider-cache, monetary-savings, latency and task-quality evaluation.
 
 ## Documented disagreements and drift
 

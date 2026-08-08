@@ -1,6 +1,6 @@
 # Active Task — Phase 1A Corpus Gate Resolution and Rerun
 
-Status: ready for implementation.
+Status: completed — PASS with recorded licence-file limitation.
 
 ## Objective
 
@@ -25,7 +25,7 @@ Read only the relevant sections of:
   - Phase 1A exit condition
 - `../phase-1/SUCCESS_CRITERIA.md`
   - Phase 1A pass
-- `../phase-1/PHASE_1A_TRACEBENCH_SPIKE.md`
+- `../phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`
   - corpus/licence finding
   - existing technical spike
   - limitations
@@ -218,3 +218,105 @@ On completion, update this file with:
 - recommended next task.
 
 Do not begin the recommended next task.
+
+### Completion record — gate resolution
+
+#### Sources and revisions checked
+
+- `Contextbench/Tracebench`, revision
+  `7da2e4f45b330be8b6e8f1cff835247723cb3341`: upstream metadata has no
+  declared licence; rejected for redistribution.
+- `NJU-LINK/CodeTraceBench`, revision
+  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`, retrieved 2026-08-08: exact
+  dataset metadata declares `mit`; the exact primary README describes
+  `bench_artifacts/full/*.tar.zst` as compressed trajectory artifacts and
+  states that the dataset is released under the MIT License. The exact root
+  tree has no README-linked `LICENSE` file; this is recorded as a limitation,
+  not filled by inference.
+- The earlier CodeTraceBench revision
+  `914de38100105c1ac21d9eb64a8134e32602d63c` was rejected for this rerun
+  because its checked tree did not contain the artifact archives.
+- No rights were inferred from ContextBench, Tracebench, CodeTracer, authors,
+  organisations or related repositories.
+
+#### Corpus/licence decision
+
+CodeTraceBench at `aa213b84ffb6690fc37ca15766d6ca174ec36d4d` is accepted for
+the Phase 1A derived-evidence rerun. Its own artifact-bearing dataset revision
+contains the trajectory archives and makes the explicit MIT declaration. Only
+sanitized derived evidence is retained in the repository; raw archives and
+trajectory text are not tracked. The missing linked `LICENSE` file remains a
+documented uncertainty.
+
+#### Work completed
+
+- Parameterized the existing
+  [`tools/phase1a_tracebench.py`](../../tools/phase1a_tracebench.py) selector
+  and importer for an explicit corpus, revision and split, preserving the
+  existing turn mapping, provenance and label boundary.
+- Reused [`tools/phase1a_run_observer.py`](../../tools/phase1a_run_observer.py)
+  unchanged. The report tool was narrowly parameterized so its evaluation
+  source label records the accepted corpus while preserving report behavior.
+- Added exact source hashes and licence findings to
+  `fixtures/phase-1a/codetracebench-mini-swe-v1/corpus-provenance.json`.
+- Updated the Phase 1A report with the historical Tracebench rejection and
+  the accepted CodeTraceBench rerun.
+
+#### Corpus and slice used
+
+- `NJU-LINK/CodeTraceBench`, revision
+  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`, `verified` split.
+- 1,000 verified manifest rows; 150 artifact-bearing `mini-SWE-agent` rows.
+- Two missing-`.traj.json` rows were excluded and recorded; after
+  recomputing rank bands, 24 trajectories were selected, four per solved ×
+  short/medium/long cell.
+- 1,498 source events and 719 one-request-per-assistant-turn traces.
+
+#### Evidence/results produced
+
+- `fixtures/phase-1a/codetracebench-mini-swe-v1/selection.json`
+- `corpus-provenance.json`, `import-report.json`, `provenance/`, `traces/`
+  and `evaluation/labels.json`
+- `results/validation.json`, `results/analyses.json` and `results/report.json`
+- Observer result: 719/719 validation and analysis successes; 712
+  deterministic observer/adapter structural candidates, 7 `DO_NOTHING`, and
+  0 review/errors.
+- The 712 classifications are candidates only—not validated safe
+  interventions, provider cache savings, provider-token savings, cost
+  savings or quality-preserving reductions.
+
+#### Tests/checks run
+
+- Python compilation passed for all three Phase 1A tools.
+- The existing offline observer processed all 719 accepted traces.
+- Local report generation passed and reproduced the 712/7 result split.
+- `C:\Users\USER\.cargo\bin\cargo.exe test --workspace` passed with 205
+  tests and 0 failures.
+- Deterministic selection/import evidence and raw-marker scan passed; labels
+  remained outside observer inputs.
+- `git diff --check` and final ignore/status checks passed.
+- No live provider calls, replay, mutation or provider profile was used.
+
+#### Phase 1A assessment
+
+`PASS` for the corpus-gate resolution task, with the missing README-linked
+`LICENSE` file retained as a licence-evidence limitation. The accepted source
+has explicit primary dataset-level MIT terms applicable to the artifact-bearing
+dataset; the tracked evidence is sanitized derived material only.
+
+#### Remaining uncertainties
+
+- The exact CodeTraceBench revision’s README links to a `LICENSE` file that is
+  absent from the root tree; its text was not reconstructed or inferred.
+- No raw artifact redistribution is performed by this repository.
+- Structural candidates remain heuristic observer output. No provider cache
+  reuse, cost, latency, replay quality or causal intervention benefit was
+  measured.
+- The two missing source-format rows remain excluded by the deterministic
+  selection definition.
+
+#### Recommended next task
+
+Separately authorize Phase 1B decision-layer design/review against the Phase 1
+plan, treating the 712 candidates as structural observations only. Do not
+begin Phase 1B as part of this completion.

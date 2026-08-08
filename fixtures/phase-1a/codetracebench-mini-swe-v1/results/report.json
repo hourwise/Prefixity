@@ -1,0 +1,179 @@
+{
+  "evaluation_labels": {
+    "interpretation": "Negative/non-useful examples are post-hoc correlations only; their labels were not provided to the observer.",
+    "source": "CodeTraceBench verified manifest; step IDs and labels only",
+    "used_in_observer_decisions": false
+  },
+  "evidence_limits": {
+    "live_provider_calls": false,
+    "provider_cache_evidence": false,
+    "realized_provider_savings": false,
+    "token_counts_are_provider_tokens": false
+  },
+  "examples": {
+    "do_nothing": [
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 0,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "no structural change recommended: layout is already effectively stable-first (24112 estimated stable-prefix candidate tokens); single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43-turn-0013",
+        "stable_prefix_candidate_tokens": 24112,
+        "total_estimated_tokens": 26696,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43/turn-0013.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43",
+        "volatile_tokens": 2584
+      },
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 0,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "no structural change recommended: layout is already effectively stable-first (25435 estimated stable-prefix candidate tokens); single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43-turn-0014",
+        "stable_prefix_candidate_tokens": 25435,
+        "total_estimated_tokens": 28046,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43/turn-0014.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43",
+        "volatile_tokens": 2611
+      },
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 0,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "no structural change recommended: layout is already effectively stable-first (25770 estimated stable-prefix candidate tokens); single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43-turn-0015",
+        "stable_prefix_candidate_tokens": 25770,
+        "total_estimated_tokens": 28426,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43/turn-0015.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43",
+        "volatile_tokens": 2656
+      }
+    ],
+    "negative_or_nonuseful_candidates": [
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 3,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "84.0% of input tokens are estimated volatile; consider OFFLINE stable-prefix simulation; single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096-turn-0000",
+        "stable_prefix_candidate_tokens": 152,
+        "total_estimated_tokens": 950,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096/turn-0000.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+        "volatile_tokens": 798
+      },
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 3,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "55.9% of input tokens are estimated volatile; consider OFFLINE stable-prefix simulation; single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096-turn-0001",
+        "stable_prefix_candidate_tokens": 694,
+        "total_estimated_tokens": 1575,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096/turn-0001.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+        "volatile_tokens": 881
+      },
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 3,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "48.1% of input tokens are estimated volatile; consider OFFLINE stable-prefix simulation; single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096-turn-0002",
+        "stable_prefix_candidate_tokens": 1039,
+        "total_estimated_tokens": 2003,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096/turn-0002.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+        "volatile_tokens": 964
+      }
+    ],
+    "positive_intervention_candidates": [
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 0,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "82.7% of input tokens are estimated volatile; consider OFFLINE stable-prefix simulation; single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e-turn-0000",
+        "stable_prefix_candidate_tokens": 152,
+        "total_estimated_tokens": 880,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e/turn-0000.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e",
+        "volatile_tokens": 728
+      },
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 0,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "58.4% of input tokens are estimated volatile; consider OFFLINE stable-prefix simulation; single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e-turn-0001",
+        "stable_prefix_candidate_tokens": 576,
+        "total_estimated_tokens": 1383,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e/turn-0001.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e",
+        "volatile_tokens": 807
+      },
+      {
+        "evaluation_only_label_summary": {
+          "incorrect_step_count": 0,
+          "unuseful_step_count": 0
+        },
+        "recommendation": "47.0% of input tokens are estimated volatile; consider OFFLINE stable-prefix simulation; single-trace analysis cannot prove cache reuse; all stable-prefix figures are heuristic candidates",
+        "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e-turn-0002",
+        "stable_prefix_candidate_tokens": 951,
+        "total_estimated_tokens": 1795,
+        "trace": "fixtures/phase-1a/codetracebench-mini-swe-v1/traces/miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e/turn-0002.json",
+        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e",
+        "volatile_tokens": 844
+      }
+    ]
+  },
+  "interpretation_limits": {
+    "intervention_candidate_meaning": "Deterministic observer/adapter structural candidate only; not a validated safe intervention, provider cache saving, or quality-preserving reduction."
+  },
+  "observer_decision_classes": {
+    "DO_NOTHING": 7,
+    "INTERVENTION_CANDIDATE": 712
+  },
+  "request_count": 719,
+  "request_counts_by_trajectory": {
+    "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e": 44,
+    "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43": 23,
+    "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096": 21,
+    "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19": 26,
+    "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-path-tracing-79ade2b0": 47,
+    "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301": 43,
+    "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-train-bpe-tokenizer-2df9c860": 28,
+    "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9": 36,
+    "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16": 24,
+    "miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd": 21,
+    "miniswe-DeepSeek__DeepSeek-V3.2-query-optimize-3b3e2297": 24,
+    "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e": 49,
+    "miniswe-OpenAI__GPT-5-clap-rs__clap-2758-8f87bc0d": 41,
+    "miniswe-OpenAI__GPT-5-clap-rs__clap-2895-928269b9": 24,
+    "miniswe-OpenAI__GPT-5-django__django-14999-5d6ca542": 20,
+    "miniswe-OpenAI__GPT-5-facebook__zstd-1733-786102c1": 44,
+    "miniswe-OpenAI__GPT-5-instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a-f7c2004c": 22,
+    "miniswe-OpenAI__GPT-5-instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan-dc9947f9": 30,
+    "miniswe-OpenAI__GPT-5-instance_internetarchive__openlibrary-bb152d23c004f3d68986877143bb0f83531fe401-ve8c8d62a2b60610a3c4631f5f23ed866bada9818-78872a1e": 30,
+    "miniswe-OpenAI__GPT-5-keras-team__keras-19484-2bd0f0db": 20,
+    "miniswe-OpenAI__GPT-5-ponylang__ponyc-2205-2a662253": 32,
+    "miniswe-OpenAI__GPT-5-prettier__prettier-12930-d76c2178": 21,
+    "miniswe-OpenAI__GPT-5-sphinx-doc__sphinx-8638-0bbaf886": 20,
+    "miniswe-OpenAI__GPT-5-sveltejs__svelte-10608-2fe6d098": 29
+  },
+  "schema_version": 1,
+  "surrogate_token_totals": {
+    "stable_prefix_candidate_tokens": 6816340,
+    "total_estimated_tokens": 13704473,
+    "volatile_tokens": 6888133
+  },
+  "trajectory_count": 24
+}

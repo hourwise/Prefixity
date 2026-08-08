@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Offline Phase 1A adapter for the pinned Tracebench mini-SWE slice.
+"""Offline Phase 1A adapter for a pinned mini-SWE trajectory slice.
 
 This is deliberately a thin, standard-library-only adapter. It selects rows
 from the verified manifest using metadata only, converts the mini-SWE-agent
@@ -70,7 +70,12 @@ def length_band(index: int, population_count: int) -> str:
 
 
 def select_rows(
-    rows: Iterable[dict[str, Any]], count_per_cell: int, excluded_ids: set[str] | None = None
+    rows: Iterable[dict[str, Any]],
+    count_per_cell: int,
+    excluded_ids: set[str] | None = None,
+    corpus: str = CORPUS,
+    corpus_revision: str = CORPUS_REVISION,
+    split: str = SPLIT,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     excluded_ids = excluded_ids or set()
     population = [
@@ -114,9 +119,9 @@ def select_rows(
     selected.sort(key=lambda row: str(row["traj_id"]))
     output = {
         "schema_version": 1,
-        "corpus": CORPUS,
-        "corpus_revision": CORPUS_REVISION,
-        "split": SPLIT,
+        "corpus": corpus,
+        "corpus_revision": corpus_revision,
+        "split": split,
         "selection_method": {
             "description": (
                 "Filter to artifact-bearing mini-SWE-agent rows, sort by "
@@ -246,6 +251,9 @@ def make_trace(
     raw_root: Path,
     archive_sha256: str | None,
     turn_index: int | None = None,
+    corpus: str = CORPUS,
+    corpus_revision: str = CORPUS_REVISION,
+    split: str = SPLIT,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
     if not messages or len(messages) != len(source_indices):
         raise SystemExit(f"{trajectory_path}: expected a non-empty messages/source-index pair")
@@ -287,8 +295,8 @@ def make_trace(
                 "required": False,
                 "stale": False,
                 "metadata": {
-                    "corpus": CORPUS,
-                    "corpus_revision": CORPUS_REVISION,
+                    "corpus": corpus,
+                    "corpus_revision": corpus_revision,
                     "trajectory_id": row["traj_id"],
                     "source_event_index": index,
                     "source_event_id": event_id,
@@ -329,9 +337,9 @@ def make_trace(
         "model": row.get("model") or "unknown-recorded-model",
         "blocks": blocks,
         "metadata": {
-            "corpus": CORPUS,
-            "corpus_revision": CORPUS_REVISION,
-            "split": SPLIT,
+            "corpus": corpus,
+            "corpus_revision": corpus_revision,
+            "split": split,
             "trajectory_id": row["traj_id"],
             "turn_index": turn_index,
             "request_context_end_event_index": source_indices[-1],
@@ -368,8 +376,15 @@ def make_trace(
 
 def import_rows(args: argparse.Namespace) -> None:
     selection = json.loads(args.selection.read_text(encoding="utf-8"))
-    if selection.get("corpus_revision") != CORPUS_REVISION:
-        raise SystemExit("selection corpus revision does not match adapter pin")
+    corpus = selection.get("corpus")
+    corpus_revision = selection.get("corpus_revision")
+    split = selection.get("split", SPLIT)
+    if not corpus or not corpus_revision:
+        raise SystemExit("selection must identify corpus and corpus revision")
+    if args.corpus and args.corpus != corpus:
+        raise SystemExit("requested corpus does not match selection corpus")
+    if args.corpus_revision and args.corpus_revision != corpus_revision:
+        raise SystemExit("requested corpus revision does not match selection revision")
     raw_root = args.raw_root.resolve()
     out_dir = args.out_dir
     if out_dir.exists():
@@ -399,7 +414,15 @@ def import_rows(args: argparse.Namespace) -> None:
         # observer one request context per recorded assistant turn. The
         # assistant response itself is excluded from its request context.
         _, events, summary = make_trace(
-            row, messages, list(range(len(messages))), trajectory_path, raw_root, archive_sha
+            row,
+            messages,
+            list(range(len(messages))),
+            trajectory_path,
+            raw_root,
+            archive_sha,
+            corpus=corpus,
+            corpus_revision=corpus_revision,
+            split=split,
         )
         turn_summaries: list[dict[str, Any]] = []
         assistant_turn = 0
@@ -415,6 +438,9 @@ def import_rows(args: argparse.Namespace) -> None:
                 raw_root,
                 archive_sha,
                 turn_index=assistant_turn,
+                corpus=corpus,
+                corpus_revision=corpus_revision,
+                split=split,
             )
             write_json(
                 out_dir / "traces" / row["traj_id"] / f"turn-{assistant_turn:04d}.json", trace
@@ -447,9 +473,9 @@ def import_rows(args: argparse.Namespace) -> None:
         out_dir / "import-report.json",
         {
             "schema_version": 1,
-            "corpus": CORPUS,
-            "corpus_revision": CORPUS_REVISION,
-            "split": SPLIT,
+            "corpus": corpus,
+            "corpus_revision": corpus_revision,
+            "split": split,
             "trajectory_count": len(summaries),
             "turn_count": sum(summary["turn_count"] for summary in summaries),
             "source_event_count": len(all_events),
@@ -470,6 +496,9 @@ def main() -> None:
     select.add_argument("--manifest", type=Path, required=True)
     select.add_argument("--out", type=Path, required=True)
     select.add_argument("--count-per-cell", type=int, default=4)
+    select.add_argument("--corpus", default=CORPUS)
+    select.add_argument("--corpus-revision", default=CORPUS_REVISION)
+    select.add_argument("--split", default=SPLIT)
     select.add_argument(
         "--exclude-traj-id",
         action="append",
@@ -483,12 +512,19 @@ def main() -> None:
     importer.add_argument("--raw-root", type=Path, required=True)
     importer.add_argument("--archive-root", type=Path)
     importer.add_argument("--out-dir", type=Path, required=True)
+    importer.add_argument("--corpus")
+    importer.add_argument("--corpus-revision")
     importer.add_argument("--replace", action="store_true")
 
     args = parser.parse_args()
     if args.command == "select":
         selected, output = select_rows(
-            read_jsonl(args.manifest), args.count_per_cell, set(args.exclude_traj_id)
+            read_jsonl(args.manifest),
+            args.count_per_cell,
+            set(args.exclude_traj_id),
+            corpus=args.corpus,
+            corpus_revision=args.corpus_revision,
+            split=args.split,
         )
         if len(selected) < 20 or len(selected) > 50:
             raise SystemExit(f"selected slice has {len(selected)} rows; expected 20-50")

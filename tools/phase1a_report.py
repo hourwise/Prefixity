@@ -34,6 +34,7 @@ def main() -> None:
     parser.add_argument("--analyses", type=Path, required=True)
     parser.add_argument("--labels", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--corpus", default="verified manifest")
     args = parser.parse_args()
 
     analyses = json.loads(args.analyses.read_text(encoding="utf-8"))
@@ -101,7 +102,7 @@ def main() -> None:
         "examples": examples,
         "evaluation_labels": {
             "used_in_observer_decisions": False,
-            "source": "Tracebench verified manifest; step IDs and labels only",
+            "source": f"{args.corpus}; step IDs and labels only",
             "interpretation": (
                 "Negative/non-useful examples are post-hoc correlations only; their labels "
                 "were not provided to the observer."

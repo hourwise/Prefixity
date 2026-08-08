@@ -1,9 +1,11 @@
-# Phase 1A Tracebench Corpus Validation Spike
+# Phase 1A Corpus Validation and Gate Resolution
 
-Status: `INSUFFICIENT-EVIDENCE` for Phase 1A acceptance.
+Status: `PASS` for Phase 1A, with the CodeTraceBench licence-file limitation
+recorded below.
 
-This report records the completed offline spike. It does not authorize Phase
-1B pruning/compression or Phase 1C replay.
+This report records the historical Tracebench spike and the completed
+CodeTraceBench gate-resolution rerun. It does not authorize Phase 1B
+pruning/compression or Phase 1C replay.
 
 ## Corpus and licence record
 
@@ -17,7 +19,8 @@ The preferred primary candidate was checked first:
 | ContextBench shape at the checked revision | Task/gold-context table: task identifiers, repository/base commit, problem statement, patch/test patch and gold context; it does not provide the released trajectory objects needed for this trace importer |
 | Tracebench artifact-bearing source | [`Contextbench/Tracebench`](https://huggingface.co/datasets/Contextbench/Tracebench/tree/7da2e4f45b330be8b6e8f1cff835247723cb3341) at dataset revision `7da2e4f45b330be8b6e8f1cff835247723cb3341` |
 | Tracebench checked status | The upstream dataset metadata/card describes trajectory artifacts and the selected verified manifest. The checked dataset metadata has no declared `license` field. |
-| Separate MIT claim checked | [`NJU-LINK/CodeTraceBench`](https://huggingface.co/datasets/NJU-LINK/CodeTraceBench/tree/914de38100105c1ac21d9eb64a8134e32602d63c) at revision `914de38100105c1ac21d9eb64a8134e32602d63c` declares MIT, but this checked revision contains manifests/reports rather than the Tracebench artifact archives. Its MIT declaration is not treated as a licence for the Tracebench archives. |
+| Accepted artifact-bearing source | [`NJU-LINK/CodeTraceBench`](https://huggingface.co/datasets/NJU-LINK/CodeTraceBench/tree/aa213b84ffb6690fc37ca15766d6ca174ec36d4d) at dataset revision `aa213b84ffb6690fc37ca15766d6ca174ec36d4d` |
+| CodeTraceBench licence evidence | The exact revision metadata declares `mit`; its primary README describes `bench_artifacts/full/*.tar.zst` as compressed trajectory artifacts and states that the dataset is released under the MIT License. The root tree at this revision does not contain the README-linked `LICENSE` file. |
 | Retrieval date | 2026-08-08 |
 
 The primary ContextBench repository is explicitly licensed, but its released
@@ -38,6 +41,31 @@ The generated Tracebench evidence remains available locally but is ignored by
 Git under `/fixtures/phase-1a/tracebench-mini-swe-v1/`; only the importer,
 reports and documentation are candidates for commit. Raw archives and
 extracted trajectory files remain outside the repository.
+
+## Gate-resolution decision
+
+Tracebench remains rejected for redistribution: its exact artifact-bearing
+revision `7da2e4f45b330be8b6e8f1cff835247723cb3341` has no declared licence in
+the upstream dataset metadata. The earlier CodeTraceBench revision
+`914de38100105c1ac21d9eb64a8134e32602d63c` was not used because its checked
+tree did not contain the artifact archives.
+
+The current CodeTraceBench revision `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`
+is accepted for the Phase 1A derived-evidence rerun. Its own upstream metadata
+declares MIT, and its own README both describes the full trajectory archive
+files and states that the dataset is released under MIT. This is a direct
+statement from the artifact-bearing dataset itself; no right is inferred from
+ContextBench, Tracebench, CodeTracer, authors or related repositories. The
+missing README-linked `LICENSE` file is retained as a limitation. No raw
+trajectory archive or trajectory text is tracked; the repository evidence is
+hash-only, metadata-only, provenance and evaluation-label data.
+
+The exact source hashes used for the rerun are recorded in
+[`corpus-provenance.json`](../../fixtures/phase-1a/codetracebench-mini-swe-v1/corpus-provenance.json):
+the verified manifest SHA-256 is
+`bd02d3da145146567e87f7d55b158ef0dd30043d4a4c2c03e631c2056ff92e`, and the
+README SHA-256 is
+`040b8eeecea41bf7d6c8e1ed67c91ee2993e71b352fb7b762`.
 
 ## Slice and transformation
 
@@ -123,7 +151,7 @@ unmeasured, and no live provider calls were made. No mutation or replay was
 performed. The 712 classifications must not be interpreted as validated safe
 actions or quality-preserving reductions.
 
-## Acceptance assessment
+## Historical Tracebench acceptance assessment
 
 | Criterion | Assessment | Evidence |
 | --- | --- | --- |
@@ -137,26 +165,72 @@ actions or quality-preserving reductions.
 | Evidence separated from interpretation | Met | Report distinguishes measured counts, heuristic estimates and limits |
 | Legal/public-corpus condition for a Phase 1A pass | Not established | Tracebench artifact redistribution terms are unresolved |
 
-Overall Phase 1A assessment: `INSUFFICIENT-EVIDENCE`. The technical spike is
+Historical Tracebench assessment: `INSUFFICIENT-EVIDENCE`. The technical spike is
 reproducible and the observer produces all three requested case categories,
 but the corpus licence gate is not satisfied. This result does not weaken the
 acceptance requirement and does not support claims about realised caching,
 cost, latency or task-quality improvement.
 
-## Reproduction
+## CodeTraceBench rerun and current assessment
+
+The accepted rerun uses the `verified` split from
+`NJU-LINK/CodeTraceBench` at revision
+`aa213b84ffb6690fc37ca15766d6ca174ec36d4d`. The deterministic selector filters
+the 150 artifact-bearing `mini-SWE-agent` rows, removes the two rows whose
+archives lack a `.traj.json` source representation, recomputes the rank bands,
+and selects 24 trajectories, four per solved x short/medium/long cell. The
+result has 1,498 source events and 719 one-request-per-assistant-turn traces.
+
+The accepted-slice evidence is under
+[`fixtures/phase-1a/codetracebench-mini-swe-v1`](../../fixtures/phase-1a/codetracebench-mini-swe-v1):
+
+- [`corpus-provenance.json`](../../fixtures/phase-1a/codetracebench-mini-swe-v1/corpus-provenance.json) — exact source URLs, revisions, source hashes and licence finding;
+- [`selection.json`](../../fixtures/phase-1a/codetracebench-mini-swe-v1/selection.json) — deterministic slice and exclusions;
+- [`import-report.json`](../../fixtures/phase-1a/codetracebench-mini-swe-v1/import-report.json) — import counts and evaluation boundary;
+- `provenance/` and `traces/` — sanitized provenance and hash-only request traces;
+- [`evaluation/labels.json`](../../fixtures/phase-1a/codetracebench-mini-swe-v1/evaluation/labels.json) — separate evaluation-only labels;
+- `results/validation.json`, `results/analyses.json` and [`results/report.json`](../../fixtures/phase-1a/codetracebench-mini-swe-v1/results/report.json) — offline observer evidence.
+
+The unchanged observer processed the accepted slice successfully:
+
+| Measure | Result |
+| --- | ---: |
+| Request traces processed | 719 |
+| Validation successes | 719/719 |
+| Analysis successes | 719/719 |
+| Deterministic observer/adapter `INTERVENTION_CANDIDATE` classifications | 712 |
+| `DO_NOTHING` recommendations | 7 |
+| `REVIEW`/error results | 0 |
+| Estimated input tokens | 13,704,473 |
+| Estimated volatile tokens | 6,888,133 |
+| Estimated stable-prefix candidate tokens | 6,816,340 |
+
+The 712 classifications are deterministic observer/adapter structural
+candidates only. They are not validated safe interventions, provider cache
+savings, provider-token savings, cost savings or quality-preserving reductions.
+Negative/non-useful examples remain post-hoc evaluation correlations; labels
+were not observer inputs. No live provider calls, replay or mutation occurred.
+
+Current Phase 1A assessment: `PASS` for the corpus-gate task, with a recorded
+licence-file limitation. The exact artifact-bearing dataset revision makes an
+explicit MIT declaration applying to the dataset that contains the trajectory
+archives, and the accepted repository material is sanitized derived evidence.
+The missing README-linked `LICENSE` file remains an uncertainty; no raw
+trajectory artifacts are redistributed by this repository.
+
+## Reproduction of the accepted rerun
 
 The following commands assume the pinned manifest and extracted artifacts have
 been obtained under terms that permit local use. The manifest and raw archives
 are intentionally not checked in:
 
 ```text
-python tools/phase1a_tracebench.py select --manifest <verified-manifest.jsonl> --out <selection.json> --count-per-cell 4 --exclude-traj-id <id> --exclude-traj-id <id>
-python tools/phase1a_tracebench.py import --manifest <verified-manifest.jsonl> --selection <selection.json> --raw-root <indexed-extracted-root> --archive-root <archive-root> --out-dir fixtures/phase-1a/tracebench-mini-swe-v1 --replace
-python tools/phase1a_run_observer.py --binary target/debug/prefixity --trace-root fixtures/phase-1a/tracebench-mini-swe-v1/traces --out-dir fixtures/phase-1a/tracebench-mini-swe-v1/results
-python tools/phase1a_report.py --analyses fixtures/phase-1a/tracebench-mini-swe-v1/results/analyses.json --labels fixtures/phase-1a/tracebench-mini-swe-v1/evaluation/labels.json --out fixtures/phase-1a/tracebench-mini-swe-v1/results/report.json
+python tools/phase1a_tracebench.py select --manifest <verified-manifest.jsonl> --out <selection.json> --count-per-cell 4 --corpus NJU-LINK/CodeTraceBench --corpus-revision aa213b84ffb6690fc37ca15766d6ca174ec36d4d --exclude-traj-id <id> --exclude-traj-id <id>
+python tools/phase1a_tracebench.py import --manifest <verified-manifest.jsonl> --selection <selection.json> --raw-root <indexed-extracted-root> --archive-root <archive-root> --out-dir fixtures/phase-1a/codetracebench-mini-swe-v1 --replace --corpus NJU-LINK/CodeTraceBench --corpus-revision aa213b84ffb6690fc37ca15766d6ca174ec36d4d
+python tools/phase1a_run_observer.py --binary target/debug/prefixity --trace-root fixtures/phase-1a/codetracebench-mini-swe-v1/traces --out-dir fixtures/phase-1a/codetracebench-mini-swe-v1/results
+python tools/phase1a_report.py --analyses fixtures/phase-1a/codetracebench-mini-swe-v1/results/analyses.json --labels fixtures/phase-1a/codetracebench-mini-swe-v1/evaluation/labels.json --out fixtures/phase-1a/codetracebench-mini-swe-v1/results/report.json --corpus "CodeTraceBench verified manifest"
 ```
 
-Recommended next task, not started: resolve the public trajectory corpus
-licence/redistribution gate (or select a trajectory corpus with explicit terms)
-and rerun the same Phase 1A protocol, retaining the no-op and post-hoc negative
-case checks.
+Recommended next task, not started: review and freeze this Phase 1A result and
+its evidence boundary before any separately authorized Phase 1B work. Do not
+begin that next task as part of this completion.

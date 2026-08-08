@@ -21,6 +21,11 @@ experiments/runs/
 # Phase 1A Tracebench evidence is local-only while redistribution terms are unresolved.
 /fixtures/phase-1a/tracebench-mini-swe-v1/
 
+# Regenerable Phase 1A CodeTraceBench intermediates
+/fixtures/phase-1a/codetracebench-mini-swe-v1/traces/
+/fixtures/phase-1a/codetracebench-mini-swe-v1/results/validation.json
+/fixtures/phase-1a/codetracebench-mini-swe-v1/results/analyses.json
+
 # Python generated files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,13 @@
+{
+  "content_retained": false,
+  "corpus": "NJU-LINK/CodeTraceBench",
+  "corpus_revision": "aa213b84ffb6690fc37ca15766d6ca174ec36d4d",
+  "evaluation_labels_in_decision_inputs": false,
+  "observer_input_glob": "traces/**/*.json",
+  "schema_version": 1,
+  "source_event_count": 1498,
+  "split": "verified",
+  "token_counts_are_surrogates": true,
+  "trajectory_count": 24,
+  "turn_count": 719
+}
