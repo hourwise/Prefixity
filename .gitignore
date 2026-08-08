@@ -17,3 +17,10 @@ Thumbs.db
 
 # Phase 0B live experiment artifacts (never committed by default)
 experiments/runs/
+
+# Phase 1A Tracebench evidence is local-only while redistribution terms are unresolved.
+/fixtures/phase-1a/tracebench-mini-swe-v1/
+
+# Python generated files
+__pycache__/
+*.py[cod]

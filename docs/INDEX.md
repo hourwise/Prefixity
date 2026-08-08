@@ -25,6 +25,7 @@
 | [`phase-1/PHASE_1_PLAN.md`](phase-1/PHASE_1_PLAN.md) | Phase 1A/1B/1C design gate and boundaries. | Any proposed Phase 1 work. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
+| [`phase-1/PHASE_1A_TRACEBENCH_SPIKE.md`](phase-1/PHASE_1A_TRACEBENCH_SPIKE.md) | Phase 1A offline corpus/import/observer evidence and limitations. | Reviewing the completed Phase 1A spike. |
 | [`phase-1/PRIOR_ART_DECISIONS.md`](phase-1/PRIOR_ART_DECISIONS.md) | Reuse, integration and differentiation decisions. | Considering external systems or architecture. |
 
 ## Implementation locations
