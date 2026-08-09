@@ -10,8 +10,8 @@
     "verified_manifest": "https://huggingface.co/datasets/NJU-LINK/CodeTraceBench/resolve/aa213b84ffb6690fc37ca15766d6ca174ec36d4d/bench_manifest.verified.jsonl?download=true"
   },
   "source_hashes": {
-    "readme_sha256": "040b8eeecea41bf7d6c8e1ed67c91ee2993e71b352fb7b762",
-    "verified_manifest_sha256": "bd02d3da145146567e87f7d55b158ef0dd30043d4a4c2c03e631c2056ff92e"
+    "readme_sha256": "040b8eeecea41bf7d1af086aec32f5257e8c1ed67c91ee2993e71b352fb7b762",
+    "verified_manifest_sha256": "bd02d3dafa145146567e87f7d55b158ef0dd30043d4a4c2c03e631c2056ff92e"
   },
   "license_decision": {
     "declared_license": "MIT",

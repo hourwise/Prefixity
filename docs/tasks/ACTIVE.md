@@ -1,6 +1,6 @@
 # Active Task — Phase 1B.3 Raw Artifact Access and Upstream Schema Verification Gate
 
-Status: ready for research/verification.
+Status: complete; assessment `PASS WITH RECORDED LIMITATIONS`.
 
 ## Objective
 
@@ -642,3 +642,122 @@ On completion record:
 - recommended next task.
 
 Do not begin the recommended next task.
+
+## Phase 1B.3 completion record — 2026-08-09
+
+### Raw-artifact access result
+
+Exact raw artifacts were successfully accessed for all 24 already accepted
+trajectories from `NJU-LINK/CodeTraceBench`, split `verified`, at revision
+`aa213b84ffb6690fc37ca15766d6ca174ec36d4d`. Metadata, README, verified
+manifest and all 24 selected `bench_artifacts/full/*.tar.zst` archives were
+inspected read-only in system temp storage. No raw archive, extracted
+trajectory, prompt, reasoning, assistant/user text, tool output or
+reconstructed conversation was added to the repository.
+
+### Revision, artifact and hash verification
+
+- Exact metadata revision SHA matched
+  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`.
+- The exact manifest contained all 24 accepted selection IDs with no missing
+  or extra selected records.
+- All 24 archive locators resolved and were locally SHA-256 hashed.
+- Each archive contained exactly one `.traj.json` member.
+- All 24 raw trajectory-member SHA-256 values matched the existing Phase 1A
+  `source_file_sha256` ledger.
+- Raw message totals reconciled to 1,498; assistant-message totals reconciled
+  to 719; manifest `step_count` totals reconciled to 719.
+- The previously recorded README and manifest source hashes were malformed
+  or truncated. They were corrected in
+  `fixtures/phase-1a/codetracebench-mini-swe-v1/corpus-provenance.json` using
+  the exact locally computed 64-character hashes.
+
+### Inspection coverage and schema findings
+
+The deterministic six-trajectory detailed sample rule from Phase 1B.2 was
+fixed before interpretation. All 24 archives were subsequently walked
+structurally. The raw object has `info`, ordered `messages` and
+`trajectory_format`; messages have explicit `role`, opaque string `content`
+and numeric `timestamp`; assistant messages have embedded response envelopes
+with globally unique response IDs, model/response metadata and provider
+usage. The top-level roles observed are only `system`, `user` and `assistant`.
+
+The raw schema is materially richer than the Phase 1A derivative for
+timestamps, response identity, provider/model response usage and bounded
+evaluation source locators. `tool_calls` and `function_call` fields occur only
+as null placeholders in the inspected response messages; no actual tool-call
+object or result object was captured.
+
+### Evidence classifications and linkage results
+
+- `CAPTURED_EXPLICIT`: exact revision/manifest/artifact identity, raw format,
+  roles, timestamps, response IDs, provider/model identity, provider usage and
+  evaluation source-locator fields (the last remain evaluation-only).
+- `DERIVED_STRUCTURAL`: message array indexes, `messages[n]` paths, generated
+  source-event IDs/indexes, role-only coarse zones and explicit
+  evaluation-line-locator to raw-message mapping.
+- `EVALUATION_ONLY`: stage IDs, stage boundaries, step IDs, solved/outcome and
+  incorrect/unuseful labels, `action_ref` and `observation_ref` metadata.
+- `INFERRED_UNSAFE`: content-based protocol assignment, adjacency-based
+  action/result pairing, semantic dependency from text/chronology and safety
+  flags inferred from age/role/outcome. None are proposed as planner input.
+- `ABSENT`: raw message IDs, actual action/tool-call IDs, observation/result
+  IDs, call-result references, dependency edges, `required`, `optional`,
+  `stale` and invalidation/supersession fields.
+
+The evaluation sidecar has 60 labelled step records. Thirty-two records have
+explicit action/observation source references, producing 63 non-null
+path/line locators. All 63 locators map structurally to exactly one raw
+`messages[]` object. Twenty-eight labelled records have no such references,
+so the exact evaluation join is bounded/partial, not a complete positional
+join. Labels remain outside planner inputs.
+
+Provider usage is explicit on all 719 assistant response envelopes, with
+provider-specific prompt/completion/total/input/output/cache/detail fields.
+This is captured response telemetry, not the derivative surrogate estimate.
+
+### Licence classification
+
+At the exact pinned revision, metadata declares `mit` and the primary README
+declares the MIT License and links `LICENSE`; the exact root tree has no
+`LICENSE` file. No licence text was reconstructed or substituted.
+
+Classification: `METADATA_AND_README_ONLY`.
+
+### Importer implications and decision gate
+
+No importer or Phase 1B planner change was made. A separately authorized
+narrow evidence-adapter revision is justified for typed preservation of raw
+response IDs, timestamps, provider usage and evaluation source locators, with
+hash-only/privacy boundaries. Required/optional/stale, dependency, actual
+tool/result linkage and complete evaluation joining remain unknown/absent.
+
+The raw evidence can newly exercise the provider-evidence/usage-presence and
+provenance reporting paths, but it does not justify a destructive planner
+candidate or any planner-rule change. CodeTraceBench should remain the bounded
+Phase 1B corpus for that separately authorized adapter/recharacterization
+task. Phase 1C was not started.
+
+Detailed evidence is in
+[`PHASE_1B3_RAW_SCHEMA_VERIFICATION.md`](../phase-1/PHASE_1B3_RAW_SCHEMA_VERIFICATION.md)
+and the compact sanitized audit is in
+[`phase1b3-raw-schema-audit.json`](../../fixtures/phase-1a/codetracebench-mini-swe-v1/results/phase1b3-raw-schema-audit.json).
+
+### Checks
+
+- Compact audit JSON validation: passed with Python JSON parsing and
+  assertions for 24 artifact records, 64-character hashes, reconciled counts,
+  partial evaluation join and privacy flags.
+- Tracked-evidence privacy scan: passed; no raw content fields were retained,
+  no new findings/audit line has trailing whitespace, and no credential value
+  was read or printed.
+- Raw archive/extraction tracked or untracked check: passed; no `.tar.zst` or
+  `.traj.json` path exists in the workspace. The downloaded material remains
+  in system temp outside the repository.
+- Exact README/manifest hashes: passed against the corrected
+  `corpus-provenance.json` values.
+- `git diff --check`: passed.
+- Rust/product tests: not run; no product code changed.
+
+Recommended next task: separately authorize a narrow evidence-adapter revision
+and frozen Phase 1B recharacterization. Do not begin it as part of this task.
