@@ -1,6 +1,67 @@
-# Active Task — Phase 1B.4 Verified Evidence Adapter Revision and Frozen Recharacterization
+# Active Task — Phase 1B.5 Corpus and Evaluation Strategy Review
 
-Status: complete; Phase 1B.4 closed with `PASS WITH RECORDED LIMITATIONS`.
+Status: complete; Phase 1B.5 closed with `PASS WITH RECORDED LIMITATIONS`.
+
+The Phase 1B.4 task definition and completion record are retained below as
+historical evidence. No Phase 1B.6 or Phase 1C work has started.
+
+## Current task
+
+Determine the next evidence source and evaluation strategy after the frozen
+CodeTraceBench Phase 1B.4 result. Do not implement an importer, corpus
+adapter, planner change, controlled benchmark, or Phase 1C work as part of
+this task.
+
+## Phase 1B.5 completion record
+
+Completed the public-source corpus and evaluation strategy review in
+[`docs/phase-1/PHASE_1B5_CORPUS_EVALUATION_STRATEGY.md`](../phase-1/PHASE_1B5_CORPUS_EVALUATION_STRATEGY.md).
+
+- Reviewed tau2-bench, ToolSandbox, AppWorld, BrowserGym, WebArena, AgentDojo,
+  and SWE-bench using their public repositories, source schemas/documentation,
+  and licence files where available. No raw third-party dataset was
+  downloaded and no provider/model call was made.
+- Preserved the Phase 1B.4 facts: CodeTraceBench remains useful for natural
+  structural observation, provenance, usage, timestamps, and partial joins;
+  its frozen planner result remains 719/719 `DO_NOTHING` because the required
+  safety evidence is absent.
+- Classified candidate evidence as `CAPTURED_EXPLICIT`,
+  `DERIVED_STRUCTURAL`, `EVALUATION_ONLY`, `INFERRED_UNSAFE`, or `ABSENT`.
+  No candidate was credited with optional, stale, dependency, required, or
+  removable semantics based on adjacency, age, repetition, or evaluation
+  labels.
+- Recommended hybrid strategy `E`: retain CodeTraceBench for natural-workload
+  observational validation and add a separate controlled intervention/quality
+  track using paired/ablated, provider-neutral traces and an independent
+  evaluation sidecar. AppWorld is the strongest public seed/design reference;
+  its public/plain-text portion is Apache-2.0, while protected task/app/API
+  material is distributed in encrypted bundles under Apache-2.0 with an
+  additional encrypted-redistribution requirement. Any future Prefixity use
+  must pin and audit the exact material used before implementation, and should
+  not copy protected raw data into the repository. ToolSandbox is a useful
+  schema reference but not the preferred raw corpus.
+- Licence/privacy decision: do not copy candidate raw trajectories, encrypted
+  bundles, archives, prompts, screenshots, or model output into the
+  repository. The next artifact must use immutable source manifests and the
+  existing hash-only boundary.
+- Repository implementation remained unchanged. The accepted CodeTraceBench
+  corpus and counts remain 24 trajectories, 719 request traces, and 1,498
+  source events; no planner rules or evaluation joins were changed.
+- Assessment: `PASS WITH RECORDED LIMITATIONS`. A useful next strategy exists,
+  but a small controlled benchmark and its privacy/licence/data-leakage audit
+  are still unresolved.
+
+Recommended next task:
+
+> **Phase 1B.6 - Controlled intervention benchmark design and seed audit.**
+> Pin the public environment/task reference, define the provider-neutral trace
+> and evaluation schemas, specify paired/ablated cases and leakage/privacy
+> rules, and approve the seed set before implementing the benchmark or adapter.
+
+Stop here. Do not begin the recommended next task, change the planner, begin
+Phase 1C, commit, or push as part of this completion.
+
+## Historical Phase 1B.4 task record
 
 ## Objective
 
