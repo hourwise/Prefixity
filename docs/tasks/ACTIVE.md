@@ -1,466 +1,604 @@
-# Active Task — Phase 1B.1 Offline Decision Characterization and Reporting Freeze
+# Active Task — Phase 1B.2 Evidence Modeling Gap Study and Importer Revision Design
 
-Status: complete - PIVOT.
+Status: ready for research/design.
 
 ## Objective
 
-Characterize the frozen Phase 1B.0 conservative planner over the accepted
-Phase 1A CodeTraceBench-derived traces.
+Determine which evidence missing from the accepted Phase 1A representation can
+truthfully be recovered from the underlying CodeTraceBench trajectory artifacts,
+which can be deterministically derived, which would require unsafe inference,
+and which is genuinely absent.
 
-Freeze a deterministic, compact reporting schema before interpreting the
-corpus results, then audit the planner's real-workload decision distribution,
-safety invariants and evidence coverage without changing planner rules in
-response to the results.
+Design the minimum provenance-preserving importer/evidence-model revision needed
+to exercise the Phase 1B decision hypothesis meaningfully.
 
-This is an offline characterization task.
+This task is a study and design gate.
 
-It does not authorize prompt mutation, planner tuning, Phase 1C replay or live
-provider calls.
+Do not implement the importer revision.
+Do not modify the Phase 1B.0 planner.
+Do not begin Phase 1C.
+
+## Why this task exists
+
+Phase 1B.1 characterized the frozen Phase 1B.0 planner over all 719 accepted
+request traces.
+
+Result:
+
+- 719/719 plans succeeded;
+- 719/719 emitted `DO_NOTHING`;
+- 0 safety-audit failures;
+- deterministic aggregate hashes matched;
+- 24,416 normalized blocks contained:
+  - no true `optional` flags;
+  - no true `required` flags;
+  - no true `stale` flags;
+  - no dependency edges;
+  - no provider usage;
+  - only the limited normalized semantic zones available from Phase 1A.
+
+This is a representation/evidence gap, not permission to weaken the planner.
+
+The next question is therefore:
+
+> What evidence can Prefixity legitimately preserve or derive from the original
+> trajectories so that the planner can reason from facts rather than invented
+> safety labels?
 
 ## Required context
 
 Read only the relevant sections of:
 
 - `../phase-1/PHASE_1_PLAN.md`
-  - Phase 1B — Offline intervention planning
-  - Phase boundaries
 - `../phase-1/SUCCESS_CRITERIA.md`
-  - Phase 1B pass
-  - hard failure / pivot criteria
 - `../phase-1/QUALITY_GATE.md`
-  - evidence tiers
-  - safety failures
-  - fail-open behaviour
 - `../phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`
-  - accepted CodeTraceBench corpus
-  - deterministic 24-trajectory / 719-request slice
-  - provenance and evaluation-label boundary
 - `../phase-1/PHASE_1B_DECISION_CONTRACT.md`
-  - authoritative decision contract
-  - conservative baseline invariants
+- `../phase-1/PHASE_1B1_CHARACTERIZATION.md`
+- `../phase-1/PHASE_1B1_CHARACTERIZATION_SCHEMA.md`
 - `../SOURCE_OF_TRUTH.md`
-  - current implemented state and limitations
 
-Inspect the existing Phase 1A tooling and Phase 1B planner before adding any
-characterization code.
+Inspect:
 
-## Frozen planner boundary
+- the current Phase 1A importer/adapter;
+- the Prefixity trace schema;
+- dependency and semantic-zone representation;
+- accepted provenance fixtures;
+- the raw locally available CodeTraceBench artifacts only where required.
 
-The Phase 1B.0 planner committed at the Phase 1B.0 checkpoint is the subject
-of this characterization.
+Do not recursively read unrelated documentation.
 
-Do not modify its decision thresholds, decision rules, reason-code semantics,
-dependency handling or intervention eligibility in response to corpus results.
+## Frozen checkpoints
 
-In particular:
+Treat these as evidence checkpoints:
 
-- do not increase intervention coverage;
-- do not make optional/stale/dependency claims that are absent from input;
-- do not reinterpret non-gold material as removable;
-- do not lower safety requirements to create positive cases;
-- do not add corpus-specific exceptions;
-- do not use evaluation labels as planner inputs.
+- Phase 1B.0 planner:
+  `3436e16afcdf359a33a691c15202900d796b25bc`
+- Phase 1B.1 characterization:
+  `836db0b8b6965bac0f587376d571bbdc837b19c5`
+- CodeTraceBench:
+  `NJU-LINK/CodeTraceBench`
+- exact corpus revision:
+  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`
+- split:
+  `verified`
 
-If characterization exposes a planner safety defect, record it and stop rather
-than repairing and rerunning the planner within this task.
+Do not broaden to a different corpus during this task.
 
-Narrow fixes to characterization/reporting infrastructure are allowed if they
-do not change planner behaviour.
+A different corpus may be recommended only as an outcome of the study.
 
-## Reporting schema freeze
+## Evidence taxonomy
 
-Before interpreting aggregate corpus results, define a versioned
-characterization-report schema.
+Every candidate field must be classified using one of these categories.
 
-Use one authoritative schema/version for this task.
+### `CAPTURED_EXPLICIT`
 
-At minimum record:
+The upstream artifact directly contains the fact.
 
-### Corpus identity
+Examples may include an explicit role, identifier, timestamp, action type,
+tool-call ID, result ID, step number, or relationship field.
 
-- corpus name;
-- exact corpus revision;
-- split;
-- Phase 1A fixture identity;
-- trajectory count;
-- request-trace count;
-- excluded/missing cases already established by Phase 1A.
+No interpretation beyond format normalization is required.
 
-### Planner identity
+### `DERIVED_STRUCTURAL`
 
-- intervention-plan contract version;
-- Prefixity git/base checkpoint;
-- planner mode/configuration;
-- whether provider/economic/quality inputs were available.
+The fact is not directly stored in the desired Prefixity form but follows
+deterministically from explicit upstream structure.
 
-### Execution
+Examples might include:
 
-- traces attempted;
-- plans produced successfully;
-- validation/planning failures;
-- first-pass aggregate hash;
-- second-pass aggregate hash;
-- deterministic match result.
+- message order;
+- exact parent/child relationships where IDs make them unambiguous;
+- tool-call -> tool-result linkage where a stable explicit identifier exists;
+- semantic zone derived purely from an explicit protocol role.
 
-### Decision distribution
+The derivation rule must be deterministic, documented and provenance-preserving.
 
-Report separately:
+### `EVALUATION_ONLY`
 
-- recommendation counts by all six contract classes;
-- number of traces containing each class;
-- traces with at least one non-no-op intervention;
-- traces whose result is `DO_NOTHING`;
-- traces with multiple intervention candidates;
-- target-block counts by intervention class.
+The fact exists in benchmark/evaluation metadata but must remain outside planner
+inputs.
 
-Do not convert these counts into savings claims.
+Examples include:
 
-### Evidence distribution
+- solved/unsolved outcome;
+- incorrect-step labels;
+- unuseful-step labels;
+- benchmark gold context where applicable.
 
-Record aggregate counts for:
+Evaluation evidence may support later post-hoc quality analysis but cannot become
+planner safety evidence merely because it exists.
 
-- reason codes;
-- evidence strengths;
-- expected quality-risk values;
-- provider-state-dependence values;
-- provider evidence present/absent;
-- economic evidence present/absent;
-- quality evidence present/absent;
-- dependency evidence states where represented.
+### `INFERRED_UNSAFE`
 
-Keep these evidence dimensions separate.
+The field could be guessed from content, position, model behaviour or benchmark
+outcome, but the source does not establish it.
 
-### Safety audit
+Examples may include:
 
-Record explicit counts for at least:
+- calling a block `optional` because it appears unimportant;
+- calling a result `stale` because it is old;
+- inventing dependency edges from topical similarity;
+- treating non-gold context as removable;
+- treating an incorrect step as safely prunable.
 
-- destructive recommendations targeting required blocks;
-- destructive recommendations targeting protocol-critical blocks;
-- destructive recommendations targeting current/user-request blocks;
-- destructive recommendations violating known dependency closure;
-- destructive recommendations made despite missing/cyclic dependency evidence;
-- unsafe cross-zone/chronology relocation recommendations;
-- `COMPRESS_CANDIDATE` emissions;
-- `DO_NOTHING` coexisting with actual intervention recommendations;
-- contradictory destructive recommendations for the same target;
-- source-trace byte/hash changes before versus after planning.
+These must not be proposed as importer facts.
 
-Every count above should be zero unless the characterization has discovered a
-planner defect.
+### `ABSENT`
 
-### Deterministic examples
+The required evidence is not available from the checked artifact structure and
+cannot be safely derived.
 
-Select a small deterministic set of examples from emitted classes.
+The correct representation is unknown/absent.
 
-Use stable selection such as lexicographically first trace/request IDs rather
-than manually choosing favourable examples.
+Do not fabricate a replacement.
 
-Record only sanitized IDs, class, reason codes and compact evidence metadata.
+## Fields to investigate
 
-Do not commit raw trajectory text.
+At minimum study the following.
 
-## Characterization implementation
+### Identity and joinability
 
-Prefer a small repository-native characterization runner rather than manually
-invoking the CLI 719 times.
+- trajectory ID;
+- task ID/name;
+- stage ID;
+- step ID;
+- message/event ID;
+- request/turn identity;
+- action ID;
+- observation/result ID;
+- any stable upstream parent/reference identifiers.
 
-A standard-library Python tool under `tools/` is acceptable if that matches the
-existing Phase 1A evidence tooling.
+Determine whether Prefixity can preserve sufficient identity to create an exact
+post-hoc join between normalized blocks and benchmark step labels.
 
-The runner should:
+Do not expose evaluation labels to the planner.
 
-1. discover the accepted local Phase 1A traces deterministically;
-2. verify the expected corpus/provenance identity;
-3. execute the existing frozen planner offline;
-4. collect the versioned report fields;
-5. verify safety invariants;
-6. write canonical deterministic output;
-7. rerun sufficiently to establish deterministic output;
-8. preserve source trace files unchanged.
+### Protocol and chronology
 
-Reuse the existing CLI/core interface rather than implementing decision logic
-in the characterization tool.
+Determine whether the source provides enough explicit structure to preserve:
 
-The characterization runner must contain no alternative planner rules.
+- message role;
+- system/user/assistant/tool distinction;
+- assistant reasoning versus externally visible assistant message where
+  represented;
+- tool invocation;
+- tool result/observation;
+- chronological ordering;
+- turn boundaries;
+- stage boundaries;
+- current request boundary.
 
-## Corpus availability
+Classify each fact according to the evidence taxonomy.
 
-Use the existing local ignored traces under:
+### Semantic zones
 
-`fixtures/phase-1a/codetracebench-mini-swe-v1/traces/`
+Determine which richer Prefixity semantic zones can be assigned from explicit or
+deterministically derivable protocol structure.
 
-Expected accepted Phase 1A set:
+Do not classify zones using semantic interpretation of raw natural-language
+content.
 
-- 24 trajectories;
-- 719 request traces.
+Produce an explicit proposed mapping table:
 
-The bulky Phase 1A traces remain local-only.
+`upstream structure -> Prefixity zone -> evidence class -> provenance`
 
-Do not change their ignore status merely for this task.
+Identify zones that remain unavailable.
 
-If the expected local evidence is missing or fails provenance checks, stop and
-record the problem rather than substituting another corpus.
+### Tool relationships
 
-## Evaluation-label overlay
+Determine whether the artifacts support reliable relationships such as:
 
-Planner execution must finish and its deterministic outputs must be fixed
-before evaluation labels are consulted.
+- tool call -> tool result;
+- action -> observation;
+- assistant turn -> generated action;
+- result -> originating invocation;
+- stage -> contained steps.
 
-After that point only, the existing evaluation-only labels may be joined as a
-separate post-hoc audit overlay.
+Distinguish explicit IDs from positional assumptions.
 
-They must never influence:
+A positional relationship may be proposed only if the upstream format defines
+that ordering relationship unambiguously.
 
-- planner inputs;
+### Dependencies
+
+Investigate whether any dependency edges can be established without semantic
+guessing.
+
+Separate:
+
+1. protocol dependency;
+2. explicit reference dependency;
+3. tool-call/result dependency;
+4. chronology only;
+5. semantic/load-bearing dependency.
+
+Do not convert chronology into a semantic dependency.
+
+Do not invent semantic dependencies from content similarity.
+
+State clearly which dependency types the current corpus cannot establish.
+
+### `required`
+
+Determine whether the corpus provides any explicit evidence that a block is
+required.
+
+Benchmark gold context, successful trajectories, or later use do not
+automatically mean `required=true`.
+
+If benchmark data can only be used as evaluation evidence, classify it
+`EVALUATION_ONLY`.
+
+### `optional`
+
+Determine whether any explicit upstream field establishes optionality.
+
+If not, leave it unavailable.
+
+Do not infer optionality from:
+
+- tool-result age;
+- low Prefixity score;
+- non-gold status;
+- repetition;
+- solved/unsolved labels;
+- absence of later reference.
+
+### `stale`
+
+Determine whether the artifact explicitly represents invalidation,
+supersession, replacement or another defensible stale-state event.
+
+Age alone is not staleness.
+
+If no explicit or deterministic stale transition exists, classify this field
+as unavailable rather than inventing a rule.
+
+### Evaluation join
+
+Determine whether the Phase 1B.1 message-ID versus benchmark-step-ID mismatch
+can be solved by preserving additional upstream identifiers.
+
+The desired result is:
+
+`normalized block/request -> upstream step ID -> evaluation label`
+
+The evaluation label must remain external to planner input.
+
+Document precisely where the identifier originates and how it survives import.
+
+## Raw-artifact inspection rules
+
+The accepted raw trajectory artifacts may be inspected locally where needed.
+
+Do not commit:
+
+- raw prompts;
+- raw reasoning;
+- raw assistant content;
+- raw tool outputs;
+- reconstructed conversations;
+- credentials;
+- upstream archives.
+
+Prefer structural inspection:
+
+- field names;
+- object types;
+- IDs;
+- counts;
+- relationship shapes;
+- format/version metadata.
+
+A small read-only inspection tool is allowed if useful.
+
+It must not become a second importer and must not modify artifacts.
+
+If a compact evidence artifact is produced, store only sanitized structural
+metadata and hashes.
+
+## Deterministic sampling
+
+Do not manually select favourable examples.
+
+If inspecting fewer than all 24 selected trajectories in detail, choose a
+deterministic sample before interpretation.
+
+Prefer covering the existing solved × short/medium/long selection cells while
+using stable trajectory-ID ordering.
+
+Record the sample rule.
+
+Use broader/all-trajectory structural counting where inexpensive.
+
+## External-source rule
+
+If upstream documentation must be checked, use primary sources only and pin the
+exact revision where possible.
+
+Do not infer missing CodeTraceBench semantics from:
+
+- related repositories;
+- author intent;
+- similar benchmark formats;
+- unrelated versions;
+- blog posts or secondary descriptions.
+
+Record disagreements between documentation and actual artifact structure.
+
+## Required evidence matrix
+
+Produce one authoritative matrix covering at least:
+
+| Desired Prefixity evidence | Upstream source | Classification | Deterministic rule | Planner-safe? | Evaluation-only? | Import revision? |
+| --- | --- | --- | --- | --- | --- | --- |
+
+Rows must include:
+
+- trajectory identity;
+- stage identity;
+- step identity;
+- message identity;
+- role/protocol type;
+- chronology;
+- current-request identity;
+- tool invocation identity;
+- tool-result identity;
+- tool invocation/result linkage;
+- semantic zone;
+- protocol dependency;
+- explicit reference dependency;
+- semantic dependency;
+- required;
+- optional;
+- stale;
+- supersession/invalidation where available;
+- evaluation-step join;
+- provider usage;
+- exact token usage.
+
+Add fields discovered during inspection where relevant.
+
+For every proposed importer addition, state whether it is:
+
+- direct preservation;
+- deterministic derivation;
+- evaluation-only preservation.
+
+No proposed planner input may originate from `INFERRED_UNSAFE`.
+
+## Proposed provenance model
+
+Design how any new imported/derived field would record its origin.
+
+At minimum distinguish:
+
+- `source_explicit`;
+- `derived_structural`;
+- `unknown`.
+
+Evaluation metadata should remain in its existing external/evaluation channel.
+
+Do not overload an ordinary boolean in a way that hides whether it was captured
+or derived.
+
+If the existing schema already has a better compatible mechanism, reuse it.
+
+This task may recommend a schema extension but must not implement one.
+
+## Importer revision design
+
+If the study finds sufficient evidence, produce a concrete minimal revision plan
+for the next task.
+
+Specify:
+
+- exact source fields consumed;
+- deterministic derivation rules;
+- new/preserved normalized fields;
+- provenance attached to each;
+- validation changes required;
+- tests required;
+- fixture changes required;
+- label-isolation guarantees;
+- privacy/licence implications;
+- backward-compatibility implications;
+- whether the Phase 1B.0 planner requires any later adaptation.
+
+The preferred design should preserve more truthful structure without embedding
+planner policy inside the importer.
+
+The importer must remain an evidence adapter, not a hidden classifier.
+
+## Planner boundary
+
+Do not change:
+
 - intervention eligibility;
-- reason codes;
-- evidence strength;
-- thresholds;
-- deterministic example selection.
+- planner thresholds;
+- planner reason codes;
+- dependency safety rules;
+- `DO_NOTHING` behaviour;
+- compression behaviour.
 
-If a reliable existing mapping permits it, report separately:
+If the study suggests the planner's contract needs a later change, record it as
+a separate recommendation.
 
-- decision distribution for solved versus unsolved trajectories;
-- overlap between recommendations and externally labelled
-  incorrect/unuseful steps.
+Do not implement it here.
 
-Any such result is correlation/diagnostic evidence only.
+## Decision gate
 
-It is not evidence that an intervention would improve quality.
+At the end, answer these questions explicitly:
 
-If an exact join is not available, record that fact rather than manufacturing
-one.
+1. Does the underlying accepted CodeTraceBench artifact contain materially more
+   useful structural evidence than the Phase 1A representation preserved?
 
-## Interpretation rules
+2. Can that evidence be preserved/derived without semantic guessing?
 
-The characterization may establish:
+3. Is there enough planner-safe evidence to justify an importer/evidence-model
+   revision and rerun of Phase 1B characterization?
 
-- what the current conservative planner recommends on this corpus;
-- how often it declines to intervene;
-- which evidence/rules dominate recommendations;
-- whether safety invariants hold;
-- whether the current trace representation contains enough explicit evidence
-  to exercise the planner.
+4. Which positive planner gates could the proposed evidence legitimately
+   exercise?
 
-It may not establish:
+5. Which planner gates would still remain untestable?
 
-- that any recommendation is quality preserving;
-- realised token savings;
-- realised cache reuse;
-- provider cost reduction;
-- latency improvement;
-- task-success improvement;
-- causal benefit.
+6. Can evaluation step IDs be preserved sufficiently for a reliable post-hoc
+   label join?
 
-An all- or mostly-`DO_NOTHING` result is valid evidence.
+7. Should CodeTraceBench remain the Phase 1B corpus after the proposed revision?
 
-Do not weaken planner rules if that occurs.
+## Assessment outcomes
 
-If the current Phase 1A representation lacks the explicit safety metadata
-needed for useful non-no-op recommendations, record that as a result and
-recommend an evidence/modeling task rather than fabricating metadata.
+Choose one.
 
-## Evidence storage
+### `PASS`
 
-Keep bulky per-trace planner outputs local-only.
+The raw artifact contains enough explicit/deterministically derivable evidence
+to justify a narrow importer/evidence-model revision capable of meaningfully
+re-exercising Phase 1B.
 
-Commit only compact sanitized evidence sufficient to audit/reproduce the
-characterization, such as:
+### `PASS WITH RECORDED LIMITATIONS`
 
-- schema/version metadata;
-- aggregate characterization report;
-- deterministic hashes;
-- sanitized representative IDs/reason codes;
-- post-hoc label summary if performed.
+A useful subset can be recovered safely, enough to justify a narrow importer
+revision, but important evidence classes remain unavailable.
 
-Do not commit raw trajectory text, reconstructed prompts, model reasoning,
-credentials or duplicated 719-plan output sets.
+### `PIVOT`
 
-Add narrowly scoped ignore rules if required.
+The accepted corpus cannot provide sufficient planner-safe evidence even after
+truthful structural preservation. Recommend a separately reviewed corpus or
+evaluation strategy change.
 
-## Tests and checks
+### `STOP`
 
-Add focused tests for the characterization/reporting layer where appropriate.
+Licence/privacy/provenance ambiguity or another hard problem means this
+evidence path should not proceed without external resolution.
 
-At minimum verify:
-
-- report serialization is deterministic;
-- schema/version is explicit;
-- all six decision classes are represented in the reporting schema even when
-  count is zero;
-- count totals reconcile;
-- deterministic reruns match;
-- safety-audit fields cannot silently disappear;
-- planner output is not altered by label availability;
-- raw labels are not passed into planner execution;
-- source traces remain unchanged;
-- existing workspace tests continue to pass.
-
-Run the normal formatting, check, clippy and workspace test suite.
+Do not choose an outcome based on expected intervention count.
 
 ## Required outputs
 
 Produce:
 
-- versioned characterization/reporting schema;
-- deterministic offline characterization runner;
-- compact sanitized CodeTraceBench characterization evidence;
-- concise Phase 1B.1 findings document or update to the existing Phase 1B
-  documentation;
+- `docs/phase-1/PHASE_1B2_EVIDENCE_GAP_STUDY.md`
+- an explicit evidence classification matrix;
+- raw-artifact structural findings;
+- proposed provenance model;
+- minimal importer/evidence-model revision design if justified;
+- decision-gate answers;
 - completion record in this file.
 
-Update `SOURCE_OF_TRUTH.md` only if the characterization materially changes
-what the repository can claim.
+A compact sanitized structural audit JSON may be added if it materially aids
+reproducibility.
+
+Do not create a full replacement corpus fixture.
+
+Update `SOURCE_OF_TRUTH.md` only if the study resolves an existing authoritative
+uncertainty. Do not describe proposed importer changes as implemented.
+
+## Tests/checks
+
+This is primarily a research/design task.
+
+If a structural inspection script is added:
+
+- add focused tests where appropriate;
+- ensure deterministic output;
+- verify source artifacts remain unchanged;
+- verify no raw content appears in tracked output.
+
+Run relevant existing checks sufficient to establish that no product behaviour
+was changed.
+
+At minimum run:
+
+- `git diff --check`;
+- any focused tests for newly added tooling.
+
+If Rust product code is untouched, a full workspace test run is optional unless
+repository guidance requires it.
 
 ## Acceptance criteria
 
-This task is complete when:
+The task is complete when:
 
-- the reporting schema is explicit and versioned;
-- the accepted 719-trace Phase 1A set is characterized without planner rule
-  changes;
-- all available traces either produce plans or failures are individually
-  accounted for;
-- a deterministic second pass reproduces the same results;
-- decision and evidence distributions are recorded;
-- hard safety invariants are explicitly audited;
-- source traces remain unchanged;
-- `DO_NOTHING` remains a legitimate result;
-- evaluation labels remain isolated from planner inputs;
-- any post-hoc label analysis is clearly separated;
-- no corpus-specific planner tuning occurs;
-- only compact sanitized evidence is prepared for commit;
-- relevant tests/checks pass;
-- results are sufficient to decide the next Phase 1B research task.
-
-A high intervention rate is not an acceptance criterion.
-
-A low or zero intervention rate is not a failure by itself.
-
-## Assessment outcomes
-
-Choose one:
-
-### `PASS`
-
-Characterization is deterministic, safety audit is clean and the current
-corpus representation provides useful coverage of the frozen planner.
-
-### `PASS WITH RECORDED LIMITATIONS`
-
-Characterization is deterministic and safety-clean, but coverage/evidence is
-limited — including a result dominated by conservative retention or
-`DO_NOTHING`.
-
-### `PIVOT`
-
-The characterization shows that the current trace/evidence representation is
-not sufficient to exercise the decision hypothesis meaningfully without a
-separately designed evidence-model change.
-
-### `STOP`
-
-A hard safety failure, unreproducible decision behaviour or other result makes
-continued Phase 1B work unjustified until reviewed.
-
-Do not choose an assessment based on intervention count alone.
+- every requested evidence class has been investigated;
+- captured facts are separated from deterministic derivations;
+- unsafe inference is explicitly rejected;
+- absent evidence remains absent;
+- evaluation-only labels remain isolated;
+- semantic zones are mapped only from defensible structure;
+- dependency types are distinguished rather than conflated;
+- `required`, `optional`, and `stale` are not fabricated;
+- feasibility of exact evaluation-step joining is established;
+- privacy/licence implications are recorded;
+- the proposed provenance representation makes captured versus derived evidence
+  auditable;
+- a concrete next importer revision exists only if supported by evidence;
+- the decision gate answers whether CodeTraceBench remains suitable;
+- no planner or importer behaviour was changed.
 
 ## Stop conditions
 
 Do not:
 
-- change Phase 1B planner rules based on corpus results;
-- tune thresholds;
-- mutate prompts or traces;
+- implement the importer revision;
+- alter the Phase 1B planner;
+- tune thresholds or rules;
+- fabricate `optional`, `required`, `stale`, or dependency metadata;
+- use benchmark labels as planner inputs;
+- infer removability from non-gold status;
+- commit raw trajectory content;
+- broaden to another corpus;
 - begin Phase 1C;
-- perform replay;
+- replay or mutate prompts;
 - make live provider calls;
-- implement automatic compression;
-- derive new safety labels from benchmark outcome labels;
-- use solved/incorrect/unuseful labels as decision inputs;
+- implement compression;
 - add current provider pricing;
-- claim realised efficiency or quality gains;
-- broaden the corpus;
 - start the recommended next task;
 - commit or push.
 
 ## Completion record
 
-On completion update this file with:
+On completion record:
 
-- reporting schema/version;
-- corpus and planner identity;
-- implementation completed;
-- traces/plans processed;
-- decision distribution;
-- evidence distribution;
-- safety-audit results;
-- determinism result;
-- post-hoc label audit, if any;
-- tests/checks run;
-- interpretation and limitations;
-- Phase 1B.1 assessment;
+- corpus/revision inspected;
+- inspection method/sample;
+- evidence matrix;
+- captured evidence;
+- deterministic derivations;
+- evaluation-only evidence;
+- unsafe inferences rejected;
+- genuinely absent evidence;
+- evaluation-join result;
+- provenance-model recommendation;
+- importer-revision design, if justified;
+- privacy/licence findings;
+- decision-gate answers;
+- tests/checks;
+- Phase 1B.2 assessment;
+- remaining limitations;
 - recommended next task.
 
 Do not begin the recommended next task.
-
-## Completion record - Phase 1B.1
-
-- Reporting schema: `prefixity.phase1b1.characterization`, version `1`,
-  frozen in `docs/phase-1/PHASE_1B1_CHARACTERIZATION_SCHEMA.md`.
-- Corpus identity: `NJU-LINK/CodeTraceBench` revision
-  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`, `verified` split, accepted
-  Phase 1A fixture; 24 trajectories, 719 request traces, 1,498 source
-  events, with the two pinned Phase 1A missing archive cases excluded.
-- Planner identity: intervention-plan contract `1`, frozen Phase 1B.0
-  checkpoint `3436e16afcdf359a33a691c15202900d796b25bc`, Git base checkpoint
-  `663b91871653e19f5c95b57e9b3ccee133b11e8f`, existing offline CLI planner,
-  no provider/economic/quality/label inputs.
-- Implementation: added the repository-native offline runner
-  `tools/phase1b1_characterize.py`, focused reporting tests, the compact
-  aggregate report, schema documentation, and findings. Full per-trace plans
-  were retained only under ignored `results/phase1b1-local/` during audit.
-  The Phase 1B.0 planner, prompts, and traces were not changed.
-- Processing: 719 traces attempted; 719 plans produced; 0 failures. First
-  and second aggregate hashes both equal
-  `8ef45466c158ebb11e5f719c07906218ad6a02f9bdcca57476df8154ee4b4a53`.
-- Decisions: 719 `DO_NOTHING` recommendation records; zero `KEEP`, `DEFER`,
-  `PRUNE`, `RELOCATE_CANDIDATE`, or `COMPRESS_CANDIDATE`; zero traces with a
-  non-no-op intervention; zero traces with multiple candidates; totals
-  reconcile.
-- Evidence: all 719 records had `UNKNOWN` strength,
-  `NONE_FOR_RETENTION` quality risk and provider dependence, absent provider,
-  economic and quality evidence, and no relevant dependency. Dominant
-  reasons were current-request/protocol protection, unknown safety, no
-  justified intervention, and the explicit absence-evidence codes.
-- Safety: every required safety count is zero, including destructive targets,
-  dependency violations/uncertainty, unsafe relocation, compression,
-  contradictory destructive targets, `DO_NOTHING` coexistence, non-hypothetical
-  output, and source-trace byte/hash changes.
-- Determinism: second pass matched the first pass and failures matched.
-- Post-hoc label audit: labels were loaded only after both planner passes;
-  raw labels were not planner inputs. All 24 trajectories joined (12 solved,
-  12 unsolved); 55 incorrect and 5 unuseful labelled steps were observed.
-  Exact recommendation/step overlap was unavailable because message IDs do
-  not have an existing reliable join to label step IDs.
-- Checks: focused Python reporting tests (7), Python bytecode compilation,
-  `cargo fmt --all -- --check`, `cargo check --workspace --offline`,
-  `cargo clippy --workspace --all-targets --offline -- -D warnings`, and
-  `cargo test --workspace --offline` all passed. The Rust workspace reported
-  220 passing tests across its test binaries.
-- Interpretation: the accepted representation has no true
-  optional/required/stale flags, no dependency edges, no provider usage, and
-  only system/messages zones across 24,416 blocks. The frozen positive
-  intervention gates were therefore not meaningfully exercised. This is not
-  a savings, quality, or tuning signal.
-- Phase 1B.1 assessment: `PIVOT` because a separately designed evidence/model
-  change is needed before the decision hypothesis can be exercised on this
-  representation. The zero intervention rate is valid evidence and was not
-  used to alter planner behavior.
-- Recommended next task: Phase 1B.2 evidence/modeling gap study and importer
-  revision plan for explicit optional/stale/dependency/zone/chronology and
-  evaluation-join metadata, with privacy/licence and label-isolation gates.
-  Do not begin it in this task.
-- Findings and compact evidence: see
-  `docs/phase-1/PHASE_1B1_CHARACTERIZATION.md` and
-  `fixtures/phase-1a/codetracebench-mini-swe-v1/results/phase1b1-characterization.json`.
