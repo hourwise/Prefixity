@@ -1,0 +1,71 @@
+{
+  "inspection_schema": "prefixity.phase1b2.structural-audit",
+  "inspection_schema_version": 1,
+  "fixture": "fixtures/phase-1a/codetracebench-mini-swe-v1",
+  "corpus": "NJU-LINK/CodeTraceBench",
+  "corpus_revision": "aa213b84ffb6690fc37ca15766d6ca174ec36d4d",
+  "inspection_method": {
+    "all_trace_files": 719,
+    "all_normalized_blocks": 24416,
+    "raw_content_read": false,
+    "raw_artifacts_available_under_fixture": false,
+    "deterministic_sample_rule": "lexicographically first selected trajectory in each solved x length-band cell",
+    "sample": [
+      {"solved": false, "length_band": "short", "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096"},
+      {"solved": false, "length_band": "medium", "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19"},
+      {"solved": false, "length_band": "long", "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e"},
+      {"solved": true, "length_band": "short", "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-git-workflow-hack-15e07e43"},
+      {"solved": true, "length_band": "medium", "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-train-bpe-tokenizer-2df9c860"},
+      {"solved": true, "length_band": "long", "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301"}
+    ]
+  },
+  "evidence_counts": {
+    "trajectory_ids": {"present": 719, "unique": 24},
+    "task_names": {"present": 719, "unique": 24},
+    "task_slugs": {"present": 719, "unique": 24},
+    "request_ids": {"present": 719, "unique": 719},
+    "session_ids": {"present": 719, "unique": 24},
+    "turn_indices": {"present": 719, "unique": 49},
+    "source_event_indices": {"present": 24416, "unique": 98},
+    "source_event_ids": {"present": 24416, "unique": 98},
+    "structural_paths": {"present": 24416, "unique": 98},
+    "roles": {"assistant": 11489, "system": 719, "user": 12208},
+    "sources": {"conversation": 11489, "system_policy": 719, "tool_result": 10998, "user_request": 1210},
+    "semantic_zones": {"messages": 23697, "system": 719},
+    "dependency_blocks": 0,
+    "dependency_edges": 0,
+    "optional_true": 0,
+    "required_true": 0,
+    "stale_true": 0,
+    "lifetime_present": 0,
+    "provider_usage_present": 0,
+    "timestamps_present": 0,
+    "content_present": 0
+  },
+  "evaluation_inventory": {
+    "label_schema_version": 1,
+    "trajectory_records": 24,
+    "stage_records": 23,
+    "step_records": 60,
+    "stage_ids_in_trace_or_source_events": 0,
+    "step_ids_in_trace_or_source_events": 0
+  },
+  "relationship_checks": {
+    "trace_request_ids_unique": true,
+    "trace_trajectory_ids_match_selection": true,
+    "block_ids_unique_within_each_trace": true,
+    "block_source_event_id_matches_block_id": true,
+    "source_event_ids_are_message_index_ids": true,
+    "trace_blocks_have_no_step_or_stage_ids": true,
+    "source_events_have_no_step_or_stage_ids": true,
+    "labels_are_separate": true
+  },
+  "fixture_file_sha256": {
+    "corpus-provenance.json": "0dddd3307cf8dd8f642c722676029639703e21eb8f420c4c4d18fd7a17931af9",
+    "selection.json": "bdcb2ce2f51a81adb9c33f793b0da9fa3e2bb806ddce7344d2a74579e2e19a7d",
+    "import-report.json": "548d0f8d09503b14a438d09e2538932a6d50b1ec3cd3bf35e8d4a3251516f393",
+    "provenance/trajectory-summaries.json": "0f787423ba0abb5065ea7ba4775923a239448ad01427d1826c4982e8190e9ec1",
+    "provenance/source-events.jsonl": "783183b1a13a726a7061cb52d8e1af0ddc2d530aeeeb2057c3bd18f4e15513fb",
+    "evaluation/labels.json": "750381dad30bbc4229a73c7e5e7d5fb03991b1b03907b4a238602a2eb5ac1e48"
+  }
+}

@@ -27,6 +27,9 @@
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
 | [`phase-1/PHASE_1B_DECISION_CONTRACT.md`](phase-1/PHASE_1B_DECISION_CONTRACT.md) | Phase 1B.0 intervention-plan contract and conservative offline baseline. | Reviewing Phase 1B decisions and invariants. |
+| [`phase-1/PHASE_1B1_CHARACTERIZATION.md`](phase-1/PHASE_1B1_CHARACTERIZATION.md) | Frozen Phase 1B.0 planner characterization over the accepted Phase 1A traces. | Reviewing the Phase 1B.1 result. |
+| [`phase-1/PHASE_1B1_CHARACTERIZATION_SCHEMA.md`](phase-1/PHASE_1B1_CHARACTERIZATION_SCHEMA.md) | Frozen reporting schema for Phase 1B.1 characterization evidence. | Reproducing or auditing Phase 1B.1 reporting. |
+| [`phase-1/PHASE_1B2_EVIDENCE_GAP_STUDY.md`](phase-1/PHASE_1B2_EVIDENCE_GAP_STUDY.md) | Evidence-model gap, provenance recommendation and raw-schema uncertainty. | Reviewing the Phase 1B.2 design gate. |
 | [`phase-1/PRIOR_ART_DECISIONS.md`](phase-1/PRIOR_ART_DECISIONS.md) | Reuse, integration and differentiation decisions. | Considering external systems or architecture. |
 
 ## Implementation locations
@@ -52,9 +55,12 @@
 | [`../experiments/runs`](../experiments/runs) | Local ignored live artifacts, not tracked benchmarks. | Auditing recorded live runs if present. |
 | [`phase-0/SUCCESS_CRITERIA.md`](phase-0/SUCCESS_CRITERIA.md) and [`phase-0/EXPERIMENTS.md`](phase-0/EXPERIMENTS.md) | Offline acceptance mapping and proposed experiment groups. | Distinguishing harness checks from future experiments. |
 
-There is currently no `benches/` directory, Phase 1B decision layer or tracked
-end-to-end quality report. The Phase 1A corpus/import evidence is documented in
-the closeout above.
+There is currently no `benches/` directory or tracked end-to-end quality report.
+The Phase 1B.0 decision layer exists. Phase 1B.1 characterized the frozen
+planner and pivoted because the accepted derivative representation did not
+exercise positive intervention gates. Phase 1B.2 records the resulting
+evidence-model gap and uncertainty about the exact upstream raw schema. The
+Phase 1A corpus/import evidence is documented in the closeout above.
 
 For history, use `git log` and [`research/PRIOR_ART.md`](research/PRIOR_ART.md)
 when the task requires provenance or prior-art context.

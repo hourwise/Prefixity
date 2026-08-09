@@ -1,6 +1,6 @@
 # Active Task — Phase 1B.2 Evidence Modeling Gap Study and Importer Revision Design
 
-Status: ready for research/design.
+Status: complete - PIVOT.
 
 ## Objective
 
@@ -602,3 +602,65 @@ On completion record:
 - recommended next task.
 
 Do not begin the recommended next task.
+
+## Completion record - Phase 1B.2
+
+- Corpus/revision inspected: accepted `NJU-LINK/CodeTraceBench` revision
+  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`, `verified` split, 24
+  trajectories and 719 normalized request traces. No other corpus was used.
+- Inspection method/sample: structural JSON-only inspection of all 719
+  traces and 24,416 blocks, plus the lexicographically first selected
+  trajectory in each solved x short/medium/long cell. No raw content was read
+  or reconstructed. No raw `.traj.json` or `.tar.zst` is available under the
+  accepted local fixture root.
+- Evidence matrix and study: recorded in
+  `docs/phase-1/PHASE_1B2_EVIDENCE_GAP_STUDY.md`; compact sanitized counts,
+  relationship checks, sample rule and fixture hashes are in
+  `results/phase1b2-structural-audit.json`.
+- Captured evidence: trajectory/task identity, request/session identity,
+  explicit message roles, source order/index, hashes, source paths, byte
+  counts and pinned provenance metadata. Evaluation stage/step IDs remain in
+  the external label file only.
+- Deterministic derivations: message-index IDs, request/turn prefixes,
+  normalized positions, source-kind/semantic-zone mapping, structural paths,
+  content hashes and surrogate token estimates. Each is documented as a
+  derivation rather than an upstream fact.
+- Evaluation-only evidence: solved/unsolved outcomes, stage IDs, step IDs,
+  incorrect labels and unuseful labels. None entered planner inputs.
+- Unsafe inference rejected: no optional, required, stale, removability,
+  semantic dependency, adjacency-based tool relation, positional step join,
+  provider usage, exact token usage, or content-derived zone claim was added.
+- Absent evidence: explicit action/tool-call IDs, observation IDs,
+  invocation/result links, stage/step mapping in traces, dependency edges,
+  invalidation/supersession, optional/required/stale facts, provider usage and
+  exact provider token counts.
+- Evaluation-step join: trajectory-level overlap exists, but no exact
+  `normalized block/request -> upstream step ID -> label` mapping is present.
+  Position- or step-count-based reconstruction was rejected.
+- Provenance model: recommend typed per-field origin
+  `source_explicit | derived_structural | unknown`, source locators and
+  versioned derivation rule IDs, with evaluation-only markers kept external.
+  Existing booleans must not hide unknown evidence behind `false`.
+- Importer revision design: a conditional, provenance-preserving design was
+  documented only. It would preserve explicit upstream IDs and protocol kinds
+  if verified, keep the hash-only privacy boundary, and add negative tests;
+  it was not implemented and does not authorize a planner rerun.
+- Privacy/licence: the pinned revision has the recorded MIT metadata/README
+  declaration, but its README-linked root `LICENSE` file is absent. No raw
+  archive, prompt, reasoning or tool output was added.
+- Decision gate: captured/derived chronology and protocol structure are
+  planner-safe for retention and `DO_NOTHING`, but the evidence path does not
+  justify positive Phase 1B coverage or an importer rerun without raw-schema
+  and identifier verification.
+- Checks: structural audit JSON parsed successfully; `git diff --check`
+  passed; existing product code was untouched, so no Rust product behavior
+  check was required beyond the prior Phase 1B validation baseline.
+- Phase 1B.2 assessment: `PIVOT`.
+- Remaining limitations: raw accepted trajectory artifacts were not locally
+  inspectable; optional/required/stale/dependency and exact evaluation-join
+  claims remain unresolved/absent; no quality or provider evidence exists.
+- Recommended next task: a narrowly scoped raw-artifact access and
+  upstream-schema verification gate for this exact CodeTraceBench revision,
+  including explicit step/action/tool-reference fields and licence evidence.
+  If those facts remain unavailable or absent, review a separately authorized
+  corpus/evaluation-strategy pivot. Do not begin it in this task.

@@ -18,6 +18,20 @@ evidence are present. Phase 1B.0 now has a deterministic, conservative offline
 intervention-plan contract and baseline planner. Phase 1C replay/runtime work
 remains unimplemented and is not authorized by the current task.
 
+Phase 1B.1 ran the frozen Phase 1B.0 planner over all 719 accepted offline
+request traces. All 719 plans produced `DO_NOTHING`; the run was deterministic
+and safety-clean. The accepted derivative representation contains no evidenced
+true `optional`, `required` or `stale` flags, no dependency edges, no provider
+usage, and insufficient structural identity for exact step-level evaluation
+joining.
+
+Phase 1B.2 established that the currently available accepted derivative
+artifacts are insufficient to justify a positive importer revision or planner
+tuning. The exact upstream raw trajectory schema has not yet been verified
+because the raw artifacts were not available in the accepted local fixture.
+This finding applies to the inspected derivative representation; CodeTraceBench
+itself has not been proven unsuitable.
+
 ## Product definition
 
 The current product is a provider-neutral, deterministic context-efficiency
@@ -128,6 +142,10 @@ not interpreted.
   These are heuristic structural observations only, not validated safe
   interventions, provider cache reuse, monetary savings, latency improvement
   or task-quality preservation.
+- Phase 1B characterization evidence: the frozen planner produced
+  `DO_NOTHING` for all 719 accepted request traces in Phase 1B.1. The result was
+  deterministic and safety-clean; this does not establish positive intervention
+  coverage.
 
 ## Incomplete and not established
 
@@ -166,6 +184,11 @@ file remains a licence-evidence limitation; its text was not recreated or
 inferred. The observed candidates remain heuristic and do not establish
 provider cache reuse, monetary savings, latency improvement or task-quality
 preservation.
+
+The next authorized research question is raw-artifact access and upstream-schema
+verification for the exact pinned CodeTraceBench revision. It must establish
+whether explicit step, action, observation or tool-reference identity exists
+before any importer revision is considered.
 
 ## Explicitly deferred
 
