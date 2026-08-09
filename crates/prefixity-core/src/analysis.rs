@@ -23,7 +23,7 @@ use crate::usage::{normalize_usage, NormalizedUsage};
 use crate::validation::validate_trace;
 
 /// Lightweight identity of a trace, used in analysis and comparison output.
-#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct TraceRef {
     /// The trace's request ID.
     pub request_id: String,

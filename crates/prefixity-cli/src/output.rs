@@ -11,6 +11,7 @@
 
 use prefixity_core::analysis::TraceAnalysis;
 use prefixity_core::compare::Comparison;
+use prefixity_core::decision::{InterventionPlan, ReasonCode};
 use prefixity_core::error::PrefixityError;
 use prefixity_core::policy::SimulationResult;
 use prefixity_core::terminal::sanitize_for_terminal;
@@ -43,6 +44,11 @@ pub fn comparison_json(comparison: &Comparison) -> serde_json::Value {
 /// JSON document for a simulation result.
 pub fn simulation_json(result: &SimulationResult) -> serde_json::Value {
     serde_json::json!({ "ok": true, "simulation": result })
+}
+
+/// JSON document for a Phase 1B intervention plan.
+pub fn plan_json(plan: &InterventionPlan) -> serde_json::Value {
+    serde_json::json!({ "ok": true, "plan": plan })
 }
 
 /// JSON document for an error.
@@ -427,6 +433,63 @@ pub fn print_simulation(cli: &crate::cli::Cli, result: &SimulationResult) {
     }
 }
 
+/// Print a Phase 1B intervention plan. This output describes hypothetical
+/// recommendations only; it never applies them to the source trace.
+pub fn print_plan(cli: &crate::cli::Cli, plan: &InterventionPlan) {
+    if cli.json {
+        print_json(&plan_json(plan));
+        return;
+    }
+
+    println!("Intervention plan: offline / hypothetical only");
+    println!(
+        "Trace: {}   Blocks retained: {}",
+        sanitize_for_terminal(&plan.trace.request_id),
+        plan.retained_block_ids.len()
+    );
+    println!("Source trace: unchanged");
+    println!();
+    for recommendation in &plan.recommendations {
+        let targets = if recommendation.target_block_ids.is_empty() {
+            "(trace)".to_string()
+        } else {
+            recommendation
+                .target_block_ids
+                .iter()
+                .map(|id| sanitize_for_terminal(id))
+                .collect::<Vec<_>>()
+                .join(", ")
+        };
+        let reasons = recommendation
+            .reason_codes
+            .iter()
+            .map(|reason| reason_code_name(*reason))
+            .collect::<Vec<_>>()
+            .join(", ");
+        println!(
+            "{}  target={}  evidence={:?}  reasons=[{}]",
+            recommendation.class.as_str(),
+            targets,
+            recommendation.evidence_strength,
+            reasons
+        );
+        println!("  {}", sanitize_for_terminal(&recommendation.explanation));
+        println!(
+            "  effect: {}",
+            sanitize_for_terminal(&recommendation.expected_structural_effect)
+        );
+    }
+    println!();
+    println!("Planner notes:");
+    for note in &plan.planner_notes {
+        println!("  - {}", sanitize_for_terminal(note));
+    }
+}
+
+fn reason_code_name(reason: ReasonCode) -> &'static str {
+    reason.as_str()
+}
+
 // ---------------------------------------------------------------------------
 // Formatting helpers
 // ---------------------------------------------------------------------------
@@ -487,6 +550,7 @@ mod tests {
     use prefixity_core::analysis::analyze_trace;
     use prefixity_core::compare::compare_traces;
     use prefixity_core::cost::default_synthetic_profile;
+    use prefixity_core::decision::plan_interventions;
     use prefixity_core::policy::{policy_from_name, simulate_policy};
     use std::path::Path;
 
@@ -534,6 +598,18 @@ mod tests {
         let first = json_string(&simulation_json(&result));
         let second = json_string(&simulation_json(&result));
         assert_eq!(first, second);
+    }
+
+    #[test]
+    fn plan_json_is_deterministic() {
+        let trace = load("06-context-reduction-wins.json");
+        let plan = plan_interventions(&trace).unwrap();
+        let first = json_string(&plan_json(&plan));
+        let second = json_string(&plan_json(&plan));
+        assert_eq!(first, second);
+        let parsed: serde_json::Value = serde_json::from_str(&first).unwrap();
+        assert_eq!(parsed["ok"], true);
+        assert!(parsed["plan"]["recommendations"].is_array());
     }
 
     #[test]

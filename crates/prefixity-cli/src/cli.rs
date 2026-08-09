@@ -59,6 +59,11 @@ pub enum Command {
         #[arg(long)]
         policy: String,
     },
+    /// Plan a conservative Phase 1B intervention contract (offline only).
+    Plan {
+        /// Path to a trace JSON file.
+        trace: PathBuf,
+    },
 }
 
 /// Run the parsed CLI and print its output. Errors are reported by the caller.
@@ -95,6 +100,11 @@ pub fn run(cli: &Cli) -> Result<(), PrefixityError> {
                 profile_ref,
             )?;
             output::print_simulation(cli, &result);
+        }
+        Command::Plan { trace } => {
+            let trace_data = load::load_trace(trace)?;
+            let plan = prefixity_core::decision::plan_interventions(&trace_data)?;
+            output::print_plan(cli, &plan);
         }
     }
     Ok(())

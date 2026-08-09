@@ -18,6 +18,8 @@
 //!    [`CostProfile`], consuming explicit normalized categories.
 //! 9. [`policy`] — offline, zone-constrained policy simulation that never
 //!    mutates its input.
+//! 10. [`decision`] — conservative Phase 1B intervention-plan contract and
+//!     fail-open offline baseline.
 //!
 //! Three concepts are kept strictly separate (Phase 0A.1):
 //!
@@ -31,6 +33,7 @@
 pub mod analysis;
 pub mod compare;
 pub mod cost;
+pub mod decision;
 pub mod error;
 pub mod hash;
 pub mod limits;

@@ -14,8 +14,9 @@ offline but have not been live-validated.
 
 Phase 1A corpus validation is implemented and closed as `PASS` for the accepted
 CodeTraceBench evidence path. The thin importer/adapter and offline observer
-evidence are present. Phase 1B decision-layer and Phase 1C replay/runtime work
-remain unimplemented and are not authorized by the current task.
+evidence are present. Phase 1B.0 now has a deterministic, conservative offline
+intervention-plan contract and baseline planner. Phase 1C replay/runtime work
+remains unimplemented and is not authorized by the current task.
 
 ## Product definition
 
@@ -56,12 +57,12 @@ The workspace has three crates:
 1. `prefixity-core` is authoritative for the trace model, validation, bounded
    input handling, structural zones/fingerprints, token estimation, the
    explainable `prefixity` heuristic, single-trace analysis, trace comparison,
-   provider-usage normalization, cost arithmetic and non-mutating policy
-   simulation.
+   provider-usage normalization, cost arithmetic, non-mutating policy
+   simulation and the Phase 1B offline intervention decision contract.
 2. `prefixity-cli` is a thin offline command-line layer over the core. It
-   exposes `validate`, `analyse`, `compare` and `simulate`, with deterministic
-   human and JSON output. It reads trace/profile files and does not mutate live
-   requests.
+   exposes `validate`, `analyse`, `compare`, `simulate` and `plan`, with
+   deterministic human and JSON output. It reads trace/profile files and does
+   not mutate live requests.
 3. `prefixity-live` is disposable experimental infrastructure for controlled
    provider calls. It generates deterministic synthetic scenarios, uses
    allowlisted provider endpoints and environment-only credentials, converts
@@ -103,6 +104,12 @@ not interpreted.
   indices and do not mutate the input trace. Required blocks are retained;
   chronological message order and zone constraints are enforced; unsafe moves
   are reported as deferred. Compression is reserved.
+- Phase 1B.0 decision layer: versioned `InterventionPlan` contract with exactly
+  `KEEP`, `DEFER`, `PRUNE`, `RELOCATE_CANDIDATE`, `COMPRESS_CANDIDATE` and
+  `DO_NOTHING`; deterministic audit fields; fail-open dependency closure;
+  required/protocol/current-request protection; explicit-metadata-only prune
+  and defer cases; hypothetical within-zone relocation candidates; and a
+  `prefixity plan <trace> --json` CLI path. Compression is contract-only.
 - Phase 0B harness: schema-smoke, stable-prefix, early-divergence and
   late-divergence plans; request-count and local estimate ceilings; explicit
   `--execute-live` opt-in; no automatic retries; TLS verification; no redirects;
@@ -124,9 +131,6 @@ not interpreted.
 
 ## Incomplete and not established
 
-- No Phase 1B decision layer with `KEEP`, `DEFER`, `PRUNE`,
-  `RELOCATE_CANDIDATE`, `COMPRESS_CANDIDATE` and `DO_NOTHING` recommendations
-  exists beyond the narrower Phase 0 policy simulator.
 - No Phase 1C controlled replay, task-quality evaluator, gold-context
   retention measurement or end-to-end quality/cost report exists.
 - OpenAI and Anthropic live behavior remains untested in this repository;
@@ -147,8 +151,9 @@ verified subset of a public agent-workload corpus, preserve task/trajectory
 provenance, keep evaluation labels separate from decision inputs, and produce
 deterministic offline observations before any mutation or replay. The Phase 1
 plan's Phase 1B prerequisites for ingestion, provenance, label separation and
-deterministic offline observation are now met. Phase 1B itself remains
-separately authorized work and has not started.
+deterministic offline observation are now met. Phase 1B.0 establishes the
+offline contract and conservative baseline only; it does not establish
+intervention quality, savings or replay readiness.
 
 The next phase should validate the central decision hypothesis rather than
 expand the feature surface. The Phase 1 quality gate requires structural
@@ -173,9 +178,10 @@ preservation.
 - Token-conversion multipliers and hard-coded current provider pricing.
 - OpenAI Responses support until its exact versioned schema is implemented and
   validated.
-- Phase 1B/1C runtime, decision and replay work remains deferred until
-  separately authorized after the Phase 1A closeout; the Phase 1A ingestion,
-  provenance and label-separation prerequisites are now met.
+- Phase 1C runtime and replay work remains deferred until separately
+  authorized after Phase 1B characterization and quality-gate preparation.
+  Automatic compression remains deferred; Phase 1B.0 only supports its
+  contract class.
 
 ## Constraints and invariants
 

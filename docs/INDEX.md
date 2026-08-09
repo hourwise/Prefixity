@@ -26,6 +26,7 @@
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
+| [`phase-1/PHASE_1B_DECISION_CONTRACT.md`](phase-1/PHASE_1B_DECISION_CONTRACT.md) | Phase 1B.0 intervention-plan contract and conservative offline baseline. | Reviewing Phase 1B decisions and invariants. |
 | [`phase-1/PRIOR_ART_DECISIONS.md`](phase-1/PRIOR_ART_DECISIONS.md) | Reuse, integration and differentiation decisions. | Considering external systems or architecture. |
 
 ## Implementation locations
@@ -36,7 +37,7 @@
 | [`../crates/prefixity-core/src/model.rs`](../crates/prefixity-core/src/model.rs), [`validation.rs`](../crates/prefixity-core/src/validation.rs), [`limits.rs`](../crates/prefixity-core/src/limits.rs) | Trace/profile model, validation and bounds. | Changing input or schema behavior. |
 | [`structure.rs`](../crates/prefixity-core/src/structure.rs), [`usage.rs`](../crates/prefixity-core/src/usage.rs), [`prefixity_score.rs`](../crates/prefixity-core/src/prefixity_score.rs) | Fingerprints, provider normalization and heuristic scoring. | Reviewing identity, usage or scoring. |
 | [`analysis.rs`](../crates/prefixity-core/src/analysis.rs), [`compare.rs`](../crates/prefixity-core/src/compare.rs), [`cost.rs`](../crates/prefixity-core/src/cost.rs), [`policy.rs`](../crates/prefixity-core/src/policy.rs) | Analysis, comparison, economics and offline policy simulation. | Changing behavior or interpreting results. |
-| [`../crates/prefixity-cli/src`](../crates/prefixity-cli/src) | Offline CLI, bounded file loading and output. | Changing commands or output. |
+| [`../crates/prefixity-cli/src`](../crates/prefixity-cli/src) | Offline CLI, bounded file loading and output, including Phase 1B planning. | Changing commands or output. |
 | [`../crates/prefixity-live/src`](../crates/prefixity-live/src) | Disposable Phase 0B providers, scenarios, guardrails and artifacts. | Reviewing controlled live validation only. |
 
 ## Tests, fixtures and validation material

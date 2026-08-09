@@ -28,8 +28,9 @@ A perfectly acceptable Phase 0 result is:
 - **Phase 0B** DeepSeek live validation complete: **PASS WITH RECORDED
   LIMITATIONS** (see `docs/phase-0/PHASE_0B_DEEPSEEK_CLOSEOUT.md`).
   OpenAI/Anthropic adapters remain offline-tested, not live-validated.
-- **Phase 1** design set added; **design gate only** — no Phase 1 runtime
-  implementation is authorized (see `docs/phase-1/PHASE_1_PLAN.md`).
+  - **Phase 1A** complete and **Phase 1B.0** conservative offline planning
+    implemented; Phase 1C replay remains unauthorized (see
+    `docs/phase-1/PHASE_1B_DECISION_CONTRACT.md`).
 - No daemon, no localhost proxy, no telemetry.
 - No semantic response caching, no KV-cache storage, no RAG, no automatic
   context mutation of live requests.
@@ -63,6 +64,9 @@ cargo run -p prefixity-cli -- compare fixtures/traces/03-tool-order-break.json \
 # Simulate an alternative context policy (offline; never mutates the trace)
 cargo run -p prefixity-cli -- simulate fixtures/traces/06-context-reduction-wins.json \
   --policy combined --provider-profile provider-profiles/synthetic-example.json
+
+# Produce a conservative Phase 1B intervention plan (offline/hypothetical)
+cargo run -p prefixity-cli -- plan fixtures/traces/06-context-reduction-wins.json --json
 ```
 
 Add `--json` to any command for stable, machine-readable output.
@@ -75,6 +79,7 @@ Add `--json` to any command for stable, machine-readable output.
 | `prefixity analyse <trace>` | Single-trace accounting, prefixity scores, cost. |
 | `prefixity compare <a> <b>` | Divergence detection and reusable-prefix estimation. |
 | `prefixity simulate <trace> --policy <policy>` | Offline policy simulation. |
+| `prefixity plan <trace>` | Conservative Phase 1B intervention planning; never mutates the trace. |
 
 Policies (research hypotheses, not production recommendations):
 `baseline`, `stable-prefix`, `defer-volatile`, `prune-stale-tool-output`,

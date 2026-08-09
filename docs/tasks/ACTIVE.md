@@ -1,6 +1,6 @@
 # Active Task — Phase 1B.0 Intervention Decision Contract and Conservative Baseline
 
-Status: ready for implementation.
+Status: complete — Phase 1B.0 implementation and acceptance checks passed.
 
 ## Objective
 
@@ -260,15 +260,88 @@ Do not:
 
 ## Completion record
 
-On completion, update this file with:
+### Implementation completed
 
-- implementation completed;
-- decision contract added;
-- conservative rules implemented;
-- tests/checks run;
-- optional corpus characterization, if performed;
-- limitations and unsupported decisions;
-- Phase 1B.0 assessment;
-- recommended next task.
+- Added `prefixity-core::decision::InterventionPlan` and the deterministic
+  `plan_interventions` baseline.
+- Added `prefixity plan <trace>` with stable JSON and concise human output.
+- Reused existing trace validation, analysis summaries, prefixity evidence,
+  semantic zones and `StablePrefixPolicy`; the existing Phase 0 simulator is
+  unchanged.
+- Added focused core and CLI tests. No prompt, trace fixture or live artifact
+  was mutated.
 
-Do not begin the recommended next task.
+### Decision contract added
+
+The version-1 contract contains exactly `KEEP`, `DEFER`, `PRUNE`,
+`RELOCATE_CANDIDATE`, `COMPRESS_CANDIDATE` and `DO_NOTHING`. Recommendation
+records include deterministic reason codes, explanation, evidence strength,
+separate structural/provider-cache/economic/quality/dependency evidence,
+relevant dependencies, expected structural effect, expected quality risk,
+provider-state dependence, provider/economic evidence-presence flags and
+`hypothetical_only: true`.
+
+### Conservative rules implemented
+
+- Required, protocol-critical and current/user-request blocks cannot receive
+  destructive recommendations.
+- Missing dependency references and dependency cycles fail open; retained
+  transitive dependents block `PRUNE` and `DEFER`.
+- `PRUNE` requires explicit `optional + stale + tool_result` metadata, no
+  retained dependent and a non-chronological zone.
+- `DEFER` requires explicit optional non-stale tool-result metadata, supporting
+  low-prefixity volatility evidence, no retained dependent and a
+  non-chronological zone. The score is not the safety proof.
+- `RELOCATE_CANDIDATE` is hypothetical, within-zone, non-chronological and
+  dependency-free; the source trace is never reordered.
+- `COMPRESS_CANDIDATE` is contract-only and is never emitted.
+- Unknown/insufficient evidence defaults to retention or `DO_NOTHING`; Phase
+  1A structural-candidate counts, token size, repetition and non-gold status
+  are not decision inputs.
+
+### Tests/checks run
+
+- `cargo fmt --all -- --check`
+- `cargo check --workspace`
+- `cargo clippy --workspace --all-targets -- -D warnings`
+- `cargo test -p prefixity-core --test decisions` — 12 passed
+- `cargo test --workspace` — all workspace tests passed (including the
+  existing core, CLI, live-harness unit and mock-pipeline suites)
+- Offline CLI smoke checks for `06-context-reduction-wins`,
+  `07-already-optimal` and `16-global-reorder-would-be-unsafe` with `--json`.
+- No live provider calls were made.
+
+### Optional corpus characterization
+
+Not performed. The accepted Phase 1A corpus was not used to tune or gate this
+baseline, and no corpus decision distribution is claimed.
+
+### Limitations and unsupported decisions
+
+- This is an offline/hypothetical decision layer, not a quality result or
+  Phase 1B pass. No replay, task-success, gold-context, latency, cache-impact
+  or economic outcome is established.
+- The planner has no current provider pricing or economic evidence input.
+- Raw provider usage presence is recorded but does not prove intervention
+  safety or future cache behaviour.
+- Dependency fields remain informational in trace validation; the planner
+  conservatively rejects missing/cyclic closure evidence.
+- `COMPRESS_CANDIDATE` is intentionally unsupported by the baseline, and no
+  automatic compression or mutation exists.
+
+### Phase 1B.0 assessment
+
+`PASS WITH RECORDED LIMITATIONS` for the Phase 1B.0 implementation gate. The
+contract, deterministic audit surface, conservative non-no-op cases and
+reachable `DO_NOTHING` outcome are implemented. This is not a claim that the
+full Phase 1B quality criteria have passed.
+
+### Recommended next task
+
+Phase 1B.1 — define and run a non-gating offline characterization/audit over
+the accepted Phase 1A-derived traces, freeze the reporting schema and inspect
+decision safety/distribution without tuning rules or using evaluation outcomes
+as planner inputs. Do not begin Phase 1C until the quality/replay gate is
+separately authorized.
+
+Do not begin the recommended next task in this turn.
