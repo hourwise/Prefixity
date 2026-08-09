@@ -1,0 +1,14 @@
+[package]
+name = "prefixity-controlled-benchmark"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Isolated deterministic Phase 1B.7 controlled benchmark artifact."
+
+[dependencies]
+prefixity-core = { path = "../prefixity-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }

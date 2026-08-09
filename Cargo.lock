@@ -641,6 +641,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "prefixity-controlled-benchmark"
+version = "0.1.0"
+dependencies = [
+ "prefixity-core",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "prefixity-core"
 version = "0.1.0"
 dependencies = [
