@@ -1,0 +1,305 @@
+{
+  "corpus": {
+    "excluded_missing_cases": {
+      "count": 2,
+      "established_by": "Phase 1A selection.json",
+      "trajectory_ids": [
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-hf-model-inference-f200d460",
+        "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-play-zork-easy-8c77a548"
+      ]
+    },
+    "name": "NJU-LINK/CodeTraceBench",
+    "phase_1a_fixture": "fixtures/phase-1a/codetracebench-mini-swe-v1",
+    "request_trace_count": 719,
+    "revision": "aa213b84ffb6690fc37ca15766d6ca174ec36d4d",
+    "source_event_count": 1498,
+    "split": "verified",
+    "trajectory_count": 24
+  },
+  "decision_distribution": {
+    "count_totals_reconcile": true,
+    "counting_basis": "recommendation records; not savings claims",
+    "recommendation_counts": {
+      "COMPRESS_CANDIDATE": 0,
+      "DEFER": 0,
+      "DO_NOTHING": 719,
+      "KEEP": 0,
+      "PRUNE": 0,
+      "RELOCATE_CANDIDATE": 0
+    },
+    "recommendation_record_total": 719,
+    "target_block_counts_by_class": {
+      "COMPRESS_CANDIDATE": 0,
+      "DEFER": 0,
+      "DO_NOTHING": 0,
+      "KEEP": 0,
+      "PRUNE": 0,
+      "RELOCATE_CANDIDATE": 0
+    },
+    "traces_containing_class": {
+      "COMPRESS_CANDIDATE": 0,
+      "DEFER": 0,
+      "DO_NOTHING": 719,
+      "KEEP": 0,
+      "PRUNE": 0,
+      "RELOCATE_CANDIDATE": 0
+    },
+    "traces_whose_result_is_do_nothing": 719,
+    "traces_with_at_least_one_non_noop_intervention": 0,
+    "traces_with_multiple_intervention_candidates": 0
+  },
+  "deterministic_examples": {
+    "DO_NOTHING": {
+      "block_count": 2,
+      "class": "DO_NOTHING",
+      "dependency_state": "NO_RELEVANT_DEPENDENCY",
+      "economic_evidence_present": false,
+      "evidence_strength": "UNKNOWN",
+      "expected_quality_risk": "NONE_FOR_RETENTION",
+      "hypothetical_only": true,
+      "provider_evidence_present": false,
+      "provider_state_dependence": "NONE_FOR_RETENTION",
+      "quality_evidence_present": false,
+      "reason_codes": [
+        "PROTOCOL_CRITICAL_BLOCK",
+        "UNKNOWN_SAFETY",
+        "CURRENT_REQUEST",
+        "NO_JUSTIFIED_INTERVENTION",
+        "NO_PROVIDER_EVIDENCE",
+        "NO_ECONOMIC_EVIDENCE",
+        "QUALITY_EVIDENCE_ABSENT"
+      ],
+      "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e-turn-0000",
+      "target_block_ids": [],
+      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e"
+    }
+  },
+  "evidence_distribution": {
+    "counting_basis": "recommendation records; evidence dimensions remain separate",
+    "dependency_evidence_states": {
+      "NO_RELEVANT_DEPENDENCY": 719,
+      "RELEVANT_DEPENDENCY": 0,
+      "UNCERTAIN": 0
+    },
+    "economic_evidence": {
+      "ABSENT": 719,
+      "PRESENT": 0
+    },
+    "evidence_strength_counts": {
+      "MODERATE": 0,
+      "STRONG": 0,
+      "UNKNOWN": 719,
+      "WEAK": 0
+    },
+    "expected_quality_risk_counts": {
+      "NONE_FOR_RETENTION": 719,
+      "UNKNOWN": 0
+    },
+    "provider_evidence": {
+      "ABSENT": 719,
+      "PRESENT": 0
+    },
+    "provider_state_dependence_counts": {
+      "NONE_FOR_RETENTION": 719,
+      "POTENTIALLY_RELEVANT": 0,
+      "UNKNOWN": 0
+    },
+    "quality_evidence": {
+      "ABSENT": 719,
+      "PRESENT": 0
+    },
+    "reason_code_counts": {
+      "CHRONOLOGY_PROTECTED": 695,
+      "COMPRESSION_NOT_ESTABLISHED": 0,
+      "CROSS_ZONE_RELOCATION_REJECTED": 0,
+      "CURRENT_REQUEST": 719,
+      "DEPENDENCY_CLOSURE_PROTECTED": 0,
+      "NO_ECONOMIC_EVIDENCE": 719,
+      "NO_JUSTIFIED_INTERVENTION": 719,
+      "NO_PROVIDER_EVIDENCE": 719,
+      "OPTIONAL_STALE_TOOL_RESULT": 0,
+      "OPTIONAL_VOLATILE_TOOL_RESULT": 0,
+      "PROTOCOL_CRITICAL_BLOCK": 719,
+      "PROVIDER_EVIDENCE_NOT_USED_AS_SAFETY_PROOF": 0,
+      "QUALITY_EVIDENCE_ABSENT": 719,
+      "REQUIRED_BLOCK": 0,
+      "STRUCTURAL_HEURISTIC_NOT_SUFFICIENT": 0,
+      "UNKNOWN_DEPENDENCY_EVIDENCE": 0,
+      "UNKNOWN_SAFETY": 719,
+      "WITHIN_ZONE_RELOCATION": 0
+    },
+    "recommendation_total": 719
+  },
+  "execution": {
+    "deterministic_match": true,
+    "failures": [],
+    "first_pass_aggregate_hash": "8ef45466c158ebb11e5f719c07906218ad6a02f9bdcca57476df8154ee4b4a53",
+    "planning_validation_failures": 0,
+    "plans_produced_successfully": 719,
+    "second_pass_aggregate_hash": "8ef45466c158ebb11e5f719c07906218ad6a02f9bdcca57476df8154ee4b4a53",
+    "second_pass_failures_match": true,
+    "second_pass_planning_validation_failures": 0,
+    "traces_attempted": 719
+  },
+  "interpretation_limits": {
+    "compression_implemented": false,
+    "intervention_counts_are_not_savings_claims": true,
+    "live_provider_calls": false,
+    "quality_preservation_not_established": true,
+    "raw_trace_text_or_full_plan_set_in_report": false,
+    "realized_provider_savings_not_measured": true,
+    "replay_performed": false
+  },
+  "planner": {
+    "economic_input_available": false,
+    "evaluation_labels_input_available": false,
+    "frozen_phase_1b0_planner_checkpoint": "3436e16afcdf359a33a691c15202900d796b25bc",
+    "git_base_checkpoint": "663b91871653e19f5c95b57e9b3ccee133b11e8f",
+    "intervention_plan_contract_version": 1,
+    "planner_binary": "target/debug/prefixity.exe",
+    "planner_binary_sha256": "22a0f29b1c95bbb1196c70fc981ea4e3138d6bb898016213a4c190ec038def84",
+    "planner_mode": "offline CLI plan --json; no provider profile",
+    "provider_input_available": false,
+    "quality_input_available": false
+  },
+  "post_hoc_label_audit": {
+    "decision_distribution_by_trajectory_outcome": {
+      "solved": {
+        "recommendation_counts": {
+          "COMPRESS_CANDIDATE": 0,
+          "DEFER": 0,
+          "DO_NOTHING": 355,
+          "KEEP": 0,
+          "PRUNE": 0,
+          "RELOCATE_CANDIDATE": 0
+        },
+        "trace_count": 355,
+        "traces_with_at_least_one_non_noop_intervention": 0,
+        "trajectory_count": 12
+      },
+      "unsolved": {
+        "recommendation_counts": {
+          "COMPRESS_CANDIDATE": 0,
+          "DEFER": 0,
+          "DO_NOTHING": 364,
+          "KEEP": 0,
+          "PRUNE": 0,
+          "RELOCATE_CANDIDATE": 0
+        },
+        "trace_count": 364,
+        "traces_with_at_least_one_non_noop_intervention": 0,
+        "trajectory_count": 12
+      }
+    },
+    "label_record_count": 24,
+    "labelled_incorrect_step_count": 55,
+    "labelled_unuseful_step_count": 5,
+    "labels_schema_version": 1,
+    "performed": true,
+    "planner_input_boundary": {
+      "labels_loaded_after_both_deterministic_planner_passes": true,
+      "planner_aggregate_hash_before_overlay": "8ef45466c158ebb11e5f719c07906218ad6a02f9bdcca57476df8154ee4b4a53",
+      "planner_output_hash_unchanged_by_overlay": true,
+      "raw_labels_passed_to_planner": false
+    },
+    "recommendation_overlap": {
+      "reason": "accepted traces expose message IDs and labels expose step IDs; no exact existing join is available",
+      "status": "unavailable"
+    },
+    "solved_trajectory_count": 12,
+    "trajectory_join_count": 24,
+    "trajectory_join_missing": [],
+    "unsolved_trajectory_count": 12
+  },
+  "safety_audit": {
+    "all_failure_counts_zero": true,
+    "compress_candidate_emissions": 0,
+    "contradictory_destructive_recommendations_for_same_target": 0,
+    "counting_basis": "recommendation/target violations, except source-integrity counts",
+    "destructive_recommendations_targeting_current_user_requests": 0,
+    "destructive_recommendations_targeting_protocol_critical_blocks": 0,
+    "destructive_recommendations_targeting_required_blocks": 0,
+    "destructive_recommendations_violating_known_dependency_closure": 0,
+    "destructive_recommendations_with_missing_or_cyclic_dependency_evidence": 0,
+    "do_nothing_coexisting_with_actual_intervention_recommendations": 0,
+    "non_hypothetical_recommendations": 0,
+    "plans_with_hypothetical_only_false": 0,
+    "source_trace_byte_changes_before_after_planning": 0,
+    "source_trace_hash_changes_before_after_planning": 0,
+    "source_trace_integrity": {
+      "changed_relative_traces": [],
+      "traces_hashed_after": 719,
+      "traces_hashed_before": 719,
+      "unchanged": true
+    },
+    "unsafe_cross_zone_or_chronology_relocation_recommendations": 0
+  },
+  "schema": {
+    "canonicalization": "sorted-key compact UTF-8 JSON; aggregate hash covers ordered trace/request/plan-digest entries",
+    "contract_classes": [
+      "KEEP",
+      "DEFER",
+      "PRUNE",
+      "RELOCATE_CANDIDATE",
+      "COMPRESS_CANDIDATE",
+      "DO_NOTHING"
+    ],
+    "dependency_evidence_states": [
+      "UNCERTAIN",
+      "RELEVANT_DEPENDENCY",
+      "NO_RELEVANT_DEPENDENCY"
+    ],
+    "evidence_strengths": [
+      "UNKNOWN",
+      "WEAK",
+      "MODERATE",
+      "STRONG"
+    ],
+    "name": "prefixity.phase1b1.characterization",
+    "provider_state_dependence": [
+      "NONE_FOR_RETENTION",
+      "POTENTIALLY_RELEVANT",
+      "UNKNOWN"
+    ],
+    "quality_risks": [
+      "NONE_FOR_RETENTION",
+      "UNKNOWN"
+    ],
+    "reason_codes": [
+      "REQUIRED_BLOCK",
+      "PROTOCOL_CRITICAL_BLOCK",
+      "CURRENT_REQUEST",
+      "OPTIONAL_STALE_TOOL_RESULT",
+      "OPTIONAL_VOLATILE_TOOL_RESULT",
+      "DEPENDENCY_CLOSURE_PROTECTED",
+      "UNKNOWN_DEPENDENCY_EVIDENCE",
+      "UNKNOWN_SAFETY",
+      "CHRONOLOGY_PROTECTED",
+      "CROSS_ZONE_RELOCATION_REJECTED",
+      "WITHIN_ZONE_RELOCATION",
+      "STRUCTURAL_HEURISTIC_NOT_SUFFICIENT",
+      "NO_JUSTIFIED_INTERVENTION",
+      "NO_PROVIDER_EVIDENCE",
+      "PROVIDER_EVIDENCE_NOT_USED_AS_SAFETY_PROOF",
+      "NO_ECONOMIC_EVIDENCE",
+      "QUALITY_EVIDENCE_ABSENT",
+      "COMPRESSION_NOT_ESTABLISHED"
+    ],
+    "safety_audit_fields": [
+      "destructive_recommendations_targeting_required_blocks",
+      "destructive_recommendations_targeting_protocol_critical_blocks",
+      "destructive_recommendations_targeting_current_user_requests",
+      "destructive_recommendations_violating_known_dependency_closure",
+      "destructive_recommendations_with_missing_or_cyclic_dependency_evidence",
+      "unsafe_cross_zone_or_chronology_relocation_recommendations",
+      "compress_candidate_emissions",
+      "do_nothing_coexisting_with_actual_intervention_recommendations",
+      "contradictory_destructive_recommendations_for_same_target",
+      "source_trace_byte_changes_before_after_planning",
+      "source_trace_hash_changes_before_after_planning",
+      "non_hypothetical_recommendations",
+      "plans_with_hypothetical_only_false"
+    ],
+    "version": 1
+  }
+}

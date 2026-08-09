@@ -1,6 +1,6 @@
 # Active Task — Phase 1B.1 Offline Decision Characterization and Reporting Freeze
 
-Status: ready for implementation.
+Status: complete - PIVOT.
 
 ## Objective
 
@@ -403,3 +403,64 @@ On completion update this file with:
 - recommended next task.
 
 Do not begin the recommended next task.
+
+## Completion record - Phase 1B.1
+
+- Reporting schema: `prefixity.phase1b1.characterization`, version `1`,
+  frozen in `docs/phase-1/PHASE_1B1_CHARACTERIZATION_SCHEMA.md`.
+- Corpus identity: `NJU-LINK/CodeTraceBench` revision
+  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`, `verified` split, accepted
+  Phase 1A fixture; 24 trajectories, 719 request traces, 1,498 source
+  events, with the two pinned Phase 1A missing archive cases excluded.
+- Planner identity: intervention-plan contract `1`, frozen Phase 1B.0
+  checkpoint `3436e16afcdf359a33a691c15202900d796b25bc`, Git base checkpoint
+  `663b91871653e19f5c95b57e9b3ccee133b11e8f`, existing offline CLI planner,
+  no provider/economic/quality/label inputs.
+- Implementation: added the repository-native offline runner
+  `tools/phase1b1_characterize.py`, focused reporting tests, the compact
+  aggregate report, schema documentation, and findings. Full per-trace plans
+  were retained only under ignored `results/phase1b1-local/` during audit.
+  The Phase 1B.0 planner, prompts, and traces were not changed.
+- Processing: 719 traces attempted; 719 plans produced; 0 failures. First
+  and second aggregate hashes both equal
+  `8ef45466c158ebb11e5f719c07906218ad6a02f9bdcca57476df8154ee4b4a53`.
+- Decisions: 719 `DO_NOTHING` recommendation records; zero `KEEP`, `DEFER`,
+  `PRUNE`, `RELOCATE_CANDIDATE`, or `COMPRESS_CANDIDATE`; zero traces with a
+  non-no-op intervention; zero traces with multiple candidates; totals
+  reconcile.
+- Evidence: all 719 records had `UNKNOWN` strength,
+  `NONE_FOR_RETENTION` quality risk and provider dependence, absent provider,
+  economic and quality evidence, and no relevant dependency. Dominant
+  reasons were current-request/protocol protection, unknown safety, no
+  justified intervention, and the explicit absence-evidence codes.
+- Safety: every required safety count is zero, including destructive targets,
+  dependency violations/uncertainty, unsafe relocation, compression,
+  contradictory destructive targets, `DO_NOTHING` coexistence, non-hypothetical
+  output, and source-trace byte/hash changes.
+- Determinism: second pass matched the first pass and failures matched.
+- Post-hoc label audit: labels were loaded only after both planner passes;
+  raw labels were not planner inputs. All 24 trajectories joined (12 solved,
+  12 unsolved); 55 incorrect and 5 unuseful labelled steps were observed.
+  Exact recommendation/step overlap was unavailable because message IDs do
+  not have an existing reliable join to label step IDs.
+- Checks: focused Python reporting tests (7), Python bytecode compilation,
+  `cargo fmt --all -- --check`, `cargo check --workspace --offline`,
+  `cargo clippy --workspace --all-targets --offline -- -D warnings`, and
+  `cargo test --workspace --offline` all passed. The Rust workspace reported
+  220 passing tests across its test binaries.
+- Interpretation: the accepted representation has no true
+  optional/required/stale flags, no dependency edges, no provider usage, and
+  only system/messages zones across 24,416 blocks. The frozen positive
+  intervention gates were therefore not meaningfully exercised. This is not
+  a savings, quality, or tuning signal.
+- Phase 1B.1 assessment: `PIVOT` because a separately designed evidence/model
+  change is needed before the decision hypothesis can be exercised on this
+  representation. The zero intervention rate is valid evidence and was not
+  used to alter planner behavior.
+- Recommended next task: Phase 1B.2 evidence/modeling gap study and importer
+  revision plan for explicit optional/stale/dependency/zone/chronology and
+  evaluation-join metadata, with privacy/licence and label-isolation gates.
+  Do not begin it in this task.
+- Findings and compact evidence: see
+  `docs/phase-1/PHASE_1B1_CHARACTERIZATION.md` and
+  `fixtures/phase-1a/codetracebench-mini-swe-v1/results/phase1b1-characterization.json`.

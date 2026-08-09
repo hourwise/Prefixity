@@ -25,6 +25,7 @@ experiments/runs/
 /fixtures/phase-1a/codetracebench-mini-swe-v1/traces/
 /fixtures/phase-1a/codetracebench-mini-swe-v1/results/validation.json
 /fixtures/phase-1a/codetracebench-mini-swe-v1/results/analyses.json
+/fixtures/phase-1a/codetracebench-mini-swe-v1/results/phase1b1-local/
 
 # Python generated files
 __pycache__/
