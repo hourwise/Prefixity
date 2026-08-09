@@ -1,17 +1,21 @@
-# Active Task — Phase 1B.0 Intervention Decision Contract and Conservative Baseline
+# Active Task — Phase 1B.1 Offline Decision Characterization and Reporting Freeze
 
-Status: complete — Phase 1B.0 implementation and acceptance checks passed.
+Status: ready for implementation.
 
 ## Objective
 
-Implement the first Phase 1B offline decision layer.
+Characterize the frozen Phase 1B.0 conservative planner over the accepted
+Phase 1A CodeTraceBench-derived traces.
 
-Define a deterministic, auditable intervention-plan contract and a conservative
-baseline planner that converts existing Prefixity observations into justified
-context-management recommendations without mutating the source trace.
+Freeze a deterministic, compact reporting schema before interpreting the
+corpus results, then audit the planner's real-workload decision distribution,
+safety invariants and evidence coverage without changing planner rules in
+response to the results.
 
-This task establishes the decision boundary. It is not a pruning/compression
-implementation task and does not authorize replay or live provider calls.
+This is an offline characterization task.
+
+It does not authorize prompt mutation, planner tuning, Phase 1C replay or live
+provider calls.
 
 ## Required context
 
@@ -19,329 +23,383 @@ Read only the relevant sections of:
 
 - `../phase-1/PHASE_1_PLAN.md`
   - Phase 1B — Offline intervention planning
-  - Context decision model
   - Phase boundaries
 - `../phase-1/SUCCESS_CRITERIA.md`
   - Phase 1B pass
-  - Hard failure / pivot criteria
+  - hard failure / pivot criteria
 - `../phase-1/QUALITY_GATE.md`
   - evidence tiers
-  - required/load-bearing context protection
+  - safety failures
   - fail-open behaviour
 - `../phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`
-  - accepted corpus result
-  - interpretation limits
+  - accepted CodeTraceBench corpus
+  - deterministic 24-trajectory / 719-request slice
+  - provenance and evaluation-label boundary
+- `../phase-1/PHASE_1B_DECISION_CONTRACT.md`
+  - authoritative decision contract
+  - conservative baseline invariants
 - `../SOURCE_OF_TRUTH.md`
-  - implemented architecture
-  - invariants and deferred work
+  - current implemented state and limitations
 
-Inspect the existing core analysis, policy simulation, trace flags,
-dependencies and CLI before adding new structures.
+Inspect the existing Phase 1A tooling and Phase 1B planner before adding any
+characterization code.
 
-Reuse existing concepts where possible rather than creating a parallel policy
-system.
+## Frozen planner boundary
 
-## Phase 1A boundary
+The Phase 1B.0 planner committed at the Phase 1B.0 checkpoint is the subject
+of this characterization.
 
-Phase 1A established deterministic ingestion and offline observation on the
-accepted CodeTraceBench slice.
+Do not modify its decision thresholds, decision rules, reason-code semantics,
+dependency handling or intervention eligibility in response to corpus results.
 
-It did not establish that any of the 712 structural candidates are safe or
-beneficial interventions.
+In particular:
 
-Treat those candidates as observations only.
+- do not increase intervention coverage;
+- do not make optional/stale/dependency claims that are absent from input;
+- do not reinterpret non-gold material as removable;
+- do not lower safety requirements to create positive cases;
+- do not add corpus-specific exceptions;
+- do not use evaluation labels as planner inputs.
 
-Do not derive safety from:
-- absence from gold context;
-- structural volatility alone;
-- token size alone;
-- repetition alone;
-- low Prefixity score alone.
+If characterization exposes a planner safety defect, record it and stop rather
+than repairing and rerunning the planner within this task.
 
-Unknown safety must default toward retention or `DO_NOTHING`.
+Narrow fixes to characterization/reporting infrastructure are allowed if they
+do not change planner behaviour.
 
-## Decision classes
+## Reporting schema freeze
 
-The Phase 1B contract must represent exactly these intervention classes:
+Before interpreting aggregate corpus results, define a versioned
+characterization-report schema.
 
-- `KEEP`
-- `DEFER`
-- `PRUNE`
-- `RELOCATE_CANDIDATE`
-- `COMPRESS_CANDIDATE`
-- `DO_NOTHING`
+Use one authoritative schema/version for this task.
 
-Supporting a class in the contract does not require the conservative baseline
-to emit that class without sufficient evidence.
+At minimum record:
 
-In particular, do not invent a compression heuristic merely to produce
-`COMPRESS_CANDIDATE`.
+### Corpus identity
 
-## Decision record
+- corpus name;
+- exact corpus revision;
+- split;
+- Phase 1A fixture identity;
+- trajectory count;
+- request-trace count;
+- excluded/missing cases already established by Phase 1A.
 
-Each non-trivial recommendation must be auditable.
+### Planner identity
 
-Represent at minimum:
+- intervention-plan contract version;
+- Prefixity git/base checkpoint;
+- planner mode/configuration;
+- whether provider/economic/quality inputs were available.
 
-- recommendation class;
-- target block ID(s), when applicable;
-- deterministic reason codes;
-- human-readable explanation;
+### Execution
+
+- traces attempted;
+- plans produced successfully;
+- validation/planning failures;
+- first-pass aggregate hash;
+- second-pass aggregate hash;
+- deterministic match result.
+
+### Decision distribution
+
+Report separately:
+
+- recommendation counts by all six contract classes;
+- number of traces containing each class;
+- traces with at least one non-no-op intervention;
+- traces whose result is `DO_NOTHING`;
+- traces with multiple intervention candidates;
+- target-block counts by intervention class.
+
+Do not convert these counts into savings claims.
+
+### Evidence distribution
+
+Record aggregate counts for:
+
+- reason codes;
+- evidence strengths;
+- expected quality-risk values;
+- provider-state-dependence values;
+- provider evidence present/absent;
+- economic evidence present/absent;
+- quality evidence present/absent;
+- dependency evidence states where represented.
+
+Keep these evidence dimensions separate.
+
+### Safety audit
+
+Record explicit counts for at least:
+
+- destructive recommendations targeting required blocks;
+- destructive recommendations targeting protocol-critical blocks;
+- destructive recommendations targeting current/user-request blocks;
+- destructive recommendations violating known dependency closure;
+- destructive recommendations made despite missing/cyclic dependency evidence;
+- unsafe cross-zone/chronology relocation recommendations;
+- `COMPRESS_CANDIDATE` emissions;
+- `DO_NOTHING` coexisting with actual intervention recommendations;
+- contradictory destructive recommendations for the same target;
+- source-trace byte/hash changes before versus after planning.
+
+Every count above should be zero unless the characterization has discovered a
+planner defect.
+
+### Deterministic examples
+
+Select a small deterministic set of examples from emitted classes.
+
+Use stable selection such as lexicographically first trace/request IDs rather
+than manually choosing favourable examples.
+
+Record only sanitized IDs, class, reason codes and compact evidence metadata.
+
+Do not commit raw trajectory text.
+
+## Characterization implementation
+
+Prefer a small repository-native characterization runner rather than manually
+invoking the CLI 719 times.
+
+A standard-library Python tool under `tools/` is acceptable if that matches the
+existing Phase 1A evidence tooling.
+
+The runner should:
+
+1. discover the accepted local Phase 1A traces deterministically;
+2. verify the expected corpus/provenance identity;
+3. execute the existing frozen planner offline;
+4. collect the versioned report fields;
+5. verify safety invariants;
+6. write canonical deterministic output;
+7. rerun sufficiently to establish deterministic output;
+8. preserve source trace files unchanged.
+
+Reuse the existing CLI/core interface rather than implementing decision logic
+in the characterization tool.
+
+The characterization runner must contain no alternative planner rules.
+
+## Corpus availability
+
+Use the existing local ignored traces under:
+
+`fixtures/phase-1a/codetracebench-mini-swe-v1/traces/`
+
+Expected accepted Phase 1A set:
+
+- 24 trajectories;
+- 719 request traces.
+
+The bulky Phase 1A traces remain local-only.
+
+Do not change their ignore status merely for this task.
+
+If the expected local evidence is missing or fails provenance checks, stop and
+record the problem rather than substituting another corpus.
+
+## Evaluation-label overlay
+
+Planner execution must finish and its deterministic outputs must be fixed
+before evaluation labels are consulted.
+
+After that point only, the existing evaluation-only labels may be joined as a
+separate post-hoc audit overlay.
+
+They must never influence:
+
+- planner inputs;
+- intervention eligibility;
+- reason codes;
 - evidence strength;
-- source evidence used;
-- relevant dependencies;
-- expected structural effect;
-- expected quality risk;
-- provider-state dependence;
-- whether provider evidence is present or absent;
-- whether economic evidence is present or absent;
-- `hypothetical_only: true`.
+- thresholds;
+- deterministic example selection.
 
-Keep structural evidence, provider/cache evidence, economic evidence and
-quality/dependency evidence distinguishable.
+If a reliable existing mapping permits it, report separately:
 
-Do not manufacture unavailable evidence.
+- decision distribution for solved versus unsolved trajectories;
+- overlap between recommendations and externally labelled
+  incorrect/unuseful steps.
 
-## Conservative baseline
+Any such result is correlation/diagnostic evidence only.
 
-Implement a deterministic offline baseline using only evidence already present
-in Prefixity traces and analysis.
+It is not evidence that an intervention would improve quality.
 
-Rules must include these invariants:
+If an exact join is not available, record that fact rather than manufacturing
+one.
 
-1. Known required blocks are always retained.
+## Interpretation rules
 
-2. Protocol-critical/current-request content must not be recommended for
-   destructive intervention.
+The characterization may establish:
 
-3. Unknown safety defaults to `KEEP` or contributes to `DO_NOTHING`.
+- what the current conservative planner recommends on this corpus;
+- how often it declines to intervene;
+- which evidence/rules dominate recommendations;
+- whether safety invariants hold;
+- whether the current trace representation contains enough explicit evidence
+  to exercise the planner.
 
-4. A block must not be recommended for destructive intervention when doing so
-   would violate recorded dependency closure.
+It may not establish:
 
-5. `PRUNE` may only be emitted where existing explicit metadata provides a
-   defensible safe case, such as an optional stale tool result with no retained
-   dependency requiring it.
+- that any recommendation is quality preserving;
+- realised token savings;
+- realised cache reuse;
+- provider cost reduction;
+- latency improvement;
+- task-success improvement;
+- causal benefit.
 
-6. `DEFER` may only be emitted where explicit metadata supports optionality and
-   deferral without violating dependencies or protocol/order requirements.
+An all- or mostly-`DO_NOTHING` result is valid evidence.
 
-7. `RELOCATE_CANDIDATE` is hypothetical only and must obey existing semantic
-   zone and chronology constraints. Do not actually reorder the trace.
+Do not weaken planner rules if that occurs.
 
-8. `COMPRESS_CANDIDATE` must remain supported by the contract but need not be
-   emitted by this baseline unless an already-established evidence rule
-   justifies it.
+If the current Phase 1A representation lacks the explicit safety metadata
+needed for useful non-no-op recommendations, record that as a result and
+recommend an evidence/modeling task rather than fabricating metadata.
 
-9. If no intervention is sufficiently justified, emit `DO_NOTHING`.
+## Evidence storage
 
-10. Never convert Phase 1A structural-candidate counts directly into Phase 1B
-    intervention recommendations.
+Keep bulky per-trace planner outputs local-only.
 
-## Implementation
+Commit only compact sanitized evidence sufficient to audit/reproduce the
+characterization, such as:
 
-Prefer implementation in `prefixity-core` and the existing CLI rather than a
-new crate.
+- schema/version metadata;
+- aggregate characterization report;
+- deterministic hashes;
+- sanitized representative IDs/reason codes;
+- post-hoc label summary if performed.
 
-Add the smallest API surface necessary for:
+Do not commit raw trajectory text, reconstructed prompts, model reasoning,
+credentials or duplicated 719-plan output sets.
 
-- intervention-plan data structures;
-- deterministic planner execution;
-- JSON serialization;
-- concise human-readable explanation;
-- offline CLI access if consistent with the existing command structure.
+Add narrowly scoped ignore rules if required.
 
-A likely CLI shape is:
+## Tests and checks
 
-`prefixity plan <trace> --json`
+Add focused tests for the characterization/reporting layer where appropriate.
 
-but inspect the current CLI conventions and use the repository-native form.
+At minimum verify:
 
-The planner must not mutate its input trace.
+- report serialization is deterministic;
+- schema/version is explicit;
+- all six decision classes are represented in the reporting schema even when
+  count is zero;
+- count totals reconcile;
+- deterministic reruns match;
+- safety-audit fields cannot silently disappear;
+- planner output is not altered by label availability;
+- raw labels are not passed into planner execution;
+- source traces remain unchanged;
+- existing workspace tests continue to pass.
 
-Do not remove or replace the existing Phase 0 policy simulator. Reuse its
-validated safety logic where appropriate, while keeping simulation and Phase
-1B recommendation concepts distinct.
-
-## Tests
-
-Add focused tests covering at minimum:
-
-- deterministic identical output for identical input/config;
-- all six decision classes serialize through the contract;
-- required block -> never `PRUNE` or `DEFER`;
-- unknown-safety block -> conservative retention/no-op;
-- optional stale tool-result safe case -> `PRUNE` where dependencies permit;
-- same case with retained dependency -> no destructive recommendation;
-- defensible optional volatile case -> `DEFER` where supported;
-- safe structural relocation -> `RELOCATE_CANDIDATE`, never actual mutation;
-- unsafe cross-zone or chronological relocation -> rejected/no-op;
-- no justified intervention -> `DO_NOTHING`;
-- compression class exists without inventing a compression implementation;
-- structural/provider/economic/quality evidence remains separately represented;
-- planner never mutates the original trace.
-
-Reuse existing synthetic fixtures where possible.
-
-Do not tune rules against the Phase 1A corpus to increase the number of
-non-no-op recommendations.
-
-## Optional characterization
-
-If the ignored Phase 1A CodeTraceBench traces are locally available, the new
-planner may be run over them after implementation as a non-gating
-characterization.
-
-If performed:
-
-- keep bulky outputs local-only;
-- record only compact aggregate evidence if useful;
-- report the distribution of Phase 1B decisions;
-- do not tune the rules in response to that distribution;
-- do not treat corpus outcome labels as planner inputs;
-- do not claim quality or savings.
-
-Absence of the local corpus must not cause tests or CI to fail.
+Run the normal formatting, check, clippy and workspace test suite.
 
 ## Required outputs
 
 Produce:
 
-- implementation of the intervention-plan contract;
-- conservative baseline planner;
-- focused tests;
-- CLI exposure if appropriate;
-- documentation of decision semantics/invariants;
+- versioned characterization/reporting schema;
+- deterministic offline characterization runner;
+- compact sanitized CodeTraceBench characterization evidence;
+- concise Phase 1B.1 findings document or update to the existing Phase 1B
+  documentation;
 - completion record in this file.
 
-Update `SOURCE_OF_TRUTH.md` only if implementation materially changes the
-authoritative implemented-state description.
+Update `SOURCE_OF_TRUTH.md` only if the characterization materially changes
+what the repository can claim.
 
 ## Acceptance criteria
 
-The task is complete when:
+This task is complete when:
 
-- all six Phase 1B decision classes exist in one authoritative contract;
-- recommendations are deterministic and auditable;
-- evidence dimensions remain distinguishable;
-- required/protocol-critical context cannot receive destructive
-  recommendations;
-- dependency closure is respected;
-- non-gold or unknown context is not automatically treated as removable;
-- weak/insufficient evidence defaults to retention or `DO_NOTHING`;
-- the conservative baseline demonstrates at least one defensible non-no-op
-  case using existing explicit metadata;
-- `DO_NOTHING` remains reachable;
-- no trace is mutated;
-- no compression implementation is invented;
-- focused tests and existing workspace tests pass;
-- documentation clearly labels recommendations as offline/hypothetical.
+- the reporting schema is explicit and versioned;
+- the accepted 719-trace Phase 1A set is characterized without planner rule
+  changes;
+- all available traces either produce plans or failures are individually
+  accounted for;
+- a deterministic second pass reproduces the same results;
+- decision and evidence distributions are recorded;
+- hard safety invariants are explicitly audited;
+- source traces remain unchanged;
+- `DO_NOTHING` remains a legitimate result;
+- evaluation labels remain isolated from planner inputs;
+- any post-hoc label analysis is clearly separated;
+- no corpus-specific planner tuning occurs;
+- only compact sanitized evidence is prepared for commit;
+- relevant tests/checks pass;
+- results are sufficient to decide the next Phase 1B research task.
 
-This task does not need to satisfy the complete Phase 1B pass criteria.
-It establishes the Phase 1B decision contract and conservative baseline on
-which subsequent Phase 1B characterization can build.
+A high intervention rate is not an acceptance criterion.
+
+A low or zero intervention rate is not a failure by itself.
+
+## Assessment outcomes
+
+Choose one:
+
+### `PASS`
+
+Characterization is deterministic, safety audit is clean and the current
+corpus representation provides useful coverage of the frozen planner.
+
+### `PASS WITH RECORDED LIMITATIONS`
+
+Characterization is deterministic and safety-clean, but coverage/evidence is
+limited — including a result dominated by conservative retention or
+`DO_NOTHING`.
+
+### `PIVOT`
+
+The characterization shows that the current trace/evidence representation is
+not sufficient to exercise the decision hypothesis meaningfully without a
+separately designed evidence-model change.
+
+### `STOP`
+
+A hard safety failure, unreproducible decision behaviour or other result makes
+continued Phase 1B work unjustified until reviewed.
+
+Do not choose an assessment based on intervention count alone.
 
 ## Stop conditions
 
 Do not:
 
-- mutate real prompts or traces;
-- begin Phase 1C replay;
+- change Phase 1B planner rules based on corpus results;
+- tune thresholds;
+- mutate prompts or traces;
+- begin Phase 1C;
+- perform replay;
 - make live provider calls;
 - implement automatic compression;
-- build a learned classifier/pruner;
-- use evaluation outcomes as decision inputs;
-- tune rules to maximize intervention count or estimated token reduction;
-- infer that non-gold context is removable;
+- derive new safety labels from benchmark outcome labels;
+- use solved/incorrect/unuseful labels as decision inputs;
 - add current provider pricing;
-- redesign the runtime;
-- start the next task;
+- claim realised efficiency or quality gains;
+- broaden the corpus;
+- start the recommended next task;
 - commit or push.
 
 ## Completion record
 
-### Implementation completed
+On completion update this file with:
 
-- Added `prefixity-core::decision::InterventionPlan` and the deterministic
-  `plan_interventions` baseline.
-- Added `prefixity plan <trace>` with stable JSON and concise human output.
-- Reused existing trace validation, analysis summaries, prefixity evidence,
-  semantic zones and `StablePrefixPolicy`; the existing Phase 0 simulator is
-  unchanged.
-- Added focused core and CLI tests. No prompt, trace fixture or live artifact
-  was mutated.
+- reporting schema/version;
+- corpus and planner identity;
+- implementation completed;
+- traces/plans processed;
+- decision distribution;
+- evidence distribution;
+- safety-audit results;
+- determinism result;
+- post-hoc label audit, if any;
+- tests/checks run;
+- interpretation and limitations;
+- Phase 1B.1 assessment;
+- recommended next task.
 
-### Decision contract added
-
-The version-1 contract contains exactly `KEEP`, `DEFER`, `PRUNE`,
-`RELOCATE_CANDIDATE`, `COMPRESS_CANDIDATE` and `DO_NOTHING`. Recommendation
-records include deterministic reason codes, explanation, evidence strength,
-separate structural/provider-cache/economic/quality/dependency evidence,
-relevant dependencies, expected structural effect, expected quality risk,
-provider-state dependence, provider/economic evidence-presence flags and
-`hypothetical_only: true`.
-
-### Conservative rules implemented
-
-- Required, protocol-critical and current/user-request blocks cannot receive
-  destructive recommendations.
-- Missing dependency references and dependency cycles fail open; retained
-  transitive dependents block `PRUNE` and `DEFER`.
-- `PRUNE` requires explicit `optional + stale + tool_result` metadata, no
-  retained dependent and a non-chronological zone.
-- `DEFER` requires explicit optional non-stale tool-result metadata, supporting
-  low-prefixity volatility evidence, no retained dependent and a
-  non-chronological zone. The score is not the safety proof.
-- `RELOCATE_CANDIDATE` is hypothetical, within-zone, non-chronological and
-  dependency-free; the source trace is never reordered.
-- `COMPRESS_CANDIDATE` is contract-only and is never emitted.
-- Unknown/insufficient evidence defaults to retention or `DO_NOTHING`; Phase
-  1A structural-candidate counts, token size, repetition and non-gold status
-  are not decision inputs.
-
-### Tests/checks run
-
-- `cargo fmt --all -- --check`
-- `cargo check --workspace`
-- `cargo clippy --workspace --all-targets -- -D warnings`
-- `cargo test -p prefixity-core --test decisions` — 12 passed
-- `cargo test --workspace` — all workspace tests passed (including the
-  existing core, CLI, live-harness unit and mock-pipeline suites)
-- Offline CLI smoke checks for `06-context-reduction-wins`,
-  `07-already-optimal` and `16-global-reorder-would-be-unsafe` with `--json`.
-- No live provider calls were made.
-
-### Optional corpus characterization
-
-Not performed. The accepted Phase 1A corpus was not used to tune or gate this
-baseline, and no corpus decision distribution is claimed.
-
-### Limitations and unsupported decisions
-
-- This is an offline/hypothetical decision layer, not a quality result or
-  Phase 1B pass. No replay, task-success, gold-context, latency, cache-impact
-  or economic outcome is established.
-- The planner has no current provider pricing or economic evidence input.
-- Raw provider usage presence is recorded but does not prove intervention
-  safety or future cache behaviour.
-- Dependency fields remain informational in trace validation; the planner
-  conservatively rejects missing/cyclic closure evidence.
-- `COMPRESS_CANDIDATE` is intentionally unsupported by the baseline, and no
-  automatic compression or mutation exists.
-
-### Phase 1B.0 assessment
-
-`PASS WITH RECORDED LIMITATIONS` for the Phase 1B.0 implementation gate. The
-contract, deterministic audit surface, conservative non-no-op cases and
-reachable `DO_NOTHING` outcome are implemented. This is not a claim that the
-full Phase 1B quality criteria have passed.
-
-### Recommended next task
-
-Phase 1B.1 — define and run a non-gating offline characterization/audit over
-the accepted Phase 1A-derived traces, freeze the reporting schema and inspect
-decision safety/distribution without tuning rules or using evaluation outcomes
-as planner inputs. Do not begin Phase 1C until the quality/replay gate is
-separately authorized.
-
-Do not begin the recommended next task in this turn.
+Do not begin the recommended next task.
