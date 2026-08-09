@@ -1,0 +1,352 @@
+{
+  "manifest_id": "prefixity-controlled-seed-v1",
+  "schema_id": "prefixity.controlled-benchmark",
+  "schema_version": 1,
+  "design_status": "proposed_not_implemented",
+  "benchmark_role": "provider_neutral_controlled_intervention_quality",
+  "appworld_role": "design_reference_only",
+  "raw_content_policy": "No raw prompts, reasoning, credentials, protected bundles, third-party trajectories, or archives are included.",
+  "source_references": [
+    {
+      "name": "AppWorld",
+      "repository": "StonyBrookNLP/appworld",
+      "revision": "v0.1.3.post1",
+      "commit_sha": "66ad8099e12188ece0d3fe45e661dbc01880813b",
+      "repository_url": "https://github.com/StonyBrookNLP/appworld/tree/v0.1.3.post1",
+      "license_url": "https://github.com/StonyBrookNLP/appworld/blob/v0.1.3.post1/LICENSE",
+      "license_boundary": "The public/plain-text repository portion is Apache-2.0. Protected task/app/API material is distributed in encrypted bundles under Apache-2.0 with an additional encrypted-redistribution requirement. The repository licence is not treated as blanket permission to copy or redistribute protected bundles.",
+      "use_disposition": "Design and task/environment inspiration only; no runtime dependency, fixture generator, bundle, or raw task data.",
+      "audit_status": "exact tag and commit recorded; protected material remains outside the repository"
+    },
+    {
+      "name": "tau2-bench",
+      "repository": "sierra-research/tau2-bench",
+      "revision": "v1.0.1",
+      "commit_sha": "fc0055dc4e0a316c3f83133267fbd6faaa770992",
+      "repository_url": "https://github.com/sierra-research/tau2-bench/tree/v1.0.1",
+      "release_url": "https://github.com/sierra-research/tau2-bench/releases/tag/v1.0.1",
+      "license_url": "https://github.com/sierra-research/tau2-bench/blob/v1.0.1/LICENSE",
+      "license_boundary": "MIT at the pinned release, subject to the release contents and any separately distributed data terms.",
+      "use_disposition": "Schema and replay/evaluation design reference only; no dependency or trajectory import.",
+      "audit_status": "exact release tag and commit recorded"
+    },
+    {
+      "name": "ToolSandbox",
+      "repository": "apple/ToolSandbox",
+      "revision": "main",
+      "commit_sha": null,
+      "repository_url": "https://github.com/apple/ToolSandbox",
+      "readme_url": "https://raw.githubusercontent.com/apple/ToolSandbox/main/README.md",
+      "license_url": "https://raw.githubusercontent.com/apple/ToolSandbox/main/LICENSE",
+      "license_boundary": "Apple Software License; not admitted as a Prefixity dependency or copied-data source.",
+      "use_disposition": "Conceptual schema reference only.",
+      "audit_status": "No immutable release or verified commit pin admitted; no source artefact is relied upon. Future use requires a new exact-revision and licence audit."
+    }
+  ],
+  "pairing_policy": {
+    "same_initial_state": true,
+    "same_environment_revision": true,
+    "same_task_revision": true,
+    "same_fixed_seed": true,
+    "baseline_required": true,
+    "control_required": true,
+    "hidden_mutation_forbidden": true,
+    "manifest_fields": [
+      "baseline_trace_id",
+      "variant_trace_id",
+      "target_event_ids",
+      "intervention_class",
+      "exact_transformation",
+      "reason",
+      "planner_visibility",
+      "expected_structural_effect",
+      "expected_quality_risk_category"
+    ]
+  },
+  "decision_paths": {
+    "KEEP": "Retain an explicitly load-bearing or protocol-preserving item when removal or relocation fails the independent oracle.",
+    "DEFER": "Move explicitly superseded context behind the bounded use boundary when the paired replay preserves quality.",
+    "PRUNE": "Candidate only when the exact paired removal preserves all deterministic quality and collateral-change checks.",
+    "RELOCATE_CANDIDATE": "Candidate only when the paired relocation preserves explicit protocol/dependency order and quality.",
+    "COMPRESS_CANDIDATE": "Not tested by this seed; no compression semantics or positive result is fabricated.",
+    "DO_NOTHING": "Use for no-op, ambiguous, unsafe, or insufficiently evidenced cases."
+  },
+  "scenarios": [
+    {
+      "scenario_id": "S01_irrelevant_context_removal",
+      "scenario_version": "v1",
+      "task_environment_concept": "Complete a deterministic profile update while an unrelated context block is present.",
+      "evidence_intentionally_exposed": ["context_block_id", "sequence_index", "action_id", "result_id", "final_state_revision"],
+      "relationships": ["produces(action_update,result_update)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S01_remove_irrelevant",
+          "intervention_class": "PRUNE",
+          "exact_transformation": "Remove only context_block_id=ctx_irrelevant; preserve all action/result IDs and initial state.",
+          "expected_structural_effect": "One context block absent; no referenced event or state transition changes.",
+          "expected_quality_risk_category": "low"
+        }
+      ],
+      "quality_oracle": "Final state equals baseline on the task predicate and all prohibited-collateral predicates.",
+      "decision_path": ["PRUNE"],
+      "negative_control": "Keep an otherwise identical baseline/control pair to detect fixture drift.",
+      "evaluation_only": ["variant_pass", "final_state_equality", "collateral_diff", "expected_removable_case_label"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S02_load_bearing_removal_failure",
+      "scenario_version": "v1",
+      "task_environment_concept": "Use an inventory result to complete a bounded checkout operation.",
+      "evidence_intentionally_exposed": ["action_id", "result_id", "originating_action_id", "reference_event_ids", "world_state_revision"],
+      "relationships": ["produces(action_inventory,result_inventory)", "references(action_checkout,result_inventory)", "depends_on(action_checkout,result_inventory)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S02_remove_inventory_result",
+          "intervention_class": "KEEP",
+          "exact_transformation": "Remove result_inventory from the later action context without changing the environment.",
+          "expected_structural_effect": "The checkout action lacks its explicit input/result reference.",
+          "expected_quality_risk_category": "high"
+        }
+      ],
+      "quality_oracle": "Variant fails the checkout completion predicate or violates the explicit action/result invariant; baseline must remain PASS.",
+      "decision_path": ["KEEP", "DO_NOTHING"],
+      "negative_control": "Replay the baseline with the result retained and require the same final state hash.",
+      "evaluation_only": ["variant_failure", "gold_required_for_case", "oracle_result", "collateral_diff"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S03_explicit_supersession_deferral",
+      "scenario_version": "v1",
+      "task_environment_concept": "Apply policy version 2 while policy version 1 is explicitly superseded.",
+      "evidence_intentionally_exposed": ["context_block_id", "world_state_revision", "sequence_index", "source_provenance"],
+      "relationships": ["supersedes(ctx_policy_v2,ctx_policy_v1)", "protocol_precedes(ctx_policy_v2,action_apply)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S03_defer_superseded_policy",
+          "intervention_class": "DEFER",
+          "exact_transformation": "Move ctx_policy_v1 behind the bounded action boundary; do not remove policy_v2.",
+          "expected_structural_effect": "Superseded context is no longer before action_apply; current policy remains in place.",
+          "expected_quality_risk_category": "low_if_boundary_preserved"
+        }
+      ],
+      "quality_oracle": "Final policy state and completion predicate equal baseline; no pre-action use of policy_v1 is required.",
+      "decision_path": ["DEFER", "PRUNE"],
+      "negative_control": "A variant that moves policy_v2 behind action_apply must fail the protocol predicate.",
+      "evaluation_only": ["supersession_outcome", "variant_pass", "oracle_result", "expected_deferral_case_label"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S04_action_result_needed_later",
+      "scenario_version": "v1",
+      "task_environment_concept": "Read a generated identifier and use it in a later update action.",
+      "evidence_intentionally_exposed": ["action_id", "result_id", "originating_action_id", "reference_event_ids", "argument_hash"],
+      "relationships": ["produces(action_create,result_created)", "references(action_update,result_created)", "depends_on(action_update,result_created)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S04_remove_created_result",
+          "intervention_class": "KEEP",
+          "exact_transformation": "Remove result_created from the later action's bounded context.",
+          "expected_structural_effect": "The later action loses its explicit generated-identifier input.",
+          "expected_quality_risk_category": "high"
+        }
+      ],
+      "quality_oracle": "Variant fails the exact target-identifier predicate; baseline completes with the created identifier.",
+      "decision_path": ["KEEP", "DO_NOTHING"],
+      "negative_control": "Change only the non-required audit observation and require the create/update state to remain unchanged.",
+      "evaluation_only": ["variant_failure", "target_identifier_match", "oracle_result"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S05_action_result_not_needed",
+      "scenario_version": "v1",
+      "task_environment_concept": "Record an audit result that is not read by any later action and has no state effect.",
+      "evidence_intentionally_exposed": ["action_id", "result_id", "originating_action_id", "world_state_revision"],
+      "relationships": ["produces(action_audit,result_audit)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S05_remove_unused_result",
+          "intervention_class": "PRUNE",
+          "exact_transformation": "Remove result_audit from the later context while retaining the audit action's source record outside planner input.",
+          "expected_structural_effect": "An unreferenced result is absent from the planner-visible context; environment state is unchanged.",
+          "expected_quality_risk_category": "low"
+        }
+      ],
+      "quality_oracle": "Final task state and invariant set are equal to baseline; audit result is not a task input.",
+      "decision_path": ["PRUNE"],
+      "negative_control": "A synthetic relation added to result_audit is forbidden; this control ensures adjacency is not promoted to dependency.",
+      "evaluation_only": ["variant_pass", "unreferenced_result_confirmation", "oracle_result"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S06_dependency_chain_preservation",
+      "scenario_version": "v1",
+      "task_environment_concept": "Create, authorize, and commit a state change through a three-step explicit chain.",
+      "evidence_intentionally_exposed": ["action_id", "result_id", "reference_event_ids", "world_state_revision", "sequence_index"],
+      "relationships": ["produces(action_create,result_create)", "depends_on(action_authorize,result_create)", "produces(action_authorize,result_authorize)", "depends_on(action_commit,result_authorize)", "protocol_precedes(action_authorize,action_commit)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S06_break_dependency_chain",
+          "intervention_class": "KEEP",
+          "exact_transformation": "Remove the middle authorization result or reorder commit before authorization.",
+          "expected_structural_effect": "At least one explicit dependency or protocol edge is violated.",
+          "expected_quality_risk_category": "high"
+        }
+      ],
+      "quality_oracle": "Variant fails the final committed-state predicate or protocol invariant; baseline commits exactly once.",
+      "decision_path": ["KEEP", "DO_NOTHING"],
+      "negative_control": "A control retains all three actions and checks stable state transitions under the same seed.",
+      "evaluation_only": ["chain_failure", "final_state", "protocol_invariant", "oracle_result"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S07_safe_context_relocation",
+      "scenario_version": "v1",
+      "task_environment_concept": "Relocate a stable reference block within the same protocol-safe pre-action zone.",
+      "evidence_intentionally_exposed": ["context_block_id", "sequence_index", "protocol_precedes", "world_state_revision"],
+      "relationships": ["protocol_precedes(ctx_reference,action_execute)", "same_state_revision(ctx_reference,action_execute)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S07_relocate_within_safe_zone",
+          "intervention_class": "RELOCATE_CANDIDATE",
+          "exact_transformation": "Move ctx_reference to another position before action_execute without changing content hash or state revision.",
+          "expected_structural_effect": "Position changes; all explicit protocol and state constraints remain true.",
+          "expected_quality_risk_category": "low_if_order_constraints_hold"
+        }
+      ],
+      "quality_oracle": "Final state, action arguments, and invariant checks equal baseline.",
+      "decision_path": ["RELOCATE_CANDIDATE"],
+      "negative_control": "Relocate the same block after action_execute and require the protocol-failure control to be rejected.",
+      "evaluation_only": ["variant_pass", "relocation_delta", "oracle_result"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S08_protocol_breaking_relocation",
+      "scenario_version": "v1",
+      "task_environment_concept": "Attempt to move a handshake or authorization context after the action that requires it.",
+      "evidence_intentionally_exposed": ["context_block_id", "sequence_index", "protocol_precedes", "reference_event_ids"],
+      "relationships": ["protocol_precedes(ctx_handshake,action_execute)", "depends_on(action_execute,ctx_handshake)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S08_move_handshake_after_action",
+          "intervention_class": "DO_NOTHING",
+          "exact_transformation": "Move ctx_handshake after action_execute.",
+          "expected_structural_effect": "The explicit protocol_precedes edge is false in the variant.",
+          "expected_quality_risk_category": "high"
+        }
+      ],
+      "quality_oracle": "Variant fails the protocol/authorization predicate before accepting the action; baseline remains PASS.",
+      "decision_path": ["DO_NOTHING", "KEEP"],
+      "negative_control": "The safe-zone relocation in S07 is not used as evidence for this distinct protocol boundary.",
+      "evaluation_only": ["variant_failure", "protocol_failure", "oracle_result"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S09_repeated_context_removal",
+      "scenario_version": "v1",
+      "task_environment_concept": "The same immutable reference is repeated without a new state revision or later reference.",
+      "evidence_intentionally_exposed": ["context_block_id", "content_hash", "sequence_index", "world_state_revision"],
+      "relationships": ["same_state_revision(ctx_reference_1,ctx_reference_2)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S09_remove_exact_repeat",
+          "intervention_class": "PRUNE",
+          "exact_transformation": "Remove the second block with the identical content hash and no additional reference edge.",
+          "expected_structural_effect": "One exact repeated block absent; the first reference remains.",
+          "expected_quality_risk_category": "low_if_identity_and_state_match"
+        }
+      ],
+      "quality_oracle": "Final state and all task predicates equal baseline; the equality is case-specific, not a general repeat rule.",
+      "decision_path": ["PRUNE"],
+      "negative_control": "S10 uses similar content with distinct identity/state and must not inherit this result.",
+      "evaluation_only": ["variant_pass", "hash_equality", "oracle_result"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S10_repeated_but_load_bearing",
+      "scenario_version": "v1",
+      "task_environment_concept": "A superficially repeated instruction is re-emitted after a state revision and is required by a later operation.",
+      "evidence_intentionally_exposed": ["context_block_id", "content_hash", "world_state_revision", "reference_event_ids", "sequence_index"],
+      "relationships": ["references(action_execute,ctx_repeated_2)", "same_state_revision(ctx_repeated_1,ctx_repeated_2)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S10_remove_load_bearing_repeat",
+          "intervention_class": "KEEP",
+          "exact_transformation": "Remove ctx_repeated_2 even though its content hash resembles ctx_repeated_1.",
+          "expected_structural_effect": "The later explicit reference is missing; visual/content repetition alone is insufficient.",
+          "expected_quality_risk_category": "high"
+        }
+      ],
+      "quality_oracle": "Variant fails the later operation predicate; baseline succeeds.",
+      "decision_path": ["KEEP", "DO_NOTHING"],
+      "negative_control": "Do not infer load-bearing status from adjacency; retain the explicit later reference as the deciding structural evidence.",
+      "evaluation_only": ["variant_failure", "later_reference_missing", "oracle_result"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S11_already_efficient_noop",
+      "scenario_version": "v1",
+      "task_environment_concept": "A minimal context sequence already satisfies the task with no safe intervention target.",
+      "evidence_intentionally_exposed": ["event_id", "sequence_index", "action_id", "result_id", "world_state_revision"],
+      "relationships": ["produces(action_minimal,result_minimal)"],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S11_no_change_control",
+          "intervention_class": "DO_NOTHING",
+          "exact_transformation": "No transformation; emit an explicit control record with the same canonical trace.",
+          "expected_structural_effect": "No structural change and no claimed savings.",
+          "expected_quality_risk_category": "none"
+        }
+      ],
+      "quality_oracle": "Baseline and control have identical final state hashes and oracle PASS.",
+      "decision_path": ["DO_NOTHING"],
+      "negative_control": "Any synthetic deletion is out of scope because no candidate is established.",
+      "evaluation_only": ["no_op", "state_equality", "oracle_result"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    },
+    {
+      "scenario_id": "S12_ambiguous_evidence",
+      "scenario_version": "v1",
+      "task_environment_concept": "A repeated observation has no explicit reference, dependency, supersession, or state relation establishing safe intervention.",
+      "evidence_intentionally_exposed": ["context_block_id", "content_hash", "sequence_index", "source_provenance"],
+      "relationships": [],
+      "baseline_expected_outcome": "PASS",
+      "intervention_variants": [
+        {
+          "variant_id": "S12_retain_ambiguous_context",
+          "intervention_class": "DO_NOTHING",
+          "exact_transformation": "No mutation is admitted; a hypothetical removal may be recorded only in evaluation planning and is not fed to the planner.",
+          "expected_structural_effect": "No planner-visible change.",
+          "expected_quality_risk_category": "unknown"
+        }
+      ],
+      "quality_oracle": "Baseline must PASS; no variant outcome is used to manufacture a general removable label.",
+      "decision_path": ["DO_NOTHING"],
+      "negative_control": "Timestamp age, adjacency, repetition, and evaluation success must not create a dependency or removability relation.",
+      "evaluation_only": ["ambiguity_reason", "hypothetical_target", "oracle_result_if_separately_run"],
+      "external_dependency": "none",
+      "privacy_license_status": "self-authored deterministic fixture; no third-party content"
+    }
+  ]
+}
