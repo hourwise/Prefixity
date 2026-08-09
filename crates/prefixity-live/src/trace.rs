@@ -58,6 +58,7 @@ fn block(
         content_hash: sha256_hex(content.as_bytes()),
         token_count: Some(estimate_tokens(content)),
         byte_count: content.len() as u64,
+        timestamp: None,
         content: None,
         semantic_zone: Some(zone.to_string()),
         structural_path: Some(path.to_string()),
@@ -68,6 +69,7 @@ fn block(
         optional: false,
         required: false,
         stale: false,
+        provenance: BTreeMap::new(),
         metadata: BTreeMap::new(),
     }
 }
@@ -139,13 +141,16 @@ pub fn build_trace(
         timestamp: Some(record.started_at.clone()),
         provider: provider.provider_id().to_string(),
         model: model.to_string(),
+        evidence_schema_version: None,
         blocks,
         usage: Some(record.raw_usage.clone()),
+        provider_response: None,
         latency: Some(LatencyInfo {
             time_to_first_token_ms: None,
             total_ms: Some(record.total_ms),
             provider_raw: BTreeMap::new(),
         }),
+        provenance: BTreeMap::new(),
         metadata,
     }
 }

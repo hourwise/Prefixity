@@ -57,7 +57,7 @@
       "evidence_strength": "UNKNOWN",
       "expected_quality_risk": "NONE_FOR_RETENTION",
       "hypothetical_only": true,
-      "provider_evidence_present": false,
+      "provider_evidence_present": true,
       "provider_state_dependence": "NONE_FOR_RETENTION",
       "quality_evidence_present": false,
       "reason_codes": [
@@ -65,13 +65,116 @@
         "UNKNOWN_SAFETY",
         "CURRENT_REQUEST",
         "NO_JUSTIFIED_INTERVENTION",
-        "NO_PROVIDER_EVIDENCE",
+        "PROVIDER_EVIDENCE_NOT_USED_AS_SAFETY_PROOF",
         "NO_ECONOMIC_EVIDENCE",
         "QUALITY_EVIDENCE_ABSENT"
       ],
       "request_id": "phase1a-miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e-turn-0000",
       "target_block_ids": [],
       "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-build-pmars-23413a0e"
+    }
+  },
+  "evidence_adapter": {
+    "evidence_schema_version": 1,
+    "provider_response": {
+      "explicit_created_count": 719,
+      "explicit_finish_reason_count": 719,
+      "explicit_id_count": 719,
+      "explicit_model_count": 719,
+      "response_ids_are_not_dependencies": true,
+      "trace_count": 719
+    },
+    "provider_usage": {
+      "explicit_usage_count": 719,
+      "raw_usage_preserved": true,
+      "schema_coverage": {
+        "codetracebench-anthropic-chat-completions-v1": {
+          "exactly_interpretable_fields": [],
+          "existing_exact_normalizer": false,
+          "raw_field_paths": [
+            "claude_cache_creation_1_h_tokens",
+            "claude_cache_creation_5_m_tokens",
+            "completion_tokens",
+            "completion_tokens_details",
+            "completion_tokens_details.audio_tokens",
+            "completion_tokens_details.reasoning_tokens",
+            "completion_tokens_details.text_tokens",
+            "input_tokens",
+            "input_tokens_details",
+            "output_tokens",
+            "prompt_tokens",
+            "prompt_tokens_details",
+            "prompt_tokens_details.audio_tokens",
+            "prompt_tokens_details.cached_tokens",
+            "prompt_tokens_details.image_tokens",
+            "prompt_tokens_details.text_tokens",
+            "total_tokens"
+          ],
+          "trace_count": 268
+        },
+        "codetracebench-deepseek-chat-completions-v1": {
+          "exactly_interpretable_fields": [],
+          "existing_exact_normalizer": false,
+          "raw_field_paths": [
+            "claude_cache_creation_1_h_tokens",
+            "claude_cache_creation_5_m_tokens",
+            "completion_tokens",
+            "completion_tokens_details",
+            "completion_tokens_details.reasoning_tokens",
+            "prompt_tokens",
+            "prompt_tokens_details",
+            "prompt_tokens_details.cached_tokens_details",
+            "reasoning_tokens",
+            "total_tokens"
+          ],
+          "trace_count": 118
+        },
+        "openai-chat-completions-v1": {
+          "exactly_interpretable_fields": [
+            "completion_tokens",
+            "prompt_tokens",
+            "prompt_tokens_details.cached_tokens",
+            "total_tokens"
+          ],
+          "existing_exact_normalizer": true,
+          "raw_field_paths": [
+            "completion_tokens",
+            "completion_tokens_details",
+            "completion_tokens_details.accepted_prediction_tokens",
+            "completion_tokens_details.audio_tokens",
+            "completion_tokens_details.image_tokens",
+            "completion_tokens_details.reasoning_tokens",
+            "completion_tokens_details.rejected_prediction_tokens",
+            "completion_tokens_details.text_tokens",
+            "prompt_tokens",
+            "prompt_tokens_details",
+            "prompt_tokens_details.audio_tokens",
+            "prompt_tokens_details.cached_tokens",
+            "prompt_tokens_details.image_tokens",
+            "prompt_tokens_details.text_tokens",
+            "total_tokens"
+          ],
+          "trace_count": 333
+        }
+      },
+      "trace_count": 719,
+      "unsupported_fields_reinterpreted": false
+    },
+    "safety_evidence": {
+      "dependency_edges": "unknown",
+      "evaluation_labels_as_planner_input": false,
+      "invalidation": "unknown",
+      "optional": "unknown",
+      "required": "unknown",
+      "stale": "unknown",
+      "supersession": "unknown",
+      "tool_call_result_links": "unknown"
+    },
+    "timestamps": {
+      "explicit_timestamp_count": 1498,
+      "source_event_count": 1498,
+      "timestamp_age_used_as_staleness": false,
+      "unique_source_event_count": 1498
     }
   },
   "evidence_distribution": {
@@ -96,8 +199,8 @@
       "UNKNOWN": 0
     },
     "provider_evidence": {
-      "ABSENT": 719,
-      "PRESENT": 0
+      "ABSENT": 0,
+      "PRESENT": 719
     },
     "provider_state_dependence_counts": {
       "NONE_FOR_RETENTION": 719,
@@ -116,11 +219,11 @@
       "DEPENDENCY_CLOSURE_PROTECTED": 0,
       "NO_ECONOMIC_EVIDENCE": 719,
       "NO_JUSTIFIED_INTERVENTION": 719,
-      "NO_PROVIDER_EVIDENCE": 719,
+      "NO_PROVIDER_EVIDENCE": 0,
       "OPTIONAL_STALE_TOOL_RESULT": 0,
       "OPTIONAL_VOLATILE_TOOL_RESULT": 0,
       "PROTOCOL_CRITICAL_BLOCK": 719,
-      "PROVIDER_EVIDENCE_NOT_USED_AS_SAFETY_PROOF": 0,
+      "PROVIDER_EVIDENCE_NOT_USED_AS_SAFETY_PROOF": 719,
       "QUALITY_EVIDENCE_ABSENT": 719,
       "REQUIRED_BLOCK": 0,
       "STRUCTURAL_HEURISTIC_NOT_SUFFICIENT": 0,
@@ -133,10 +236,10 @@
   "execution": {
     "deterministic_match": true,
     "failures": [],
-    "first_pass_aggregate_hash": "8ef45466c158ebb11e5f719c07906218ad6a02f9bdcca57476df8154ee4b4a53",
+    "first_pass_aggregate_hash": "5157f5a4a8b59d58d8898bf3df3fc4ad9bea60f08ccf9d920b87f41734e806fb",
     "planning_validation_failures": 0,
     "plans_produced_successfully": 719,
-    "second_pass_aggregate_hash": "8ef45466c158ebb11e5f719c07906218ad6a02f9bdcca57476df8154ee4b4a53",
+    "second_pass_aggregate_hash": "5157f5a4a8b59d58d8898bf3df3fc4ad9bea60f08ccf9d920b87f41734e806fb",
     "second_pass_failures_match": true,
     "second_pass_planning_validation_failures": 0,
     "traces_attempted": 719
@@ -154,10 +257,10 @@
     "economic_input_available": false,
     "evaluation_labels_input_available": false,
     "frozen_phase_1b0_planner_checkpoint": "3436e16afcdf359a33a691c15202900d796b25bc",
-    "git_base_checkpoint": "663b91871653e19f5c95b57e9b3ccee133b11e8f",
+    "git_base_checkpoint": "fab5b006b10cc93d8a1319f8f11538e2cc380220",
     "intervention_plan_contract_version": 1,
     "planner_binary": "target/debug/prefixity.exe",
-    "planner_binary_sha256": "22a0f29b1c95bbb1196c70fc981ea4e3138d6bb898016213a4c190ec038def84",
+    "planner_binary_sha256": "0bfa0b60500cb01b7874dc78249e2dc09a8e32e6bcf8b2b10fde3efa2cb6f3e1",
     "planner_mode": "offline CLI plan --json; no provider profile",
     "provider_input_available": false,
     "quality_input_available": false
@@ -191,19 +294,27 @@
         "trajectory_count": 12
       }
     },
+    "evaluation_source_locator_coverage": {
+      "exact_source_event_count": 52,
+      "exact_step_join_count": 32,
+      "explicit_source_locator_count": 63,
+      "labelled_step_count": 60,
+      "positional_fallback_used": false,
+      "unresolved_step_count": 28
+    },
     "label_record_count": 24,
     "labelled_incorrect_step_count": 55,
     "labelled_unuseful_step_count": 5,
-    "labels_schema_version": 1,
+    "labels_schema_version": 2,
     "performed": true,
     "planner_input_boundary": {
       "labels_loaded_after_both_deterministic_planner_passes": true,
-      "planner_aggregate_hash_before_overlay": "8ef45466c158ebb11e5f719c07906218ad6a02f9bdcca57476df8154ee4b4a53",
+      "planner_aggregate_hash_before_overlay": "5157f5a4a8b59d58d8898bf3df3fc4ad9bea60f08ccf9d920b87f41734e806fb",
       "planner_output_hash_unchanged_by_overlay": true,
       "raw_labels_passed_to_planner": false
     },
     "recommendation_overlap": {
-      "reason": "accepted traces expose message IDs and labels expose step IDs; no exact existing join is available",
+      "reason": "bounded source locators are preserved post-hoc, but labels remain outside planner inputs and no causal recommendation overlap is inferred",
       "status": "unavailable"
     },
     "solved_trajectory_count": 12,
@@ -300,6 +411,6 @@
       "non_hypothetical_recommendations",
       "plans_with_hypothetical_only_false"
     ],
-    "version": 1
+    "version": 2
   }
 }

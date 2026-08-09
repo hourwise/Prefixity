@@ -418,6 +418,7 @@ mod tests {
             content_hash: hash_content(content),
             token_count: Some(tokens),
             byte_count: content.len() as u64,
+            timestamp: None,
             content: Some(content.to_string()),
             semantic_zone: None,
             structural_path: None,
@@ -428,6 +429,7 @@ mod tests {
             optional: false,
             required: false,
             stale: false,
+            provenance: BTreeMap::new(),
             metadata: BTreeMap::new(),
         }
     }
@@ -440,9 +442,12 @@ mod tests {
             timestamp: None,
             provider: "synthetic".to_string(),
             model: "synthetic-model".to_string(),
+            evidence_schema_version: None,
             blocks,
             usage: None,
+            provider_response: None,
             latency: None,
+            provenance: BTreeMap::new(),
             metadata: BTreeMap::new(),
         }
     }

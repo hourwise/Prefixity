@@ -1,6 +1,6 @@
 # Active Task — Phase 1B.4 Verified Evidence Adapter Revision and Frozen Recharacterization
 
-Status: ready for implementation.
+Status: complete; Phase 1B.4 closed with `PASS WITH RECORDED LIMITATIONS`.
 
 ## Objective
 
@@ -452,3 +452,99 @@ On completion record:
 - recommended next task.
 
 Do not begin the recommended next task.
+
+## Phase 1B.4 completion record
+
+Completed against the frozen source `NJU-LINK/CodeTraceBench`, revision
+`aa213b84ffb6690fc37ca15766d6ca174ec36d4d`, split `verified`, and the existing
+24-trajectory selection.
+
+### Implementation
+
+- Model/schema: retained trace format v2 compatibility and added optional
+  evidence schema version 1. Added typed `EvidenceOrigin`, bounded
+  `SourceLocator`, `EvidenceProvenance`, `ProviderFieldState`, and bounded
+  `ProviderResponseMetadata`. `ContextBlock` now accepts a source-explicit
+  numeric timestamp and block provenance; `RequestTrace` accepts evidence
+  version, provider response metadata, and trace provenance. Historical
+  fixtures remain readable without fabricating evidence.
+- Provenance: every new captured/derived field is represented as
+  `source_explicit`, `derived_structural`, or `unknown`, with bounded source
+  locators. Generated message IDs, role-only source/zone projections, paths,
+  and unique evaluation locator joins are marked derived. Provider response
+  IDs are identity only, not dependency or tool relationships.
+- Importer: corrected message classification to use role only; preserved raw
+  numeric timestamps, response metadata, provider-specific raw usage, and
+  hash-only source provenance; retained explicit evaluation locators and exact
+  path/line-span joins. No content-marker, adjacency, timestamp-age,
+  evaluation-label, or repetition inference creates safety evidence.
+- Privacy: no raw prompts, reasoning, tool output, trajectory JSON, or archive
+  was added to the repository. Decision-input traces remain hash-only.
+
+### Evidence and recharacterization
+
+- Corpus/count integrity: deterministic re-import produced 24 trajectories,
+  719 request traces, 1,498 source events, and 724 derivative files. Two
+  independent imports had identical file sets and SHA-256 hashes.
+- Provider usage: 719/719 traces retain explicit raw usage. Schema counts are
+  268 Anthropic custom, 118 DeepSeek custom, and 333 OpenAI Chat Completions.
+  Existing exact normalization is claimed only for the OpenAI fields
+  `prompt_tokens`, `prompt_tokens_details.cached_tokens`, `completion_tokens`,
+  and `total_tokens`; unsupported Anthropic/DeepSeek fields remain raw.
+- Provider response metadata: 719/719 traces preserve explicit response ID,
+  model, `created`, and finish-reason metadata.
+- Timestamp coverage: 1,498/1,498 source events preserve explicit numeric
+  timestamps. Timestamp age was not used as staleness evidence and did not
+  alter a planner decision.
+- Evaluation join coverage: 60 labeled steps contain 63 explicit locator
+  references; 32 steps have an exact bounded source-event join and 28 remain
+  unresolved. No positional fallback was used. Labels were loaded only after
+  both planner passes and were never planner inputs.
+- Frozen planner distribution: 719/719 `DO_NOTHING`; `KEEP`, `DEFER`, `PRUNE`,
+  `RELOCATE_CANDIDATE`, and `COMPRESS_CANDIDATE` each 0. This remains valid
+  because no intervention-safety evidence was established.
+- Safety audit: all failure counts are zero, including no source trace
+  mutation, no destructive recommendation against current/required/protocol
+  blocks, no missing/cyclic dependency-evidence violation, no unsafe
+  relocation, no contradictory destructive recommendations, and no
+  non-hypothetical recommendations.
+- Determinism: both planner passes produced 719 plans, zero validation
+  failures, and aggregate hash
+  `5157f5a4a8b59d58d8898bf3df3fc4ad9bea60f08ccf9d920b87f41734e806fb`.
+  Repeated characterization matched. No live provider/model calls were made.
+
+### Checks and decision gate
+
+Focused importer and characterization tests passed (`3` evidence-adapter
+tests, `7` characterization tests, Python compilation). `cargo fmt --all
+-- --check`, `cargo check --workspace`, `cargo clippy --workspace
+--all-targets --all-features -- -D warnings`, and `cargo test --workspace`
+passed (workspace test groups: 5, 59, 12, 2, 24, 12, 86, 22, plus zero-test
+groups). The deterministic re-import produced identical hashes for both 724-
+file outputs and preserved 24/719/1,498 counts; no raw material was present.
+The final frozen characterization passed with 719 plans and zero validation
+failures. Privacy/hash-only review found no raw archives or trajectory-content
+files in the repository, and `git diff --check` passed.
+
+Decision-gate answers: all verified B.3 fields were preservable without a
+privacy regression; the adapter and planner were deterministic; corpus identity
+and counts were stable; captured versus derived evidence is auditable; all 719
+requests have provider usage; only the existing OpenAI schema fields listed
+above are exactly interpretable; all 1,498 messages/events have timestamps;
+timestamp evidence changed no stale decision; 32 exact evaluation joins are
+reproducible and 28 remain unresolved; no safety-sensitive field became known;
+the decision distribution is 719 `DO_NOTHING`; the hard safety audit is clean;
+repeated characterization matches; audit/evaluation capability materially
+improved even though intervention coverage remains zero; and another
+CodeTraceBench planner characterization is not justified without new evidence.
+
+Assessment: `PASS WITH RECORDED LIMITATIONS`. Remaining limitations are the
+absence of explicit action/result/dependency/removability evidence, the 28
+unresolved evaluation joins, lack of causal quality joins, and no replay,
+savings, latency, or task-success evidence.
+
+Recommended next task: separately review a corpus/evaluation artifact with
+explicit action/result/dependency/removability identity and task-quality joins.
+Do not begin that task or Phase 1C as part of this completion.
+
+Findings: `docs/phase-1/PHASE_1B4_EVIDENCE_ADAPTER_RECHARACTERIZATION.md`.

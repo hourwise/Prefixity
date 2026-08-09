@@ -49,6 +49,7 @@ mod tests {
             content_hash: "0".repeat(64),
             token_count,
             byte_count: 0,
+            timestamp: None,
             content: content.map(str::to_string),
             semantic_zone: None,
             structural_path: None,
@@ -59,6 +60,7 @@ mod tests {
             optional: false,
             required: false,
             stale: false,
+            provenance: BTreeMap::new(),
             metadata: BTreeMap::new(),
         }
     }

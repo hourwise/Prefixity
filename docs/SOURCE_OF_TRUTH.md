@@ -20,17 +20,17 @@ remains unimplemented and is not authorized by the current task.
 
 Phase 1B.1 ran the frozen Phase 1B.0 planner over all 719 accepted offline
 request traces. All 719 plans produced `DO_NOTHING`; the run was deterministic
-and safety-clean. The accepted derivative representation contains no evidenced
-true `optional`, `required` or `stale` flags, no dependency edges, no provider
-usage, and insufficient structural identity for exact step-level evaluation
-joining.
+and safety-clean. At that baseline, the derivative representation lacked
+provider usage and sufficient structural identity for exact step-level
+evaluation joining, and contained no evidenced true `optional`, `required` or
+`stale` flags or dependency edges.
 
-Phase 1B.2 established that the currently available accepted derivative
-artifacts are insufficient to justify a positive importer revision or planner
-tuning. The exact upstream raw trajectory schema has not yet been verified
-because the raw artifacts were not available in the accepted local fixture.
-This finding applies to the inspected derivative representation; CodeTraceBench
-itself has not been proven unsuitable.
+Phase 1B.4 completed a narrow evidence-adapter revision justified by the pinned
+raw-schema verification. The accepted derivative now preserves source-explicit
+message timestamps, bounded provider response metadata, provider-specific raw
+usage, field-level provenance and bounded evaluation source locators. The
+frozen planner remains conservative: all 719 plans are `DO_NOTHING`, with no
+new optional/required/stale/dependency/tool-link evidence synthesized.
 
 ## Product definition
 
@@ -89,11 +89,13 @@ crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.
 
 The trace format is version 2. Blocks carry ordered structural metadata,
-content hashes, optional token/content data, flags and dependencies. Raw usage
-is retained with an explicit versioned API-surface schema. Known offline
-normalizers cover synthetic, OpenAI Chat Completions, Anthropic Messages and
-DeepSeek Chat Completions. OpenAI Responses is recognized as reserved but is
-not interpreted.
+content hashes, optional token/content data, flags and dependencies. The
+additive Phase 1B.4 evidence schema preserves source-explicit timestamps,
+bounded response metadata and typed provenance without changing trace-v2
+compatibility. Raw usage is retained with an explicit versioned API-surface
+schema. Known offline normalizers cover synthetic, OpenAI Chat Completions,
+Anthropic Messages and DeepSeek Chat Completions. OpenAI Responses is
+recognized as reserved but is not interpreted.
 
 ## Implemented
 
@@ -146,6 +148,13 @@ not interpreted.
   `DO_NOTHING` for all 719 accepted request traces in Phase 1B.1. The result was
   deterministic and safety-clean; this does not establish positive intervention
   coverage.
+- Phase 1B.4 evidence-adapter evidence: the pinned raw source preserves
+  provider response metadata and usage on 719/719 request traces, numeric
+  timestamps on 1,498/1,498 source events, and 32/60 exact evaluation-step
+  joins from explicit bounded locators. The remaining 28 joins remain
+  unresolved; labels stay outside planner inputs. Re-import and repeated
+  planner execution are deterministic and safety-clean. See
+  `docs/phase-1/PHASE_1B4_EVIDENCE_ADAPTER_RECHARACTERIZATION.md`.
 
 ## Incomplete and not established
 
@@ -185,10 +194,10 @@ inferred. The observed candidates remain heuristic and do not establish
 provider cache reuse, monetary savings, latency improvement or task-quality
 preservation.
 
-The next authorized research question is raw-artifact access and upstream-schema
-verification for the exact pinned CodeTraceBench revision. It must establish
-whether explicit step, action, observation or tool-reference identity exists
-before any importer revision is considered.
+The next authorized research question is whether a separately reviewed corpus
+or evaluation artifact can provide explicit action/result/dependency/
+removability identity and task-quality joins. The current CodeTraceBench slice
+does not justify another planner characterization without new evidence.
 
 ## Explicitly deferred
 

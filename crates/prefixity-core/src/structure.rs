@@ -108,6 +108,7 @@ mod tests {
             content_hash: hash_content(content),
             token_count: Some(1),
             byte_count: content.len() as u64,
+            timestamp: None,
             content: Some(content.to_string()),
             semantic_zone: zone.map(str::to_string),
             structural_path: path.map(str::to_string),
@@ -118,6 +119,7 @@ mod tests {
             optional: false,
             required: false,
             stale: false,
+            provenance: BTreeMap::new(),
             metadata: BTreeMap::new(),
         }
     }

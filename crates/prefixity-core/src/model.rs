@@ -25,8 +25,90 @@ use std::collections::BTreeMap;
 /// fields) and [`ContextBlock`] gained structural identity fields.
 pub const TRACE_FORMAT_VERSION: u32 = 2;
 
+/// Additive evidence-adapter schema version carried by Phase 1B.4 traces.
+///
+/// This is deliberately separate from [`TRACE_FORMAT_VERSION`]. Existing
+/// trace-v2 readers continue to accept historical fixtures, while adapters
+/// that understand this optional extension can inspect typed provenance and
+/// provider-response evidence.
+pub const EVIDENCE_SCHEMA_VERSION: u32 = 1;
+
 /// The provider-profile format version this crate reads.
 pub const PROVIDER_PROFILE_FORMAT_VERSION: u32 = 1;
+
+/// Origin of an evidence value preserved by an adapter.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum EvidenceOrigin {
+    /// The upstream source explicitly contained the field/value.
+    SourceExplicit,
+    /// The adapter produced the value by a documented structural rule.
+    DerivedStructural,
+    /// The source was silent or the value is not safely established.
+    #[default]
+    Unknown,
+}
+
+/// A bounded source locator used by the evidence adapter.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct SourceLocator {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trajectory_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_file_sha256: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_event_index: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_event_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub upstream_field_path: Option<String>,
+}
+
+/// Provenance for one imported or structurally derived evidence field.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct EvidenceProvenance {
+    pub origin: EvidenceOrigin,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_locator: Option<SourceLocator>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub derivation_rule: Option<String>,
+    #[serde(default)]
+    pub derivation_inputs: Vec<SourceLocator>,
+    #[serde(default)]
+    pub evaluation_only: bool,
+}
+
+/// Presence state for a provider response field whose value is intentionally
+/// not retained (for example a null tool-call placeholder).
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ProviderFieldState {
+    Absent,
+    Null,
+    Present,
+}
+
+/// Provider response identity and non-content response metadata.
+///
+/// Response IDs identify provider responses only. They are not message IDs,
+/// action IDs, observation IDs, dependency edges or safety evidence.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ProviderResponseMetadata {
+    pub id: String,
+    pub model: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub created: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub object: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub choice_index: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub finish_reason: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response_message_role: Option<String>,
+    #[serde(default)]
+    pub field_states: BTreeMap<String, ProviderFieldState>,
+}
 
 /// A single recorded LLM/agent request and its context.
 ///
@@ -55,6 +137,10 @@ pub struct RequestTrace {
     pub provider: String,
     /// Model identifier (for example `synthetic-model`).
     pub model: String,
+    /// Optional additive evidence-adapter schema version. Historical traces
+    /// omit this field and remain valid trace-v2 documents.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_schema_version: Option<u32>,
     /// Ordered context blocks exactly as sent to the model.
     pub blocks: Vec<ContextBlock>,
     /// Provider-specific raw usage, preserved verbatim. Normalisation is a
@@ -62,9 +148,16 @@ pub struct RequestTrace {
     /// reinterpreted in place.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub usage: Option<RawUsage>,
+    /// Explicit provider response identity/metadata for the response that
+    /// produced this recorded request trace, when available.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub provider_response: Option<ProviderResponseMetadata>,
     /// Optional latency information.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub latency: Option<LatencyInfo>,
+    /// Field-level provenance for additive evidence captured at trace scope.
+    #[serde(default)]
+    pub provenance: BTreeMap<String, EvidenceProvenance>,
     /// Free-form metadata. Must remain JSON so that unknown future fields
     /// round-trip losslessly.
     #[serde(default)]
@@ -101,6 +194,10 @@ pub struct ContextBlock {
     /// Byte count of the block content. When `content` is present, validation
     /// requires this to equal the UTF-8 byte length of `content`.
     pub byte_count: u64,
+    /// Source-explicit event timestamp, when the upstream message contains
+    /// one. Timestamp age never implies staleness or removability.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub timestamp: Option<f64>,
     /// Optional actual content. Phase 0 fixtures generally omit this and keep
     /// hashes only, to avoid storing complete prompt content.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -141,6 +238,9 @@ pub struct ContextBlock {
     /// Explicitly marked as stale (e.g. superseded tool output).
     #[serde(default)]
     pub stale: bool,
+    /// Field-level provenance for additive evidence captured on this block.
+    #[serde(default)]
+    pub provenance: BTreeMap<String, EvidenceProvenance>,
     /// Free-form block metadata.
     #[serde(default)]
     pub metadata: BTreeMap<String, serde_json::Value>,

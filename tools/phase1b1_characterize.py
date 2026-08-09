@@ -19,7 +19,7 @@ from typing import Any, Iterable
 
 
 REPORT_SCHEMA_NAME = "prefixity.phase1b1.characterization"
-REPORT_SCHEMA_VERSION = 1
+REPORT_SCHEMA_VERSION = 2
 INTERVENTION_CONTRACT_VERSION = 1
 FROZEN_PLANNER_CHECKPOINT = "3436e16afcdf359a33a691c15202900d796b25bc"
 EXPECTED_CORPUS = "NJU-LINK/CodeTraceBench"
@@ -216,6 +216,124 @@ def source_hashes(traces: list[dict[str, Any]]) -> dict[str, str]:
     return {
         item["relative_path"]: sha256_bytes(item["path"].read_bytes())
         for item in traces
+    }
+
+
+def flattened_usage_fields(raw: Any, prefix: str = "") -> set[str]:
+    fields: set[str] = set()
+    if not isinstance(raw, dict):
+        return fields
+    for key, value in raw.items():
+        path = f"{prefix}.{key}" if prefix else str(key)
+        fields.add(path)
+        if isinstance(value, dict):
+            fields.update(flattened_usage_fields(value, path))
+    return fields
+
+
+def evidence_adapter_coverage(
+    traces: list[dict[str, Any]],
+    source_events_path: Path,
+    import_report: dict[str, Any],
+) -> dict[str, Any]:
+    provider_schema_counts: dict[str, int] = defaultdict(int)
+    provider_schema_fields: dict[str, set[str]] = defaultdict(set)
+    response_id_count = 0
+    response_model_count = 0
+    response_created_count = 0
+    response_finish_reason_count = 0
+    for item in traces:
+        document = item["document"]
+        usage = document.get("usage")
+        if isinstance(usage, dict):
+            schema = str(usage.get("provider_schema"))
+            provider_schema_counts[schema] += 1
+            provider_schema_fields[schema].update(
+                flattened_usage_fields(usage.get("raw"))
+            )
+        response = document.get("provider_response")
+        if isinstance(response, dict):
+            response_id_count += int(isinstance(response.get("id"), str))
+            response_model_count += int(isinstance(response.get("model"), str))
+            response_created_count += int(isinstance(response.get("created"), int))
+            response_finish_reason_count += int(
+                isinstance(response.get("finish_reason"), str)
+            )
+
+    source_events = [
+        json.loads(line)
+        for line in source_events_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    timestamp_count = sum(
+        1
+        for event in source_events
+        if isinstance(event.get("timestamp"), (int, float))
+        and not isinstance(event.get("timestamp"), bool)
+    )
+    timestamp_event_ids = {
+        (event.get("trajectory_id"), event.get("source_event_index"))
+        for event in source_events
+    }
+    exact_openai_fields = {
+        "prompt_tokens",
+        "prompt_tokens_details.cached_tokens",
+        "completion_tokens",
+        "total_tokens",
+    }
+    normalized_coverage: dict[str, Any] = {}
+    for schema, count in sorted(provider_schema_counts.items()):
+        fields = sorted(provider_schema_fields[schema])
+        exact_fields = (
+            exact_openai_fields & provider_schema_fields[schema]
+            if schema == "openai-chat-completions-v1"
+            else set()
+        )
+        normalized_coverage[schema] = {
+            "trace_count": count,
+            "raw_field_paths": fields,
+            "existing_exact_normalizer": schema == "openai-chat-completions-v1"
+            and exact_openai_fields.issubset(provider_schema_fields[schema]),
+            "exactly_interpretable_fields": sorted(exact_fields),
+        }
+
+    return {
+        "evidence_schema_version": import_report.get("evidence_adapter", {}).get(
+            "schema_version"
+        ),
+        "provider_response": {
+            "trace_count": len(traces),
+            "explicit_id_count": response_id_count,
+            "explicit_model_count": response_model_count,
+            "explicit_created_count": response_created_count,
+            "explicit_finish_reason_count": response_finish_reason_count,
+            "response_ids_are_not_dependencies": True,
+        },
+        "provider_usage": {
+            "trace_count": len(traces),
+            "explicit_usage_count": sum(
+                isinstance(item["document"].get("usage"), dict) for item in traces
+            ),
+            "schema_coverage": normalized_coverage,
+            "raw_usage_preserved": True,
+            "unsupported_fields_reinterpreted": False,
+        },
+        "timestamps": {
+            "source_event_count": len(source_events),
+            "unique_source_event_count": len(timestamp_event_ids),
+            "explicit_timestamp_count": timestamp_count,
+            "timestamp_age_used_as_staleness": False,
+        },
+        "safety_evidence": {
+            "optional": "unknown",
+            "required": "unknown",
+            "stale": "unknown",
+            "invalidation": "unknown",
+            "supersession": "unknown",
+            "dependency_edges": "unknown",
+            "tool_call_result_links": "unknown",
+            "evaluation_labels_as_planner_input": False,
+        },
     }
 
 
@@ -686,8 +804,29 @@ def load_posthoc_labels(labels_path: Path, records: list[dict[str, Any]]) -> dic
         for record in label_records
         for stage in record.get("incorrect_stages", [])
     )
-    # The trace importer preserves message IDs, while labels preserve source
-    # step IDs. The accepted local evidence has no exact message-to-step map.
+    labelled_steps = [
+        step
+        for record in label_records
+        for stage in record.get("incorrect_stages", [])
+        for step in stage.get("steps", [])
+    ]
+    exact_steps = [
+        step
+        for step in labelled_steps
+        if step.get("source_event_join", {}).get("status") == "exact"
+    ]
+    explicit_locator_count = sum(
+        len(step.get("source_locators", {})) for step in labelled_steps
+    )
+    exact_source_events = sorted(
+        {
+            source_event_index
+            for step in exact_steps
+            for source_event_index in step.get("source_event_join", {}).get(
+                "source_event_indices", []
+            )
+        }
+    )
     overlay = {
         "performed": True,
         "labels_schema_version": labels_document.get("schema_version"),
@@ -698,10 +837,18 @@ def load_posthoc_labels(labels_path: Path, records: list[dict[str, Any]]) -> dic
         "unsolved_trajectory_count": sum(not bool(item.get("solved")) for item in label_records),
         "labelled_incorrect_step_count": incorrect_steps,
         "labelled_unuseful_step_count": unuseful_steps,
+        "evaluation_source_locator_coverage": {
+            "labelled_step_count": len(labelled_steps),
+            "explicit_source_locator_count": explicit_locator_count,
+            "exact_step_join_count": len(exact_steps),
+            "unresolved_step_count": len(labelled_steps) - len(exact_steps),
+            "exact_source_event_count": len(exact_source_events),
+            "positional_fallback_used": False,
+        },
         "decision_distribution_by_trajectory_outcome": grouped,
         "recommendation_overlap": {
             "status": "unavailable",
-            "reason": "accepted traces expose message IDs and labels expose step IDs; no exact existing join is available",
+            "reason": "bounded source locators are preserved post-hoc, but labels remain outside planner inputs and no causal recommendation overlap is inferred",
         },
     }
     return overlay
@@ -729,6 +876,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     provenance_path = (root / args.provenance).resolve()
     selection_path = (root / args.selection).resolve()
     import_report_path = (root / args.import_report).resolve()
+    source_events_path = (root / args.source_events).resolve()
     labels_path = (root / args.labels).resolve()
     binary = (root / args.binary).resolve()
     output = (root / args.out).resolve()
@@ -741,6 +889,10 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         provenance_path,
         selection_path,
         import_report_path,
+    )
+    import_report = read_json(import_report_path)
+    evidence_coverage = evidence_adapter_coverage(
+        traces, source_events_path, import_report
     )
     before_hashes = source_hashes(traces)
     first_records, first_failures, first_hash = run_pass(
@@ -826,6 +978,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             "safety_audit_fields": SAFETY_FAILURE_FIELDS,
         },
         "corpus": corpus,
+        "evidence_adapter": evidence_coverage,
         "planner": planner,
         "execution": execution,
         "decision_distribution": decision_distribution(first_records),
@@ -859,6 +1012,9 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--provenance", default=f"{current_fixture}/corpus-provenance.json")
     result.add_argument("--selection", default=f"{current_fixture}/selection.json")
     result.add_argument("--import-report", default=f"{current_fixture}/import-report.json")
+    result.add_argument(
+        "--source-events", default=f"{current_fixture}/provenance/source-events.jsonl"
+    )
     result.add_argument("--labels", default=f"{current_fixture}/evaluation/labels.json")
     result.add_argument("--binary", default="target/debug/prefixity.exe")
     result.add_argument("--out", default=f"{current_fixture}/results/phase1b1-characterization.json")

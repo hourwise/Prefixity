@@ -3,8 +3,44 @@
   "corpus": "NJU-LINK/CodeTraceBench",
   "corpus_revision": "aa213b84ffb6690fc37ca15766d6ca174ec36d4d",
   "evaluation_labels_in_decision_inputs": false,
+  "evaluation_source_locator_join": {
+    "exact_step_join_count": 32,
+    "explicit_locator_count": 63,
+    "labelled_step_count": 60,
+    "positional_fallback_used": false,
+    "unresolved_step_count": 28
+  },
+  "evidence_adapter": {
+    "derived_structural": [
+      "messages[n] source event index/path",
+      "generated source event ID",
+      "role-only source and semantic-zone projection",
+      "explicit evaluation locator to unique message span"
+    ],
+    "schema_version": 1,
+    "source_explicit": [
+      "messages[].timestamp",
+      "messages[].role",
+      "messages[].extra.response.id",
+      "messages[].extra.response.model",
+      "messages[].extra.response.created",
+      "messages[].extra.response.object",
+      "messages[].extra.response.choices[].finish_reason",
+      "messages[].extra.response.usage"
+    ],
+    "unknown_or_absent": [
+      "tool-call/result IDs and links",
+      "dependency edges",
+      "required",
+      "optional",
+      "stale",
+      "invalidation",
+      "supersession",
+      "removability"
+    ]
+  },
   "observer_input_glob": "traces/**/*.json",
-  "schema_version": 1,
+  "schema_version": 2,
   "source_event_count": 1498,
   "split": "verified",
   "token_counts_are_surrogates": true,

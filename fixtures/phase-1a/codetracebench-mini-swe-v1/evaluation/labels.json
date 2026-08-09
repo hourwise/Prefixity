@@ -1,4 +1,5 @@
 {
+  "planner_input": false,
   "records": [
     {
       "incorrect_stages": [],
@@ -32,18 +33,258 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  10,
+                  11
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 297,
+                  "line_start": 253,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/install-windows-xp/install-windows-xp.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0010",
+                        "source_event_index": 10,
+                        "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                        "upstream_field_path": "messages[10]"
+                      }
+                    },
+                    "source_event_id": "message-0010",
+                    "source_event_index": 10,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 302,
+                  "line_start": 298,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/install-windows-xp/install-windows-xp.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0011",
+                        "source_event_index": 11,
+                        "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                        "upstream_field_path": "messages[11]"
+                      }
+                    },
+                    "source_event_id": "message-0011",
+                    "source_event_index": 11,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 5
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  12,
+                  13
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 347,
+                  "line_start": 303,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/install-windows-xp/install-windows-xp.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0012",
+                        "source_event_index": 12,
+                        "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                        "upstream_field_path": "messages[12]"
+                      }
+                    },
+                    "source_event_id": "message-0012",
+                    "source_event_index": 12,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 352,
+                  "line_start": 348,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/install-windows-xp/install-windows-xp.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0013",
+                        "source_event_index": 13,
+                        "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                        "upstream_field_path": "messages[13]"
+                      }
+                    },
+                    "source_event_id": "message-0013",
+                    "source_event_index": 13,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 6
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  18,
+                  19
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 497,
+                  "line_start": 453,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/install-windows-xp/install-windows-xp.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0018",
+                        "source_event_index": 18,
+                        "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                        "upstream_field_path": "messages[18]"
+                      }
+                    },
+                    "source_event_id": "message-0018",
+                    "source_event_index": 18,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 502,
+                  "line_start": 498,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/install-windows-xp/install-windows-xp.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0019",
+                        "source_event_index": 19,
+                        "source_file_sha256": "49ed4a32f2df16d30bda8d1e4e2f4082a765f63ed74dca91d68bef0e40c8b073",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-install-windows-xp-edd35096",
+                        "upstream_field_path": "messages[19]"
+                      }
+                    },
+                    "source_event_id": "message-0019",
+                    "source_event_index": 19,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 9
             }
           ],
@@ -69,6 +310,86 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  48,
+                  49
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1247,
+                  "line_start": 1203,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/neuron-to-jaxley-conversion/neuron-to-jaxley-conversion.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0048",
+                        "source_event_index": 48,
+                        "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                        "upstream_field_path": "messages[48]"
+                      }
+                    },
+                    "source_event_id": "message-0048",
+                    "source_event_index": 48,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1252,
+                  "line_start": 1248,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/neuron-to-jaxley-conversion/neuron-to-jaxley-conversion.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0049",
+                        "source_event_index": 49,
+                        "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                        "upstream_field_path": "messages[49]"
+                      }
+                    },
+                    "source_event_id": "message-0049",
+                    "source_event_index": 49,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 24
             }
           ],
@@ -84,12 +405,138 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  50,
+                  51
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1297,
+                  "line_start": 1253,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/neuron-to-jaxley-conversion/neuron-to-jaxley-conversion.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0050",
+                        "source_event_index": 50,
+                        "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                        "upstream_field_path": "messages[50]"
+                      }
+                    },
+                    "source_event_id": "message-0050",
+                    "source_event_index": 50,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1302,
+                  "line_start": 1298,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/neuron-to-jaxley-conversion/neuron-to-jaxley-conversion.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0051",
+                        "source_event_index": 51,
+                        "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                        "upstream_field_path": "messages[51]"
+                      }
+                    },
+                    "source_event_id": "message-0051",
+                    "source_event_index": 51,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 25
             },
             {
               "labels": [
                 "unuseful"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  52
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1347,
+                  "line_start": 1303,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/neuron-to-jaxley-conversion/neuron-to-jaxley-conversion.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0052",
+                        "source_event_index": 52,
+                        "source_file_sha256": "9ff64fea7aeccd84615c05810c0997cb89aef5a1d906677c5275a7ace52c7297",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-neuron-to-jaxley-conversion-87200f19",
+                        "upstream_field_path": "messages[52]"
+                      }
+                    },
+                    "source_event_id": "message-0052",
+                    "source_event_index": 52,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 26
             }
           ],
@@ -128,18 +575,258 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  10,
+                  11
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 297,
+                  "line_start": 253,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/reshard-c4-data/reshard-c4-data.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0010",
+                        "source_event_index": 10,
+                        "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                        "upstream_field_path": "messages[10]"
+                      }
+                    },
+                    "source_event_id": "message-0010",
+                    "source_event_index": 10,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 302,
+                  "line_start": 298,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/reshard-c4-data/reshard-c4-data.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0011",
+                        "source_event_index": 11,
+                        "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                        "upstream_field_path": "messages[11]"
+                      }
+                    },
+                    "source_event_id": "message-0011",
+                    "source_event_index": 11,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 5
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  12,
+                  13
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 347,
+                  "line_start": 303,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/reshard-c4-data/reshard-c4-data.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0012",
+                        "source_event_index": 12,
+                        "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                        "upstream_field_path": "messages[12]"
+                      }
+                    },
+                    "source_event_id": "message-0012",
+                    "source_event_index": 12,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 352,
+                  "line_start": 348,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/reshard-c4-data/reshard-c4-data.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0013",
+                        "source_event_index": 13,
+                        "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                        "upstream_field_path": "messages[13]"
+                      }
+                    },
+                    "source_event_id": "message-0013",
+                    "source_event_index": 13,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 6
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  14,
+                  15
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 397,
+                  "line_start": 353,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/reshard-c4-data/reshard-c4-data.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0014",
+                        "source_event_index": 14,
+                        "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                        "upstream_field_path": "messages[14]"
+                      }
+                    },
+                    "source_event_id": "message-0014",
+                    "source_event_index": 14,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 402,
+                  "line_start": 398,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/reshard-c4-data/reshard-c4-data.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0015",
+                        "source_event_index": 15,
+                        "source_file_sha256": "09013b81a7efb46242d775dbeb5fbb8aa5542b26733ab0be28a7322028dbdc02",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-reshard-c4-data-f4ff7301",
+                        "upstream_field_path": "messages[15]"
+                      }
+                    },
+                    "source_event_id": "message-0015",
+                    "source_event_index": 15,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 7
             }
           ],
@@ -176,36 +863,516 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  60,
+                  61
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1547,
+                  "line_start": 1503,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0060",
+                        "source_event_index": 60,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[60]"
+                      }
+                    },
+                    "source_event_id": "message-0060",
+                    "source_event_index": 60,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1552,
+                  "line_start": 1548,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0061",
+                        "source_event_index": 61,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[61]"
+                      }
+                    },
+                    "source_event_id": "message-0061",
+                    "source_event_index": 61,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 30
             },
             {
               "labels": [
                 "unuseful"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  62,
+                  63
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1597,
+                  "line_start": 1553,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0062",
+                        "source_event_index": 62,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[62]"
+                      }
+                    },
+                    "source_event_id": "message-0062",
+                    "source_event_index": 62,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1602,
+                  "line_start": 1598,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0063",
+                        "source_event_index": 63,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[63]"
+                      }
+                    },
+                    "source_event_id": "message-0063",
+                    "source_event_index": 63,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 31
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  64,
+                  65
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1647,
+                  "line_start": 1603,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0064",
+                        "source_event_index": 64,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[64]"
+                      }
+                    },
+                    "source_event_id": "message-0064",
+                    "source_event_index": 64,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1652,
+                  "line_start": 1648,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0065",
+                        "source_event_index": 65,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[65]"
+                      }
+                    },
+                    "source_event_id": "message-0065",
+                    "source_event_index": 65,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 32
             },
             {
               "labels": [
                 "unuseful"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  66,
+                  67
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1697,
+                  "line_start": 1653,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0066",
+                        "source_event_index": 66,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[66]"
+                      }
+                    },
+                    "source_event_id": "message-0066",
+                    "source_event_index": 66,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1702,
+                  "line_start": 1698,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0067",
+                        "source_event_index": 67,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[67]"
+                      }
+                    },
+                    "source_event_id": "message-0067",
+                    "source_event_index": 67,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 33
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  68,
+                  69
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1747,
+                  "line_start": 1703,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0068",
+                        "source_event_index": 68,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[68]"
+                      }
+                    },
+                    "source_event_id": "message-0068",
+                    "source_event_index": 68,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1752,
+                  "line_start": 1748,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0069",
+                        "source_event_index": 69,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[69]"
+                      }
+                    },
+                    "source_event_id": "message-0069",
+                    "source_event_index": 69,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 34
             },
             {
               "labels": [
                 "unuseful"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  70,
+                  71
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1797,
+                  "line_start": 1753,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0070",
+                        "source_event_index": 70,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[70]"
+                      }
+                    },
+                    "source_event_id": "message-0070",
+                    "source_event_index": 70,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1802,
+                  "line_start": 1798,
+                  "path": "traj/miniswe/Anthropic__Claude-Sonnet-4-20250514-Thinking/miniswe-claude/vul-flask/vul-flask.1-of-1.claude-sonnet-4-20250514-thinking/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                      "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0071",
+                        "source_event_index": 71,
+                        "source_file_sha256": "11a35d9969f4c1c3e6b920a265ed624328693228525d01f2424ece748c3862e8",
+                        "trajectory_id": "miniswe-Anthropic__Claude-Sonnet-4-20250514-Thinking-vul-flask-4946dda9",
+                        "upstream_field_path": "messages[71]"
+                      }
+                    },
+                    "source_event_id": "message-0071",
+                    "source_event_index": 71,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 35
             }
           ],
@@ -238,24 +1405,344 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  26,
+                  27
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 479,
+                  "line_start": 452,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0026",
+                        "source_event_index": 26,
+                        "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                        "upstream_field_path": "messages[26]"
+                      }
+                    },
+                    "source_event_id": "message-0026",
+                    "source_event_index": 26,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 484,
+                  "line_start": 480,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0027",
+                        "source_event_index": 27,
+                        "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                        "upstream_field_path": "messages[27]"
+                      }
+                    },
+                    "source_event_id": "message-0027",
+                    "source_event_index": 27,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 13
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  28,
+                  31
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 512,
+                  "line_start": 485,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0028",
+                        "source_event_index": 28,
+                        "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                        "upstream_field_path": "messages[28]"
+                      }
+                    },
+                    "source_event_id": "message-0028",
+                    "source_event_index": 28,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 553,
+                  "line_start": 549,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0031",
+                        "source_event_index": 31,
+                        "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                        "upstream_field_path": "messages[31]"
+                      }
+                    },
+                    "source_event_id": "message-0031",
+                    "source_event_index": 31,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 14
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  30,
+                  31
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 548,
+                  "line_start": 518,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0030",
+                        "source_event_index": 30,
+                        "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                        "upstream_field_path": "messages[30]"
+                      }
+                    },
+                    "source_event_id": "message-0030",
+                    "source_event_index": 30,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 553,
+                  "line_start": 549,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0031",
+                        "source_event_index": 31,
+                        "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                        "upstream_field_path": "messages[31]"
+                      }
+                    },
+                    "source_event_id": "message-0031",
+                    "source_event_index": 31,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 15
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  32,
+                  33
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 581,
+                  "line_start": 554,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0032",
+                        "source_event_index": 32,
+                        "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                        "upstream_field_path": "messages[32]"
+                      }
+                    },
+                    "source_event_id": "message-0032",
+                    "source_event_index": 32,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 586,
+                  "line_start": 582,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/cartpole-rl-training/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0033",
+                        "source_event_index": 33,
+                        "source_file_sha256": "d4a9fb98c0eb0bb98a28800ed60b17c524f990d4aedbd90768016cc75ca6003f",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-cartpole-rl-training-74a92a16",
+                        "upstream_field_path": "messages[33]"
+                      }
+                    },
+                    "source_event_id": "message-0033",
+                    "source_event_index": 33,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 16
             }
           ],
@@ -281,6 +1768,86 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  12,
+                  13
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 301,
+                  "line_start": 265,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/merge-diff-arc-agi-task/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4203f8c8f538b161a8d882c1fb362981721703334876f7184d6a3b6855124cf5",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0012",
+                        "source_event_index": 12,
+                        "source_file_sha256": "4203f8c8f538b161a8d882c1fb362981721703334876f7184d6a3b6855124cf5",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd",
+                        "upstream_field_path": "messages[12]"
+                      }
+                    },
+                    "source_event_id": "message-0012",
+                    "source_event_index": 12,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 306,
+                  "line_start": 302,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/merge-diff-arc-agi-task/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4203f8c8f538b161a8d882c1fb362981721703334876f7184d6a3b6855124cf5",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0013",
+                        "source_event_index": 13,
+                        "source_file_sha256": "4203f8c8f538b161a8d882c1fb362981721703334876f7184d6a3b6855124cf5",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-merge-diff-arc-agi-task-cb5aafdd",
+                        "upstream_field_path": "messages[13]"
+                      }
+                    },
+                    "source_event_id": "message-0013",
+                    "source_event_index": 13,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 6
             }
           ],
@@ -319,30 +1886,430 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  56,
+                  57
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1213,
+                  "line_start": 1179,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0056",
+                        "source_event_index": 56,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[56]"
+                      }
+                    },
+                    "source_event_id": "message-0056",
+                    "source_event_index": 56,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1218,
+                  "line_start": 1214,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0057",
+                        "source_event_index": 57,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[57]"
+                      }
+                    },
+                    "source_event_id": "message-0057",
+                    "source_event_index": 57,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 28
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  58,
+                  59
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1253,
+                  "line_start": 1219,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0058",
+                        "source_event_index": 58,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[58]"
+                      }
+                    },
+                    "source_event_id": "message-0058",
+                    "source_event_index": 58,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1258,
+                  "line_start": 1254,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0059",
+                        "source_event_index": 59,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[59]"
+                      }
+                    },
+                    "source_event_id": "message-0059",
+                    "source_event_index": 59,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 29
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  60,
+                  61
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1293,
+                  "line_start": 1259,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0060",
+                        "source_event_index": 60,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[60]"
+                      }
+                    },
+                    "source_event_id": "message-0060",
+                    "source_event_index": 60,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1298,
+                  "line_start": 1294,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0061",
+                        "source_event_index": 61,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[61]"
+                      }
+                    },
+                    "source_event_id": "message-0061",
+                    "source_event_index": 61,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 30
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  64,
+                  65
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1377,
+                  "line_start": 1341,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0064",
+                        "source_event_index": 64,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[64]"
+                      }
+                    },
+                    "source_event_id": "message-0064",
+                    "source_event_index": 64,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1382,
+                  "line_start": 1378,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0065",
+                        "source_event_index": 65,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[65]"
+                      }
+                    },
+                    "source_event_id": "message-0065",
+                    "source_event_index": 65,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 32
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  72,
+                  73
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1545,
+                  "line_start": 1509,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0072",
+                        "source_event_index": 72,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[72]"
+                      }
+                    },
+                    "source_event_id": "message-0072",
+                    "source_event_index": 72,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1550,
+                  "line_start": 1546,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0073",
+                        "source_event_index": 73,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[73]"
+                      }
+                    },
+                    "source_event_id": "message-0073",
+                    "source_event_index": 73,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 36
             }
           ],
@@ -364,42 +2331,602 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  76,
+                  77
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1629,
+                  "line_start": 1593,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0076",
+                        "source_event_index": 76,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[76]"
+                      }
+                    },
+                    "source_event_id": "message-0076",
+                    "source_event_index": 76,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1634,
+                  "line_start": 1630,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0077",
+                        "source_event_index": 77,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[77]"
+                      }
+                    },
+                    "source_event_id": "message-0077",
+                    "source_event_index": 77,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 38
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  80,
+                  81
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1713,
+                  "line_start": 1677,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0080",
+                        "source_event_index": 80,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[80]"
+                      }
+                    },
+                    "source_event_id": "message-0080",
+                    "source_event_index": 80,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1718,
+                  "line_start": 1714,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0081",
+                        "source_event_index": 81,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[81]"
+                      }
+                    },
+                    "source_event_id": "message-0081",
+                    "source_event_index": 81,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 40
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  82,
+                  83
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1755,
+                  "line_start": 1719,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0082",
+                        "source_event_index": 82,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[82]"
+                      }
+                    },
+                    "source_event_id": "message-0082",
+                    "source_event_index": 82,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1760,
+                  "line_start": 1756,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0083",
+                        "source_event_index": 83,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[83]"
+                      }
+                    },
+                    "source_event_id": "message-0083",
+                    "source_event_index": 83,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 41
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  88,
+                  89
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1881,
+                  "line_start": 1845,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0088",
+                        "source_event_index": 88,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[88]"
+                      }
+                    },
+                    "source_event_id": "message-0088",
+                    "source_event_index": 88,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1886,
+                  "line_start": 1882,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0089",
+                        "source_event_index": 89,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[89]"
+                      }
+                    },
+                    "source_event_id": "message-0089",
+                    "source_event_index": 89,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 44
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  92,
+                  93
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 1961,
+                  "line_start": 1927,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0092",
+                        "source_event_index": 92,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[92]"
+                      }
+                    },
+                    "source_event_id": "message-0092",
+                    "source_event_index": 92,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 1966,
+                  "line_start": 1962,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0093",
+                        "source_event_index": 93,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[93]"
+                      }
+                    },
+                    "source_event_id": "message-0093",
+                    "source_event_index": 93,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 46
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  94,
+                  95
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 2001,
+                  "line_start": 1967,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0094",
+                        "source_event_index": 94,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[94]"
+                      }
+                    },
+                    "source_event_id": "message-0094",
+                    "source_event_index": 94,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 2006,
+                  "line_start": 2002,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0095",
+                        "source_event_index": 95,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[95]"
+                      }
+                    },
+                    "source_event_id": "message-0095",
+                    "source_event_index": 95,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 47
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                  "evaluation_only": true,
+                  "origin": "derived_structural"
+                },
+                "source_event_indices": [
+                  96,
+                  97
+                ],
+                "status": "exact"
+              },
+              "source_locators": {
+                "action": {
+                  "line_end": 2043,
+                  "line_start": 2007,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.action_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0096",
+                        "source_event_index": 96,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[96]"
+                      }
+                    },
+                    "source_event_id": "message-0096",
+                    "source_event_index": 96,
+                    "status": "exact"
+                  }
+                },
+                "observation": {
+                  "line_end": 2048,
+                  "line_start": 2044,
+                  "path": "traj/miniswe/DeepSeek__DeepSeek-V3.2/miniswe-deepseek/schemelike-metacircular-eval/agent-logs/mini.traj.json",
+                  "provenance": {
+                    "evaluation_only": true,
+                    "origin": "source_explicit",
+                    "source_locator": {
+                      "source_event_id": null,
+                      "source_event_index": null,
+                      "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                      "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                      "upstream_field_path": "evaluation.observation_ref"
+                    }
+                  },
+                  "source_event_join": {
+                    "provenance": {
+                      "derivation_rule": "codetracebench.evaluation_locator_to_message_span_v1",
+                      "evaluation_only": true,
+                      "origin": "derived_structural",
+                      "source_locator": {
+                        "source_event_id": "message-0097",
+                        "source_event_index": 97,
+                        "source_file_sha256": "4d9140b8cbaa4818d18ddf938cd8fe82722c72917ca7049710714c664719ddc9",
+                        "trajectory_id": "miniswe-DeepSeek__DeepSeek-V3.2-schemelike-metacircular-eval-e73a741e",
+                        "upstream_field_path": "messages[97]"
+                      }
+                    },
+                    "source_event_id": "message-0097",
+                    "source_event_index": 97,
+                    "status": "exact"
+                  }
+                }
+              },
               "step_id": 48
             }
           ],
@@ -444,12 +2971,30 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 7
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 8
             }
           ],
@@ -465,6 +3010,15 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 19
             }
           ],
@@ -509,12 +3063,30 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 21
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 22
             }
           ],
@@ -530,6 +3102,15 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 29
             }
           ],
@@ -555,6 +3136,15 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 29
             }
           ],
@@ -580,6 +3170,15 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 19
             }
           ],
@@ -606,12 +3205,30 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 27
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 28
             }
           ],
@@ -627,6 +3244,15 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 31
             }
           ],
@@ -655,24 +3281,60 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 10
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 12
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 14
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 15
             }
           ],
@@ -688,6 +3350,15 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 20
             }
           ],
@@ -714,12 +3385,30 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 8
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 10
             }
           ],
@@ -738,30 +3427,75 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 16
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 17
             },
             {
               "labels": [
                 "unuseful"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 18
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 19
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 20
             }
           ],
@@ -791,18 +3525,45 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 23
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 24
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 26
             }
           ],
@@ -819,12 +3580,30 @@
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 28
             },
             {
               "labels": [
                 "incorrect"
               ],
+              "source_event_join": {
+                "provenance": {
+                  "evaluation_only": true,
+                  "origin": "unknown"
+                },
+                "source_event_indices": [],
+                "status": "unresolved"
+              },
+              "source_locators": {},
               "step_id": 29
             }
           ],
@@ -839,5 +3618,12 @@
       "trajectory_id": "miniswe-OpenAI__GPT-5-sveltejs__svelte-10608-2fe6d098"
     }
   ],
-  "schema_version": 1
+  "schema_version": 2,
+  "source_locator_join": {
+    "explicit_source_locator_count": 63,
+    "labelled_step_count": 60,
+    "positional_fallback_used": false,
+    "steps_with_exact_source_event_join": 32,
+    "steps_without_exact_source_event_join": 28
+  }
 }

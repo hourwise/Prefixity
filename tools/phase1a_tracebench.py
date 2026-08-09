@@ -25,10 +25,17 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-CORPUS = "Contextbench/Tracebench"
-CORPUS_REVISION = "7da2e4f45b330be8b6e8f1cff835247723cb3341"
+CORPUS = "NJU-LINK/CodeTraceBench"
+CORPUS_REVISION = "aa213b84ffb6690fc37ca15766d6ca174ec36d4d"
 SPLIT = "verified"
 TRACE_FORMAT_VERSION = 2
+EVIDENCE_SCHEMA_VERSION = 1
+
+PROVIDER_USAGE_SCHEMAS = {
+    "anthropic": "codetracebench-anthropic-chat-completions-v1",
+    "deepseek": "codetracebench-deepseek-chat-completions-v1",
+    "openai": "openai-chat-completions-v1",
+}
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -196,25 +203,256 @@ def json_text(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
+def provider_identity(model: Any) -> str:
+    prefix = str(model or "").split("/", 1)[0].strip().lower()
+    return prefix if prefix in PROVIDER_USAGE_SCHEMAS else "recorded-corpus"
+
+
+def provider_usage_schema(provider: str) -> str:
+    return PROVIDER_USAGE_SCHEMAS.get(
+        provider, "codetracebench-recorded-response-v1"
+    )
+
+
+def finite_timestamp(message: dict[str, Any], index: int) -> int | float:
+    value = message.get("timestamp")
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+        raise SystemExit(f"messages[{index}].timestamp must be a finite number")
+    return value
+
+
+def source_locator(
+    trajectory_id: str,
+    source_file_sha256: str,
+    source_event_index: int | None,
+    source_event_id: str | None,
+    upstream_field_path: str | None = None,
+) -> dict[str, Any]:
+    return {
+        "trajectory_id": trajectory_id,
+        "source_file_sha256": source_file_sha256,
+        "source_event_index": source_event_index,
+        "source_event_id": source_event_id,
+        "upstream_field_path": upstream_field_path,
+    }
+
+
+def evidence_provenance(
+    origin: str,
+    locator: dict[str, Any] | None,
+    derivation_rule: str | None = None,
+    evaluation_only: bool = False,
+) -> dict[str, Any]:
+    value: dict[str, Any] = {"origin": origin}
+    if locator is not None:
+        value["source_locator"] = locator
+    if derivation_rule is not None:
+        value["derivation_rule"] = derivation_rule
+    if evaluation_only:
+        value["evaluation_only"] = True
+    return value
+
+
+def response_field_states(response_message: dict[str, Any]) -> dict[str, str]:
+    states: dict[str, str] = {}
+    for field in ("reasoning_content", "tool_calls", "function_call", "annotations", "refusal"):
+        if field not in response_message:
+            states[field] = "absent"
+        elif response_message[field] is None:
+            states[field] = "null"
+        else:
+            states[field] = "present"
+    return states
+
+
+def provider_response_metadata(response: dict[str, Any]) -> dict[str, Any]:
+    choices = response.get("choices")
+    choice = choices[0] if isinstance(choices, list) and choices and isinstance(choices[0], dict) else {}
+    response_message = choice.get("message") if isinstance(choice.get("message"), dict) else {}
+    created = response.get("created")
+    if created is not None and (isinstance(created, bool) or not isinstance(created, int)):
+        raise SystemExit("provider response created metadata must be an integer")
+    choice_index = choice.get("index")
+    if choice_index is not None and (isinstance(choice_index, bool) or not isinstance(choice_index, int)):
+        raise SystemExit("provider response choice index must be an integer")
+    response_id = response.get("id")
+    response_model = response.get("model")
+    if not isinstance(response_id, str) or not response_id:
+        raise SystemExit("assistant response is missing explicit response.id")
+    if not isinstance(response_model, str) or not response_model:
+        raise SystemExit("assistant response is missing explicit response.model")
+    return {
+        "id": response_id,
+        "model": response_model,
+        "created": created,
+        "object": response.get("object"),
+        "choice_index": choice_index,
+        "finish_reason": choice.get("finish_reason"),
+        "response_message_role": response_message.get("role"),
+        "field_states": response_field_states(response_message),
+    }
+
+
+def message_line_spans(path: Path) -> dict[int, tuple[int, int]]:
+    """Return line spans for raw messages without retaining their content."""
+
+    text = path.read_text(encoding="utf-8")
+    decoder = json.JSONDecoder()
+
+    def skip_whitespace(position: int) -> int:
+        while position < len(text) and text[position] in " \t\r\n":
+            position += 1
+        return position
+
+    def line_number(position: int) -> int:
+        return text.count("\n", 0, position) + 1
+
+    position = skip_whitespace(0)
+    if position >= len(text) or text[position] != "{":
+        raise SystemExit(f"{path}: raw trajectory root is not an object")
+    position += 1
+    while True:
+        position = skip_whitespace(position)
+        if text[position] == "}":
+            break
+        key, position = decoder.raw_decode(text, position)
+        if not isinstance(key, str):
+            raise SystemExit(f"{path}: raw trajectory object key is not a string")
+        position = skip_whitespace(position)
+        if position >= len(text) or text[position] != ":":
+            raise SystemExit(f"{path}: malformed raw trajectory object")
+        position = skip_whitespace(position + 1)
+        if key == "messages":
+            if position >= len(text) or text[position] != "[":
+                raise SystemExit(f"{path}: messages is not an array")
+            position += 1
+            spans: dict[int, tuple[int, int]] = {}
+            index = 0
+            while True:
+                position = skip_whitespace(position)
+                if text[position] == "]":
+                    return spans
+                start = position
+                _, end = decoder.raw_decode(text, position)
+                spans[index] = (line_number(start), line_number(end - 1))
+                index += 1
+                position = skip_whitespace(end)
+                if text[position] == ",":
+                    position += 1
+                elif text[position] != "]":
+                    raise SystemExit(f"{path}: malformed messages array")
+        _, position = decoder.raw_decode(text, position)
+        position = skip_whitespace(position)
+        if text[position] == ",":
+            position += 1
+
+
 def classify_message(message: dict[str, Any], index: int) -> tuple[str, str]:
     role = str(message.get("role", "unknown"))
-    content = message.get("content")
-    content_text = content if isinstance(content, str) else json_text(content)
     if role == "system":
         return "system_policy", "system"
     if role == "assistant":
         return "conversation", "messages"
     if role == "user":
-        # mini-SWE-agent records shell observations as user messages. The
-        # markers are source-format syntax, not evaluation labels.
-        if index > 0 and ("<returncode>" in content_text or "<output>" in content_text):
-            return "tool_result", "messages"
         return "user_request", "messages"
     return "unknown", "other"
 
 
-def evaluation_stage_summary(stages: Any) -> list[dict[str, Any]]:
-    """Keep evaluation IDs/labels without copying action or observation text."""
+def evaluation_stage_summary(
+    stages: Any,
+    *,
+    trajectory_id: str | None = None,
+    source_file_sha256: str | None = None,
+    source_file_name: str | None = None,
+    message_spans: dict[int, tuple[int, int]] | None = None,
+) -> list[dict[str, Any]]:
+    """Keep evaluation labels and bounded explicit source locators only.
+
+    The upstream reference ``content`` field is deliberately dropped. A
+    locator joins to a raw message only when its explicit path and line range
+    identify exactly one message object; no positional or adjacency fallback
+    is permitted.
+    """
+
+    def sanitized_ref(ref: Any, field_name: str) -> dict[str, Any] | None:
+        if not isinstance(ref, dict):
+            return None
+        path = ref.get("path")
+        line_start = ref.get("line_start")
+        line_end = ref.get("line_end")
+        if (
+            not isinstance(path, str)
+            or not isinstance(line_start, int)
+            or not isinstance(line_end, int)
+            or isinstance(line_start, bool)
+            or isinstance(line_end, bool)
+        ):
+            return None
+        result: dict[str, Any] = {
+            "path": path.replace("\\", "/"),
+            "line_start": line_start,
+            "line_end": line_end,
+            "provenance": evidence_provenance(
+                "source_explicit",
+                source_locator(
+                    trajectory_id or "",
+                    source_file_sha256 or "",
+                    None,
+                    None,
+                    f"evaluation.{field_name}_ref",
+                ),
+                evaluation_only=True,
+            ),
+        }
+        if (
+            message_spans is not None
+            and source_file_name is not None
+            and path.replace("\\", "/").rsplit("/", 1)[-1] == source_file_name
+        ):
+            matches = [
+                index
+                for index, (start, end) in message_spans.items()
+                if line_start >= start and line_end <= end
+            ]
+            if len(matches) == 1:
+                index = matches[0]
+                event_id = f"message-{index:04d}"
+                result["source_event_join"] = {
+                    "status": "exact",
+                    "source_event_index": index,
+                    "source_event_id": event_id,
+                    "provenance": evidence_provenance(
+                        "derived_structural",
+                        source_locator(
+                            trajectory_id or "",
+                            source_file_sha256 or "",
+                            index,
+                            event_id,
+                            f"messages[{index}]",
+                        ),
+                        derivation_rule="codetracebench.evaluation_locator_to_message_span_v1",
+                        evaluation_only=True,
+                    ),
+                }
+            else:
+                result["source_event_join"] = {
+                    "status": "unresolved_no_unique_message_span",
+                    "provenance": evidence_provenance(
+                        "unknown",
+                        None,
+                        evaluation_only=True,
+                    ),
+                }
+        else:
+            result["source_event_join"] = {
+                "status": "unresolved_no_explicit_source_match",
+                "provenance": evidence_provenance(
+                    "unknown",
+                    None,
+                    evaluation_only=True,
+                ),
+            }
+        return result
 
     if not isinstance(stages, list):
         return []
@@ -232,6 +470,35 @@ def evaluation_stage_summary(stages: Any) -> list[dict[str, Any]]:
                     "labels": sorted(str(label) for label in step.get("labels", [])),
                 }
             )
+            step_summaries[-1]["source_locators"] = {
+                name: locator
+                for name, locator in (
+                    ("action", sanitized_ref(step.get("action_ref"), "action")),
+                    ("observation", sanitized_ref(step.get("observation_ref"), "observation")),
+                )
+                if locator is not None
+            }
+            joins = [
+                locator.get("source_event_join")
+                for locator in step_summaries[-1]["source_locators"].values()
+                if locator.get("source_event_join", {}).get("status") == "exact"
+            ]
+            step_summaries[-1]["source_event_join"] = {
+                "status": "exact" if joins else "unresolved",
+                "source_event_indices": sorted(
+                    join["source_event_index"] for join in joins
+                ),
+                "provenance": evidence_provenance(
+                    "derived_structural" if joins else "unknown",
+                    None,
+                    derivation_rule=(
+                        "codetracebench.evaluation_locator_to_message_span_v1"
+                        if joins
+                        else None
+                    ),
+                    evaluation_only=True,
+                ),
+            }
         summaries.append(
             {
                 "stage_id": stage.get("stage_id"),
@@ -251,6 +518,8 @@ def make_trace(
     raw_root: Path,
     archive_sha256: str | None,
     turn_index: int | None = None,
+    response_message: dict[str, Any] | None = None,
+    response_index: int | None = None,
     corpus: str = CORPUS,
     corpus_revision: str = CORPUS_REVISION,
     split: str = SPLIT,
@@ -275,6 +544,42 @@ def make_trace(
         content_hash = hashlib.sha256(event_bytes).hexdigest()
         token_estimate = max(1, math.ceil(len(event_text) / 4))
         event_id = f"message-{index:04d}"
+        timestamp = finite_timestamp(message, index)
+        locator = source_locator(
+            row["traj_id"],
+            source_file_sha256,
+            index,
+            event_id,
+            f"messages[{index}]",
+        )
+        block_provenance = {
+            "id": evidence_provenance(
+                "derived_structural", locator, "codetracebench.message_id_v1"
+            ),
+            "role": evidence_provenance(
+                "source_explicit",
+                {**locator, "upstream_field_path": f"messages[{index}].role"},
+            ),
+            "source": evidence_provenance(
+                "derived_structural",
+                locator,
+                "codetracebench.role_to_source_v1",
+            ),
+            "semantic_zone": evidence_provenance(
+                "derived_structural",
+                locator,
+                "codetracebench.role_to_zone_v1",
+            ),
+            "structural_path": evidence_provenance(
+                "derived_structural",
+                locator,
+                "codetracebench.message_array_path_v1",
+            ),
+            "timestamp": evidence_provenance(
+                "source_explicit",
+                {**locator, "upstream_field_path": f"messages[{index}].timestamp"},
+            ),
+        }
         role_counts[role] += 1
         source_counts[source] += 1
         content_hashes[content_hash] += 1
@@ -287,13 +592,11 @@ def make_trace(
                 "content_hash": content_hash,
                 "token_count": token_estimate,
                 "byte_count": len(event_bytes),
+                "timestamp": timestamp,
                 "semantic_zone": zone,
                 "structural_path": f"messages[{index}]",
                 "role": role,
-                "dependencies": [],
-                "optional": False,
-                "required": False,
-                "stale": False,
+                "provenance": block_provenance,
                 "metadata": {
                     "corpus": corpus,
                     "corpus_revision": corpus_revision,
@@ -317,14 +620,62 @@ def make_trace(
                 "source": source,
                 "semantic_zone": zone,
                 "structural_path": f"messages[{index}]",
+                "timestamp": timestamp,
                 "content_hash": content_hash,
                 "byte_count": len(event_bytes),
                 "content_retained": False,
                 "source_file_sha256": source_file_sha256,
+                "provenance": block_provenance,
             }
         )
+        extra = message.get("extra")
+        response = extra.get("response") if isinstance(extra, dict) else None
+        if isinstance(response, dict):
+            response_info = provider_response_metadata(response)
+            source_events[-1]["provider_response_id"] = response_info["id"]
+            source_events[-1]["provider_response_model"] = response_info["model"]
+            source_events[-1]["provider_usage_schema"] = provider_usage_schema(
+                provider_identity(row.get("model"))
+            )
 
     repeated_event_count = sum(count - 1 for count in content_hashes.values() if count > 1)
+    provider = provider_identity(row.get("model"))
+    captured_response: dict[str, Any] | None = None
+    captured_usage: dict[str, Any] | None = None
+    trace_provenance: dict[str, Any] = {}
+    if response_message is not None:
+        extra = response_message.get("extra")
+        response = extra.get("response") if isinstance(extra, dict) else None
+        if not isinstance(response, dict):
+            raise SystemExit(
+                f"{trajectory_path}: assistant message {response_index} has no response envelope"
+            )
+        if not isinstance(response.get("usage"), dict):
+            raise SystemExit(
+                f"{trajectory_path}: assistant message {response_index} has no response usage object"
+            )
+        captured_response = provider_response_metadata(response)
+        captured_usage = {
+            "provider_schema": provider_usage_schema(provider),
+            "raw": response["usage"],
+        }
+        response_event_id = f"message-{response_index:04d}"
+        response_locator = source_locator(
+            row["traj_id"],
+            source_file_sha256,
+            response_index,
+            response_event_id,
+            f"messages[{response_index}].extra.response",
+        )
+        trace_provenance = {
+            "provider_response": evidence_provenance(
+                "source_explicit", response_locator
+            ),
+            "usage": evidence_provenance(
+                "source_explicit",
+                {**response_locator, "upstream_field_path": f"messages[{response_index}].extra.response.usage"},
+            ),
+        }
     trace = {
         "format_version": TRACE_FORMAT_VERSION,
         "request_id": (
@@ -333,9 +684,13 @@ def make_trace(
             else f"phase1a-{row['traj_id']}"
         ),
         "session_id": row["traj_id"],
-        "provider": "recorded-corpus",
+        "provider": provider,
         "model": row.get("model") or "unknown-recorded-model",
+        "evidence_schema_version": EVIDENCE_SCHEMA_VERSION,
         "blocks": blocks,
+        "usage": captured_usage,
+        "provider_response": captured_response,
+        "provenance": trace_provenance,
         "metadata": {
             "corpus": corpus,
             "corpus_revision": corpus_revision,
@@ -350,6 +705,10 @@ def make_trace(
             "source_event_file": str(trajectory_path.relative_to(raw_root)).replace("\\", "/"),
             "source_file_sha256": source_file_sha256,
             "source_archive_sha256": archive_sha256,
+            "evidence_schema_version": EVIDENCE_SCHEMA_VERSION,
+            "provider_usage_schema": captured_usage["provider_schema"] if captured_usage else None,
+            "provider_response_id": captured_response["id"] if captured_response else None,
+            "source_response_event_index": response_index,
             "transformation": "mini-SWE messages -> ordered Prefixity blocks; content hashed and omitted",
             "evaluation_labels_excluded": True,
             "evaluation_labels_location": "../evaluation/labels.json",
@@ -403,6 +762,7 @@ def import_rows(args: argparse.Namespace) -> None:
         row = manifest_rows[record["traj_id"]]
         trajectory_path = find_trajectory_file(raw_root, row["source_relpath"], ordinal)
         trajectory = json.loads(trajectory_path.read_text(encoding="utf-8"))
+        message_spans = message_line_spans(trajectory_path)
         archive_sha = archive_hash(args.archive_root, row["artifact_path"])
         messages = trajectory.get("messages")
         if not isinstance(messages, list) or not messages:
@@ -438,6 +798,8 @@ def import_rows(args: argparse.Namespace) -> None:
                 raw_root,
                 archive_sha,
                 turn_index=assistant_turn,
+                response_message=message,
+                response_index=response_index,
                 corpus=corpus,
                 corpus_revision=corpus_revision,
                 split=split,
@@ -456,7 +818,13 @@ def import_rows(args: argparse.Namespace) -> None:
                 "trajectory_id": row["traj_id"],
                 "task_name": row.get("task_name"),
                 "solved": bool(row.get("solved")),
-                "incorrect_stages": evaluation_stage_summary(row.get("incorrect_stages", [])),
+                "incorrect_stages": evaluation_stage_summary(
+                    row.get("incorrect_stages", []),
+                    trajectory_id=row["traj_id"],
+                    source_file_sha256=summary["source_file_sha256"],
+                    source_file_name=trajectory_path.name,
+                    message_spans=message_spans,
+                ),
                 "stage_count": row.get("stage_count"),
                 "step_count": row.get("step_count"),
                 "label_source": "manifest; evaluation-only; not included in trace input",
@@ -464,7 +832,33 @@ def import_rows(args: argparse.Namespace) -> None:
         )
 
     write_json(out_dir / "selection.json", selection)
-    write_json(out_dir / "evaluation" / "labels.json", {"schema_version": 1, "records": labels})
+    labelled_steps = [
+        step
+        for record in labels
+        for stage in record.get("incorrect_stages", [])
+        for step in stage.get("steps", [])
+    ]
+    exact_join_steps = [
+        step for step in labelled_steps if step.get("source_event_join", {}).get("status") == "exact"
+    ]
+    explicit_locator_count = sum(
+        len(step.get("source_locators", {})) for step in labelled_steps
+    )
+    write_json(
+        out_dir / "evaluation" / "labels.json",
+        {
+            "schema_version": 2,
+            "records": labels,
+            "planner_input": False,
+            "source_locator_join": {
+                "labelled_step_count": len(labelled_steps),
+                "steps_with_exact_source_event_join": len(exact_join_steps),
+                "steps_without_exact_source_event_join": len(labelled_steps) - len(exact_join_steps),
+                "explicit_source_locator_count": explicit_locator_count,
+                "positional_fallback_used": False,
+            },
+        },
+    )
     write_json(out_dir / "provenance" / "trajectory-summaries.json", {"records": summaries})
     with (out_dir / "provenance" / "source-events.jsonl").open("w", encoding="utf-8", newline="\n") as handle:
         for event in all_events:
@@ -472,7 +866,7 @@ def import_rows(args: argparse.Namespace) -> None:
     write_json(
         out_dir / "import-report.json",
         {
-            "schema_version": 1,
+            "schema_version": 2,
             "corpus": corpus,
             "corpus_revision": corpus_revision,
             "split": split,
@@ -483,6 +877,42 @@ def import_rows(args: argparse.Namespace) -> None:
             "evaluation_labels_in_decision_inputs": False,
             "observer_input_glob": "traces/**/*.json",
             "token_counts_are_surrogates": True,
+            "evidence_adapter": {
+                "schema_version": EVIDENCE_SCHEMA_VERSION,
+                "source_explicit": [
+                    "messages[].timestamp",
+                    "messages[].role",
+                    "messages[].extra.response.id",
+                    "messages[].extra.response.model",
+                    "messages[].extra.response.created",
+                    "messages[].extra.response.object",
+                    "messages[].extra.response.choices[].finish_reason",
+                    "messages[].extra.response.usage",
+                ],
+                "derived_structural": [
+                    "messages[n] source event index/path",
+                    "generated source event ID",
+                    "role-only source and semantic-zone projection",
+                    "explicit evaluation locator to unique message span",
+                ],
+                "unknown_or_absent": [
+                    "tool-call/result IDs and links",
+                    "dependency edges",
+                    "required",
+                    "optional",
+                    "stale",
+                    "invalidation",
+                    "supersession",
+                    "removability",
+                ],
+            },
+            "evaluation_source_locator_join": {
+                "labelled_step_count": len(labelled_steps),
+                "exact_step_join_count": len(exact_join_steps),
+                "unresolved_step_count": len(labelled_steps) - len(exact_join_steps),
+                "explicit_locator_count": explicit_locator_count,
+                "positional_fallback_used": False,
+            },
         },
     )
     print(json.dumps({"ok": True, "trajectory_count": len(summaries), "source_event_count": len(all_events)}))

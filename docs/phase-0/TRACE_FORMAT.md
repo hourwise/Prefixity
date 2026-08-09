@@ -12,6 +12,13 @@ Version 2 (Phase 0A.1) changes vs version 1:
   `structural_path`, `role`) used by the structural fingerprint.
 * `byte_count` is validated against `content` when content is present.
 
+Phase 1B.4 adds an optional evidence-adapter extension. It does not change
+`format_version`: trace-v2 readers remain compatible with historical fixtures.
+Evidence-aware adapters may emit `evidence_schema_version: 1`, typed field
+provenance, source-explicit message timestamps, and non-content provider
+response metadata. The extension is additive and may be omitted by historical
+or unrelated trace writers.
+
 ## Concepts that must never be conflated
 
 | Concept | Meaning | Source |
@@ -37,6 +44,9 @@ called **stable-prefix candidates** and are heuristic only.
 | `usage` | RawUsage | no | Provider-specific raw usage, preserved verbatim. |
 | `latency` | LatencyInfo | no | Optional latency. |
 | `metadata` | object | no | Free-form JSON; preserved verbatim. |
+| `evidence_schema_version` | integer | no | Optional additive evidence-adapter version. Phase 1B.4 emits `1`; absent means no evidence-adapter extension is claimed. |
+| `provider_response` | ProviderResponseMetadata | no | Explicit provider response identity and bounded response metadata; response IDs are not dependency or safety evidence. |
+| `provenance` | object | no | Field-level evidence provenance. Values use `source_explicit`, `derived_structural`, or `unknown` and may include bounded source locators. |
 
 ## ContextBlock
 
@@ -48,6 +58,7 @@ called **stable-prefix candidates** and are heuristic only.
 | `content_hash` | string | yes | 64-char lowercase hex SHA-256 of the **content**. If `content` is present, validation recomputes and requires a match. |
 | `token_count` | integer | no | Recorder-known token count. If absent, a documented heuristic (chars/4) is used when `content` is present; otherwise tokens are unknown (0 + warning). |
 | `byte_count` | integer | yes | Byte count of the content. Must equal the UTF-8 length of `content` when content is present. |
+| `timestamp` | number | no | Source-explicit upstream message timestamp. Its presence or age does not imply `stale`, invalidation, supersession, or removability. |
 | `content` | string | no | **Optional.** Phase 0 fixtures omit it wherever possible (privacy stance). |
 | `semantic_zone` | string | no | e.g. `tools`, `system`, `messages`, `other`. Absent blocks are treated as `other`. Used by zone-aware policies. |
 | `structural_path` | string | no | Wire path, e.g. `tools[3]`, `messages[7].content[1]`. |
@@ -59,8 +70,34 @@ called **stable-prefix candidates** and are heuristic only.
 | `required` | boolean | no | **Never removed by any policy, regardless of other flags or size.** |
 | `stale` | boolean | no | Explicitly stale (e.g. superseded tool output). |
 | `metadata` | object | no | Free-form JSON. |
+| `provenance` | object | no | Field-level provenance for additive evidence captured on this block. |
 
 Unknown JSON fields anywhere in a trace are ignored (forward compatibility).
+
+### Evidence-adapter metadata
+
+The Phase 1B.4 extension uses these bounded, non-content structures when an
+upstream recorder provides them:
+
+* `provider_response` retains explicit response `id`, `model`, `created`,
+  `object`, selected choice/finish metadata, and presence states for selected
+  response fields. A provider response ID identifies the response only; it is
+  not a tool-call ID, result ID, dependency edge, or safety proof.
+* `provenance` maps captured fields to an `origin` of `source_explicit`,
+  `derived_structural`, or `unknown`. A source locator may contain the
+  trajectory ID, source-file SHA-256, source-event index/ID, and an upstream
+  field path. Evaluation-only locators remain sidecar metadata and are not
+  planner inputs.
+* `ContextBlock.timestamp` is the numeric timestamp explicitly present on the
+  corresponding upstream message. Timestamp age is not a staleness signal.
+  The adapter does not synthesize `optional`, `required`, `stale`, dependency,
+  invalidation, supersession, tool-link, or removability evidence.
+
+`RawUsage` remains the provider-specific usage boundary. The evidence adapter
+preserves the complete raw usage map and its explicit schema name. It uses an
+existing normalizer only for schemas and fields whose semantics are already
+exactly supported; unsupported provider fields remain raw and are not
+converted into universal token or savings claims.
 
 ### Structural fingerprint
 

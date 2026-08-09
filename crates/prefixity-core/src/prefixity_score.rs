@@ -177,6 +177,7 @@ mod tests {
             content_hash: "0".repeat(64),
             token_count: Some(1),
             byte_count: 1,
+            timestamp: None,
             content: None,
             semantic_zone: None,
             structural_path: None,
@@ -187,6 +188,7 @@ mod tests {
             optional,
             required,
             stale,
+            provenance: BTreeMap::new(),
             metadata: BTreeMap::new(),
         }
     }
