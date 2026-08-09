@@ -19,6 +19,7 @@ pub struct WorldExecution {
     pub completed: bool,
     pub final_state: BTreeMap<String, String>,
     pub final_state_hash: Option<String>,
+    pub executed_action_ids: Vec<String>,
     pub note: String,
 }
 
@@ -28,10 +29,8 @@ impl ScriptedWorld {
     pub fn execute(&self, envelope: &ControlledEnvelope) -> Result<WorldExecution, BenchmarkError> {
         validate_envelope(envelope)?;
         let scenario_id = &envelope.scenario.scenario_id;
-        let events = envelope
-            .trace
-            .planner_input
-            .events
+        let ordered_events = &envelope.trace.planner_input.events;
+        let events = ordered_events
             .iter()
             .map(|event| (event.event_id.clone(), event.clone()))
             .collect::<BTreeMap<_, _>>();
@@ -42,6 +41,8 @@ impl ScriptedWorld {
             }
         }
         let mut state = initial_state(envelope);
+        let mut available = BTreeSet::new();
+        let mut executed_action_ids = Vec::new();
 
         if let Some(failure) =
             relation_failure(&envelope.trace.planner_input.relations, &events, &actions)
@@ -49,21 +50,25 @@ impl ScriptedWorld {
             return Ok(task_failure(state, failure));
         }
 
-        for event in events.values() {
+        for event in ordered_events {
             let Some(action) = &event.action else {
+                mark_available(event, &mut available);
                 continue;
             };
-            if let Some(failure) = reference_order_failure(event, &events) {
+            if let Some(failure) =
+                reference_availability_failure(event, &events, &actions, &available)
+            {
                 return Ok(task_failure(state, failure));
             }
+            executed_action_ids.push(action.action_id.clone());
             match execute_action(
                 scenario_id,
                 event,
                 action.tool_name.as_str(),
-                &events,
+                &available,
                 &mut state,
             ) {
-                ActionResult::Continue => {}
+                ActionResult::Continue => mark_available(event, &mut available),
                 ActionResult::TaskFailure(note) => return Ok(task_failure(state, note)),
                 ActionResult::Unresolved(note) => return Ok(unresolved(state, note)),
             }
@@ -81,6 +86,7 @@ impl ScriptedWorld {
             completed: true,
             final_state: state,
             final_state_hash,
+            executed_action_ids,
             note: "all scripted actions completed".to_string(),
         })
     }
@@ -96,14 +102,14 @@ fn execute_action(
     scenario_id: &str,
     event: &Event,
     tool_name: &str,
-    events: &BTreeMap<String, Event>,
+    available: &BTreeSet<String>,
     state: &mut BTreeMap<String, String>,
 ) -> ActionResult {
     let has_reference = |expected: &str| {
         event
             .reference_event_ids
             .iter()
-            .any(|reference| reference == expected && events.contains_key(reference))
+            .any(|reference| reference == expected && available.contains(reference))
     };
     match tool_name {
         "update_profile" => {
@@ -232,17 +238,34 @@ fn relation_failure(
     None
 }
 
-fn reference_order_failure(event: &Event, events: &BTreeMap<String, Event>) -> Option<String> {
+fn reference_availability_failure(
+    event: &Event,
+    events: &BTreeMap<String, Event>,
+    actions: &BTreeMap<String, Event>,
+    available: &BTreeSet<String>,
+) -> Option<String> {
     for reference in &event.reference_event_ids {
-        let referenced = events.get(reference)?;
-        if referenced.sequence_index >= event.sequence_index {
+        if resolve_address(reference, events, actions).is_none() {
+            continue;
+        }
+        if !available.contains(reference) {
             return Some(format!(
-                "event {} references {} at a later order position",
+                "event {} references {} before it is available",
                 event.event_id, reference
             ));
         }
     }
     None
+}
+
+fn mark_available(event: &Event, available: &mut BTreeSet<String>) {
+    available.insert(event.event_id.clone());
+    if let Some(result) = &event.result {
+        available.insert(result.result_id.clone());
+    }
+    if let Some(context_block_id) = &event.context_block_id {
+        available.insert(context_block_id.clone());
+    }
 }
 
 fn resolve_address<'a>(
@@ -290,6 +313,7 @@ fn task_failure(state: BTreeMap<String, String>, note: String) -> WorldExecution
         completed: false,
         final_state: state,
         final_state_hash: None,
+        executed_action_ids: Vec::new(),
         note,
     }
 }
@@ -300,6 +324,7 @@ fn unresolved(state: BTreeMap<String, String>, note: String) -> WorldExecution {
         completed: false,
         final_state: state,
         final_state_hash: None,
+        executed_action_ids: Vec::new(),
         note,
     }
 }

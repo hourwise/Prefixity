@@ -1,7 +1,7 @@
 # Phase 1B.7 - Controlled Benchmark Implementation
 
-Status: implementation complete; validation complete; commit/push pending
-final review.
+Status: implementation complete; corrective audit complete; committed and
+pushed on `main`.
 
 Assessment: `PASS WITH RECORDED LIMITATIONS`.
 
@@ -38,6 +38,15 @@ The new crate is `prefixity-controlled-benchmark`:
 - `Cargo.toml` adds the isolated crate to the existing workspace.
 - `Cargo.lock` records only the new isolated workspace package.
 - This findings document records the implementation evidence.
+
+The Phase 1B.7 corrective audit confirmed an execution-order defect in the
+original scripted world. It built an event `BTreeMap` for lookup and then
+executed `events.values()`, which runs by lexicographic event ID rather than
+the validated trace's `sequence_index` order. The correction keeps maps for
+ID/action lookup but iterates the already validated event vector directly.
+`WorldExecution` now records bounded executed action IDs for isolated audit
+tests only; this is not exposed through production Prefixity types or planner
+evidence.
 
 `docs/tasks/ACTIVE.md` was not modified, staged, or included. Its pre-existing
 unrelated FATES-SLICE-002 worktree modification remains protected.
@@ -105,7 +114,7 @@ not universal planner labels.
 The aggregate report hash is:
 
 ```text
-e257b14803c9a80c69e1c38c549fe2a41cf6edc6d8604cd95243ea4517245572
+6de4017421e66a81e4bc6d5662b731d879f5d7c2ed9a343d7d8f758ac90ca37d
 ```
 
 Stable per-scenario manifest hashes are:
@@ -159,6 +168,15 @@ the dependent action after its prerequisite; `protocol_precedes` requires the
 opposite order. No wall clock, random source, network, provider, or model is
 used.
 
+Execution follows the validated `trace.planner_input.events` vector, whose
+contiguous `sequence_index` values are checked by the loader. Lookup remains
+map-backed, but it is not an execution-order mechanism. During execution a
+small bounded availability set is populated only when an event is reached;
+its event ID, result ID, and context-block ID become available then. A
+reference to a structurally present but not-yet-reached event/result cannot
+be consumed merely because it exists in the trace. No general event engine or
+new authored dependency is introduced.
+
 The oracle first requires the baseline to complete and match its exact
 scenario predicate. A failed baseline is `INVALID_BASELINE`; an unresolved
 baseline is `INCONCLUSIVE`. A variant is `PASS` only when it completes, has
@@ -210,6 +228,10 @@ Focused coverage includes:
 - collateral mutation preventing `PASS`;
 - fixture immutability; and
 - deterministic offline world execution.
+- actual action execution in validated trace order, using S06 where
+  lexicographic event IDs differ from the authoritative action/result chain;
+- rejection of consuming a future result before its producer runs; and
+- corrected aggregate oracle and determinism evidence after the audit.
 
 The full workspace suite and lint/build checks remain the final gate before
 commit. The controlled artifact is intentionally not a general agent
@@ -229,6 +251,13 @@ quality evaluation, strict planner/evaluation separation, and reproducible
 aggregate identities. The limitations are deliberate: compression remains
 untested, the world is narrow and synthetic, and no causal result generalizes
 beyond its exact scenario and intervention pair.
+
+The corrective audit changed execution semantics but did not change the
+S01-S12 oracle distribution: the corrected result remains 7 `PASS`, 5
+`FAIL`, 0 `INVALID_BASELINE`, and 0 `INCONCLUSIVE`. The aggregate hash above
+is the replacement for the pre-audit report hash. Repeated runs produced
+identical execution-order records, final states, oracle records, planner
+projections, planner runs, canonical report bytes, and aggregate hash.
 
 The recommended next task is:
 

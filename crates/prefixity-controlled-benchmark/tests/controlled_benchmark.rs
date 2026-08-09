@@ -317,3 +317,35 @@ fn world_execution_is_deterministic_and_has_no_network_surface() {
     assert_eq!(first.status, ExecutionStatus::Complete);
     assert!(first.final_state_hash.is_some());
 }
+
+#[test]
+fn world_executes_actions_in_validated_trace_order() {
+    let fixture = case("S06_dependency_chain_preservation");
+    let execution = benchmark::ScriptedWorld.execute(&fixture.baseline).unwrap();
+    assert_eq!(
+        execution.executed_action_ids,
+        vec!["create", "authorize", "commit"]
+    );
+}
+
+#[test]
+fn world_does_not_consume_a_future_result_before_its_producer_runs() {
+    let fixture = case("S06_dependency_chain_preservation");
+    let execution = benchmark::ScriptedWorld.execute(&fixture.baseline).unwrap();
+    let create = execution
+        .executed_action_ids
+        .iter()
+        .position(|action| action == "create")
+        .unwrap();
+    let authorize = execution
+        .executed_action_ids
+        .iter()
+        .position(|action| action == "authorize")
+        .unwrap();
+    let commit = execution
+        .executed_action_ids
+        .iter()
+        .position(|action| action == "commit")
+        .unwrap();
+    assert!(create < authorize && authorize < commit);
+}
