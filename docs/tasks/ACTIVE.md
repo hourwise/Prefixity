@@ -1,473 +1,562 @@
-# Active Task — Phase 1B.2 Evidence Modeling Gap Study and Importer Revision Design
+# Active Task — Phase 1B.3 Raw Artifact Access and Upstream Schema Verification Gate
 
-Status: complete - PIVOT.
+Status: ready for research/verification.
 
 ## Objective
 
-Determine which evidence missing from the accepted Phase 1A representation can
-truthfully be recovered from the underlying CodeTraceBench trajectory artifacts,
-which can be deterministically derived, which would require unsafe inference,
-and which is genuinely absent.
+Obtain or inspect raw CodeTraceBench artifacts from the exact accepted dataset
+revision and determine which structural identifiers and relationships actually
+exist upstream.
 
-Design the minimum provenance-preserving importer/evidence-model revision needed
-to exercise the Phase 1B decision hypothesis meaningfully.
+Resolve the central uncertainty left by Phase 1B.2:
 
-This task is a study and design gate.
+> Does CodeTraceBench itself contain materially richer explicit structure than
+> the current Phase 1A derivative representation preserved?
 
-Do not implement the importer revision.
-Do not modify the Phase 1B.0 planner.
+This is a raw-artifact access and schema-verification gate.
+
+Do not revise the importer.
+Do not change the Phase 1B planner.
 Do not begin Phase 1C.
 
-## Why this task exists
+## Background
 
-Phase 1B.1 characterized the frozen Phase 1B.0 planner over all 719 accepted
-request traces.
+Phase 1B.1 ran the frozen Phase 1B.0 planner over 719 accepted request traces.
 
-Result:
+All 719 produced `DO_NOTHING`.
 
-- 719/719 plans succeeded;
-- 719/719 emitted `DO_NOTHING`;
-- 0 safety-audit failures;
-- deterministic aggregate hashes matched;
-- 24,416 normalized blocks contained:
-  - no true `optional` flags;
-  - no true `required` flags;
-  - no true `stale` flags;
-  - no dependency edges;
-  - no provider usage;
-  - only the limited normalized semantic zones available from Phase 1A.
+Phase 1B.2 established that the accepted derivative representation lacks
+sufficient evidence to exercise positive planner gates:
 
-This is a representation/evidence gap, not permission to weaken the planner.
+- no evidenced true `optional`, `required`, or `stale` values;
+- no dependency edges;
+- no explicit tool-call/result linkage;
+- no provider usage;
+- no exact block/request -> evaluation step mapping;
+- limited semantic-zone information.
 
-The next question is therefore:
+However, Phase 1B.2 could not inspect the exact upstream raw `.traj.json` /
+archive structure because those raw artifacts were not present in the accepted
+local fixture.
 
-> What evidence can Prefixity legitimately preserve or derive from the original
-> trajectories so that the planner can reason from facts rather than invented
-> safety labels?
+Therefore CodeTraceBench itself has NOT yet been shown to be unsuitable.
+
+This task must resolve that uncertainty before any importer revision or corpus
+pivot.
 
 ## Required context
 
 Read only the relevant sections of:
 
-- `../phase-1/PHASE_1_PLAN.md`
-- `../phase-1/SUCCESS_CRITERIA.md`
-- `../phase-1/QUALITY_GATE.md`
 - `../phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`
 - `../phase-1/PHASE_1B_DECISION_CONTRACT.md`
 - `../phase-1/PHASE_1B1_CHARACTERIZATION.md`
-- `../phase-1/PHASE_1B1_CHARACTERIZATION_SCHEMA.md`
+- `../phase-1/PHASE_1B2_EVIDENCE_GAP_STUDY.md`
+- `../phase-1/WORKLOAD_CORPUS.md`
+- `../phase-1/QUALITY_GATE.md`
 - `../SOURCE_OF_TRUTH.md`
 
-Inspect:
-
-- the current Phase 1A importer/adapter;
-- the Prefixity trace schema;
-- dependency and semantic-zone representation;
-- accepted provenance fixtures;
-- the raw locally available CodeTraceBench artifacts only where required.
+Inspect the existing Phase 1A selection/provenance files so that any raw
+artifact obtained can be checked against the already accepted corpus identity.
 
 Do not recursively read unrelated documentation.
 
-## Frozen checkpoints
+## Pinned corpus identity
 
-Treat these as evidence checkpoints:
+The only authorized corpus for this task is:
 
-- Phase 1B.0 planner:
-  `3436e16afcdf359a33a691c15202900d796b25bc`
-- Phase 1B.1 characterization:
-  `836db0b8b6965bac0f587376d571bbdc837b19c5`
-- CodeTraceBench:
-  `NJU-LINK/CodeTraceBench`
-- exact corpus revision:
+- Dataset: `NJU-LINK/CodeTraceBench`
+- Revision:
   `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`
-- split:
-  `verified`
+- Split: `verified`
+- Accepted Phase 1A fixture:
+  `fixtures/phase-1a/codetracebench-mini-swe-v1`
+- Accepted selected trajectories: 24
+- Accepted request traces: 719
 
-Do not broaden to a different corpus during this task.
+Do not silently use:
 
-A different corpus may be recommended only as an outcome of the study.
+- latest/main;
+- another CodeTraceBench revision;
+- ContextBench current main;
+- a regenerated dataset;
+- another benchmark;
+- similarly named repositories.
 
-## Evidence taxonomy
+If the exact revision cannot be accessed, record that and stop.
 
-Every candidate field must be classified using one of these categories.
+## Source hierarchy
 
-### `CAPTURED_EXPLICIT`
+Use primary sources only.
 
-The upstream artifact directly contains the fact.
+Acceptable evidence includes:
 
-Examples may include an explicit role, identifier, timestamp, action type,
-tool-call ID, result ID, step number, or relationship field.
+1. exact files from the pinned dataset revision;
+2. exact dataset metadata from that revision;
+3. the pinned revision's README/documentation;
+4. raw artifacts referenced by that exact revision.
 
-No interpretation beyond format normalization is required.
+Do not infer raw-schema semantics from:
 
-### `DERIVED_STRUCTURAL`
+- current/latest revisions;
+- another repository version;
+- related papers when artifact structure disagrees;
+- blog posts;
+- secondary descriptions;
+- assumptions about mini-SWE-agent formats.
 
-The fact is not directly stored in the desired Prefixity form but follows
-deterministically from explicit upstream structure.
+Observed artifact structure outranks descriptive prose when they differ.
 
-Examples might include:
+Record any disagreement.
 
-- message order;
-- exact parent/child relationships where IDs make them unambiguous;
-- tool-call -> tool-result linkage where a stable explicit identifier exists;
-- semantic zone derived purely from an explicit protocol role.
+## Raw-artifact acquisition
 
-The derivation rule must be deterministic, documented and provenance-preserving.
+Attempt to obtain only the raw artifacts necessary to resolve the schema
+questions.
 
-### `EVALUATION_ONLY`
+Prefer the narrowest viable access.
 
-The fact exists in benchmark/evaluation metadata but must remain outside planner
-inputs.
+Start with the already accepted 24 trajectories if the upstream artifact layout
+allows direct selection.
 
-Examples include:
+If archives package many trajectories together and a larger archive must be
+retrieved, do not expand the research corpus: inspect only the already selected
+trajectory identities.
 
-- solved/unsolved outcome;
-- incorrect-step labels;
-- unuseful-step labels;
-- benchmark gold context where applicable.
+Record:
 
-Evaluation evidence may support later post-hoc quality analysis but cannot become
-planner safety evidence merely because it exists.
+- exact source locator;
+- revision;
+- artifact filename;
+- source hash/checksum if available;
+- locally computed SHA-256;
+- byte size;
+- extraction method;
+- whether the artifact maps to an accepted Phase 1A provenance record.
 
-### `INFERRED_UNSAFE`
+Downloaded raw artifacts must remain local-only and untracked.
 
-The field could be guessed from content, position, model behaviour or benchmark
-outcome, but the source does not establish it.
+Do not commit the archive or extracted trajectory files.
 
-Examples may include:
+Add a narrow ignore rule only if necessary.
 
-- calling a block `optional` because it appears unimportant;
-- calling a result `stale` because it is old;
-- inventing dependency edges from topical similarity;
-- treating non-gold context as removable;
-- treating an incorrect step as safely prunable.
+## Integrity gate
 
-These must not be proposed as importer facts.
+Before using a raw trajectory as evidence, establish that it belongs to the
+pinned accepted revision.
 
-### `ABSENT`
+Verify as much of the following as available:
 
-The required evidence is not available from the checked artifact structure and
-cannot be safely derived.
-
-The correct representation is unknown/absent.
-
-Do not fabricate a replacement.
-
-## Fields to investigate
-
-At minimum study the following.
-
-### Identity and joinability
-
+- dataset revision;
+- manifest identity;
 - trajectory ID;
-- task ID/name;
-- stage ID;
-- step ID;
-- message/event ID;
-- request/turn identity;
-- action ID;
-- observation/result ID;
-- any stable upstream parent/reference identifiers.
+- artifact/archive identity;
+- file hash;
+- accepted Phase 1A selection membership.
 
-Determine whether Prefixity can preserve sufficient identity to create an exact
-post-hoc join between normalized blocks and benchmark step labels.
+Do not mix raw content from another revision with the accepted fixture.
 
-Do not expose evaluation labels to the planner.
+If identity cannot be established confidently, classify the artifact as
+unverified and do not use it to justify importer changes.
 
-### Protocol and chronology
+## Privacy boundary
 
-Determine whether the source provides enough explicit structure to preserve:
+Raw artifacts may contain prompts, reasoning, assistant messages and tool
+output.
 
-- message role;
-- system/user/assistant/tool distinction;
-- assistant reasoning versus externally visible assistant message where
-  represented;
-- tool invocation;
-- tool result/observation;
-- chronological ordering;
-- turn boundaries;
-- stage boundaries;
-- current request boundary.
-
-Classify each fact according to the evidence taxonomy.
-
-### Semantic zones
-
-Determine which richer Prefixity semantic zones can be assigned from explicit or
-deterministically derivable protocol structure.
-
-Do not classify zones using semantic interpretation of raw natural-language
-content.
-
-Produce an explicit proposed mapping table:
-
-`upstream structure -> Prefixity zone -> evidence class -> provenance`
-
-Identify zones that remain unavailable.
-
-### Tool relationships
-
-Determine whether the artifacts support reliable relationships such as:
-
-- tool call -> tool result;
-- action -> observation;
-- assistant turn -> generated action;
-- result -> originating invocation;
-- stage -> contained steps.
-
-Distinguish explicit IDs from positional assumptions.
-
-A positional relationship may be proposed only if the upstream format defines
-that ordering relationship unambiguously.
-
-### Dependencies
-
-Investigate whether any dependency edges can be established without semantic
-guessing.
-
-Separate:
-
-1. protocol dependency;
-2. explicit reference dependency;
-3. tool-call/result dependency;
-4. chronology only;
-5. semantic/load-bearing dependency.
-
-Do not convert chronology into a semantic dependency.
-
-Do not invent semantic dependencies from content similarity.
-
-State clearly which dependency types the current corpus cannot establish.
-
-### `required`
-
-Determine whether the corpus provides any explicit evidence that a block is
-required.
-
-Benchmark gold context, successful trajectories, or later use do not
-automatically mean `required=true`.
-
-If benchmark data can only be used as evaluation evidence, classify it
-`EVALUATION_ONLY`.
-
-### `optional`
-
-Determine whether any explicit upstream field establishes optionality.
-
-If not, leave it unavailable.
-
-Do not infer optionality from:
-
-- tool-result age;
-- low Prefixity score;
-- non-gold status;
-- repetition;
-- solved/unsolved labels;
-- absence of later reference.
-
-### `stale`
-
-Determine whether the artifact explicitly represents invalidation,
-supersession, replacement or another defensible stale-state event.
-
-Age alone is not staleness.
-
-If no explicit or deterministic stale transition exists, classify this field
-as unavailable rather than inventing a rule.
-
-### Evaluation join
-
-Determine whether the Phase 1B.1 message-ID versus benchmark-step-ID mismatch
-can be solved by preserving additional upstream identifiers.
-
-The desired result is:
-
-`normalized block/request -> upstream step ID -> evaluation label`
-
-The evaluation label must remain external to planner input.
-
-Document precisely where the identifier originates and how it survives import.
-
-## Raw-artifact inspection rules
-
-The accepted raw trajectory artifacts may be inspected locally where needed.
+Treat them as inspection inputs only.
 
 Do not commit:
 
-- raw prompts;
-- raw reasoning;
-- raw assistant content;
-- raw tool outputs;
+- prompt text;
+- assistant reasoning;
+- assistant response text;
+- user text;
+- tool output;
 - reconstructed conversations;
+- filesystem contents exposed by tasks;
 - credentials;
-- upstream archives.
+- secrets;
+- source-code payloads contained in trajectories.
 
-Prefer structural inspection:
+Tracked evidence must contain only sanitized structural information such as:
 
 - field names;
-- object types;
-- IDs;
-- counts;
+- type names;
+- identifiers where safe;
 - relationship shapes;
-- format/version metadata.
+- counts;
+- booleans;
+- enum/value vocabularies where they are protocol metadata;
+- hashes;
+- path/schema locators;
+- archive metadata.
 
-A small read-only inspection tool is allowed if useful.
+Do not include raw string values merely to demonstrate a schema.
 
-It must not become a second importer and must not modify artifacts.
+## Structural schema inventory
 
-If a compact evidence artifact is produced, store only sanitized structural
-metadata and hashes.
+Inspect the actual raw trajectory object structure.
 
-## Deterministic sampling
+Produce a structural inventory covering:
 
-Do not manually select favourable examples.
+- top-level fields;
+- trajectory/session/task identity;
+- stages;
+- steps;
+- message/events;
+- roles;
+- actions;
+- observations;
+- tool calls;
+- tool results;
+- IDs;
+- reference/parent fields;
+- timestamps/order fields;
+- status/outcome fields;
+- metadata objects;
+- usage/token fields;
+- explicit invalidation/supersession fields if any.
 
-If inspecting fewer than all 24 selected trajectories in detail, choose a
-deterministic sample before interpretation.
+For each field relevant to Prefixity, record:
 
-Prefer covering the existing solved × short/medium/long selection cells while
-using stable trajectory-ID ordering.
+- field path;
+- data type;
+- whether always/optionally present;
+- count/coverage across inspected accepted trajectories;
+- whether it contains an explicit fact or merely content;
+- safe evidence classification.
 
-Record the sample rule.
+Do not commit field values containing raw trajectory content.
 
-Use broader/all-trajectory structural counting where inexpensive.
+## Evidence taxonomy
 
-## External-source rule
+Continue using the Phase 1B.2 taxonomy:
 
-If upstream documentation must be checked, use primary sources only and pin the
-exact revision where possible.
+### `CAPTURED_EXPLICIT`
 
-Do not infer missing CodeTraceBench semantics from:
+The exact raw artifact directly contains the fact.
 
-- related repositories;
-- author intent;
-- similar benchmark formats;
-- unrelated versions;
-- blog posts or secondary descriptions.
+### `DERIVED_STRUCTURAL`
 
-Record disagreements between documentation and actual artifact structure.
+The fact follows deterministically from explicit raw structure.
 
-## Required evidence matrix
+### `EVALUATION_ONLY`
 
-Produce one authoritative matrix covering at least:
+The fact belongs to benchmark quality/evaluation metadata and must stay outside
+planner inputs.
 
-| Desired Prefixity evidence | Upstream source | Classification | Deterministic rule | Planner-safe? | Evaluation-only? | Import revision? |
-| --- | --- | --- | --- | --- | --- | --- |
+### `INFERRED_UNSAFE`
 
-Rows must include:
+The fact could only be guessed or semantically interpreted.
 
-- trajectory identity;
-- stage identity;
-- step identity;
-- message identity;
-- role/protocol type;
-- chronology;
-- current-request identity;
-- tool invocation identity;
-- tool-result identity;
-- tool invocation/result linkage;
-- semantic zone;
-- protocol dependency;
-- explicit reference dependency;
-- semantic dependency;
-- required;
-- optional;
-- stale;
-- supersession/invalidation where available;
-- evaluation-step join;
-- provider usage;
-- exact token usage.
+### `ABSENT`
 
-Add fields discovered during inspection where relevant.
+No defensible source for the evidence exists.
 
-For every proposed importer addition, state whether it is:
+No `INFERRED_UNSAFE` field may be proposed as planner input.
 
-- direct preservation;
-- deterministic derivation;
-- evaluation-only preservation.
+## Questions to resolve
 
-No proposed planner input may originate from `INFERRED_UNSAFE`.
+### Step and stage identity
 
-## Proposed provenance model
+Determine whether the raw trajectory contains explicit:
 
-Design how any new imported/derived field would record its origin.
+- stage IDs;
+- step IDs;
+- step ordering;
+- parent-stage relationships.
 
-At minimum distinguish:
+If IDs exist, determine whether they correspond exactly to the existing
+evaluation label stage/step IDs.
 
-- `source_explicit`;
-- `derived_structural`;
-- `unknown`.
+Do not infer equivalence from matching counts alone.
 
-Evaluation metadata should remain in its existing external/evaluation channel.
+### Message/event identity
 
-Do not overload an ordinary boolean in a way that hides whether it was captured
-or derived.
+Determine whether raw messages/events contain explicit stable IDs or whether
+Phase 1A's generated `message-####` identifiers are the only available
+identity.
 
-If the existing schema already has a better compatible mechanism, reuse it.
+If explicit IDs exist, record their scope and uniqueness.
 
-This task may recommend a schema extension but must not implement one.
+### Tool/action identity
 
-## Importer revision design
+Determine whether the source explicitly represents:
 
-If the study finds sufficient evidence, produce a concrete minimal revision plan
-for the next task.
+- action ID;
+- tool-call ID;
+- function/tool name;
+- observation/result ID;
+- result/reference ID;
+- originating call reference;
+- parent/action reference.
 
-Specify:
+Distinguish:
 
-- exact source fields consumed;
-- deterministic derivation rules;
-- new/preserved normalized fields;
-- provenance attached to each;
-- validation changes required;
-- tests required;
-- fixture changes required;
-- label-isolation guarantees;
-- privacy/licence implications;
-- backward-compatibility implications;
-- whether the Phase 1B.0 planner requires any later adaptation.
+- an explicit relationship;
+- sequential adjacency;
+- semantic resemblance.
 
-The preferred design should preserve more truthful structure without embedding
-planner policy inside the importer.
+Only explicit/deterministic relationships are admissible.
 
-The importer must remain an evidence adapter, not a hidden classifier.
+### Action -> observation linkage
 
-## Planner boundary
+Establish whether an exact link can be constructed from raw fields.
 
-Do not change:
+If the format contains an explicit call/result identifier pair, classify it
+accordingly.
 
-- intervention eligibility;
-- planner thresholds;
-- planner reason codes;
-- dependency safety rules;
-- `DO_NOTHING` behaviour;
-- compression behaviour.
+If linking requires "the next message probably belongs to this action", reject
+that as unsafe unless the upstream format normatively defines that relation.
 
-If the study suggests the planner's contract needs a later change, record it as
-a separate recommendation.
+### Protocol structure
 
-Do not implement it here.
+Determine whether the raw schema provides richer protocol structure than the
+current normalized roles.
+
+Investigate explicit representation of:
+
+- system;
+- user;
+- assistant;
+- tool;
+- action;
+- observation;
+- reasoning/thought;
+- visible assistant response;
+- environment;
+- control/protocol records.
+
+Do not use natural-language content to assign a protocol type.
+
+### Semantic zones
+
+Determine which Prefixity zones could legitimately be produced from verified
+raw protocol fields.
+
+Create a proposed mapping:
+
+`raw field/type -> Prefixity semantic zone -> evidence classification`
+
+This remains design only.
+
+Do not implement it.
+
+### Dependencies
+
+Search only for explicit structural dependency evidence:
+
+- parent IDs;
+- references;
+- call/result relationships;
+- graph edges;
+- consumed-output identifiers;
+- explicit prerequisites.
+
+Do not infer semantic dependency from textual reference, chronology or task
+logic.
+
+Separate tool/protocol relations from semantic/load-bearing dependencies.
+
+### `required`
+
+Determine whether any explicit raw field establishes requiredness.
+
+Do not treat:
+
+- successful use;
+- later reference;
+- benchmark gold context;
+- system role alone;
+- inclusion in the original prompt
+
+as proof of `required=true` unless that is the exact defined semantics of an
+upstream field.
+
+### `optional`
+
+Determine whether any raw metadata explicitly establishes optionality.
+
+Do not infer it.
+
+### `stale` / invalidation / supersession
+
+Search for explicit invalidation, replacement, supersession, versioning or
+lifetime signals.
+
+Age/order alone does not establish staleness.
+
+### Provider usage
+
+Determine whether the raw artifact carries actual model/provider usage:
+
+- input tokens;
+- cached tokens;
+- output tokens;
+- total tokens;
+- model/provider identity;
+- request usage payload.
+
+Separate provider-reported usage from benchmark estimates.
+
+### Evaluation join
+
+This is a key gate.
+
+Determine whether the raw schema permits an exact mapping:
+
+`normalized request/block`
+    ->
+`raw trajectory event/action/message`
+    ->
+`raw stage/step ID`
+    ->
+`evaluation stage/step ID`
+
+The mapping must be based on explicit identity or a normative deterministic
+relationship.
+
+Do not use position/count matching as proof.
+
+If exact mapping is possible, describe the complete join key and provenance.
+
+Do not implement it yet.
+
+## Coverage
+
+Where inexpensive, inspect structural fields across all 24 accepted
+trajectories.
+
+For detailed schema examples, use a deterministic sample.
+
+Use the same solved/unsolved × short/medium/long deterministic sampling
+principle already recorded in Phase 1B.2 unless raw archive structure makes
+another deterministic rule necessary.
+
+Record the rule before interpretation.
+
+Do not cherry-pick trajectories containing richer metadata.
+
+## Licence verification
+
+Revisit the unresolved licence evidence at the exact pinned revision.
+
+The current evidence records:
+
+- dataset metadata declaring MIT;
+- README declaring MIT;
+- README referencing a `LICENSE`;
+- no root `LICENSE` file observed at the exact checked revision.
+
+For this task:
+
+- inspect the exact pinned revision for the referenced licence material;
+- inspect raw archive metadata/layout for bundled licence information if
+  present;
+- do not reconstruct or substitute licence text from another revision;
+- do not copy a licence from current main and describe it as belonging to the
+  pinned revision.
+
+Classify the result as one of:
+
+- `EXACT_LICENSE_FILE_VERIFIED`
+- `METADATA_AND_README_ONLY`
+- `CONFLICTING_LICENSE_EVIDENCE`
+- `INSUFFICIENT_LICENSE_EVIDENCE`
+
+This does not require a legal conclusion.
+
+The purpose is provenance accuracy and determining whether redistribution
+remains constrained.
+
+## Proposed importer implications
+
+Do not modify the importer.
+
+For each useful verified raw field, state whether a future importer should:
+
+- preserve it directly;
+- derive a structural field from it;
+- keep it evaluation-only;
+- ignore it;
+- leave the corresponding Prefixity field unknown.
+
+A future importer must remain an evidence adapter, not a planner.
+
+Do not convert raw structure into safety policy.
+
+## Required output
+
+Produce:
+
+`docs/phase-1/PHASE_1B3_RAW_SCHEMA_VERIFICATION.md`
+
+Optionally produce a compact sanitized audit:
+
+`fixtures/phase-1a/codetracebench-mini-swe-v1/results/phase1b3-raw-schema-audit.json`
+
+if this materially improves reproducibility.
+
+The audit must contain no raw textual trajectory content.
+
+The findings document must contain:
+
+- acquisition/access result;
+- exact source/revision identity;
+- integrity checks;
+- inspected trajectory coverage;
+- structural schema inventory;
+- evidence matrix;
+- step/stage identity result;
+- tool/action/observation relationship result;
+- protocol/semantic-zone result;
+- dependency result;
+- required/optional/stale result;
+- provider-usage result;
+- evaluation-join result;
+- licence result;
+- importer implications;
+- decision-gate answers;
+- assessment;
+- recommended next task.
 
 ## Decision gate
 
-At the end, answer these questions explicitly:
+Answer explicitly:
 
-1. Does the underlying accepted CodeTraceBench artifact contain materially more
-   useful structural evidence than the Phase 1A representation preserved?
+1. Were exact raw artifacts for the pinned revision successfully accessed?
 
-2. Can that evidence be preserved/derived without semantic guessing?
+2. Were their identities verified strongly enough to use as evidence?
 
-3. Is there enough planner-safe evidence to justify an importer/evidence-model
-   revision and rerun of Phase 1B characterization?
+3. Does the raw schema contain materially more useful structure than the
+   accepted Phase 1A derivative representation?
 
-4. Which positive planner gates could the proposed evidence legitimately
-   exercise?
+4. Which fields are `CAPTURED_EXPLICIT`?
 
-5. Which planner gates would still remain untestable?
+5. Which useful facts are only `DERIVED_STRUCTURAL`?
 
-6. Can evaluation step IDs be preserved sufficiently for a reliable post-hoc
-   label join?
+6. Which desired fields remain `ABSENT`?
 
-7. Should CodeTraceBench remain the Phase 1B corpus after the proposed revision?
+7. Does explicit tool-call/action -> observation/result linkage exist?
+
+8. Does explicit dependency evidence exist beyond protocol/tool relationships?
+
+9. Are `required`, `optional`, or `stale` represented explicitly?
+
+10. Can an exact evaluation-step join be established without unsafe positional
+    inference?
+
+11. Does the raw schema contain provider usage evidence?
+
+12. What is the exact licence-evidence classification?
+
+13. Is a narrow importer/evidence-model revision now justified?
+
+14. Would such a revision materially exercise at least one currently untested
+    Phase 1B planner evidence path?
+
+15. Should CodeTraceBench remain the Phase 1B corpus?
 
 ## Assessment outcomes
 
@@ -475,192 +564,81 @@ Choose one.
 
 ### `PASS`
 
-The raw artifact contains enough explicit/deterministically derivable evidence
-to justify a narrow importer/evidence-model revision capable of meaningfully
-re-exercising Phase 1B.
+The exact raw schema contains sufficient verified structural evidence to justify
+a narrow importer/evidence-model revision and another Phase 1B characterization.
 
 ### `PASS WITH RECORDED LIMITATIONS`
 
-A useful subset can be recovered safely, enough to justify a narrow importer
-revision, but important evidence classes remain unavailable.
+Useful raw structure exists and justifies a narrow revision, but important
+planner evidence classes remain unavailable.
 
 ### `PIVOT`
 
-The accepted corpus cannot provide sufficient planner-safe evidence even after
-truthful structural preservation. Recommend a separately reviewed corpus or
-evaluation strategy change.
+The exact raw schema can be inspected but still lacks enough planner-safe
+evidence to justify meaningful Phase 1B progression. Recommend a separately
+authorized corpus/evaluation strategy review.
 
 ### `STOP`
 
-Licence/privacy/provenance ambiguity or another hard problem means this
-evidence path should not proceed without external resolution.
+Exact artifacts cannot be verified/accessed, or provenance/licence/privacy
+problems prevent this evidence path from being relied upon.
 
-Do not choose an outcome based on expected intervention count.
-
-## Required outputs
-
-Produce:
-
-- `docs/phase-1/PHASE_1B2_EVIDENCE_GAP_STUDY.md`
-- an explicit evidence classification matrix;
-- raw-artifact structural findings;
-- proposed provenance model;
-- minimal importer/evidence-model revision design if justified;
-- decision-gate answers;
-- completion record in this file.
-
-A compact sanitized structural audit JSON may be added if it materially aids
-reproducibility.
-
-Do not create a full replacement corpus fixture.
-
-Update `SOURCE_OF_TRUTH.md` only if the study resolves an existing authoritative
-uncertainty. Do not describe proposed importer changes as implemented.
-
-## Tests/checks
-
-This is primarily a research/design task.
-
-If a structural inspection script is added:
-
-- add focused tests where appropriate;
-- ensure deterministic output;
-- verify source artifacts remain unchanged;
-- verify no raw content appears in tracked output.
-
-Run relevant existing checks sufficient to establish that no product behaviour
-was changed.
-
-At minimum run:
-
-- `git diff --check`;
-- any focused tests for newly added tooling.
-
-If Rust product code is untouched, a full workspace test run is optional unless
-repository guidance requires it.
-
-## Acceptance criteria
-
-The task is complete when:
-
-- every requested evidence class has been investigated;
-- captured facts are separated from deterministic derivations;
-- unsafe inference is explicitly rejected;
-- absent evidence remains absent;
-- evaluation-only labels remain isolated;
-- semantic zones are mapped only from defensible structure;
-- dependency types are distinguished rather than conflated;
-- `required`, `optional`, and `stale` are not fabricated;
-- feasibility of exact evaluation-step joining is established;
-- privacy/licence implications are recorded;
-- the proposed provenance representation makes captured versus derived evidence
-  auditable;
-- a concrete next importer revision exists only if supported by evidence;
-- the decision gate answers whether CodeTraceBench remains suitable;
-- no planner or importer behaviour was changed.
+Do not choose an outcome based on desired intervention count.
 
 ## Stop conditions
 
 Do not:
 
-- implement the importer revision;
-- alter the Phase 1B planner;
-- tune thresholds or rules;
-- fabricate `optional`, `required`, `stale`, or dependency metadata;
-- use benchmark labels as planner inputs;
-- infer removability from non-gold status;
-- commit raw trajectory content;
+- change the importer;
+- change the Phase 1B planner;
+- alter decision rules or thresholds;
+- invent missing IDs;
+- infer tool links from adjacency unless normatively guaranteed;
+- infer dependencies from text;
+- fabricate required/optional/stale metadata;
+- expose evaluation labels to planner inputs;
+- commit raw trajectories or archives;
 - broaden to another corpus;
 - begin Phase 1C;
 - replay or mutate prompts;
-- make live provider calls;
+- make live provider/model calls;
 - implement compression;
 - add current provider pricing;
 - start the recommended next task;
 - commit or push.
 
+## Checks
+
+If an inspection/download script is created, keep it read-only and deterministic.
+
+Run focused tests for new tooling where appropriate.
+
+At minimum:
+
+- validate any compact JSON audit;
+- verify tracked evidence contains no raw trajectory content;
+- verify downloaded/extracted artifacts remain ignored/untracked;
+- run `git diff --check`.
+
+Product tests are optional if Rust/product code is untouched.
+
 ## Completion record
 
 On completion record:
 
-- corpus/revision inspected;
-- inspection method/sample;
-- evidence matrix;
-- captured evidence;
-- deterministic derivations;
-- evaluation-only evidence;
-- unsafe inferences rejected;
-- genuinely absent evidence;
+- raw-artifact access result;
+- exact revision/artifact identity;
+- hashes/integrity result;
+- inspection coverage;
+- schema findings;
+- evidence classifications;
 - evaluation-join result;
-- provenance-model recommendation;
-- importer-revision design, if justified;
-- privacy/licence findings;
+- licence result;
+- importer implication;
 - decision-gate answers;
-- tests/checks;
-- Phase 1B.2 assessment;
-- remaining limitations;
+- checks;
+- Phase 1B.3 assessment;
+- limitations;
 - recommended next task.
 
 Do not begin the recommended next task.
-
-## Completion record - Phase 1B.2
-
-- Corpus/revision inspected: accepted `NJU-LINK/CodeTraceBench` revision
-  `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`, `verified` split, 24
-  trajectories and 719 normalized request traces. No other corpus was used.
-- Inspection method/sample: structural JSON-only inspection of all 719
-  traces and 24,416 blocks, plus the lexicographically first selected
-  trajectory in each solved x short/medium/long cell. No raw content was read
-  or reconstructed. No raw `.traj.json` or `.tar.zst` is available under the
-  accepted local fixture root.
-- Evidence matrix and study: recorded in
-  `docs/phase-1/PHASE_1B2_EVIDENCE_GAP_STUDY.md`; compact sanitized counts,
-  relationship checks, sample rule and fixture hashes are in
-  `results/phase1b2-structural-audit.json`.
-- Captured evidence: trajectory/task identity, request/session identity,
-  explicit message roles, source order/index, hashes, source paths, byte
-  counts and pinned provenance metadata. Evaluation stage/step IDs remain in
-  the external label file only.
-- Deterministic derivations: message-index IDs, request/turn prefixes,
-  normalized positions, source-kind/semantic-zone mapping, structural paths,
-  content hashes and surrogate token estimates. Each is documented as a
-  derivation rather than an upstream fact.
-- Evaluation-only evidence: solved/unsolved outcomes, stage IDs, step IDs,
-  incorrect labels and unuseful labels. None entered planner inputs.
-- Unsafe inference rejected: no optional, required, stale, removability,
-  semantic dependency, adjacency-based tool relation, positional step join,
-  provider usage, exact token usage, or content-derived zone claim was added.
-- Absent evidence: explicit action/tool-call IDs, observation IDs,
-  invocation/result links, stage/step mapping in traces, dependency edges,
-  invalidation/supersession, optional/required/stale facts, provider usage and
-  exact provider token counts.
-- Evaluation-step join: trajectory-level overlap exists, but no exact
-  `normalized block/request -> upstream step ID -> label` mapping is present.
-  Position- or step-count-based reconstruction was rejected.
-- Provenance model: recommend typed per-field origin
-  `source_explicit | derived_structural | unknown`, source locators and
-  versioned derivation rule IDs, with evaluation-only markers kept external.
-  Existing booleans must not hide unknown evidence behind `false`.
-- Importer revision design: a conditional, provenance-preserving design was
-  documented only. It would preserve explicit upstream IDs and protocol kinds
-  if verified, keep the hash-only privacy boundary, and add negative tests;
-  it was not implemented and does not authorize a planner rerun.
-- Privacy/licence: the pinned revision has the recorded MIT metadata/README
-  declaration, but its README-linked root `LICENSE` file is absent. No raw
-  archive, prompt, reasoning or tool output was added.
-- Decision gate: captured/derived chronology and protocol structure are
-  planner-safe for retention and `DO_NOTHING`, but the evidence path does not
-  justify positive Phase 1B coverage or an importer rerun without raw-schema
-  and identifier verification.
-- Checks: structural audit JSON parsed successfully; `git diff --check`
-  passed; existing product code was untouched, so no Rust product behavior
-  check was required beyond the prior Phase 1B validation baseline.
-- Phase 1B.2 assessment: `PIVOT`.
-- Remaining limitations: raw accepted trajectory artifacts were not locally
-  inspectable; optional/required/stale/dependency and exact evaluation-join
-  claims remain unresolved/absent; no quality or provider evidence exists.
-- Recommended next task: a narrowly scoped raw-artifact access and
-  upstream-schema verification gate for this exact CodeTraceBench revision,
-  including explicit step/action/tool-reference fields and licence evidence.
-  If those facts remain unavailable or absent, review a separately authorized
-  corpus/evaluation-strategy pivot. Do not begin it in this task.
