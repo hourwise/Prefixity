@@ -6,6 +6,7 @@
 //! eligibility, CodeTraceBench, or live-provider code.
 
 mod error;
+mod external_artifact_admission;
 mod fixtures;
 mod hashing;
 mod loader;
@@ -17,6 +18,19 @@ mod planner;
 mod world;
 
 pub use error::BenchmarkError;
+pub use external_artifact_admission::{
+    canonical_manifest_json, derive_admission, parse_manifest_json, validate_manifest,
+    AdmissionDecision, AdmissionDecisionReport, AdmissionError, AdmissionReason,
+    AdmissionReasonCode, AdmissionValidationError, AdmissionWarning, AdmissionWarningCode,
+    ArtifactContentEvidence, ArtifactKind, ContentSufficiency, EvidenceRecord, EvidenceReference,
+    EvidenceState, ExecutionRequirement, ExecutionRequirements, ExternalArtifactAdmissionManifest,
+    ExternalArtifactAdmissionManifestV1, GitRetention, GitRetentionPolicy, GoldIndependence,
+    GoldIndependenceEvidence, JoinAmbiguity, JoinClassification, JoinKeyKind, MaterialEvidence,
+    MaterialPresence, OperationEvidence, ParentProjectIdentity, PermissionBasis,
+    PermissionEvidence, PresenceStatus, PublicAccessibility, RequestedUse, RevisionKind,
+    StableJoinEvidence, ThirdPartyMaterialEvidence, EXTERNAL_ARTIFACT_ADMISSION_SCHEMA_ID,
+    EXTERNAL_ARTIFACT_ADMISSION_SCHEMA_VERSION, MAX_MANIFEST_BYTES,
+};
 pub use fixtures::build_seed;
 pub use loader::{
     canonical_envelope_json, envelope_hash, load_envelope, load_envelope_from_path, manifest_hash,

@@ -49,6 +49,10 @@
 
 ## Tests, fixtures and validation material
 
+The [external artifact admission contract](phase-1/EXTERNAL_ARTIFACT_ADMISSION_CONTRACT.md)
+defines the research-only provenance, permission, leakage, retention, and
+admission checks for future supplied manifests.
+
 | Path | Contains | Read when |
 | --- | --- | --- |
 | [`../crates/prefixity-core/tests`](../crates/prefixity-core/tests) | Fixture, policy, determinism, normalization and safety integration tests. | Verifying core behavior. |

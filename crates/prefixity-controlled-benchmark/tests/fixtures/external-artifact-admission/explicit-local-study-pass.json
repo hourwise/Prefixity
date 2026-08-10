@@ -1,0 +1,217 @@
+{
+  "schema_id": "prefixity.external-artifact-admission.v1",
+  "schema_version": 1,
+  "artifact_id": "fictional-trajectory-pass-v1",
+  "artifact_kind": "TRAJECTORY_DATASET",
+  "canonical_source": "https://example.invalid/fictional-trajectory-pass",
+  "source_owner": "fictional-research-owner",
+  "immutable_revision_kind": "DATASET_REVISION",
+  "immutable_revision": "fictional-revision-001",
+  "parent_project": {
+    "identifier": "fictional-benchmark-v1",
+    "reference": "https://example.invalid/fictional-benchmark"
+  },
+  "public_accessibility": "RESTRICTED",
+  "provenance_evidence": [
+    {
+      "locator": "https://example.invalid/fictional-provenance",
+      "note": "Synthetic fixture only"
+    }
+  ],
+  "framework_code_license": {
+    "state": "EXPLICIT",
+    "references": [
+      {
+        "locator": "https://example.invalid/fictional-code-license"
+      }
+    ]
+  },
+  "dataset_artifact_reuse": {
+    "state": "EXPLICIT",
+    "references": [
+      {
+        "locator": "https://example.invalid/fictional-data-permission"
+      }
+    ]
+  },
+  "underlying_third_party_material": {
+    "state": "EXPLICIT",
+    "references": [
+      {
+        "locator": "https://example.invalid/fictional-provenance"
+      }
+    ]
+  },
+  "permission": {
+    "metadata_inspection": {
+      "basis": "PERMITTED_EXPLICIT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-data-permission"
+        }
+      ]
+    },
+    "local_raw_download": {
+      "basis": "PERMITTED_EXPLICIT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-data-permission"
+        }
+      ]
+    },
+    "local_raw_read_parse": {
+      "basis": "PERMITTED_EXPLICIT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-data-permission"
+        }
+      ]
+    },
+    "local_transformation": {
+      "basis": "PERMITTED_EXPLICIT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-data-permission"
+        }
+      ]
+    },
+    "retain_hashes_identifiers_aggregate_metrics": {
+      "basis": "PERMITTED_EXPLICIT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-data-permission"
+        }
+      ]
+    },
+    "retain_bounded_structural_metadata": {
+      "basis": "PERMITTED_EXPLICIT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-data-permission"
+        }
+      ]
+    },
+    "retain_source_excerpts": {
+      "basis": "NOT_PERMITTED"
+    },
+    "redistribute_raw_artifact": {
+      "basis": "NOT_PERMITTED"
+    },
+    "vendor_raw_artifact": {
+      "basis": "NOT_PERMITTED"
+    }
+  },
+  "third_party_material": {
+    "source_code": {
+      "status": "EXPLICIT_ABSENT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-provenance"
+        }
+      ]
+    },
+    "issue_or_pr_text": {
+      "status": "EXPLICIT_ABSENT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-provenance"
+        }
+      ]
+    },
+    "patches": {
+      "status": "EXPLICIT_ABSENT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-provenance"
+        }
+      ]
+    },
+    "tests_or_test_patches": {
+      "status": "EXPLICIT_ABSENT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-provenance"
+        }
+      ]
+    },
+    "tool_output_source_excerpts": {
+      "status": "EXPLICIT_ABSENT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-provenance"
+        }
+      ]
+    },
+    "private_user_data": {
+      "status": "EXPLICIT_ABSENT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-provenance"
+        }
+      ]
+    },
+    "unknown_third_party_material": {
+      "status": "EXPLICIT_ABSENT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-provenance"
+        }
+      ]
+    }
+  },
+  "stable_join": {
+    "classification": "EXACT_ONE_TO_MANY",
+    "key_kind": "TRAJECTORY_TASK_NAME",
+    "left_identifier_description": "fictional task ID",
+    "right_identifier_description": "fictional trajectory task name",
+    "deterministic_exact_match": true,
+    "ambiguity": "NONE",
+    "expected_join_count": 4,
+    "observed_bounded_join_count": 4
+  },
+  "gold_independence": {
+    "status": "BLIND_TO_GOLD",
+    "evidence_basis": {
+      "state": "EXPLICIT",
+      "references": [
+        {
+          "locator": "https://example.invalid/fictional-gold-boundary"
+        }
+      ]
+    }
+  },
+  "content": {
+    "sufficiency": "SUFFICIENT_FOR_FRONT_HALF",
+    "chronology_or_order": "EXPLICIT_PRESENT",
+    "tool_calls": "EXPLICIT_PRESENT",
+    "tool_results": "EXPLICIT_PRESENT",
+    "file_reads_or_views": "EXPLICIT_PRESENT",
+    "search_or_symbol_activity": "EXPLICIT_PRESENT",
+    "observations": "EXPLICIT_PRESENT",
+    "edits_or_actions": "EXPLICIT_PRESENT",
+    "stable_task_identity": "EXPLICIT_PRESENT"
+  },
+  "retention": {
+    "raw_external_artifact": "DO_NOT_TRACK",
+    "full_trajectories": "DO_NOT_TRACK",
+    "source_file_bodies": "DO_NOT_TRACK",
+    "source_excerpts": "DO_NOT_TRACK",
+    "problem_statements": "DO_NOT_TRACK",
+    "patches_or_test_patches": "DO_NOT_TRACK",
+    "opaque_task_ids": "TRACK",
+    "hashes": "TRACK",
+    "source_urls_and_revisions": "TRACK",
+    "license_and_provenance_metadata": "TRACK",
+    "structural_metadata": "TRACK",
+    "aggregate_metrics": "TRACK"
+  },
+  "execution": {
+    "static_data_parsing": "REQUIRED",
+    "archive_decompression": "NOT_REQUIRED",
+    "third_party_code_execution": "NOT_REQUIRED",
+    "container_execution": "NOT_REQUIRED",
+    "network_access": "NOT_REQUIRED",
+    "provider_model_inference": "NOT_REQUIRED"
+  },
+  "requested_use": "EXTERNAL_FRONT_HALF_EVALUATION"
+}
