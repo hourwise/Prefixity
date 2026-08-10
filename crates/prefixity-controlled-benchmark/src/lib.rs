@@ -12,6 +12,7 @@ mod loader;
 mod model;
 mod oracle;
 mod phase1b9;
+mod phase1c_stage0;
 mod planner;
 mod world;
 
@@ -36,6 +37,13 @@ pub use phase1b9::{
     BlindedEvent, BlindedRelation, BlindedTrace, FrozenPlannerBaseline, Phase1b9DecisionRecord,
     Phase1b9Report, ResearchInterventionClass, ResearchPolicyDecision, PHASE_1B9_POLICY_VERSION,
     PHASE_1B9_SCOPE,
+};
+pub use phase1c_stage0::{
+    canonical_stage0_report_json, run_stage0_certification, stage0_design_hash, Stage0AbortProbe,
+    Stage0CertificationStatus, Stage0EfficiencyGateResult, Stage0Manifest, Stage0Report,
+    Stage0TaskIdentity, Stage0TaskRecord, STAGE0_ABORT_POLICY_VERSION, STAGE0_EVALUATOR_VERSION,
+    STAGE0_MOCK_TRANSPORT_SCHEMA_VERSION, STAGE0_REDACTION_VERSION, STAGE0_REPORT_SCHEMA_VERSION,
+    STAGE0_RUNNER_VERSION,
 };
 pub use planner::{project_planner_evidence, run_frozen_planner};
 pub use world::{ExecutionStatus, ScriptedWorld, WorldExecution};
