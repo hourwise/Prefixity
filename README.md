@@ -3,21 +3,21 @@
 > **Prefixity is experimental research software.**
 > **Phase 0 does not modify live LLM requests.**
 
-Prefixity is a provider-neutral, **offline** context-efficiency profiler for
-LLM/agent workloads. It analyses recorded or synthetic request traces to
-explain where context cost is incurred, where reusable prefixes diverge, and
-what alternative context policies *might* have done — before any live request
-is touched.
+Prefixity is a provider-neutral context analysis and decision-research system
+for LLM/agent workloads. It analyses recorded or synthetic request traces to
+explain structural context cost, prefix/cache divergence, provider-reported
+usage, and what conservative offline policies *might* have done before any
+live prompt is changed. It does not automatically mutate live context.
 
 Phase 0 is a small, deterministic research harness. It exists to confirm or
 invalidate the core thesis:
 
-> For an observed LLM/agent workload, can a deterministic tool explain where
-> context cost is being incurred, identify prefix divergence and unnecessary
-> context, model provider-specific cache economics, and simulate alternative
-> context policies before modifying live prompts?
+> Can a provider-neutral, auditable decision layer determine when accumulated
+> agent context should be retained or changed, and when DO_NOTHING is
+> preferable after accounting for quality, structural evidence, provider
+> behavior, and cache economics?
 
-A perfectly acceptable Phase 0 result is:
+A perfectly acceptable result at any phase is:
 
 > "Do nothing. Your existing client is already close to optimal."
 
@@ -28,9 +28,22 @@ A perfectly acceptable Phase 0 result is:
 - **Phase 0B** DeepSeek live validation complete: **PASS WITH RECORDED
   LIMITATIONS** (see `docs/phase-0/PHASE_0B_DEEPSEEK_CLOSEOUT.md`).
   OpenAI/Anthropic adapters remain offline-tested, not live-validated.
-  - **Phase 1A** complete and **Phase 1B.0** conservative offline planning
-    implemented; Phase 1C replay remains unauthorized (see
-    `docs/phase-1/PHASE_1B_DECISION_CONTRACT.md`).
+- **Phase 1A** natural-workload observation is complete for the accepted
+  CodeTraceBench evidence path.
+- **Phase 1B** controlled evidence is complete through the corrected
+  benchmark review and the 1B.9 held-out intervention-recall study. The
+  `controlled-evidence-policy-v1` policy remains research-only and
+  `CONTROLLED_ONLY`; its bounded 4/4 positive result is not population or
+  generalization evidence.
+- **Phase 1C** design authorization and Stage 0 offline replay certification
+  are complete. Stage 0 is certified and remains valid, but it made no
+  provider/model calls and read no credentials. Stage 1 is currently blocked
+  by the external-evidence admission gate: an explicit reuse basis for a
+  suitable external trajectory artifact, currently Tracebench, is still
+  missing. No adapter or scoring study has started.
+- **Current research dependency:** obtaining an explicit reuse basis for a
+  suitable pre-existing external trajectory artifact. This blocks the next
+  Phase 1C evidence step, not the project as a whole.
 - No daemon, no localhost proxy, no telemetry.
 - No semantic response caching, no KV-cache storage, no RAG, no automatic
   context mutation of live requests.
@@ -144,8 +157,9 @@ Prefixity/
 ├── crates/
 │   ├── prefixity-core/        # deterministic analysis logic (authoritative)
 │   ├── prefixity-cli/         # thin CLI over the core logic
-│   └── prefixity-live/        # Phase 0B live validation harness (experimental)
-├── docs/                      # charter, threat model, prior art, phase-0 docs
+│   ├── prefixity-live/        # Phase 0B live validation harness (experimental)
+│   └── prefixity-controlled-benchmark/ # research-only controlled evaluator
+├── docs/                      # charter, source of truth, prior art, phase docs
 ├── fixtures/traces/           # synthetic trace fixtures (no real secrets)
 ├── provider-profiles/         # SYNTHETIC cost profiles (not real pricing)
 └── experiments/               # live run artifacts (runs/ gitignored)
@@ -188,6 +202,15 @@ Prefixity/
   conditions.
 - `docs/phase-1/PHASE_1_PLAN.md` — the Phase 1 plan: real-workload
   observation and quality-gated context decisions (1A/1B/1C, design gate).
+- `docs/phase-1/PHASE_1B8_CONTROLLED_BENCHMARK_REVIEW.md` and
+  `docs/phase-1/PHASE_1B9_HELD_OUT_INTERVENTION_RECALL.md` — completed
+  controlled Phase 1B evidence and its limitations.
+- `docs/phase-1/PHASE_1C_DESIGN_AUTHORIZATION_GATE.md` and
+  `docs/phase-1/PHASE_1C_STAGE_0_CERTIFICATION.md` — the frozen Phase 1C
+  design and certified offline replay boundary.
+- `docs/phase-1/PHASE_1C_EXTERNAL_EVIDENCE_FRONT_HALF_GATE.md` and
+  `docs/phase-1/CONTEXTBENCH_EXTERNAL_TRAJECTORY_ADMISSION.md` — the
+  current external-evidence blocker and conservative admission result.
 - `docs/phase-1/QUALITY_GATE.md` — Phase 1 quality gate, evidence tiers and
   intervention rules.
 - `docs/phase-1/SUCCESS_CRITERIA.md` — Phase 1 success/failure and pivot

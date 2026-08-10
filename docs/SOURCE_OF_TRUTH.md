@@ -5,25 +5,29 @@
 
 ## Status
 
-Prefixity is experimental research software. At the audit point, `main` is at
-commit `72f06b0` (the Phase 1 design set). Phase 0A and Phase 0A.1 offline
-work are implemented; the separate Phase 0B controlled live-validation
-harness is implemented, and the controlled DeepSeek sequence is closed as
-`PASS WITH RECORDED LIMITATIONS`. OpenAI and Anthropic adapters are tested
-offline but have not been live-validated.
+Prefixity is experimental research software. At the current audit checkpoint,
+`main` is at commit
+`6f8fce28f69876f51c093b051afb604b5b514f69`; CI #38 passed for that commit.
+Phase 0A and Phase 0A.1 offline work are implemented. The separate Phase 0B
+controlled live-validation harness is implemented, and the controlled
+DeepSeek sequence is closed as `PASS WITH RECORDED LIMITATIONS`. OpenAI and
+Anthropic adapters remain offline-tested rather than live-validated.
 
-Phase 1A corpus validation is implemented and closed as `PASS` for the accepted
-CodeTraceBench evidence path. The thin importer/adapter and offline observer
-evidence are present. Phase 1B.0 now has a deterministic, conservative offline
-intervention-plan contract and baseline planner. Phase 1C replay/runtime work
-remains unimplemented and is not authorized by the current task.
+Phase 1A natural-workload observation is complete for the accepted
+CodeTraceBench evidence path. Phase 1B is complete through the controlled
+benchmark design, chronological-world correction, controlled review, and the
+1B.9 held-out intervention-recall study. The frozen
+`controlled-evidence-policy-v1` remains research-only with scope
+`CONTROLLED_ONLY`; the bounded 4/4 positive held-out result is not population
+or generalization evidence.
 
-Phase 1B.1 ran the frozen Phase 1B.0 planner over all 719 accepted offline
-request traces. All 719 plans produced `DO_NOTHING`; the run was deterministic
-and safety-clean. At that baseline, the derivative representation lacked
-provider usage and sufficient structural identity for exact step-level
-evaluation joining, and contained no evidenced true `optional`, `required` or
-`stale` flags or dependency edges.
+Phase 1C design authorization is complete, and Stage 0 offline replay
+certification is complete with result
+`CERTIFIED — READY FOR SEPARATE STAGE 1 AUTHORIZATION`. Stage 0 remains valid:
+it made no provider/model calls, read no credentials, and did not establish
+provider behavior, task-quality preservation, cache behavior, or production
+benefit. The later external-evidence gate leaves Phase 1C Stage 1
+`BLOCKED`.
 
 Phase 1B.4 completed a narrow evidence-adapter revision justified by the pinned
 raw-schema verification. The accepted derivative now preserves source-explicit
@@ -32,23 +36,39 @@ usage, field-level provenance and bounded evaluation source locators. The
 frozen planner remains conservative: all 719 plans are `DO_NOTHING`, with no
 new optional/required/stale/dependency/tool-link evidence synthesized.
 
+The immediate research blocker is obtaining an explicit reuse basis for a
+suitable pre-existing external trajectory artifact, currently Tracebench.
+This is an external research dependency, not a global project blocker; other
+offline and research-infrastructure work remains possible. No
+ContextBench/Tracebench adapter or scoring study is authorized or started.
+
 ## Product definition
 
-The current product is a provider-neutral, deterministic context-efficiency
-profiler and offline policy simulator for recorded or synthetic LLM/agent
-request traces. It explains structural context cost, prefix divergence,
-provider-reported usage and hypothetical policy effects before any live prompt
-mutation.
+The current product is an experimental, provider-neutral context analysis and
+decision-research system. It includes deterministic trace observation,
+prefix/cache structural analysis, offline policy simulation, conservative
+intervention planning, research-only controlled benchmark/evaluator
+infrastructure, bounded live-validation infrastructure from Phase 0B, and
+certified offline Phase 1C replay machinery.
 
-The implemented product boundary is the Phase 0 observer/simulator plus the
-disposable Phase 0B validation harness. The charter's possible future
-"context compiler" is a conditional design direction, not an implemented
-product capability.
+The current product boundary does not include production context
+optimization, natural-trace intervention safety, universal savings, provider
+superiority, live Phase 1C success, or automatic context mutation. The
+charter's possible future "context compiler" remains a conditional design
+direction, not an implemented production capability.
 
 ## Problem being solved
 
-The hypothesis is that a deterministic tool can make context-management
-decisions testable by answering, for an observed workload:
+The current research question is:
+
+> Can a provider-neutral, auditable decision layer determine when accumulated
+> agent context should be retained or changed, and when `DO_NOTHING` is
+> preferable after accounting for quality, structural evidence, provider
+> behavior, and cache economics?
+
+This remains a research hypothesis, not a scientifically established result.
+The decision layer makes context-management claims testable by answering, for
+an observed workload:
 
 - where context cost is incurred;
 - where consecutive request structures first diverge;
@@ -66,7 +86,7 @@ task quality under intervention, or produce end-to-end savings.
 
 ## Current architecture
 
-The workspace has three crates:
+The workspace has four crates:
 
 1. `prefixity-core` is authoritative for the trace model, validation, bounded
    input handling, structural zones/fingerprints, token estimation, the
@@ -83,6 +103,12 @@ The workspace has three crates:
    responses into trace v2, preserves raw usage, reconciles pair ratios and
    writes sanitized local artifacts. It delegates analysis and normalization
    to `prefixity-core`.
+4. `prefixity-controlled-benchmark` is isolated, offline, research-only
+   controlled benchmark and evaluator infrastructure. It owns the
+   self-authored controlled envelope, deterministic world/oracle, blinded
+   planner projection, Phase 1B.9 study, and Phase 1C Stage 0 certification.
+   It is not production runtime infrastructure and does not authorize
+   provider calls or live replay.
 
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
@@ -155,11 +181,39 @@ recognized as reserved but is not interpreted.
   unresolved; labels stay outside planner inputs. Re-import and repeated
   planner execution are deterministic and safety-clean. See
   `docs/phase-1/PHASE_1B4_EVIDENCE_ADAPTER_RECHARACTERIZATION.md`.
+- Phase 1B controlled-evidence path: the corrected chronological-world
+  benchmark review established a deterministic bounded measurement mechanism,
+  and the 1B.9 held-out study selected four of four authored positive cases
+  with no observed false positives, false negatives, unsafe actions, or
+  regressions under the frozen controlled construction. This is controlled
+  evidence only; it is not population/generalization evidence.
+- Phase 1C design and Stage 0: the replay design/authorization gate is
+  complete, and the offline Stage 0 runner is certified as
+  `CERTIFIED — READY FOR SEPARATE STAGE 1 AUTHORIZATION`. Stage 0 certifies
+  offline harness behavior only and remains valid; it made zero network calls,
+  read zero credentials, and incurred zero spend.
+- Phase 1C external evidence: the corrected ContextBench source is
+  EuniAI/ContextBench at revision
+  `1436c28a8eb95496da4ea69ad458b9f8a8eb7d61`; its pinned artifact provides
+  human gold-context/task material but not a permission-cleared external
+  trajectory, so its result is
+  `NO-GO — BENCHMARK ADMISSION/TRAJECTORY INSUFFICIENT`. The strongest
+  technical candidate is Contextbench/Tracebench at observed revision
+  `7da2e4f45b330be8b6e8f1cff835247723cb3341`, with 376 exact ContextBench
+  task joins and 596 trajectory rows in the bounded metadata join. Raw
+  trajectory admission remains blocked because no explicit reuse/licence
+  basis was established; its result is
+  `NO-GO — NO PERMISSION-CLEARED EXTERNAL TRAJECTORY ARTIFACT FOUND`.
 
 ## Incomplete and not established
 
 - No Phase 1C controlled replay, task-quality evaluator, gold-context
   retention measurement or end-to-end quality/cost report exists.
+- Phase 1C Stage 1 schema smoke and Stage 2 replay are blocked. The blocker is
+  front-half external evidence admission, not Stage 0 harness correctness.
+- No permission-cleared external trajectory artifact has been admitted. The
+  Tracebench clarification is an external dependency; no raw trajectory data
+  has been downloaded, vendored, or committed.
 - OpenAI and Anthropic live behavior remains untested in this repository;
   their adapters are exercised with mocks/offline schemas only.
 - OpenAI Responses usage normalization/live adapter is reserved and absent.
@@ -172,32 +226,28 @@ recognized as reserved but is not interpreted.
 
 ## Accepted near-term direction
 
-Phase 1A is complete for the accepted `NJU-LINK/CodeTraceBench` artifact-bearing
-dataset revision `aa213b84ffb6690fc37ca15766d6ca174ec36d4d`: use a narrow,
-verified subset of a public agent-workload corpus, preserve task/trajectory
-provenance, keep evaluation labels separate from decision inputs, and produce
-deterministic offline observations before any mutation or replay. The Phase 1
-plan's Phase 1B prerequisites for ingestion, provenance, label separation and
-deterministic offline observation are now met. Phase 1B.0 establishes the
-offline contract and conservative baseline only; it does not establish
-intervention quality, savings or replay readiness.
+Phase 1A remains complete for the accepted `NJU-LINK/CodeTraceBench`
+artifact-bearing dataset revision
+`aa213b84ffb6690fc37ca15766d6ca174ec36d4d`. Its importer preserves
+task/trajectory provenance, keeps evaluation labels separate from decision
+inputs, and produces deterministic offline observations. The missing
+README-linked `LICENSE` text remains a licence-evidence limitation; it was
+not recreated or inferred.
 
-The next phase should validate the central decision hypothesis rather than
-expand the feature surface. The Phase 1 quality gate requires structural
-safety, required/dependency retention, reproducibility, task-quality evidence
-and end-to-end accounting. `DO_NOTHING` is a valid success outcome.
+Phase 1B is complete as a controlled research path through the corrected
+benchmark review and 1B.9 held-out recall. The result supports bounded
+measurement and a conservative fail-open policy, not a production policy,
+natural-workload generalization, intervention safety, or universal savings.
+The Phase 1 quality gate still requires structural safety, required/dependency
+retention, reproducibility, task-quality evidence, and end-to-end accounting.
+`DO_NOTHING` remains a valid success outcome.
 
-The accepted corpus declaration and exact source revision are recorded in the
-Phase 1A closeout and fixture provenance. The missing README-linked `LICENSE`
-file remains a licence-evidence limitation; its text was not recreated or
-inferred. The observed candidates remain heuristic and do not establish
-provider cache reuse, monetary savings, latency improvement or task-quality
-preservation.
-
-The next authorized research question is whether a separately reviewed corpus
-or evaluation artifact can provide explicit action/result/dependency/
-removability identity and task-quality joins. The current CodeTraceBench slice
-does not justify another planner characterization without new evidence.
+Phase 1C Stage 0 is certified and valid, but Stage 1 remains blocked. The
+current central dependency is explicit reuse clarification or an explicitly
+licensed, immutable external trajectory artifact, currently Tracebench. Until
+that admission boundary changes, no ContextBench/Tracebench adapter, raw-data
+acquisition, scoring study, schema smoke, or replay should begin. This does
+not prevent unrelated offline or research-infrastructure work.
 
 ## Explicitly deferred
 
@@ -210,9 +260,10 @@ does not justify another planner characterization without new evidence.
 - Token-conversion multipliers and hard-coded current provider pricing.
 - OpenAI Responses support until its exact versioned schema is implemented and
   validated.
-- Phase 1C runtime and replay work remains deferred until separately
-  authorized after Phase 1B characterization and quality-gate preparation.
-  Automatic compression remains deferred; Phase 1B.0 only supports its
+- Phase 1C Stage 1 schema smoke and Stage 2 replay remain deferred and blocked
+  until the external trajectory admission dependency is resolved and each
+  later execution scope is separately authorized. Stage 0 is complete;
+  automatic compression remains deferred, and Phase 1B.0 only supports its
   contract class.
 
 ## Constraints and invariants
@@ -267,6 +318,12 @@ does not justify another planner characterization without new evidence.
   and the missing text has not been recreated.
 - Whether the 712 structural candidates survive intervention-quality,
   provider-cache, monetary-savings, latency and task-quality evaluation.
+- Whether Tracebench or an equivalent external trajectory artifact has an
+  explicit reuse basis for bounded local research; the current no-go is a
+  conservative research-admission decision, not a legal finding.
+- Whether ContextBench's gold-context/task material and the underlying source
+  repositories can be used for any future slice without copying or
+  redistributing restricted benchmark material.
 
 ## Documented disagreements and drift
 
@@ -281,6 +338,10 @@ does not justify another planner characterization without new evidence.
 - `prefixity-live` comments in `lib.rs` and `experiment.rs` still mention a
   default request count of 3, while the current CLI constant and live protocol
   use a default of 4 to support the four-turn DeepSeek late-divergence plan.
+- Earlier Phase 1 documents intentionally preserve the design or checkpoint
+  state in which they were written. The current Phase 1B/1C status and
+  external-evidence boundary are recorded here and in the later evidence
+  documents; historical wording is not retroactively rewritten.
 - The Phase 0B closeout and findings are the authoritative record for the
   controlled DeepSeek result; ignored `experiments/runs` artifacts are useful
   evidence but are not tracked benchmark outputs.
