@@ -11,6 +11,7 @@ mod hashing;
 mod loader;
 mod model;
 mod oracle;
+mod phase1b9;
 mod planner;
 mod world;
 
@@ -30,6 +31,12 @@ pub use model::{
     TASK_REVISION,
 };
 pub use oracle::{evaluate_case, evaluate_envelopes};
+pub use phase1b9::{
+    blinded_trace_json, canonical_phase1b9_report_json, preregistration_hash, run_phase1b9_study,
+    BlindedEvent, BlindedRelation, BlindedTrace, FrozenPlannerBaseline, Phase1b9DecisionRecord,
+    Phase1b9Report, ResearchInterventionClass, ResearchPolicyDecision, PHASE_1B9_POLICY_VERSION,
+    PHASE_1B9_SCOPE,
+};
 pub use planner::{project_planner_evidence, run_frozen_planner};
 pub use world::{ExecutionStatus, ScriptedWorld, WorldExecution};
 

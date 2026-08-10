@@ -1,0 +1,183 @@
+{
+  "artifact_id": "prefixity-phase1b9-held-out-v1",
+  "baseline_pass_intervention_failures": 0,
+  "case_count": 14,
+  "decisions": [
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h001",
+      "classification": "TRUE_POSITIVE",
+      "intervention_completed": true,
+      "oracle_result": "PASS",
+      "positive_available": true,
+      "selected_class": "PRUNE",
+      "selected_target_event_id": "e002"
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h002",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h003",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h004",
+      "classification": "TRUE_POSITIVE",
+      "intervention_completed": true,
+      "oracle_result": "PASS",
+      "positive_available": true,
+      "selected_class": "PRUNE",
+      "selected_target_event_id": "e003"
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h005",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h006",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h007",
+      "classification": "TRUE_POSITIVE",
+      "intervention_completed": true,
+      "oracle_result": "PASS",
+      "positive_available": true,
+      "selected_class": "DEFER",
+      "selected_target_event_id": "e001"
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h008",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h009",
+      "classification": "TRUE_POSITIVE",
+      "intervention_completed": true,
+      "oracle_result": "PASS",
+      "positive_available": true,
+      "selected_class": "RELOCATE_CANDIDATE",
+      "selected_target_event_id": "e002"
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h010",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h011",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h012",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h013",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    },
+    {
+      "baseline_completed": true,
+      "baseline_pass_intervention_fail": false,
+      "case_id": "h014",
+      "classification": "TRUE_NOOP",
+      "intervention_completed": null,
+      "oracle_result": null,
+      "positive_available": false,
+      "selected_class": "DO_NOTHING",
+      "selected_target_event_id": null
+    }
+  ],
+  "determinism_hash": "be13da638022e6123c21ee9b009f9eaeb58a752e8547508b9f3900fc9d04c0a5",
+  "evaluation_key_hash": "c473241757ee72b2df4726e76879c2b94fc4a54e5ca244bb4d6eb1b08bda9a9c",
+  "false_negatives": 0,
+  "false_positives": 0,
+  "frozen_planner": {
+    "distribution": {
+      "DO_NOTHING": 14
+    },
+    "report_hash": "137193fcd6785b4f6d8d4828aa48ba52e211c1f211e5a2446bcb2d448a7667a3"
+  },
+  "held_out_set_hash": "10605a2e4b39f04dfbb9a26126a1a416dc036e185d719c32f4407115809b944b",
+  "planner_evidence_hash": "9c037de315e1e3090bb0c07786d4aeef180dc7cf84a9351cacb77bf9c42e28af",
+  "policy_hash": "2139e084d97b16f3ae4ad36d95d40f0c73b4b1f448fe68f197139aa744dfe0e4",
+  "policy_version": "controlled-evidence-policy-v1",
+  "positive_cases_available": 4,
+  "positive_interventions_selected": 4,
+  "precision": 1.0,
+  "preregistration_hash": "e12846776660960093f9208b099ca171dc4b9c9583150b58de340e965409cd3b",
+  "recall": 1.0,
+  "true_noop_decisions": 10,
+  "true_positives": 4,
+  "unsafe_intervention_count": 0
+}
