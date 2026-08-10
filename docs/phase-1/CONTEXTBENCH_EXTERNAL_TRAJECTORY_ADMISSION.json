@@ -1,0 +1,93 @@
+{
+  "artifact_version": "contextbench-external-trajectory-admission-v1",
+  "review_date": "2026-08-10",
+  "checkpoint": {
+    "prefixity_commit": "6ef6fe6e4b271d0dc62fe5481a7c408e2db3c306",
+    "ci_run": 31379728346,
+    "ci_run_number": 37,
+    "ci_conclusion": "success",
+    "active_sha256": "D329C117BF346D65B2587B07EF9B13AA394E5796B580C623E71B1593853F17E2"
+  },
+  "contextbench": {
+    "repository": "https://github.com/EuniAI/ContextBench",
+    "repository_revision": "1436c28a8eb95496da4ea69ad458b9f8a8eb7d61",
+    "paper": "https://arxiv.org/abs/2602.05892",
+    "dataset": "Contextbench/ContextBench",
+    "dataset_revision": "c2855792b006af41c67202d33883fb9d46362853",
+    "published_task_count": 1136,
+    "framework_code_license": "Apache-2.0",
+    "raw_dataset_license": "not_declared",
+    "front_half_status": "NO-GO — BENCHMARK ADMISSION/TRAJECTORY INSUFFICIENT"
+  },
+  "candidate": {
+    "name": "Contextbench/Tracebench",
+    "url": "https://huggingface.co/datasets/Contextbench/Tracebench",
+    "revision": "7da2e4f45b330be8b6e8f1cff835247723cb3341",
+    "manifest_full_jsonl_sha256": "8f688bb147fb1840572887af10d137653b4b49523c5bbd3dc3ee9c333bbe082e",
+    "manifest_full_parquet_sha256": "1330b1b7c35e4d563ff73dbe18fb046300cfb2e2efc70c1ca02092f1d33d13c5",
+    "manifest_verified_jsonl_sha256": "5b33978effbeaa966d701160429729eb9631d524305abc870f9aa0d421ef8963",
+    "manifest_verified_parquet_sha256": "2fbedb26641ad9843642c869674473defb3c606542a9c9215ebfba38755ebe14",
+    "declared_full_trajectory_count": 3316,
+    "declared_full_swe_trajectory_count": 646,
+    "declared_full_terminal_trajectory_count": 2670,
+    "declared_full_artifact_count": 3291,
+    "exact_join_key": "ContextBench.original_inst_id == Tracebench.task_name",
+    "selected_contextbench_task_count": 500,
+    "exact_joined_task_count": 376,
+    "exact_joined_trajectory_row_count": 596,
+    "joined_rows_with_artifact_path": 596,
+    "joined_by_source": {
+      "Verified": {"task_ids": 162, "trajectory_rows": 176},
+      "Pro": {"task_ids": 46, "trajectory_rows": 104},
+      "Poly": {"task_ids": 85, "trajectory_rows": 208},
+      "Multi": {"task_ids": 83, "trajectory_rows": 108}
+    },
+    "gold_independence": "BLIND_TO_GOLD at metadata level; raw archive inspection not performed",
+    "trajectory_sufficiency": "TECHNICALLY_SUFFICIENT_BY_MANIFEST_AND_PUBLIC_FORMAT",
+    "permission": "UNCLEAR",
+    "dataset_license_tag": null,
+    "license_or_terms_file_observed": false,
+    "local_raw_research_permission": "NOT_ESTABLISHED",
+    "vendor_or_redistribute_permission": "NOT_ESTABLISHED",
+    "classification": "PERMISSION_UNCLEAR"
+  },
+  "other_candidates": [
+    {
+      "name": "SWE-bench/experiments",
+      "revision": "1faa91cade0562ba62b66c1c99e71f7b72d96f13",
+      "url": "https://github.com/SWE-bench/experiments",
+      "classification": "ADMISSIBLE_METADATA_ONLY",
+      "finding": "README documents exact per-instance trajectories, but raw logs/traces are in S3, require an AWS account, and no repository license or immutable S3 artifact hash was established."
+    },
+    {
+      "name": "Pinned ContextBench repository and dataset",
+      "classification": "TRAJECTORY_INSUFFICIENT",
+      "finding": "Evaluator and gold/task material are present; no bundled external trajectory collection is supplied."
+    },
+    {
+      "name": "ContextBench leaderboard and website",
+      "classification": "REFERENCE_ONLY",
+      "finding": "Aggregate results and benchmark descriptions only."
+    },
+    {
+      "name": "Existing Prefixity CodeTraceBench slice",
+      "classification": "JOIN_INSUFFICIENT",
+      "finding": "The completed ContextBench preflight recorded zero joined candidates; no widening was performed."
+    }
+  ],
+  "decision": "NO-GO — NO PERMISSION-CLEARED EXTERNAL TRAJECTORY ARTIFACT FOUND",
+  "stage_1": "BLOCKED",
+  "raw_boundary": {
+    "tracebench_archives_acquired": false,
+    "tracebench_archives_extracted": false,
+    "raw_rows_added_to_prefixity": false,
+    "raw_trajectories_added_to_prefixity": false,
+    "provider_or_model_calls": false,
+    "credentials_accessed": false,
+    "agent_or_repository_execution": false,
+    "docker_execution": false
+  },
+  "recommended_next_task": "Obtain written reuse clarification or an explicitly licensed, immutable Tracebench trajectory slice from the source owner, then repeat the admission review.",
+  "commit_proposal": "docs: record external trajectory acquisition no-go",
+  "commit_authorized": false
+}
