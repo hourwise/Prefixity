@@ -1,0 +1,102 @@
+{
+  "artifact_version": "contextbench-front-half-report-v1",
+  "status": "NO-GO — BENCHMARK ADMISSION/TRAJECTORY INSUFFICIENT",
+  "prefixity_checkpoint": "975a1ae12dcdfb590814b97711f54b39e2bafca1",
+  "benchmark": {
+    "repository": "https://github.com/EuniAI/ContextBench",
+    "repository_revision": "1436c28a8eb95496da4ea69ad458b9f8a8eb7d61",
+    "paper": "https://arxiv.org/abs/2602.05892",
+    "dataset": "Contextbench/ContextBench",
+    "dataset_revision": "c2855792b006af41c67202d33883fb9d46362853"
+  },
+  "preregistration_sha256": "05bc1daa9e6b621cd370da2365106519487f71731391ffa825bcdb3bdd4b3180",
+  "admission_manifest_sha256": "d6f9616bed46b9f98a120081aee3fae2d41ef9841d4539ac31f19ad0844ead34",
+  "admission": {
+    "classification": "ADMISSIBLE WITH PROVENANCE RESTRICTIONS",
+    "repository_code_license": "Apache-2.0",
+    "dataset_license": "NOT_DECLARED_IN_OBSERVED_HUGGING_FACE_METADATA",
+    "underlying_source_provenance": "SOURCE_SPECIFIC_REVIEW_REQUIRED",
+    "local_research_permission": "NOT_EXERCISED_NO_JOINED_TRAJECTORY",
+    "vendoring_or_redistribution": "NOT_CLEARED"
+  },
+  "counts": {
+    "repository_published_candidates": 1136,
+    "trajectory_joined_candidates": 0,
+    "admitted_instances": 0,
+    "excluded_instances": 1136,
+    "sample_count": 0,
+    "minimum_required_sample": 25,
+    "target_sample": 50
+  },
+  "trajectory_source": {
+    "source": null,
+    "bundled_trajectory_artifacts": 0,
+    "trajectory_like_dataset_fields": [],
+    "result": "ABSENT — evaluator formats are documented, but no trajectory records are supplied by the pinned benchmark material"
+  },
+  "adapter": {
+    "implemented": false,
+    "version": null,
+    "sha256": null,
+    "reason": "Study stopped before adapter implementation under the preregistered trajectory-availability gate"
+  },
+  "evidence_categories": [
+    "CAPTURED_EXPLICIT",
+    "DERIVED_STRUCTURAL",
+    "EVALUATION_ONLY",
+    "INFERRED_UNSAFE",
+    "ABSENT",
+    "UNKNOWN"
+  ],
+  "evaluation_granularity": "NOT RUN — no joined trajectory sample",
+  "baselines": {
+    "KEEP_ALL": "NOT RUN",
+    "EXPLICIT_REFERENCE_ONLY": "NOT APPLICABLE — no trajectory",
+    "RECENCY": "NOT RUN"
+  },
+  "metrics": {
+    "prefixity": "NOT RUN",
+    "gold_context_protection_recall": "NOT RUN",
+    "file_gold_recall": "NOT RUN",
+    "symbol_gold_recall": "NOT RUN",
+    "span_gold_recall": "NOT RUN",
+    "protection_precision": "NOT RUN",
+    "f1": "NOT RUN",
+    "unknown_retain_rate": "NOT RUN",
+    "selectivity": "NOT RUN",
+    "coverage": "NOT RUN",
+    "provenance_completeness": "0 joined instances",
+    "join_success_rate": "0 / 1136",
+    "gold_context_miss_count": "NOT RUN"
+  },
+  "determinism": {
+    "preflight_reproduction": "PASS",
+    "scoring_reproduction": "NOT APPLICABLE",
+    "hash": "1ba696638c21df135641dd5b5d7c2f10473f62ab1185272460fbb8b00d0a069a",
+    "notes": "Pinned revisions, bounded source hashes, schema observations, and the zero-trajectory scan are recorded in the admission preflight manifest."
+  },
+  "leakage": {
+    "gold_used_for_evidence_extraction": false,
+    "result": "PASS — no adapter or scoring run occurred"
+  },
+  "retention_boundary": {
+    "raw_benchmark_rows_tracked": false,
+    "raw_source_bodies_tracked": false,
+    "raw_trajectories_tracked": false,
+    "raw_data_boundary_checks": "PASS"
+  },
+  "model_provider_calls": 0,
+  "inference_spend": 0,
+  "production_planner_changed": false,
+  "relocate_candidate_constraint": "REMAINS FROZEN; no positional model behavior was tested",
+  "stage_1_decision": "STAGE_1 REMAINS BLOCKED — BENCHMARK/PROVENANCE ISSUE",
+  "recommended_next_task": "Obtain a permission-cleared, pinned external trajectory artifact with a stable join to ContextBench, then reopen the admission review.",
+  "validation": {
+    "cargo_fmt": "NOT RUN — no Rust changes",
+    "cargo_clippy": "NOT RUN — no Rust changes",
+    "cargo_test": "NOT RUN — no Rust changes",
+    "source_link_sanity": "PASS for pinned-source records",
+    "provenance_admission_review": "PASS — no-go correctly enforced",
+    "git_diff_check": "PASS"
+  }
+}

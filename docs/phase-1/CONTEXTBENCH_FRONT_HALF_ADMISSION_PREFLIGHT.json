@@ -1,0 +1,126 @@
+{
+  "artifact_version": "contextbench-front-half-admission-preflight-v1",
+  "prefixity_checkpoint": "975a1ae12dcdfb590814b97711f54b39e2bafca1",
+  "benchmark": {
+    "repository": "https://github.com/EuniAI/ContextBench",
+    "repository_revision": "1436c28a8eb95496da4ea69ad458b9f8a8eb7d61",
+    "paper": "https://arxiv.org/abs/2602.05892",
+    "dataset": "Contextbench/ContextBench",
+    "dataset_revision": "c2855792b006af41c67202d33883fb9d46362853"
+  },
+  "repository_evidence": {
+    "code_license": "Apache-2.0",
+    "hashed_files_observed_at_pinned_revision": [
+      {
+        "path": "LICENSE",
+        "role": "repository_code_license",
+        "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+      },
+      {
+        "path": "README.md",
+        "role": "repository_documentation",
+        "sha256": "61c0da6520ede80f745d0f0552d96b7d9e5c5b925a26ad5a2ebc29ab36f28c30"
+      },
+      {
+        "path": "data/full.parquet",
+        "role": "benchmark_dataset_payload_not_vendored",
+        "sha256": "2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8"
+      }
+    ],
+    "published_task_count": 1136,
+    "published_repository_count": 66,
+    "published_language_count": 8,
+    "bundled_external_trajectory_artifact_count": 0,
+    "trajectory_scan": {
+      "supported_evaluator_formats": [
+        ".traj.json",
+        ".checkpoints.jsonl",
+        ".traj",
+        ".context.json",
+        "patch_context.txt",
+        ".log",
+        "OpenHands output.jsonl"
+      ],
+      "matching_benchmark_paths": [],
+      "result": "ABSENT"
+    }
+  },
+  "dataset_evidence": {
+    "observed_schema_fields": [
+      "instance_id",
+      "original_inst_id",
+      "repo",
+      "repo_url",
+      "language",
+      "base_commit",
+      "gold_context",
+      "patch",
+      "test_patch",
+      "problem_statement",
+      "f2p",
+      "p2p",
+      "source"
+    ],
+    "trajectory_like_fields": [],
+    "gold_context_present_as_evaluation_sidecar": true,
+    "dataset_license_metadata": null,
+    "public_metadata_count_observation": "The pinned public page exposes the repository-sized parquet files and conflicting viewer/card row summaries; the repository README's 1136-row count is used as the bounded candidate count. No sample selection depends on the conflicting HF display count.",
+    "raw_dataset_tracked_in_prefixity": false
+  },
+  "source_family_preflight": [
+    {
+      "source": "Verified",
+      "provenance_basis": "SWE-bench Verified; official SWE-bench code repository is MIT-licensed and the tasks originate in third-party open-source repositories",
+      "selected_500_metadata_rows": 174,
+      "trajectory_joined_rows": 0,
+      "status": "EXCLUDED_NO_EXTERNAL_TRAJECTORY_AND_NO_BLANKET_DATASET_REDISTRIBUTION_CLEARANCE"
+    },
+    {
+      "source": "Pro",
+      "provenance_basis": "SWE-bench Pro family; task and repository rights require source-specific review",
+      "selected_500_metadata_rows": 54,
+      "trajectory_joined_rows": 0,
+      "status": "EXCLUDED_NO_EXTERNAL_TRAJECTORY_AND_NO_BLANKET_DATASET_REDISTRIBUTION_CLEARANCE"
+    },
+    {
+      "source": "Poly",
+      "provenance_basis": "Amazon Science SWE-PolyBench; repository README identifies MIT code license, while task/source-repository material remains separately governed",
+      "selected_500_metadata_rows": 116,
+      "trajectory_joined_rows": 0,
+      "status": "EXCLUDED_NO_EXTERNAL_TRAJECTORY_AND_NO_BLANKET_DATASET_REDISTRIBUTION_CLEARANCE"
+    },
+    {
+      "source": "Multi",
+      "provenance_basis": "Multi-SWE-bench; repository README identifies Apache-2.0 project licensing and explicitly builds on SWE-bench, while underlying task repositories remain separately governed",
+      "selected_500_metadata_rows": 156,
+      "trajectory_joined_rows": 0,
+      "status": "EXCLUDED_NO_EXTERNAL_TRAJECTORY_AND_NO_BLANKET_DATASET_REDISTRIBUTION_CLEARANCE"
+    }
+  ],
+  "candidate_counts": {
+    "repository_published_candidates": 1136,
+    "trajectory_joined_candidates": 0,
+    "admitted_instances": 0,
+    "excluded_instances": 1136,
+    "minimum_required_for_external_claim": 25,
+    "target_sample_size": 50
+  },
+  "admission": {
+    "classification": "ADMISSIBLE WITH PROVENANCE RESTRICTIONS",
+    "framework_code_license": "Apache-2.0",
+    "distributed_dataset_license": "NOT_DECLARED_IN_OBSERVED_HUGGING_FACE_METADATA",
+    "underlying_source_repository_licenses": "REQUIRES_SOURCE_SPECIFIC_REVIEW",
+    "bounded_local_research_use": "POTENTIALLY PERMITTED_ONLY_AFTER_TRAJECTORY_AND_PROVENANCE_REVIEW",
+    "copy_vendor_redistribute": "NOT_CLEARED",
+    "study_result": "NO-GO — BENCHMARK ADMISSION/TRAJECTORY INSUFFICIENT",
+    "stop_reason": "Pinned ContextBench material contains gold/task metadata and evaluator code but no permission-cleared external trajectory joined to the gold instances."
+  },
+  "retention_boundary": {
+    "raw_rows_in_prefixity": false,
+    "raw_source_repositories_in_prefixity": false,
+    "raw_trajectories_in_prefixity": false,
+    "temporary_cache_location": "outside tracked Prefixity workspace",
+    "provider_calls": 0,
+    "inference_spend": 0
+  }
+}
