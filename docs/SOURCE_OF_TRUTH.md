@@ -219,6 +219,19 @@ cache impact remains unknown. P0-L11 does not apply requests, attach runtime
 telemetry, predict savings, or introduce provider-specific planning. See
 docs/phase-0/CONTEXT_LAYOUT_PLANNER.md.
 
+P0-L12 adds a separate, versioned CandidateEvaluation over the existing
+P0-L11 candidate, P0-L7 RequestDiff, P0-L8 CacheDiagnostic, and P0-L9
+capability-profile records. It preserves independent structural and empirical
+assessment, distinguishes structural-only, capability-compatible,
+experiment-ready, observational, mixed, contrary, and blocked evidence
+states, and keeps documented or synthetic evidence from becoming experimental
+support. Capability, observation, performance, causal, and application claim
+scopes remain explicit; performance, causal, and automatic-application claims
+are not allowed. Logical experiment design readiness remains separate from the
+environment-blocked P0-L6 state. P0-L12 does not execute candidates, rewrite
+requests, infer cache behavior, add statistical scoring, integrate ContextBench,
+or begin P0-L13. See docs/phase-0/CANDIDATE_EVALUATION.md.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.

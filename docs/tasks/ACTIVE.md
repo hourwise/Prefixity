@@ -1,7 +1,32 @@
-# Active Task — Phase 0 Foundation Slice (P0-L11)
+# Active Task — Phase 0 Foundation Slice (P0-L12)
 
-Status: complete; P0-L11 is implemented and validated. P0-L1 through P0-L5,
-P0-L7 through P0-L11 remain complete. P0-L6 remains environment-blocked.
+Status: complete; P0-L12 is implemented and validated. P0-L1 through P0-L5,
+P0-L7 through P0-L12 remain complete. P0-L6 remains environment-blocked.
+
+## P0-L12 completion record
+
+- Added the versioned, bounded `CandidateEvaluation` evidence gate over the
+  existing P0-L7 `RequestDiff`, P0-L8 `CacheDiagnostic`, P0-L9 capability
+  profile, and P0-L11 `LayoutCandidate` contracts. No foundational contract
+  was duplicated or changed.
+- Kept structural merit separate from empirical merit; added deterministic
+  evidence states, capability gating, observation relevance rejection,
+  structural hypothesis, claim permissions, bounded blockers, next actions,
+  and separate design/environment/execution readiness.
+- Preserved the documented/synthetic/experimentally-observed boundary,
+  P0-L8's metric and causality semantics, unknown cache impact, and the
+  environment-blocked P0-L6 state. No candidate was executed or applied.
+- Added `docs/phase-0/CANDIDATE_EVALUATION.md` and focused deterministic tests
+  covering the evidence ladder, capability and identity gates, mixed and
+  contrary evidence, synthetic evidence, readiness separation, determinism,
+  and input immutability.
+- Validation: focused P0-L12 tests, P0-L11/P0-L10/P0-L9/P0-L8/P0-L7/P0-L5/
+  P0-L4/P0-L2 tests, workspace check, formatting, clippy, full workspace
+  tests, documentation review, and `git diff --check`.
+
+P0-L13, ContextBench integration, live inference, runtime probing, cache
+execution, benchmark scoring, statistical methodology, and automatic request
+application remain deferred.
 
 ## Completion record
 

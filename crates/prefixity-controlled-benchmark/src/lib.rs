@@ -5,6 +5,7 @@
 //! planner-visible projection. It does not alter `RequestTrace`, planner
 //! eligibility, CodeTraceBench, or live-provider code.
 
+mod candidate_evaluation;
 mod capability_registry;
 mod conformance;
 mod context_stability;
@@ -24,6 +25,17 @@ mod phase1c_stage0;
 mod planner;
 mod world;
 
+pub use candidate_evaluation::{
+    evaluate_candidate, CandidateEvaluation, CandidateEvaluationInput, CandidateHypothesis,
+    CandidateReference, CapabilityAssessment, CapabilityGateAssessment, ClaimPermission,
+    ClaimPermissions, DesignReadiness, EnvironmentReadiness, EnvironmentState,
+    EvaluationProvenance, EvidenceBlocker, EvidenceState as CandidateEvidenceState,
+    ExecutionReadiness, ExperimentReadiness, NextAction, ObservationEvidence, ObservationRelevance,
+    ObservationRelevanceReason, RuntimeProfileReference as EvaluationRuntimeProfileReference,
+    StructuralAssessment, CANDIDATE_EVALUATION_SCHEMA_ID, CANDIDATE_EVALUATION_SCHEMA_VERSION,
+    CANDIDATE_EVALUATOR_VERSION, MAX_EVALUATION_BLOCKERS, MAX_EVALUATION_OBSERVATIONS,
+    MAX_EVALUATION_PROVENANCE,
+};
 pub use capability_registry::{
     load_approved_capability_registry, load_capability_registry_from_paths, CapabilityCell,
     CapabilityGap, CapabilityKey, CapabilityMatrix, CapabilityMatrixRow, CapabilityProfile,
