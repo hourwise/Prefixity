@@ -6,6 +6,7 @@
 //! eligibility, CodeTraceBench, or live-provider code.
 
 mod conformance;
+mod diff;
 mod error;
 mod external_artifact_admission;
 mod fixtures;
@@ -27,6 +28,13 @@ pub use conformance::{
     RequestEnvelope, ResponseFormat, RuntimeProfileReference, ToolDefinition,
     CONFORMANCE_RESULT_SCHEMA_ID, CONFORMANCE_RESULT_SCHEMA_VERSION, CONFORMANCE_SCHEMA_ID,
     CONFORMANCE_SCHEMA_VERSION, MOCK_TRANSPORT_ID, MOCK_TRANSPORT_VERSION,
+};
+pub use diff::{
+    envelope_diff, prefix_diff, request_diff, CacheImpactAssessment, ChangeCategory,
+    CommonPrefixMeasurement, DiffChange, DiffState, EnvelopeChange, EnvelopeDiff, EnvelopeField,
+    PrefixDiff, RequestDiff, RequestDiffInterpretation, TextCommonPrefix, ValueSummary,
+    ENVELOPE_DIFF_SCHEMA_ID, ENVELOPE_DIFF_SCHEMA_VERSION, PREFIX_DIFF_SCHEMA_ID,
+    PREFIX_DIFF_SCHEMA_VERSION, REQUEST_DIFF_SCHEMA_ID, REQUEST_DIFF_SCHEMA_VERSION,
 };
 pub use error::BenchmarkError;
 pub use external_artifact_admission::{

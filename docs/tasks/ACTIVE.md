@@ -1,7 +1,7 @@
-# Active Task — Phase 0 Foundation Slice (P0-L5)
+# Active Task — Phase 0 Foundation Slice (P0-L7)
 
-Status: complete; P0-L5 is implemented and validated. P0-L1 through P0-L4
-remain complete.
+Status: complete; P0-L7 is implemented and validated. P0-L1 through P0-L5
+remain complete. P0-L6 remains environment-blocked.
 
 ## Completion record
 
@@ -66,7 +66,32 @@ integration, benchmark scoring, and optimization work remain deferred.
   formatting, clippy, full workspace tests, and `git diff --check`.
 
 P0-L6 is the planned first real local llama.cpp conformance/session-cache
-experiment. It was not started.
+experiment. It remains environment-blocked because no existing usable
+`llama-server` binary or suitable GGUF model was available in the inspected
+environment. It was not started, completed, or failed.
+
+## P0-L7 completion record
+
+- Added provider-neutral `PrefixDiff`, `EnvelopeDiff`, and combined
+  `RequestDiff` diagnostics beside the existing P0-L4 conformance request
+  model. Prefix Diff compares model-visible context; Envelope Diff compares
+  model, reasoning, and response-format settings independently.
+- Added deterministic first-divergence paths, structural/common-unit counts,
+  byte common-prefix measurements for comparable text, ordered artifact/tool/
+  schema-field change categories, whitespace-only classification, and bounded
+  value summaries containing hashes and short previews rather than full values.
+- Token-level common-prefix measurements remain `not_observed` because no
+  tokenizer was introduced. Every P0-L7 cache-impact assessment remains
+  `unknown`; no cache hit, miss, invalidation, or performance prediction is
+  made.
+- Added focused diff tests derived from the existing P0-L4 fixture, covering
+  exact repeats, content and whitespace changes, artifact additions/removals/
+  ordering, tool/schema changes, envelope-only changes, bounded diagnostics,
+  malformed requests, determinism, and independent context/envelope results.
+- Added [`docs/phase-0/PREFIX_DIFF.md`](../phase-0/PREFIX_DIFF.md) and updated
+  the source-of-truth and documentation index.
+
+P0-L8 and later work were not started.
 
 ## Historical task: Phase 1B.5 Corpus and Evaluation Strategy Review
 

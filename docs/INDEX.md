@@ -22,6 +22,7 @@
 | [`phase-0/OBSERVATION_SCHEMAS.md`](phase-0/OBSERVATION_SCHEMAS.md) | Versioned neutral artifact, observation and capability contracts. | Changing or consuming the P0 observation vocabulary. |
 | [`phase-0/CONFORMANCE_HARNESS.md`](phase-0/CONFORMANCE_HARNESS.md) | P0-L4 neutral cache-conformance experiment, mutation, runner and result foundation. | Designing controlled cache-behaviour experiments. |
 | [`phase-0/LLAMA_CPP_CONFORMANCE_ADAPTER.md`](phase-0/LLAMA_CPP_CONFORMANCE_ADAPTER.md) | P0-L5 llama.cpp request projection, fake transport boundary and response observer. | Reviewing the llama.cpp adapter or its evidence boundary. |
+| [`phase-0/PREFIX_DIFF.md`](phase-0/PREFIX_DIFF.md) | P0-L7 provider-neutral Prefix Diff, Envelope Diff and bounded evidence boundary. | Diagnosing structural request differences. |
 | [`THREAT_MODEL.md`](THREAT_MODEL.md) | Offline-core data, input and terminal-safety constraints. | Handling trace content or untrusted input. |
 | [`phase-0/PHASE_0B_LIVE_VALIDATION.md`](phase-0/PHASE_0B_LIVE_VALIDATION.md) | Controlled live protocol, guardrails and result classification. | Inspecting the live harness; never assume it authorizes a live run. |
 | [`phase-0/PHASE_0B_FINDINGS.md`](phase-0/PHASE_0B_FINDINGS.md) | Individual DeepSeek observations and limitations. | Reviewing provider evidence. |

@@ -146,6 +146,11 @@ offline-only llama-server request projection and response observer. It uses
 synthetic fake transport fixtures and does not establish experimentally
 observed llama.cpp behavior.
 
+The P0-L7 diagnostics extend the same neutral request model with versioned
+Prefix Diff, Request Envelope Diff, and combined Request Diff results. They
+describe model-visible structural divergence and envelope changes with bounded
+summaries; they do not rewrite requests or predict cache outcomes.
+
 The workspace has four crates:
 
 1. `prefixity-core` is authoritative for the trace model, validation, bounded
@@ -279,6 +284,11 @@ recognized as reserved but is not interpreted.
   synthetic response normalization into `CacheObservation`, conflict-safe
   native/usage handling, a fake transport, and documented-only capability
   metadata. This is protocol validation, not llama.cpp runtime evidence.
+- P0-L7 request-difference diagnostics: versioned Prefix Diff, Request
+  Envelope Diff, and combined Request Diff contracts with deterministic common
+  prefix measurements, first-divergence paths, ordered-change taxonomy,
+  bounded value summaries, and conservative unknown cache impact. This is
+  structural diagnosis, not optimization or cache prediction.
 
 ## Incomplete and not established
 
@@ -342,8 +352,11 @@ not prevent unrelated offline or research-infrastructure work.
   contract class.
 - P0-L6 and later runtime integration, cache probing, automatic context
   rewriting, cache routing, KV quantisation, cache simulation, benchmark
-  scoring, and public performance claims remain separately deferred. P0-L4's
-  and P0-L5 fake runners are not live inference.
+  scoring, and public performance claims remain separately deferred. P0-L6 is
+  environment-blocked because no existing usable `llama-server` or suitable
+  GGUF was available in the inspected environment. P0-L4 and P0-L5 fake
+  runners are not live inference, and P0-L7 diagnostics do not create runtime
+  evidence.
 
 ## Constraints and invariants
 
@@ -374,6 +387,10 @@ not prevent unrelated offline or research-infrastructure work.
   slots, reconstructed context, wall time, or performance. Absent values stay
   `not_observed`; explicit zero remains known; conflicting native and usage
   values fail rather than being silently reconciled.
+- Prefix and envelope diagnostics describe differences only. They preserve
+  request fingerprints, report token-level common prefixes as `not_observed`
+  without a tokenizer, bound changed-value summaries, and keep cache impact
+  `unknown` unless a future runtime observation explicitly supports a claim.
 - Committed fixtures contain no credentials or private source. Content may be
   omitted in favor of hashes/metadata. Terminal output sanitizes untrusted
   strings and input handling is bounded.
