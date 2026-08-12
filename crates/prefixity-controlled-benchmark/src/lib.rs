@@ -7,6 +7,7 @@
 
 mod capability_registry;
 mod conformance;
+mod context_stability;
 mod diff;
 mod error;
 mod external_artifact_admission;
@@ -38,6 +39,15 @@ pub use conformance::{
     RequestEnvelope, ResponseFormat, RuntimeProfileReference, ToolDefinition,
     CONFORMANCE_RESULT_SCHEMA_ID, CONFORMANCE_RESULT_SCHEMA_VERSION, CONFORMANCE_SCHEMA_ID,
     CONFORMANCE_SCHEMA_VERSION, MOCK_TRANSPORT_ID, MOCK_TRANSPORT_VERSION,
+};
+pub use context_stability::{
+    analyze_context_stability, analyze_request_stability, BoundaryClassification,
+    BoundaryDirection, ClassificationSource, ContextRole, ContextSegmentAnalysis,
+    ContextStabilityAnalysis, ContextStabilityInputs, LeadingRegionLimit, SizeSource,
+    StabilityAlignedLeadingRegion, StabilityBoundary, StabilityFinding, StabilityFindingKind,
+    StabilitySummary, StructuralRoleDefault, StructuralRoleDefaults, CONTEXT_STABILITY_SCHEMA_ID,
+    CONTEXT_STABILITY_SCHEMA_VERSION, MAX_STABILITY_BOUNDARIES, MAX_STABILITY_FINDINGS,
+    MAX_STABILITY_PROVENANCE, MAX_STABILITY_SEGMENTS, MAX_STABILITY_TEXT_BYTES,
 };
 pub use diff::{
     envelope_diff, prefix_diff, request_diff, CacheImpactAssessment, ChangeCategory,

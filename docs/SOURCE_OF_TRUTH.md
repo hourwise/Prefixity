@@ -198,6 +198,16 @@ The workspace has four crates:
    It is not production runtime infrastructure and does not authorize
    provider calls or live replay.
 
+P0-L10 adds a separate, versioned ContextStabilityAnalysis over the existing
+P0-L4 neutral request and optional P0-L2 ContextArtifact metadata. It
+preserves stability, lifecycle, trust, explicit-versus-derived classification
+source, bounded segment fingerprints/sizes, deterministic boundaries,
+stability inversions, and a stability-aligned leading-region observation.
+Unknown classifications remain unknown; token analysis remains
+not_observed; and no cache outcome, causal claim, or optimization action is
+produced. P0-L10 does not reinterpret P0-L9 capabilities or P0-L8
+observations. See docs/phase-0/CONTEXT_STABILITY.md.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.

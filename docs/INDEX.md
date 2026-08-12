@@ -7,6 +7,7 @@
 
 | Path | Contains | Read when |
 | --- | --- | --- |
+| [`phase-0/CONTEXT_STABILITY.md`](phase-0/CONTEXT_STABILITY.md) | P0-L10 deterministic context stability, lifecycle, boundary, inversion and leading-region analysis. | Classifying context without automatically optimizing it. |
 | [`SOURCE_OF_TRUTH.md`](SOURCE_OF_TRUTH.md) | Accepted product definition, implemented state, constraints and uncertainties. | Every substantial task. |
 | [`tasks/ACTIVE.md`](tasks/ACTIVE.md) | Current task, validation status and next-task recommendation. | Every task. |
 | [`../README.md`](../README.md) | User-facing scope, commands, repository layout and safety summary. | Orienting to the project or running the CLI. |

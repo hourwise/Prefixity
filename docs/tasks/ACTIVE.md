@@ -1,7 +1,7 @@
-# Active Task — Phase 0 Foundation Slice (P0-L9)
+# Active Task — Phase 0 Foundation Slice (P0-L10)
 
-Status: complete; P0-L9 is implemented and validated. P0-L1 through P0-L5,
-P0-L7, and P0-L8 remain complete. P0-L6 remains environment-blocked.
+Status: complete; P0-L10 is implemented and validated. P0-L1 through P0-L5,
+P0-L7 through P0-L10 remain complete. P0-L6 remains environment-blocked.
 
 ## Completion record
 
@@ -140,6 +140,30 @@ were not started at the time of the P0-L8 completion record.
   with an actual approved-fixture matrix example.
 - P0-L6 remains environment-blocked; P0-L8 observations remain separate from
   registry profiles; ContextBench remains pending; no P0-L10 work started.
+
+## P0-L10 completion record
+
+- Added ContextStabilityAnalysis over the existing P0-L4 ConformanceRequest
+  and optional P0-L2 ContextArtifact metadata. No P0-L2 or P0-L4 contract
+  change was required.
+- Added explicit-versus-derived classification sources, separate stability and
+  lifecycle handling, independent trust references, bounded segment
+  fingerprints/sizes/token metadata, deterministic adjacent boundaries, and
+  stability inversion findings.
+- Added a stability-aligned leading-region observation that stops stronger
+  conclusions at unknown classifications or stability inversions. Unknown
+  sizes remain unknown; token aggregation remains not observed.
+- Preserved tool order and represented individual tool metadata where supplied;
+  missing dynamic tool metadata remains unknown. No context reordering,
+  canonicalization, pruning, cache prediction, or optimization action was
+  added.
+- Added focused synthetic tests derived from the existing P0-L4 request shape
+  covering explicit metadata, lifecycle/trust separation, structural defaults,
+  inversions, unknown middle segments, append-only context, tools, sizes,
+  determinism, immutability, malformed metadata, and the existing conformance
+  fixture.
+- Added docs/phase-0/CONTEXT_STABILITY.md. P0-L6 remains environment-blocked;
+  ContextBench remains pending; no P0-L11 work started.
 
 ## Historical task: Phase 1B.5 Corpus and Evaluation Strategy Review
 
