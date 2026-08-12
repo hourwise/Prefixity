@@ -135,6 +135,12 @@ observation-only and preserve explicit known, unknown, and not-observed
 states. The capability contract distinguishes supported, unsupported, and
 unknown from documented, experimentally observed, and unverified evidence.
 
+The P0-L4 cache-conformance foundation extends the existing
+`prefixity-controlled-benchmark` crate with versioned provider-neutral
+experiment, mutation-case, request, result, and runner-boundary types. Its
+in-process mock transport records only traceable identities and explicit
+`not_observed` metrics; it is not runtime integration or cache evidence.
+
 The workspace has four crates:
 
 1. `prefixity-core` is authoritative for the trace model, validation, bounded
@@ -258,6 +264,11 @@ recognized as reserved but is not interpreted.
   serde-compatible Rust types, bounded validation, focused tests, and
   representative local/cloud capability examples. The examples are not
   provider validation; unestablished capabilities remain unknown/unverified.
+- P0-L4 cache-conformance foundation: deterministic experiment/case/request
+  and result contracts, controlled mutation vocabulary, an in-process mock
+  runner, focused validation tests, and one synthetic coding-agent-style
+  fixture. It establishes reproducible experiment structure only; it does not
+  establish cache behavior or provider/runtime capability.
 
 ## Incomplete and not established
 
@@ -319,9 +330,10 @@ not prevent unrelated offline or research-infrastructure work.
   later execution scope is separately authorized. Stage 0 is complete;
   automatic compression remains deferred, and Phase 1B.0 only supports its
   contract class.
-- P0-L4 and later runtime integration, cache probing, automatic context
+- P0-L5 and later runtime integration, cache probing, automatic context
   rewriting, cache routing, KV quantisation, cache simulation, benchmark
-  scoring, and public performance claims remain separately deferred.
+  scoring, and public performance claims remain separately deferred. P0-L4's
+  mock runner is not live inference.
 
 ## Constraints and invariants
 
@@ -344,6 +356,10 @@ not prevent unrelated offline or research-infrastructure work.
   equate cached tokens with tokens removed. Provider/model/protocol/runtime
   identity remains distinct, as do volatility versus lifecycle and cache
   persistence versus conversation chaining or KV caching.
+- Conformance mutation classes describe controlled changes only; they do not
+  imply cache hits, misses, invalidation, or provider behavior. Mock results
+  keep cache/token/timing values `not_observed` and retain synthetic transport
+  telemetry separately.
 - Committed fixtures contain no credentials or private source. Content may be
   omitted in favor of hashes/metadata. Terminal output sanitizes untrusted
   strings and input handling is bounded.

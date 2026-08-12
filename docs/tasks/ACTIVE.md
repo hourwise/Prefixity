@@ -1,6 +1,7 @@
-# Active Task — Phase 0 Foundation Slice (P0-L1–P0-L3)
+# Active Task — Phase 0 Foundation Slice (P0-L4)
 
-Status: complete; P0-L1 through P0-L3 are implemented and validated.
+Status: complete; P0-L4 is implemented and validated. P0-L1 through P0-L3
+remain complete.
 
 ## Completion record
 
@@ -19,7 +20,29 @@ Status: complete; P0-L1 through P0-L3 are implemented and validated.
 
 The contracts are observation-only. No runtime integration, cache probing,
 automatic rewriting, cache routing, KV quantisation, benchmark scoring,
-ContextBench integration, or P0-L4 work was started.
+ContextBench integration, or P0-L5 work was started.
+
+## P0-L4 completion record
+
+- Extended the existing `prefixity-controlled-benchmark` crate with versioned
+  provider-neutral `ConformanceExperiment`, `ConformanceCase`,
+  `ConformanceRequest`, `ConformanceResult`, and `ConformanceRunner` types.
+- Separated model-visible context from the request envelope and added
+  deterministic ordered JSON-field handling and request/context fingerprints.
+- Added baseline/repeat, content, structured-content, tool, model, reasoning,
+  and response-format mutation classes without encoding cache outcomes.
+- Added a deterministic in-process mock runner that records P0-L2
+  `CacheObservation` values with explicit `not_observed` telemetry and no
+  fabricated token, cache, latency, quality, or provider values.
+- Added the synthetic coding-agent fixture at
+  `fixtures/conformance/coding-agent-cache-conformance-v1.json` and focused
+  validation/determinism tests.
+- Validation included focused conformance tests, observation-schema tests,
+  research-state consistency tests, workspace check, formatting, clippy,
+  full workspace tests, and `git diff --check`.
+
+P0-L5 runtime adapters, live inference, cache probing, ContextBench
+integration, benchmark scoring, and optimization work remain deferred.
 
 ## Historical task: Phase 1B.5 Corpus and Evaluation Strategy Review
 

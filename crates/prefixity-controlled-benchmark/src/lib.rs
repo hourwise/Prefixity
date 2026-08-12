@@ -5,6 +5,7 @@
 //! planner-visible projection. It does not alter `RequestTrace`, planner
 //! eligibility, CodeTraceBench, or live-provider code.
 
+mod conformance;
 mod error;
 mod external_artifact_admission;
 mod fixtures;
@@ -17,6 +18,15 @@ mod phase1c_stage0;
 mod planner;
 mod world;
 
+pub use conformance::{
+    CaseRelationship, CompletionStatus, ConformanceCase, ConformanceCaseResult,
+    ConformanceExperiment, ConformanceRequest, ConformanceResult, ConformanceRunner,
+    ContextArtifactInput, ExpectedObservationMetadata, ExpectedObservationState, JsonField,
+    MockConformanceRunner, MutationClass, OrderedJsonObject, ReasoningSetting, RequestContext,
+    RequestEnvelope, ResponseFormat, RuntimeProfileReference, ToolDefinition,
+    CONFORMANCE_RESULT_SCHEMA_ID, CONFORMANCE_RESULT_SCHEMA_VERSION, CONFORMANCE_SCHEMA_ID,
+    CONFORMANCE_SCHEMA_VERSION, MOCK_TRANSPORT_ID, MOCK_TRANSPORT_VERSION,
+};
 pub use error::BenchmarkError;
 pub use external_artifact_admission::{
     canonical_manifest_json, derive_admission, parse_manifest_json, validate_manifest,
