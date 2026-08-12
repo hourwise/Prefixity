@@ -1,6 +1,6 @@
-# Active Task — Phase 0 Foundation Slice (P0-L7)
+# Active Task — Phase 0 Foundation Slice (P0-L8)
 
-Status: complete; P0-L7 is implemented and validated. P0-L1 through P0-L5
+Status: complete; P0-L8 is implemented and validated. P0-L1 through P0-L5
 remain complete. P0-L6 remains environment-blocked.
 
 ## Completion record
@@ -91,7 +91,34 @@ environment. It was not started, completed, or failed.
 - Added [`docs/phase-0/PREFIX_DIFF.md`](../phase-0/PREFIX_DIFF.md) and updated
   the source-of-truth and documentation index.
 
-P0-L8 and later work were not started.
+## P0-L8 completion record
+
+- Added versioned, reference-based `ObservationComparison` and
+  `CacheDiagnostic` results. Raw observations and raw telemetry are not copied
+  into diagnostics; identity dimensions, experiment/case references, request/
+  context fingerprints, and evidence source classes remain auditable.
+- Compared token accounting independently for transmitted input,
+  provider-cached, fresh-prefill, reconstructed-context, and output tokens.
+  Preserved known zero versus unknown/not-observed; unavailable metrics remain
+  unavailable. Added bounded derived ratios with explicit denominators,
+  relative timing changes, and RAM/VRAM/KV directional/resource deltas.
+- Added directly/partially/incomparable/insufficient comparability, bounded
+  reuse assessment, deterministic evidence statements, structural/observed
+  association, and an explicit `not_established` causality status. No
+  better/worse score, threshold, significance test, algebraic token equation,
+  or universal performance score was introduced.
+- Added deterministic synthetic fixtures/tests for exact repeats, partial and
+  apparent reuse changes, fresh-prefill and timing-only changes, missing
+  telemetry, explicit zero, identity incompatibility, mixed signals, and
+  envelope-only changes. Runtime capabilities remain documentation only.
+- Added [`docs/phase-0/CACHE_OBSERVATION_DIAGNOSTICS.md`](../phase-0/CACHE_OBSERVATION_DIAGNOSTICS.md)
+  documenting the three-layer Phase-0 model and evidence boundary.
+- Validation: focused P0-L8 tests, P0-L7/P0-L5/P0-L4/P0-L2 tests, research
+  state consistency, workspace check, formatting, clippy, full workspace
+  tests, and `git diff --check`.
+
+P0-L9, ContextBench, runtime probing, live provider work, and later phases
+were not started.
 
 ## Historical task: Phase 1B.5 Corpus and Evaluation Strategy Review
 

@@ -14,6 +14,7 @@ mod hashing;
 mod llama_cpp;
 mod loader;
 mod model;
+mod observation_diagnostics;
 mod oracle;
 mod phase1b9;
 mod phase1c_stage0;
@@ -70,6 +71,17 @@ pub use model::{
     SourceProvenance, TimestampOrigin, TraceEnvelope, VariantRole, BENCHMARK_ID,
     ENVIRONMENT_REVISION, ORACLE_VERSION, RELATION_SEMANTICS_VERSION, SCHEMA_ID, SCHEMA_VERSION,
     TASK_REVISION,
+};
+pub use observation_diagnostics::{
+    compare_conformance_cases, compare_observations, diagnose_cache, diagnose_conformance_cache,
+    CacheDiagnostic, CacheRegressionAssessment, CausalityStatus, ComparabilityLevel,
+    ComparabilityReason, ComparabilityReport, DerivedMetrics, DerivedRatio, DiagnosticMetric,
+    EvidenceAssociation, EvidenceSourceClass, EvidenceStatement, IdentityComparison, IdentityMatch,
+    MetricDirection, NumericMetricDelta, ObservationComparison, ObservationReference,
+    RequestObservationAlignment, ResourceDeltas, RuntimeIdentityReference, TimingDeltas,
+    TokenDeltas, TokenMetricDelta, TokenMetricName, CACHE_DIAGNOSTIC_SCHEMA_ID,
+    CACHE_DIAGNOSTIC_SCHEMA_VERSION, OBSERVATION_COMPARISON_SCHEMA_ID,
+    OBSERVATION_COMPARISON_SCHEMA_VERSION,
 };
 pub use oracle::{evaluate_case, evaluate_envelopes};
 pub use phase1b9::{

@@ -151,6 +151,17 @@ Prefix Diff, Request Envelope Diff, and combined Request Diff results. They
 describe model-visible structural divergence and envelope changes with bounded
 summaries; they do not rewrite requests or predict cache outcomes.
 
+The P0-L8 diagnostics add a separate, versioned comparison of references to
+two P0-L2 `CacheObservation` records and an association-only combination with
+P0-L7 `RequestDiff`. They preserve identity/fingerprint references, explicit
+known/unknown/not-observed states, independent token/timing/resource deltas,
+safe derived ratios with named denominators, bounded directional assessment,
+and deterministic evidence statements whose causality remains
+`not_established`. They do not copy raw observations, infer cache algebra,
+produce a universal score, substitute runtime capabilities for observations,
+or fabricate live runtime evidence. See
+`docs/phase-0/CACHE_OBSERVATION_DIAGNOSTICS.md`.
+
 The workspace has four crates:
 
 1. `prefixity-core` is authoritative for the trace model, validation, bounded
