@@ -370,7 +370,8 @@ fn assert_error_contains(inputs: &RepositoryInputs, expected: &str) {
 }
 
 fn replace_once(value: &mut String, old: &str, new: &str) {
-    let replaced = value.replacen(old, new, 1);
+    let normalized = value.replace("\r\n", "\n");
+    let replaced = normalized.replacen(old, new, 1);
     assert_ne!(
         replaced.as_str(),
         value.as_str(),
