@@ -6,12 +6,27 @@
 ## Status
 
 Prefixity is experimental research software. At the current audit checkpoint,
-`main` is at commit
-`6f8fce28f69876f51c093b051afb604b5b514f69`; CI #38 passed for that commit.
-Phase 0A and Phase 0A.1 offline work are implemented. The separate Phase 0B
+the bounded current-state marker below is the machine-checkable status aid for
+this document. Its semantic checkpoint ID is intentionally stable across
+commits that preserve these conclusions; it is not a claim that every later
+Git HEAD has the same SHA. Phase 0A and Phase 0A.1 offline work are
+implemented. The separate Phase 0B
 controlled live-validation harness is implemented, and the controlled
 DeepSeek sequence is closed as `PASS WITH RECORDED LIMITATIONS`. OpenAI and
 Anthropic adapters remain offline-tested rather than live-validated.
+
+<!-- PREFIXITY_CURRENT_STATE_BEGIN -->
+checkpoint_id = phase-1c-research-state-v1
+workspace_crates = 4
+workspace_members = crates/prefixity-core,crates/prefixity-cli,crates/prefixity-live,crates/prefixity-controlled-benchmark
+phase_1c_stage_0 = CERTIFIED
+phase_1c_stage_1 = BLOCKED
+phase_1c_live_replay = NOT_STARTED
+external_front_half = EXTERNAL_TRAJECTORY_PERMISSION_PENDING
+controlled_policy_name = controlled-evidence-policy-v1
+controlled_policy_scope = CONTROLLED_ONLY
+artifact_admission_schema = prefixity.external-artifact-admission.v1
+<!-- PREFIXITY_CURRENT_STATE_END -->
 
 Phase 1A natural-workload observation is complete for the accepted
 CodeTraceBench evidence path. Phase 1B is complete through the controlled

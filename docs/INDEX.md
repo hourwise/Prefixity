@@ -51,7 +51,10 @@
 
 The [external artifact admission contract](phase-1/EXTERNAL_ARTIFACT_ADMISSION_CONTRACT.md)
 defines the research-only provenance, permission, leakage, retention, and
-admission checks for future supplied manifests.
+admission checks for future supplied manifests. The [research-state consistency
+guard](RESEARCH_STATE_CONSISTENCY.md) checks a small bounded set of current
+repository facts without treating historical evidence documents as current
+state.
 
 | Path | Contains | Read when |
 | --- | --- | --- |
