@@ -1,7 +1,7 @@
-# Active Task — Phase 0 Foundation Slice (P0-L10)
+# Active Task — Phase 0 Foundation Slice (P0-L11)
 
-Status: complete; P0-L10 is implemented and validated. P0-L1 through P0-L5,
-P0-L7 through P0-L10 remain complete. P0-L6 remains environment-blocked.
+Status: complete; P0-L11 is implemented and validated. P0-L1 through P0-L5,
+P0-L7 through P0-L11 remain complete. P0-L6 remains environment-blocked.
 
 ## Completion record
 
@@ -164,6 +164,27 @@ were not started at the time of the P0-L8 completion record.
   fixture.
 - Added docs/phase-0/CONTEXT_STABILITY.md. P0-L6 remains environment-blocked;
   ContextBench remains pending; no P0-L11 work started.
+
+## P0-L11 completion record
+
+- Added a versioned ContextLayoutPlan over the existing P0-L4 request and
+  P0-L10 stability analysis. No foundational request, observation, diff, or
+  capability contract was changed.
+- Added explicit constraint forms for precedence, fixed positions, preserved
+  relative order, compatible movement regions, and unknown permission. Only
+  artifact-sequence reorders are considered; system, user, and tool slots stay
+  fixed.
+- Added conservative trust-boundary checks, unknown-safety refusal, lifecycle
+  preservation, deterministic adjacent/region-local candidate generation,
+  minimal-change ordering, duplicate-layout suppression, and bounded rejection
+  records.
+- Re-analysed candidates through P0-L10 and attached P0-L7 request diffs. Cache
+  impact remains unknown and no candidate is automatically applicable. No
+  request rewriting, runtime evidence, cache prediction, token-savings claim,
+  provider-specific planner, or P0-L12 work was added.
+- Added focused offline tests and
+  [`docs/phase-0/CONTEXT_LAYOUT_PLANNER.md`](../phase-0/CONTEXT_LAYOUT_PLANNER.md).
+  P0-L6 remains environment-blocked and ContextBench remains pending.
 
 ## Historical task: Phase 1B.5 Corpus and Evaluation Strategy Review
 

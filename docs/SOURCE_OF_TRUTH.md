@@ -208,6 +208,17 @@ not_observed; and no cache outcome, causal claim, or optimization action is
 produced. P0-L10 does not reinterpret P0-L9 capabilities or P0-L8
 observations. See docs/phase-0/CONTEXT_STABILITY.md.
 
+P0-L11 adds a separate, versioned ContextLayoutPlan over the existing P0-L4
+request and P0-L10 analysis. It proposes only bounded reorders of
+independently represented context artifacts when explicit movement permission,
+ordering, semantic, chronology, and trust constraints establish that the move
+is safe to describe. System, user, and tool slots remain fixed; unknown safety
+is rejected; lifecycle remains metadata rather than a placement heuristic.
+Candidates are re-analysed through P0-L10 and diffed through P0-L7, while every
+cache impact remains unknown. P0-L11 does not apply requests, attach runtime
+telemetry, predict savings, or introduce provider-specific planning. See
+docs/phase-0/CONTEXT_LAYOUT_PLANNER.md.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.

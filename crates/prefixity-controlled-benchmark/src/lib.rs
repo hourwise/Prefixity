@@ -13,6 +13,7 @@ mod error;
 mod external_artifact_admission;
 mod fixtures;
 mod hashing;
+mod layout_planner;
 mod llama_cpp;
 mod loader;
 mod model;
@@ -71,6 +72,14 @@ pub use external_artifact_admission::{
     EXTERNAL_ARTIFACT_ADMISSION_SCHEMA_VERSION, MAX_MANIFEST_BYTES,
 };
 pub use fixtures::build_seed;
+pub use layout_planner::{
+    plan_context_layout, plan_request_layout, CandidateSafetyStatus, ContextLayoutPlan,
+    LayoutCandidate, LayoutPlanningConstraints, LayoutSegmentReference, LayoutStructuralMetrics,
+    LayoutTransformation, LayoutTransformationKind, OrderingConstraint, PlanningReason,
+    PreserveOrderReason, RejectedLayoutCandidate, RejectionReason, StructuralLayoutEffect,
+    CONTEXT_LAYOUT_PLAN_SCHEMA_ID, CONTEXT_LAYOUT_PLAN_SCHEMA_VERSION, MAX_LAYOUT_CANDIDATES,
+    MAX_LAYOUT_CONSTRAINTS, MAX_LAYOUT_PROVENANCE, MAX_LAYOUT_REJECTIONS, MAX_LAYOUT_TEXT_BYTES,
+};
 pub use llama_cpp::{
     normalize_llama_cpp_response, project_llama_cpp_request, FakeLlamaCppTransport,
     LlamaCppConformanceRunner, LlamaCppFunction, LlamaCppJsonObject, LlamaCppMessage,
