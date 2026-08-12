@@ -162,6 +162,18 @@ produce a universal score, substitute runtime capabilities for observations,
 or fabricate live runtime evidence. See
 `docs/phase-0/CACHE_OBSERVATION_DIAGNOSTICS.md`.
 
+P0-L9 adds a separate, versioned `CapabilityRegistry` over the existing
+P0-L2 `RuntimeCacheCapabilities` contract. It loads the explicit approved
+local/cloud capability fixtures through one bounded offline path, retains
+provider/model/protocol/runtime/version identity, computes deterministic
+semantic profile fingerprints, and exposes typed queries, evidence-preserving
+matrix cells, and research-gap counts. Unknown remains distinct from
+unsupported; documented remains distinct from experimentally observed; and
+synthetic fixture ingestion does not promote any capability to live evidence.
+P0-L9 does not derive registry entries from P0-L8 observations, perform live
+runtime/provider work, add ContextBench, or implement P0-L10. See
+`docs/phase-0/CACHE_CAPABILITY_REGISTRY.md`.
+
 The workspace has four crates:
 
 1. `prefixity-core` is authoritative for the trace model, validation, bounded
@@ -300,6 +312,13 @@ recognized as reserved but is not interpreted.
   prefix measurements, first-divergence paths, ordered-change taxonomy,
   bounded value summaries, and conservative unknown cache impact. This is
   structural diagnosis, not optimization or cache prediction.
+- P0-L8 observation diagnostics: versioned reference-based observation
+  comparison with independent deltas, bounded association-only assessment, and
+  explicit non-causality.
+- P0-L9 capability registry: deterministic ingestion of the approved local and
+  cloud capability fixtures, typed identity/evidence queries, generated matrix
+  cells, and research-gap reporting. No capability is promoted to observed by
+  fixture loading or synthetic protocol tests.
 
 ## Incomplete and not established
 
@@ -361,13 +380,13 @@ not prevent unrelated offline or research-infrastructure work.
   later execution scope is separately authorized. Stage 0 is complete;
   automatic compression remains deferred, and Phase 1B.0 only supports its
   contract class.
-- P0-L6 and later runtime integration, cache probing, automatic context
+- P0-L6 runtime integration and cache probing, automatic context
   rewriting, cache routing, KV quantisation, cache simulation, benchmark
   scoring, and public performance claims remain separately deferred. P0-L6 is
   environment-blocked because no existing usable `llama-server` or suitable
   GGUF was available in the inspected environment. P0-L4 and P0-L5 fake
-  runners are not live inference, and P0-L7 diagnostics do not create runtime
-  evidence.
+  runners are not live inference, P0-L7 diagnostics do not create runtime
+  evidence, and P0-L9 registry knowledge does not create runtime observations.
 
 ## Constraints and invariants
 

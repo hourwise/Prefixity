@@ -5,6 +5,7 @@
 //! planner-visible projection. It does not alter `RequestTrace`, planner
 //! eligibility, CodeTraceBench, or live-provider code.
 
+mod capability_registry;
 mod conformance;
 mod diff;
 mod error;
@@ -21,6 +22,14 @@ mod phase1c_stage0;
 mod planner;
 mod world;
 
+pub use capability_registry::{
+    load_approved_capability_registry, load_capability_registry_from_paths, CapabilityCell,
+    CapabilityGap, CapabilityKey, CapabilityMatrix, CapabilityMatrixRow, CapabilityProfile,
+    CapabilityQuery, CapabilityRegistry, CapabilityState, ProfileGap, RegistryEvidenceOrigin,
+    ResearchGapReport, APPROVED_CAPABILITY_FIXTURE_PATHS, CAPABILITY_REGISTRY_SCHEMA_ID,
+    CAPABILITY_REGISTRY_SCHEMA_VERSION, MAX_REGISTRY_PROFILES, MAX_REGISTRY_PROVENANCE,
+    MAX_REGISTRY_TEXT_BYTES,
+};
 pub use conformance::{
     CaseRelationship, CompletionStatus, ConformanceCase, ConformanceCaseResult,
     ConformanceExperiment, ConformanceRequest, ConformanceResult, ConformanceRunner,

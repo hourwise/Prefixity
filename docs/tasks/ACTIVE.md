@@ -1,7 +1,7 @@
-# Active Task — Phase 0 Foundation Slice (P0-L8)
+# Active Task — Phase 0 Foundation Slice (P0-L9)
 
-Status: complete; P0-L8 is implemented and validated. P0-L1 through P0-L5
-remain complete. P0-L6 remains environment-blocked.
+Status: complete; P0-L9 is implemented and validated. P0-L1 through P0-L5,
+P0-L7, and P0-L8 remain complete. P0-L6 remains environment-blocked.
 
 ## Completion record
 
@@ -118,7 +118,28 @@ environment. It was not started, completed, or failed.
   tests, and `git diff --check`.
 
 P0-L9, ContextBench, runtime probing, live provider work, and later phases
-were not started.
+were not started at the time of the P0-L8 completion record.
+
+## P0-L9 completion record
+
+- Added `CapabilityRegistry` over the existing P0-L2
+  `RuntimeCacheCapabilities` contract; no second capability schema or P0-L2
+  contract extension was required.
+- Added explicit offline ingestion of the eight approved capability fixtures:
+  llama.cpp neutral and documented profiles, Ollama, DeepSeek, Meta, Mistral,
+  Alibaba Model Studio, and Z.AI / GLM. Fixture provenance remains separate
+  from documented and experimentally observed capability evidence.
+- Added deterministic semantic profile fingerprints, duplicate and malformed
+  profile validation, typed identity/capability/evidence queries, generated
+  evidence-preserving matrix cells and Markdown rendering, and research-gap
+  counts that never relabel unknown as unsupported.
+- Added focused registry tests for fixture loading, identity scope, evidence
+  states, deterministic queries/matrices/serialization, validation failures,
+  and gap reporting. Added
+  [`docs/phase-0/CACHE_CAPABILITY_REGISTRY.md`](../phase-0/CACHE_CAPABILITY_REGISTRY.md)
+  with an actual approved-fixture matrix example.
+- P0-L6 remains environment-blocked; P0-L8 observations remain separate from
+  registry profiles; ContextBench remains pending; no P0-L10 work started.
 
 ## Historical task: Phase 1B.5 Corpus and Evaluation Strategy Review
 
