@@ -1,0 +1,19 @@
+{
+  "id": "synthetic-llama-cache-reuse",
+  "object": "chat.completion",
+  "choices": [],
+  "timings": {
+    "cache_n": 80,
+    "prompt_n": 20,
+    "prompt_ms": 10.5,
+    "predicted_n": 12,
+    "predicted_ms": 20.25
+  },
+  "usage": {
+    "prompt_tokens": 100,
+    "completion_tokens": 12,
+    "total_tokens": 112,
+    "prompt_tokens_details": { "cached_tokens": 80 }
+  },
+  "synthetic_fixture": true
+}

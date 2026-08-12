@@ -1,0 +1,10 @@
+{
+  "id": "synthetic-llama-malformed-timings",
+  "object": "chat.completion",
+  "choices": [],
+  "timings": {
+    "cache_n": "not-a-number",
+    "prompt_n": 20
+  },
+  "synthetic_fixture": true
+}

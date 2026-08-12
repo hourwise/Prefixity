@@ -1,6 +1,6 @@
-# Active Task — Phase 0 Foundation Slice (P0-L4)
+# Active Task — Phase 0 Foundation Slice (P0-L5)
 
-Status: complete; P0-L4 is implemented and validated. P0-L1 through P0-L3
+Status: complete; P0-L5 is implemented and validated. P0-L1 through P0-L4
 remain complete.
 
 ## Completion record
@@ -20,7 +20,8 @@ remain complete.
 
 The contracts are observation-only. No runtime integration, cache probing,
 automatic rewriting, cache routing, KV quantisation, benchmark scoring,
-ContextBench integration, or P0-L5 work was started.
+ContextBench integration, or P0-L5 work was included in that completion
+record.
 
 ## P0-L4 completion record
 
@@ -43,6 +44,29 @@ ContextBench integration, or P0-L5 work was started.
 
 P0-L5 runtime adapters, live inference, cache probing, ContextBench
 integration, benchmark scoring, and optimization work remain deferred.
+
+## P0-L5 completion record
+
+- Added the llama.cpp-specific adapter inside the existing
+  `prefixity-controlled-benchmark` crate: deterministic request projection,
+  `LlamaCppTransport`, `FakeLlamaCppTransport`,
+  `LlamaCppConformanceRunner`, and response normalization into P0-L2
+  `CacheObservation`.
+- Preserved context/artifact/tool order and represented envelope fields. A
+  generic reasoning setting is explicitly rejected as not representable rather
+  than silently omitted.
+- Normalized native `timings` and compatibility `usage` fields separately;
+  absent telemetry remains `not_observed`, explicit zero remains known, and
+  malformed or conflicting values fail safely while raw values remain bounded
+  and separate.
+- Added synthetic llama-server protocol fixtures, a documented-only capability
+  fixture, focused adapter tests, and the P0-L5 evidence-boundary document.
+- Validation included llama.cpp adapter tests, P0-L4 conformance tests,
+  P0-L2 observation tests, research-state consistency tests, workspace check,
+  formatting, clippy, full workspace tests, and `git diff --check`.
+
+P0-L6 is the planned first real local llama.cpp conformance/session-cache
+experiment. It was not started.
 
 ## Historical task: Phase 1B.5 Corpus and Evaluation Strategy Review
 

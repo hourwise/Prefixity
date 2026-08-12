@@ -247,7 +247,7 @@ impl ConformanceRequest {
         canonical_hash(&self.context).map_err(|error| validation(error.to_string()))
     }
 
-    fn artifact_references(&self) -> Vec<ArtifactReference> {
+    pub(crate) fn artifact_references(&self) -> Vec<ArtifactReference> {
         self.context
             .artifacts
             .iter()
@@ -421,10 +421,7 @@ impl ConformanceExperiment {
             runtime_profile: self.runtime_profile.clone(),
             cases: results,
             status: CompletionStatus::Complete,
-            provenance: BTreeMap::from([
-                ("runner".to_string(), MOCK_TRANSPORT_ID.to_string()),
-                ("cache_metrics".to_string(), "not_observed".to_string()),
-            ]),
+            provenance: runner.provenance(),
         })
     }
 }
@@ -522,6 +519,13 @@ pub trait ConformanceRunner {
         runtime_profile: &RuntimeProfileReference,
         case: &ConformanceCase,
     ) -> Result<ConformanceCaseResult, BenchmarkError>;
+
+    fn provenance(&self) -> BTreeMap<String, String> {
+        BTreeMap::from([
+            ("runner".to_string(), MOCK_TRANSPORT_ID.to_string()),
+            ("cache_metrics".to_string(), "not_observed".to_string()),
+        ])
+    }
 }
 
 /// Deterministic, in-process runner. It records identity and explicit absence

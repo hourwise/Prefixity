@@ -141,6 +141,11 @@ experiment, mutation-case, request, result, and runner-boundary types. Its
 in-process mock transport records only traceable identities and explicit
 `not_observed` metrics; it is not runtime integration or cache evidence.
 
+The P0-L5 llama.cpp adapter extends that same runner boundary with a typed,
+offline-only llama-server request projection and response observer. It uses
+synthetic fake transport fixtures and does not establish experimentally
+observed llama.cpp behavior.
+
 The workspace has four crates:
 
 1. `prefixity-core` is authoritative for the trace model, validation, bounded
@@ -269,6 +274,11 @@ recognized as reserved but is not interpreted.
   runner, focused validation tests, and one synthetic coding-agent-style
   fixture. It establishes reproducible experiment structure only; it does not
   establish cache behavior or provider/runtime capability.
+- P0-L5 llama.cpp adapter foundation: deterministic projection of supported
+  neutral requests, explicit rejection of unsupported reasoning settings,
+  synthetic response normalization into `CacheObservation`, conflict-safe
+  native/usage handling, a fake transport, and documented-only capability
+  metadata. This is protocol validation, not llama.cpp runtime evidence.
 
 ## Incomplete and not established
 
@@ -330,10 +340,10 @@ not prevent unrelated offline or research-infrastructure work.
   later execution scope is separately authorized. Stage 0 is complete;
   automatic compression remains deferred, and Phase 1B.0 only supports its
   contract class.
-- P0-L5 and later runtime integration, cache probing, automatic context
+- P0-L6 and later runtime integration, cache probing, automatic context
   rewriting, cache routing, KV quantisation, cache simulation, benchmark
   scoring, and public performance claims remain separately deferred. P0-L4's
-  mock runner is not live inference.
+  and P0-L5 fake runners are not live inference.
 
 ## Constraints and invariants
 
@@ -360,6 +370,10 @@ not prevent unrelated offline or research-infrastructure work.
   imply cache hits, misses, invalidation, or provider behavior. Mock results
   keep cache/token/timing values `not_observed` and retain synthetic transport
   telemetry separately.
+- The llama.cpp adapter does not infer cache hits, residency, persistence,
+  slots, reconstructed context, wall time, or performance. Absent values stay
+  `not_observed`; explicit zero remains known; conflicting native and usage
+  values fail rather than being silently reconciled.
 - Committed fixtures contain no credentials or private source. Content may be
   omitted in favor of hashes/metadata. Terminal output sanitizes untrusted
   strings and input handling is bounded.

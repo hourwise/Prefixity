@@ -21,6 +21,7 @@
 | [`phase-0/ADR-001-LOCAL-FIRST-PRODUCT-BOUNDARY.md`](phase-0/ADR-001-LOCAL-FIRST-PRODUCT-BOUNDARY.md) | Accepted local-first product boundary and runtime-adapter scope. | Product or architecture boundary work. |
 | [`phase-0/OBSERVATION_SCHEMAS.md`](phase-0/OBSERVATION_SCHEMAS.md) | Versioned neutral artifact, observation and capability contracts. | Changing or consuming the P0 observation vocabulary. |
 | [`phase-0/CONFORMANCE_HARNESS.md`](phase-0/CONFORMANCE_HARNESS.md) | P0-L4 neutral cache-conformance experiment, mutation, runner and result foundation. | Designing controlled cache-behaviour experiments. |
+| [`phase-0/LLAMA_CPP_CONFORMANCE_ADAPTER.md`](phase-0/LLAMA_CPP_CONFORMANCE_ADAPTER.md) | P0-L5 llama.cpp request projection, fake transport boundary and response observer. | Reviewing the llama.cpp adapter or its evidence boundary. |
 | [`THREAT_MODEL.md`](THREAT_MODEL.md) | Offline-core data, input and terminal-safety constraints. | Handling trace content or untrusted input. |
 | [`phase-0/PHASE_0B_LIVE_VALIDATION.md`](phase-0/PHASE_0B_LIVE_VALIDATION.md) | Controlled live protocol, guardrails and result classification. | Inspecting the live harness; never assume it authorizes a live run. |
 | [`phase-0/PHASE_0B_FINDINGS.md`](phase-0/PHASE_0B_FINDINGS.md) | Individual DeepSeek observations and limitations. | Reviewing provider evidence. |
@@ -68,6 +69,7 @@ state.
 | [`../fixtures/traces/README.md`](../fixtures/traces/README.md) and [`../fixtures/traces`](../fixtures/traces) | Synthetic scenarios and sanitized provider-derived fixtures. | Reproducing documented examples. |
 | [`../fixtures/observations`](../fixtures/observations) and [`../fixtures/capabilities`](../fixtures/capabilities) | Representative neutral artifact/observation fixtures and local/cloud capability examples. | Reproducing P0-L2/L3 schema examples. |
 | [`../fixtures/conformance/coding-agent-cache-conformance-v1.json`](../fixtures/conformance/coding-agent-cache-conformance-v1.json) | Small synthetic P0-L4 coding-agent-style mutation experiment. | Reproducing conformance-harness tests. |
+| [`../fixtures/llama-cpp`](../fixtures/llama-cpp) and [`../fixtures/capabilities/llama-cpp-documented-v1.json`](../fixtures/capabilities/llama-cpp-documented-v1.json) | Synthetic llama-server protocol responses and documented-only capability shape. | Reproducing P0-L5 adapter tests. |
 | [`../provider-profiles/README.md`](../provider-profiles/README.md) and [`../provider-profiles`](../provider-profiles) | Synthetic cost-profile data. | Running cost or simulation examples. |
 | [`../experiments/runs`](../experiments/runs) | Local ignored live artifacts, not tracked benchmarks. | Auditing recorded live runs if present. |
 | [`phase-0/SUCCESS_CRITERIA.md`](phase-0/SUCCESS_CRITERIA.md) and [`phase-0/EXPERIMENTS.md`](phase-0/EXPERIMENTS.md) | Offline acceptance mapping and proposed experiment groups. | Distinguishing harness checks from future experiments. |

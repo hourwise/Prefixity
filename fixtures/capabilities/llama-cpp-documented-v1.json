@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "backend": "llama.cpp",
+    "provider": { "state": "known", "value": "local" },
+    "model": { "state": "unknown" },
+    "protocol": { "state": "known", "value": "llama.cpp-openai-chat-v1" },
+    "runtime": { "state": "known", "value": "llama.cpp" },
+    "runtime_version": { "state": "unknown" }
+  },
+  "prefix_cache": {
+    "prefix_reuse": {
+      "support": "supported",
+      "evidence": "documented",
+      "details": { "state": "known", "value": true }
+    }
+  },
+  "metrics": {
+    "input_tokens": {
+      "support": "supported",
+      "evidence": "documented",
+      "details": { "state": "known", "value": true }
+    },
+    "cached_tokens": {
+      "support": "supported",
+      "evidence": "documented",
+      "details": { "state": "known", "value": true }
+    },
+    "prompt_evaluation_duration": {
+      "support": "supported",
+      "evidence": "documented",
+      "details": { "state": "known", "value": true }
+    }
+  },
+  "raw_capabilities": {
+    "evidence_scope": "documented protocol surface only",
+    "synthetic_fixture": true
+  }
+}
