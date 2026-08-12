@@ -72,6 +72,33 @@ superiority, live Phase 1C success, or automatic context mutation. The
 charter's possible future "context compiler" remains a conditional design
 direction, not an implemented production capability.
 
+### Accepted P0-L1 product boundary
+
+Prefixity is local-first context and inference-efficiency infrastructure for
+resource-constrained and self-hosted LLM use, while retaining broad
+compatibility with proprietary and cloud model APIs through adapters. Local
+resource constraints are the tie-breaker when a design trade-off cannot serve
+every environment equally, unless an existing accepted decision says
+otherwise.
+
+Prefixity is not an inference engine and does not replace llama.cpp, Ollama,
+LM Studio, vLLM, SGLang, or provider inference infrastructure. Those systems
+own model execution, kernels, scheduling, and backend-specific KV machinery.
+Prefixity operates above or alongside them.
+
+The conceptual boundary is Context Compiler, Context/Artifact Identity Layer,
+Cache Planner / Cache Intelligence, Inference Budget + Telemetry, and Runtime /
+Provider Adapters. This is a research scope boundary, not a claim that all
+components are implemented.
+
+The accepted runtime integration priority is llama.cpp, Ollama, LM Studio,
+vLLM, then SGLang. This is a research/implementation priority, not a
+permanent compatibility restriction. Cloud/provider adapters remain desirable.
+
+Lossless and potentially lossy transformations remain separate. No lossy
+change may silently weaken instruction hierarchy, provenance, trust
+boundaries, security controls, or model-visible temporal/authority semantics.
+
 ## Problem being solved
 
 The current research question is:
@@ -100,6 +127,13 @@ structural observations. It does not establish intervention safety, preserve
 task quality under intervention, or produce end-to-end savings.
 
 ## Current architecture
+
+The neutral P0 observation vocabulary is implemented in
+`prefixity-core::observation`: versioned `ContextArtifact`,
+`CacheObservation`, and `RuntimeCacheCapabilities` contracts. They are
+observation-only and preserve explicit known, unknown, and not-observed
+states. The capability contract distinguishes supported, unsupported, and
+unknown from documented, experimentally observed, and unverified evidence.
 
 The workspace has four crates:
 
@@ -219,6 +253,11 @@ recognized as reserved but is not interpreted.
   trajectory admission remains blocked because no explicit reuse/licence
   basis was established; its result is
   `NO-GO — NO PERMISSION-CLEARED EXTERNAL TRAJECTORY ARTIFACT FOUND`.
+- P0-L2/L3 observation foundation: versioned neutral context-artifact,
+  cache-observation, and runtime-capability contracts are implemented with
+  serde-compatible Rust types, bounded validation, focused tests, and
+  representative local/cloud capability examples. The examples are not
+  provider validation; unestablished capabilities remain unknown/unverified.
 
 ## Incomplete and not established
 
@@ -280,6 +319,9 @@ not prevent unrelated offline or research-infrastructure work.
   later execution scope is separately authorized. Stage 0 is complete;
   automatic compression remains deferred, and Phase 1B.0 only supports its
   contract class.
+- P0-L4 and later runtime integration, cache probing, automatic context
+  rewriting, cache routing, KV quantisation, cache simulation, benchmark
+  scoring, and public performance claims remain separately deferred.
 
 ## Constraints and invariants
 
@@ -298,6 +340,10 @@ not prevent unrelated offline or research-infrastructure work.
   and label applied within-zone reorders experimental.
 - Unknown usage schemas do not manufacture values. Raw provider usage is
   preserved verbatim, while normalization is schema-aware.
+- Observation schemas preserve explicit unknown/not-observed values and do not
+  equate cached tokens with tokens removed. Provider/model/protocol/runtime
+  identity remains distinct, as do volatility versus lifecycle and cache
+  persistence versus conversation chaining or KV caching.
 - Committed fixtures contain no credentials or private source. Content may be
   omitted in favor of hashes/metadata. Terminal output sanitizes untrusted
   strings and input handling is bounded.

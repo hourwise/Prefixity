@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "backend": "provider-api",
+    "provider": { "state": "known", "value": "Alibaba Model Studio" },
+    "model": { "state": "known", "value": "example-model" },
+    "protocol": { "state": "known", "value": "chat-completions" },
+    "runtime": { "state": "unknown" },
+    "runtime_version": { "state": "unknown" }
+  },
+  "prefix_cache": {
+    "prefix_reuse": {
+      "support": "unknown",
+      "evidence": "unverified",
+      "details": { "state": "unknown" }
+    },
+    "automatic_cache_population": {
+      "support": "unknown",
+      "evidence": "unverified",
+      "details": { "state": "unknown" }
+    },
+    "explicit_cache_population": {
+      "support": "unknown",
+      "evidence": "unverified",
+      "details": { "state": "unknown" }
+    },
+    "minimum_cacheable_prefix_tokens": {
+      "support": "unknown",
+      "evidence": "unverified",
+      "details": { "state": "unknown" }
+    },
+    "cache_unit": { "state": "unknown" },
+    "matching_constraints": { "state": "unknown" }
+  }
+}

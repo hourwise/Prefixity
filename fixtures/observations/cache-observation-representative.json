@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "observation_id": "obs-llama-cpp-001",
+  "observed_at": "2026-08-12T10:00:00Z",
+  "runtime": {
+    "backend": "llama.cpp",
+    "provider": {
+      "state": "known",
+      "value": "local"
+    },
+    "model": {
+      "state": "known",
+      "value": "example-local-model"
+    },
+    "protocol": {
+      "state": "known",
+      "value": "llama.cpp-http"
+    },
+    "runtime": {
+      "state": "known",
+      "value": "llama.cpp"
+    },
+    "runtime_version": {
+      "state": "unknown"
+    },
+    "session_id": {
+      "state": "unknown"
+    },
+    "slot_id": {
+      "state": "known",
+      "value": "slot-0"
+    },
+    "conversation_id": {
+      "state": "not_observed"
+    }
+  },
+  "context": {
+    "artifacts": [
+      {
+        "artifact_id": "repo-map:v3",
+        "content_hash": {
+          "state": "known",
+          "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      }
+    ],
+    "serialized_request_identity": {
+      "state": "known",
+      "value": "request-sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "reusable_prefix_identity": {
+      "state": "unknown"
+    }
+  },
+  "accounting": {
+    "transmitted_input_tokens": {
+      "state": "known",
+      "value": {
+        "count": 2048,
+        "provider": {
+          "state": "known",
+          "value": "local"
+        },
+        "model": {
+          "state": "known",
+          "value": "example-local-model"
+        },
+        "tokenizer": {
+          "state": "unknown"
+        }
+      }
+    },
+    "provider_cached_tokens": {
+      "state": "known",
+      "value": {
+        "count": 1024,
+        "provider": {
+          "state": "known",
+          "value": "local"
+        },
+        "model": {
+          "state": "known",
+          "value": "example-local-model"
+        },
+        "tokenizer": {
+          "state": "unknown"
+        }
+      }
+    },
+    "fresh_prefill_tokens": {
+      "state": "known",
+      "value": {
+        "count": 700,
+        "provider": {
+          "state": "known",
+          "value": "local"
+        },
+        "model": {
+          "state": "known",
+          "value": "example-local-model"
+        },
+        "tokenizer": {
+          "state": "unknown"
+        }
+      }
+    },
+    "reconstructed_context_tokens": {
+      "state": "unknown"
+    },
+    "output_tokens": {
+      "state": "known",
+      "value": {
+        "count": 128,
+        "provider": {
+          "state": "known",
+          "value": "local"
+        },
+        "model": {
+          "state": "known",
+          "value": "example-local-model"
+        },
+        "tokenizer": {
+          "state": "unknown"
+        }
+      }
+    }
+  },
+  "timing": {
+    "prefill_duration_ms": {
+      "state": "known",
+      "value": 180
+    },
+    "time_to_first_token_ms": {
+      "state": "known",
+      "value": 240
+    },
+    "generation_duration_ms": {
+      "state": "unknown"
+    },
+    "wall_duration_ms": {
+      "state": "known",
+      "value": 980
+    }
+  },
+  "resources": {
+    "ram_bytes": {
+      "state": "known",
+      "value": 17179869184
+    },
+    "vram_bytes": {
+      "state": "unknown"
+    },
+    "kv_cache_bytes": {
+      "state": "unknown"
+    }
+  },
+  "cache": {
+    "temperature": {
+      "state": "known",
+      "value": "warm"
+    },
+    "materialization": {
+      "state": "known",
+      "value": "resident"
+    },
+    "restore_duration_ms": {
+      "state": "not_observed"
+    },
+    "rebuild_duration_ms": {
+      "state": "not_observed"
+    },
+    "cache_read": {
+      "state": "known",
+      "value": true
+    },
+    "cache_write": {
+      "state": "known",
+      "value": false
+    },
+    "cache_hit": {
+      "state": "known",
+      "value": true
+    },
+    "cache_miss": {
+      "state": "known",
+      "value": false
+    }
+  },
+  "outcome": {
+    "status": {
+      "state": "known",
+      "value": "succeeded"
+    },
+    "task_result_reference": {
+      "state": "not_observed"
+    },
+    "quality_reference": {
+      "state": "not_observed"
+    }
+  },
+  "raw_telemetry": {
+    "llama_cpp": {
+      "slot_cache_label": "fixture-only-example"
+    }
+  }
+}

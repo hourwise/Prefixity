@@ -1,4 +1,27 @@
-# Active Task — Phase 1B.5 Corpus and Evaluation Strategy Review
+# Active Task — Phase 0 Foundation Slice (P0-L1–P0-L3)
+
+Status: complete; P0-L1 through P0-L3 are implemented and validated.
+
+## Completion record
+
+- P0-L1 accepted the local-first product boundary in
+  [`docs/phase-0/ADR-001-LOCAL-FIRST-PRODUCT-BOUNDARY.md`](../phase-0/ADR-001-LOCAL-FIRST-PRODUCT-BOUNDARY.md)
+  and aligned the product definition in `docs/SOURCE_OF_TRUTH.md`.
+- P0-L2 added versioned serde contracts in
+  `crates/prefixity-core/src/observation.rs`: `ContextArtifact` v1,
+  `CacheObservation` v1, and `RuntimeCacheCapabilities` v1.
+- P0-L3 added focused validation tests and representative observation and
+  capability fixtures. Local capability examples cover llama.cpp and Ollama;
+  cloud/provider examples cover DeepSeek, Meta, Mistral, Alibaba Model Studio,
+  and Z.AI / GLM. Unestablished capabilities remain unknown/unverified.
+- Validation: focused observation-schema tests, workspace check, formatting,
+  clippy, full workspace tests, documentation review, and `git diff --check`.
+
+The contracts are observation-only. No runtime integration, cache probing,
+automatic rewriting, cache routing, KV quantisation, benchmark scoring,
+ContextBench integration, or P0-L4 work was started.
+
+## Historical task: Phase 1B.5 Corpus and Evaluation Strategy Review
 
 Status: complete; Phase 1B.5 closed with `PASS WITH RECORDED LIMITATIONS`.
 

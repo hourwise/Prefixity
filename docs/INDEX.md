@@ -18,6 +18,8 @@
 | --- | --- | --- |
 | [`PROJECT_CHARTER.md`](PROJECT_CHARTER.md) | Purpose, Phase 0 boundaries and source-of-truth principles. | Checking scope or non-goals. |
 | [`phase-0/TRACE_FORMAT.md`](phase-0/TRACE_FORMAT.md) | Normative trace v2, usage schemas and profile format. | Changing or consuming trace data. |
+| [`phase-0/ADR-001-LOCAL-FIRST-PRODUCT-BOUNDARY.md`](phase-0/ADR-001-LOCAL-FIRST-PRODUCT-BOUNDARY.md) | Accepted local-first product boundary and runtime-adapter scope. | Product or architecture boundary work. |
+| [`phase-0/OBSERVATION_SCHEMAS.md`](phase-0/OBSERVATION_SCHEMAS.md) | Versioned neutral artifact, observation and capability contracts. | Changing or consuming the P0 observation vocabulary. |
 | [`THREAT_MODEL.md`](THREAT_MODEL.md) | Offline-core data, input and terminal-safety constraints. | Handling trace content or untrusted input. |
 | [`phase-0/PHASE_0B_LIVE_VALIDATION.md`](phase-0/PHASE_0B_LIVE_VALIDATION.md) | Controlled live protocol, guardrails and result classification. | Inspecting the live harness; never assume it authorizes a live run. |
 | [`phase-0/PHASE_0B_FINDINGS.md`](phase-0/PHASE_0B_FINDINGS.md) | Individual DeepSeek observations and limitations. | Reviewing provider evidence. |
@@ -59,9 +61,11 @@ state.
 | Path | Contains | Read when |
 | --- | --- | --- |
 | [`../crates/prefixity-core/tests`](../crates/prefixity-core/tests) | Fixture, policy, determinism, normalization and safety integration tests. | Verifying core behavior. |
+| [`../crates/prefixity-core/src/observation.rs`](../crates/prefixity-core/src/observation.rs) and [`../crates/prefixity-core/tests/observation_schemas.rs`](../crates/prefixity-core/tests/observation_schemas.rs) | Versioned neutral observation/capability types and focused validation tests. | Changing or consuming P0-L2/L3 contracts. |
 | [`../crates/prefixity-live/tests`](../crates/prefixity-live/tests) | Fully offline mock-transport pipeline tests. | Verifying live-harness behavior without network access. |
 | [`../crates/prefixity-cli/src/output.rs`](../crates/prefixity-cli/src/output.rs) | CLI JSON/output determinism tests. | Verifying rendered output. |
 | [`../fixtures/traces/README.md`](../fixtures/traces/README.md) and [`../fixtures/traces`](../fixtures/traces) | Synthetic scenarios and sanitized provider-derived fixtures. | Reproducing documented examples. |
+| [`../fixtures/observations`](../fixtures/observations) and [`../fixtures/capabilities`](../fixtures/capabilities) | Representative neutral artifact/observation fixtures and local/cloud capability examples. | Reproducing P0-L2/L3 schema examples. |
 | [`../provider-profiles/README.md`](../provider-profiles/README.md) and [`../provider-profiles`](../provider-profiles) | Synthetic cost-profile data. | Running cost or simulation examples. |
 | [`../experiments/runs`](../experiments/runs) | Local ignored live artifacts, not tracked benchmarks. | Auditing recorded live runs if present. |
 | [`phase-0/SUCCESS_CRITERIA.md`](phase-0/SUCCESS_CRITERIA.md) and [`phase-0/EXPERIMENTS.md`](phase-0/EXPERIMENTS.md) | Offline acceptance mapping and proposed experiment groups. | Distinguishing harness checks from future experiments. |

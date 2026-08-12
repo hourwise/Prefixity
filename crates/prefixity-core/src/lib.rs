@@ -38,6 +38,7 @@ pub mod error;
 pub mod hash;
 pub mod limits;
 pub mod model;
+pub mod observation;
 pub mod policy;
 pub mod prefixity_score;
 pub mod structure;
@@ -48,3 +49,4 @@ pub mod validation;
 
 pub use error::PrefixityError;
 pub use model::{CostProfile, RawUsage, RequestTrace};
+pub use observation::{CacheObservation, ContextArtifact, RuntimeCacheCapabilities};

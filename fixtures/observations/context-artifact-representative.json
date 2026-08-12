@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "artifact_id": "repo-map:v3",
+  "origin_id": "workspace:prefixity/repository-map",
+  "content_source_id": {
+    "state": "known",
+    "value": "git-tree:9f1e"
+  },
+  "content_hash": {
+    "state": "known",
+    "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "revision": {
+    "state": "known",
+    "value": "commit:9f1e"
+  },
+  "artifact_type": {
+    "kind": "source_file"
+  },
+  "stability": "stable",
+  "lifecycle": "persistent_versioned",
+  "sizes": {
+    "byte_size": {
+      "state": "known",
+      "value": 4096
+    },
+    "logical_size": {
+      "state": "known",
+      "value": 128
+    },
+    "token_size": {
+      "state": "known",
+      "value": {
+        "count": 1024,
+        "provider": {
+          "state": "known",
+          "value": "local"
+        },
+        "model": {
+          "state": "known",
+          "value": "example-local-model"
+        },
+        "tokenizer": {
+          "state": "unknown"
+        }
+      }
+    }
+  },
+  "cache": {
+    "cacheability": "cacheable",
+    "materialized": {
+      "state": "known",
+      "value": "materialized"
+    },
+    "residency": {
+      "state": "known",
+      "value": "host_ram"
+    }
+  },
+  "trust": {
+    "state": "known",
+    "value": "trusted"
+  },
+  "provenance": {
+    "content": {
+      "origin": "source_explicit"
+    }
+  },
+  "metadata": {
+    "privacy": "hash_only"
+  }
+}
