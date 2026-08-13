@@ -1,8 +1,11 @@
 # Active Task — Phase 0 Foundation Slice (P0-L13)
 
 Status: P0-L6C-R1 repair complete; P0-L6C Attempt 002 is preserved as
-runtime-blocked / failed before inference, and Attempt 003 is readiness-
-blocked before inference. No P0-L6C commit or push is authorized.
+runtime-blocked / failed before inference, Attempt 003 is readiness-blocked
+before inference, and Attempt 004 is readiness-blocked before preflight.
+P0-L6C remains incomplete; the next action is a separately authorized
+Attempt 005 from a clean repository baseline after operator-confirmed
+listener-ready llama.cpp state.
 P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
 
 ## P0-L6A completion record
@@ -160,6 +163,30 @@ separately authorized live execution, and recorded evidence are still pending.
   P0-L12 evaluation, commit, or push is authorized from this readiness-blocked
   state. No tuning, second experiment, ContextBench integration, or P0-L14
   work occurred.
+
+## P0-L6C Attempt 004 execution record
+
+- The operator supplied the required console confirmation that a freshly
+  restarted llama.cpp instance reported `model loaded` and
+  `listening on http://127.0.0.1:8080`.
+- The authorization permits a bounded non-inference TCP listener check, and
+  that check found no active listener on `127.0.0.1:8080` despite the supplied
+  console confirmation. The Attempt 004 fresh-server gate therefore failed,
+  as required by the authorization, and execution stopped before the shared
+  preflight.
+- Attempt 004 used no transport, sent no HTTP request, performed no inference,
+  processed zero model tokens, and created no evidence directory. No A0/A1/B1/
+  C0/C1 case ran; no P0-L8 comparison or P0-L12 evaluation exists. No llama.cpp
+  process was started, stopped, or restarted by this task.
+- The approved Attempt 004 configuration was not applied: no runtime request
+  timeout or execution identity was frozen, and no live attempt occurred.
+- A live attempt number is consumed when substantive readiness/runtime
+  observations are recorded, even if no inference request is sent. Attempt
+  004 must not be reused. The next action is narrowly to obtain
+  operator-confirmed listener-ready llama.cpp state, then begin a separately
+  authorized Attempt 005 from a clean repository baseline. No commit or push
+  was performed for the live attempt; no tuning, second experiment,
+  ContextBench integration, or P0-L14 work occurred.
 
 ## P0-L13 completion record
 

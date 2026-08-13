@@ -303,6 +303,21 @@ live execution with zero transport attempts and zero inference requests. No
 Attempt 003 evidence, result, cache conclusion, commit, or push was produced.
 The historical Attempt 001 and Attempt 002 artifacts remain preserved.
 
+P0-L6C Attempt 004 was authorized after an operator supplied console
+confirmation of `model loaded` and `listening on http://127.0.0.1:8080`, but a
+permitted non-inference TCP listener check found no active listener. Per the
+Attempt 004 gate, execution stopped before shared preflight: no transport or
+HTTP request was sent, no inference occurred, zero model tokens were
+processed, no Attempt 004 evidence directory was created, and no P0-L8 or
+P0-L12 result exists. No llama.cpp process was started, stopped, or restarted
+by this task. P0-L6C remains incomplete; another live attempt requires an
+operator-confirmed fresh runtime that passes the bounded listener check. A
+live attempt number is consumed when substantive readiness/runtime observations
+are recorded, even if no inference request is sent; Attempt 004 must not be
+reused. The next action is to obtain operator-confirmed listener-ready
+llama.cpp state, then begin a separately authorized Attempt 005 from a clean
+repository baseline.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.
