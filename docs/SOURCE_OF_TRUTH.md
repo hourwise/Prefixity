@@ -276,8 +276,32 @@ not experimental cache evidence and do not support a causal or performance
 claim. P0-L6C-R1 repaired this boundary offline by adding the narrow
 `ArtifactOrder` mutation class for C0, keeping A0 as the sole generic
 baseline, and routing both preflight and execution through one validated
-five-case conformance-construction helper. Attempt 002 remains separately
-unauthorized; no live retry, ContextBench integration, or P0-L14 work began.
+five-case conformance-construction helper.
+
+P0-L6C Attempt 002 passed that repaired gate and full zero-network preflight,
+then stopped at the first live A0 transport timeout without retry. Operator-
+observed llama.cpp output establishes that the intended server was listening,
+accepted A0, and began prompt processing before the client request timed out.
+One transport request was attempted; zero experiment cases completed; no
+complete raw response was available for normalization. Its distinct ignored
+bounded artifacts preserve the frozen identity, exact `A0/A1/B1/C0/C1`
+sequence, runtime configuration, and failure record. The exact client values
+were `connect_timeout_ms=1000` and `request_timeout_ms=30000`, consistent with
+the observed cancellation at roughly 31 seconds. The server console output is
+execution-diagnostic evidence only, not P0-L5 cache telemetry or experimental
+cache evidence. No commit or push was performed because the five-request
+sequence did not complete. No tuning, second experiment, ContextBench
+integration, or P0-L14 work began.
+
+P0-L6C Attempt 003 was prepared with the corrected bounded client timeout
+(`request_timeout_ms=600000`, `connect_timeout_ms=1000`) and the unchanged
+semantic experiment definition. Its repaired R1 gate and full zero-network
+preflight passed, but two bounded non-inference listener checks over roughly
+90 seconds did not observe a listener on `127.0.0.1:8080` after the operator
+restart. No HTTP request or model token was sent, so Attempt 003 stopped before
+live execution with zero transport attempts and zero inference requests. No
+Attempt 003 evidence, result, cache conclusion, commit, or push was produced.
+The historical Attempt 001 and Attempt 002 artifacts remain preserved.
 
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`

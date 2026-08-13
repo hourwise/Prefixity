@@ -1,7 +1,8 @@
 # Active Task — Phase 0 Foundation Slice (P0-L13)
 
-Status: P0-L6C-R1 repair complete; P0-L6C Attempt 001 remains
-preflight-blocked / failed before inference, and Attempt 002 is not authorized.
+Status: P0-L6C-R1 repair complete; P0-L6C Attempt 002 is preserved as
+runtime-blocked / failed before inference, and Attempt 003 is readiness-
+blocked before inference. No P0-L6C commit or push is authorized.
 P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
 
 ## P0-L6A completion record
@@ -103,7 +104,62 @@ separately authorized live execution, and recorded evidence are still pending.
 - Attempt 001 remains historical `preflight-blocked`: zero inference
   requests, no runtime observations, no experimental cache evidence, and no
   causal result. Its ignored artifacts were not overwritten or reused. No
-  Attempt 002, runtime contact, tuning, ContextBench, or P0-L14 work occurred.
+  tuning, ContextBench, or P0-L14 work occurred.
+
+## P0-L6C Attempt 002 execution record
+
+- The baseline was re-verified on `main` at
+  `2d0672a96bf43cd1b4b427c29a7b44765dc5f232`, matching `origin/main`, with a
+  clean worktree and unchanged Attempt 001 artifact hashes. CI run `#55`
+  (`31720338764`) was green before execution.
+- The shared R1 gate and full preflight passed offline with zero network calls,
+  exact `A0/A1/B1/C0/C1` sequencing, one A0 baseline, independent C0/C1
+  safety certificates, the Qwen3.5 Q4_0 runtime identity, 8192 context, one
+  slot, metrics enabled, and all unspecified tuning fields preserved as
+  unknown. Attempt 002 was frozen under the distinct ignored evidence path
+  `experiments/runs/p0-l6c-first-live-paired-mutation-02/`; Attempt 001 was
+  not modified.
+- The single live execution attempted A0 once and stopped at the first
+  transport timeout (`request_timeout`) without retry. Operator-observed
+  llama.cpp output confirms that the intended server was listening, accepted
+  A0, and began prompt processing before the client request timed out. The
+  bounded run record is therefore `failed`, with `completed_steps=0`, one
+  attempted transport request, zero complete raw response records, zero
+  completed inference cases, no normalized result, and no P0-L8/P0-L12 result.
+- The exact Attempt 002 client configuration was `connect_timeout_ms=1000` and
+  `request_timeout_ms=30000`. The observed cancellation at roughly 31 seconds
+  is consistent with that configured client request timeout. The server console
+  output is execution-diagnostic evidence only; it is not P0-L5 cache telemetry
+  or experimental cache evidence.
+- No live conclusion, performance claim, capability promotion, tuning change,
+  second experiment, ContextBench integration, or P0-L14 work is supported.
+  Attempt 002 artifacts and the bounded failure status are preserved locally
+  for review. Because the five-request sequence did not complete, no commit or
+  push was performed.
+
+## P0-L6C Attempt 003 execution record
+
+- The exact Attempt 002 timeout audit was completed before this attempt:
+  `connect_timeout_ms=1000` and `request_timeout_ms=30000`. The observed
+  cancellation at roughly 31 seconds is consistent with that client timeout;
+  the corrected diagnosis above is retained.
+- Attempt 003 was prepared with the unchanged semantic experiment ID
+  `0c8d479c092359941747f640552077400bc61e88b56a6ebd70c9ccfec9dd4a11`, a
+  distinct intended evidence path
+  `experiments/runs/p0-l6c-first-live-paired-mutation-03/`,
+  `request_timeout_ms=600000`, `connect_timeout_ms=1000`, and
+  `fresh_server_for_run=true`. The repaired R1 gate and full offline preflight
+  passed with zero network calls and the exact five-case sequence.
+- The operator-restarted `llama` process was present, but two bounded,
+  non-inference listener checks over approximately 90 seconds did not observe
+  a listener on `127.0.0.1:8080`. No HTTP request, connectivity completion,
+  warm-up, model token, transport attempt, or inference request was sent.
+  Attempt 003 therefore stopped before live execution and has no run evidence
+  beyond this bounded readiness status.
+- No Attempt 003 inference result, cache conclusion, P0-L8 diagnostic,
+  P0-L12 evaluation, commit, or push is authorized from this readiness-blocked
+  state. No tuning, second experiment, ContextBench integration, or P0-L14
+  work occurred.
 
 ## P0-L13 completion record
 
