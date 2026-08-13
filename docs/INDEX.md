@@ -10,6 +10,7 @@
 | [`phase-0/CONTEXT_STABILITY.md`](phase-0/CONTEXT_STABILITY.md) | P0-L10 deterministic context stability, lifecycle, boundary, inversion and leading-region analysis. | Classifying context without automatically optimizing it. |
 | [`phase-0/CONTEXT_LAYOUT_PLANNER.md`](phase-0/CONTEXT_LAYOUT_PLANNER.md) | P0-L11 bounded, constraint-first context-layout candidate planning. | Reviewing proposal-only safe ordering candidates. |
 | [`phase-0/CANDIDATE_EVALUATION.md`](phase-0/CANDIDATE_EVALUATION.md) | P0-L12 candidate evidence ladder, capability gate and experiment-readiness boundary. | Evaluating what a layout candidate currently justifies. |
+| [`phase-0/CANDIDATE_MATERIALIZATION.md`](phase-0/CANDIDATE_MATERIALIZATION.md) | P0-L13 inert candidate materialization, conservation checks, safety certificate, and experiment-pair boundary. | Materializing a candidate for controlled experimentation. |
 | [`SOURCE_OF_TRUTH.md`](SOURCE_OF_TRUTH.md) | Accepted product definition, implemented state, constraints and uncertainties. | Every substantial task. |
 | [`tasks/ACTIVE.md`](tasks/ACTIVE.md) | Current task, validation status and next-task recommendation. | Every task. |
 | [`../README.md`](../README.md) | User-facing scope, commands, repository layout and safety summary. | Orienting to the project or running the CLI. |

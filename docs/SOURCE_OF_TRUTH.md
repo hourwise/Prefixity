@@ -229,8 +229,22 @@ support. Capability, observation, performance, causal, and application claim
 scopes remain explicit; performance, causal, and automatic-application claims
 are not allowed. Logical experiment design readiness remains separate from the
 environment-blocked P0-L6 state. P0-L12 does not execute candidates, rewrite
-requests, infer cache behavior, add statistical scoring, integrate ContextBench,
-or begin P0-L13. See docs/phase-0/CANDIDATE_EVALUATION.md.
+requests, infer cache behavior, add statistical scoring, or integrate
+ContextBench. See docs/phase-0/CANDIDATE_EVALUATION.md.
+
+P0-L13 adds a separate, versioned controlled materialization layer over the
+existing neutral request, P0-L11 candidate, and P0-L12 evaluation. It reuses
+P0-L11’s bounded artifact-reorder reconstruction, fails closed on stale or
+incompatible identities, and proves with a deterministic internal
+MaterializationSafetyCertificate that model-visible content, count-aware
+artifact membership/content, tools, envelope, trust, provenance, and all
+non-authorized fields are conserved. P0-L7 actual/planned diff agreement and
+P0-L10 re-analysis are required. It also produces a deterministic,
+runtime-result-free CandidateExperimentPair where the source is control and
+the candidate is neutral treatment. P0-L13 does not execute, project, apply,
+benchmark, predict cache behavior, or claim performance; cache impact and
+performance remain unknown/unverified. See
+docs/phase-0/CANDIDATE_MATERIALIZATION.md.
 
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`

@@ -17,6 +17,7 @@ mod hashing;
 mod layout_planner;
 mod llama_cpp;
 mod loader;
+mod materialization;
 mod model;
 mod observation_diagnostics;
 mod oracle;
@@ -69,7 +70,7 @@ pub use diff::{
     ENVELOPE_DIFF_SCHEMA_ID, ENVELOPE_DIFF_SCHEMA_VERSION, PREFIX_DIFF_SCHEMA_ID,
     PREFIX_DIFF_SCHEMA_VERSION, REQUEST_DIFF_SCHEMA_ID, REQUEST_DIFF_SCHEMA_VERSION,
 };
-pub use error::BenchmarkError;
+pub use error::{BenchmarkError, MaterializationErrorCode};
 pub use external_artifact_admission::{
     canonical_manifest_json, derive_admission, parse_manifest_json, validate_manifest,
     AdmissionDecision, AdmissionDecisionReport, AdmissionError, AdmissionReason,
@@ -102,6 +103,14 @@ pub use llama_cpp::{
 pub use loader::{
     canonical_envelope_json, envelope_hash, load_envelope, load_envelope_from_path, manifest_hash,
     validate_case, validate_envelope,
+};
+pub use materialization::{
+    build_candidate_experiment_pair, materialize_candidate, CandidateExperimentPair,
+    CertificationStatus, InvariantResult, MaterializationInvariant,
+    MaterializationSafetyCertificate, MaterializedCandidate, RequestDiffReference,
+    EXPERIMENT_PAIR_SCHEMA_ID, EXPERIMENT_PAIR_SCHEMA_VERSION, MATERIALIZATION_SCHEMA_ID,
+    MATERIALIZATION_SCHEMA_VERSION, MAX_EXPERIMENT_CASE_ID_BYTES, MAX_MATERIALIZATION_PROVENANCE,
+    SAFETY_CERTIFICATE_SCHEMA_ID, SAFETY_CERTIFICATE_SCHEMA_VERSION,
 };
 pub use model::{
     ActionIdentity, ActorRole, AggregateCounts, BenchmarkReport, ControlledCase,

@@ -1,7 +1,52 @@
-# Active Task — Phase 0 Foundation Slice (P0-L12)
+# Active Task — Phase 0 Foundation Slice (P0-L13)
 
-Status: complete; P0-L12 is implemented and validated. P0-L1 through P0-L5,
-P0-L7 through P0-L12 remain complete. P0-L6 remains environment-blocked.
+Status: complete; P0-L13 is implemented and validated. P0-L1 through P0-L5,
+P0-L7 through P0-L13 remain complete. P0-L6 remains environment-blocked.
+
+## P0-L13 completion record
+
+- Added the neutral `materialize_candidate` boundary over the existing P0-L4
+  `ConformanceRequest`, P0-L11 `ContextLayoutPlan`/`LayoutCandidate`, and
+  P0-L12 `CandidateEvaluation`. The existing P0-L11 request reconstruction
+  path is reused; no parallel request representation or provider projection
+  was introduced.
+- Added typed, bounded materialization failures for stale source, candidate or
+  evaluation identity mismatch, unsafe candidates, unsupported transformations,
+  artifact omission/duplication/content drift, tool or envelope changes,
+  trust/provenance drift, planned/actual diff mismatch, and P0-L10 structural
+  re-analysis mismatch.
+- Added deterministic `MaterializationSafetyCertificate` invariants covering
+  source/candidate identity, authorized transformation, model-visible content,
+  count-aware artifact conservation, tools, envelope, trust, provenance,
+  order-only change, P0-L7 diff agreement, and P0-L10 re-analysis. The
+  certificate is an internal transformation-fidelity proof only; it makes no
+  performance, cache, causal, production-safety, or runtime claim.
+- Added deterministic `CandidateExperimentPair` control/treatment manifest
+  with no runtime results or telemetry. The source remains control and the
+  candidate remains neutral treatment for a future experiment.
+- Added P0-L2 metadata fingerprints to P0-L11 segment references where
+  metadata is available, allowing P0-L13 to detect revision, origin,
+  content-source, trust, lifecycle, and provenance drift without changing the
+  neutral request contract. Layout fingerprints remain order/content identity
+  and do not claim metadata or performance semantics.
+- Added focused offline tests for valid reorder, stale source/evaluation,
+  malformed artifact permutation, content and metadata drift, unsafe and
+  unsupported candidates, planned/actual diff mismatch, P0-L10 mismatch,
+  deterministic certificate/pair identity, and input immutability.
+- Validation: `cargo fmt --all -- --check`, focused P0-L13 materialization
+  tests (`9` passed), `cargo check --workspace --offline --locked`, strict
+  workspace clippy (`--all-targets --all-features --offline --locked
+  -- -D warnings`), full `cargo test --workspace --offline --locked`, and
+  `git diff --check` all passed. The full workspace suite preserved the prior
+  P0-L2 through P0-L12 results and passed the new materialization suite.
+- No live inference, provider/runtime call, network access, candidate
+  execution, automatic application, runtime telemetry, performance claim, or
+  ContextBench integration occurred. P0-L6 remains environment-blocked because
+  no existing usable `llama-server` or suitable GGUF model is available.
+
+P0-L14, ContextBench integration, live inference, runtime probing, cache
+execution, benchmark scoring, statistical methodology, and automatic request
+application remain deferred.
 
 ## P0-L12 completion record
 
@@ -23,10 +68,6 @@ P0-L7 through P0-L12 remain complete. P0-L6 remains environment-blocked.
 - Validation: focused P0-L12 tests, P0-L11/P0-L10/P0-L9/P0-L8/P0-L7/P0-L5/
   P0-L4/P0-L2 tests, workspace check, formatting, clippy, full workspace
   tests, documentation review, and `git diff --check`.
-
-P0-L13, ContextBench integration, live inference, runtime probing, cache
-execution, benchmark scoring, statistical methodology, and automatic request
-application remain deferred.
 
 ## Completion record
 

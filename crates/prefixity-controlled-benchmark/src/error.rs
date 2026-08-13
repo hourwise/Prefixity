@@ -1,5 +1,47 @@
 use std::path::PathBuf;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MaterializationErrorCode {
+    StaleSourceRequest,
+    CandidateIdentityMismatch,
+    CandidateSafetyRejected,
+    EvaluationMismatch,
+    UnsupportedTransformation,
+    ArtifactMissing,
+    ArtifactDuplicated,
+    ArtifactContentMismatch,
+    UnexpectedToolChange,
+    UnexpectedEnvelopeChange,
+    UnexpectedContentChange,
+    TrustProvenanceMismatch,
+    PlannedActualDiffMismatch,
+    StructuralReanalysisMismatch,
+    CertificateInvariantFailed,
+}
+
+impl std::fmt::Display for MaterializationErrorCode {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let value = match self {
+            Self::StaleSourceRequest => "stale_source_request",
+            Self::CandidateIdentityMismatch => "candidate_identity_mismatch",
+            Self::CandidateSafetyRejected => "candidate_safety_rejected",
+            Self::EvaluationMismatch => "evaluation_mismatch",
+            Self::UnsupportedTransformation => "unsupported_transformation",
+            Self::ArtifactMissing => "artifact_missing",
+            Self::ArtifactDuplicated => "artifact_duplicated",
+            Self::ArtifactContentMismatch => "artifact_content_mismatch",
+            Self::UnexpectedToolChange => "unexpected_tool_change",
+            Self::UnexpectedEnvelopeChange => "unexpected_envelope_change",
+            Self::UnexpectedContentChange => "unexpected_content_change",
+            Self::TrustProvenanceMismatch => "trust_provenance_mismatch",
+            Self::PlannedActualDiffMismatch => "planned_actual_diff_mismatch",
+            Self::StructuralReanalysisMismatch => "structural_reanalysis_mismatch",
+            Self::CertificateInvariantFailed => "certificate_invariant_failed",
+        };
+        formatter.write_str(value)
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum BenchmarkError {
     #[error("I/O error reading {path}: {source}")]
@@ -30,6 +72,11 @@ pub enum BenchmarkError {
         scenario_id: String,
         message: String,
     },
+    #[error("candidate materialization failed [{code}]: {message}")]
+    Materialization {
+        code: MaterializationErrorCode,
+        message: String,
+    },
 }
 
 impl BenchmarkError {
@@ -43,6 +90,13 @@ impl BenchmarkError {
     pub fn pair(scenario_id: &str, message: impl Into<String>) -> Self {
         Self::PairValidation {
             scenario_id: scenario_id.to_string(),
+            message: message.into(),
+        }
+    }
+
+    pub fn materialization(code: MaterializationErrorCode, message: impl Into<String>) -> Self {
+        Self::Materialization {
+            code,
             message: message.into(),
         }
     }

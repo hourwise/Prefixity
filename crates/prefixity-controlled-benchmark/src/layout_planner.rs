@@ -126,6 +126,11 @@ pub struct LayoutSegmentReference {
     pub component_id: Option<String>,
     pub role: ContextRole,
     pub content_fingerprint: String,
+    /// Fingerprint of the complete P0-L2 metadata record when metadata was
+    /// supplied to P0-L10. Layout identity intentionally excludes this
+    /// value, while P0-L13 uses it to prove metadata conservation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metadata_fingerprint: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -419,7 +424,7 @@ pub fn plan_context_layout(
             candidates.push(LayoutCandidate {
                 candidate_id: format!("layout-{attempted_layout_fingerprint}"),
                 layout_fingerprint: attempted_layout_fingerprint,
-                ordered_segments: ordered_references(source_analysis, &order),
+                ordered_segments: ordered_references(source_analysis, &order, stability_inputs)?,
                 transformations: vec![transformation],
                 resulting_analysis: candidate_analysis,
                 safety: CandidateSafetyStatus::OrderingSafeUnderDeclaredConstraints,
@@ -612,7 +617,7 @@ fn safety_reasons(
     Ok(reasons.into_iter().collect())
 }
 
-fn reordered_request(
+pub(crate) fn reordered_request(
     request: &ConformanceRequest,
     analysis: &ContextStabilityAnalysis,
     order: &[usize],
@@ -765,20 +770,45 @@ fn transformation_for_order(
 fn ordered_references(
     analysis: &ContextStabilityAnalysis,
     order: &[usize],
-) -> Vec<LayoutSegmentReference> {
+    inputs: &ContextStabilityInputs,
+) -> Result<Vec<LayoutSegmentReference>, BenchmarkError> {
     order
         .iter()
-        .map(|position| {
-            let segment = &analysis.segments[*position];
-            LayoutSegmentReference {
-                source_position: *position,
-                structural_path: segment.structural_path.clone(),
-                component_id: segment.component_id.clone(),
-                role: segment.role,
-                content_fingerprint: segment.content_fingerprint.clone(),
-            }
-        })
+        .map(
+            |position| -> Result<LayoutSegmentReference, BenchmarkError> {
+                let segment = &analysis.segments[*position];
+                Ok(LayoutSegmentReference {
+                    source_position: *position,
+                    structural_path: segment.structural_path.clone(),
+                    component_id: segment.component_id.clone(),
+                    role: segment.role,
+                    content_fingerprint: segment.content_fingerprint.clone(),
+                    metadata_fingerprint: metadata_fingerprint_for_segment(segment, inputs)?,
+                })
+            },
+        )
         .collect()
+}
+
+pub(crate) fn metadata_fingerprint_for_segment(
+    segment: &ContextSegmentAnalysis,
+    inputs: &ContextStabilityInputs,
+) -> Result<Option<String>, BenchmarkError> {
+    let metadata = match segment.role {
+        ContextRole::SystemInstruction => inputs.system_instruction.as_ref(),
+        ContextRole::ContextArtifact => segment
+            .component_id
+            .as_ref()
+            .and_then(|id| inputs.artifacts.get(id)),
+        ContextRole::CurrentUserTask => inputs.current_user_task.as_ref(),
+        ContextRole::ToolDefinition => segment
+            .component_id
+            .as_ref()
+            .and_then(|name| inputs.tools.get(name)),
+    };
+    metadata
+        .map(|value| canonical_hash(value).map_err(|error| validation(error.to_string())))
+        .transpose()
 }
 
 #[derive(Debug, Serialize)]
@@ -793,7 +823,7 @@ struct LayoutIdentitySegment<'a> {
     content_fingerprint: &'a str,
 }
 
-fn layout_fingerprint_for_order(
+pub(crate) fn layout_fingerprint_for_order(
     analysis: &ContextStabilityAnalysis,
     order: &[usize],
 ) -> Result<String, BenchmarkError> {
@@ -816,7 +846,7 @@ fn layout_fingerprint_for_order(
     canonical_hash(&identity).map_err(|error| validation(error.to_string()))
 }
 
-fn layout_metrics(analysis: &ContextStabilityAnalysis) -> LayoutStructuralMetrics {
+pub(crate) fn layout_metrics(analysis: &ContextStabilityAnalysis) -> LayoutStructuralMetrics {
     LayoutStructuralMetrics {
         inversion_count: analysis
             .findings
@@ -1023,6 +1053,9 @@ fn validate_segment_references(
             &reference.content_fingerprint,
             "candidate segment fingerprint",
         )?;
+        if let Some(fingerprint) = &reference.metadata_fingerprint {
+            validate_hash(fingerprint, "candidate segment metadata fingerprint")?;
+        }
     }
     Ok(())
 }
