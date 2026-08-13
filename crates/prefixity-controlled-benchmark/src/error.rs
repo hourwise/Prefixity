@@ -19,6 +19,50 @@ pub enum MaterializationErrorCode {
     CertificateInvariantFailed,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LivePreparationErrorCode {
+    NonLoopbackEndpoint,
+    InvalidEndpoint,
+    LiveOptInRequired,
+    EndpointUnavailable,
+    ConnectionTimeout,
+    RequestTimeout,
+    MalformedResponse,
+    NormalizationConflict,
+    ContextLimitRejected,
+    ServerError,
+    IncompleteSequence,
+    EvidenceWriteFailure,
+    InvalidConfiguration,
+    UnsafeMaterializedCandidate,
+    EvidenceStateMismatch,
+    ResponseTooLarge,
+}
+
+impl std::fmt::Display for LivePreparationErrorCode {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let value = match self {
+            Self::NonLoopbackEndpoint => "non_loopback_endpoint",
+            Self::InvalidEndpoint => "invalid_endpoint",
+            Self::LiveOptInRequired => "live_opt_in_required",
+            Self::EndpointUnavailable => "endpoint_unavailable",
+            Self::ConnectionTimeout => "connection_timeout",
+            Self::RequestTimeout => "request_timeout",
+            Self::MalformedResponse => "malformed_response",
+            Self::NormalizationConflict => "normalization_conflict",
+            Self::ContextLimitRejected => "context_limit_rejected",
+            Self::ServerError => "server_error",
+            Self::IncompleteSequence => "incomplete_sequence",
+            Self::EvidenceWriteFailure => "evidence_write_failure",
+            Self::InvalidConfiguration => "invalid_configuration",
+            Self::UnsafeMaterializedCandidate => "unsafe_materialized_candidate",
+            Self::EvidenceStateMismatch => "evidence_state_mismatch",
+            Self::ResponseTooLarge => "response_too_large",
+        };
+        formatter.write_str(value)
+    }
+}
+
 impl std::fmt::Display for MaterializationErrorCode {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let value = match self {
@@ -77,6 +121,11 @@ pub enum BenchmarkError {
         code: MaterializationErrorCode,
         message: String,
     },
+    #[error("live experiment harness failed [{code}]: {message}")]
+    LiveHarness {
+        code: LivePreparationErrorCode,
+        message: String,
+    },
 }
 
 impl BenchmarkError {
@@ -96,6 +145,13 @@ impl BenchmarkError {
 
     pub fn materialization(code: MaterializationErrorCode, message: impl Into<String>) -> Self {
         Self::Materialization {
+            code,
+            message: message.into(),
+        }
+    }
+
+    pub fn live_harness(code: LivePreparationErrorCode, message: impl Into<String>) -> Self {
+        Self::LiveHarness {
             code,
             message: message.into(),
         }

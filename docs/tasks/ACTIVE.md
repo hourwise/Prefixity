@@ -1,7 +1,36 @@
 # Active Task — Phase 0 Foundation Slice (P0-L13)
 
-Status: complete; P0-L13 is implemented and validated. P0-L1 through P0-L5,
-P0-L7 through P0-L13 remain complete. P0-L6 remains environment-blocked.
+Status: P0-L6A preparation complete; P0-L6 remains environment-blocked and
+live-run-pending. P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
+
+## P0-L6A completion record
+
+- Added a versioned loopback-only HTTP transport boundary for the existing
+  P0-L5 llama.cpp adapter. It accepts only HTTP `127.0.0.1`, `::1`, or the
+  literal `localhost`, uses explicit connect/request timeouts, disables
+  redirects and retries, bounds response bodies, and emits typed bounded
+  failures.
+- Added an explicit `execute_live` opt-in that defaults to false, plus a
+  machine-readable zero-network preflight/readiness record. Ordinary tests,
+  builds, and the preflight path do not contact real sockets.
+- Added versioned runtime configuration, unknown-preserving environment
+  manifest types, P0-L13 certificate/pair validation, deterministic identity,
+  and the fixed A1/A2/C1/C2/B1/A3/C3 control/treatment/interference sequence.
+  B1 is deterministic and structurally early-different; no tuning or current
+  model-specific configuration is hardcoded.
+- Kept raw response telemetry, P0-L5 normalization, `CacheObservation`, and
+  `ConformanceResult` as separate stages. Partial/failed runs cannot carry a
+  final normalized result; no P0-L8/P0-L12 admission is performed here.
+- Added focused offline tests for endpoint safety, opt-in gating, bounded
+  configuration, unknown environment fields, deterministic sequence identity,
+  zero-network preflight, and partial-run safety.
+- Validation for this slice covers focused tests, workspace formatting/checks,
+  strict clippy, full offline workspace tests, and diff review. No live
+  inference, llama-server startup, GGUF loading, localhost request, benchmark
+  inspection, or P0-L14 work is authorized or performed.
+
+P0-L6 itself is not complete. A suitable local llama-server/GGUF environment,
+separately authorized live execution, and recorded evidence are still pending.
 
 ## P0-L13 completion record
 

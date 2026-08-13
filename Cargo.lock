@@ -645,6 +645,7 @@ name = "prefixity-controlled-benchmark"
 version = "0.1.0"
 dependencies = [
  "prefixity-core",
+ "reqwest",
  "serde",
  "serde_json",
  "sha2",

@@ -349,6 +349,15 @@ pub trait LlamaCppTransport {
     ) -> Result<LlamaCppResponse, BenchmarkError>;
 }
 
+impl<T: LlamaCppTransport + ?Sized> LlamaCppTransport for &mut T {
+    fn chat_completion(
+        &mut self,
+        request: &LlamaCppRequest,
+    ) -> Result<LlamaCppResponse, BenchmarkError> {
+        (**self).chat_completion(request)
+    }
+}
+
 /// Deterministic fake transport used by P0-L5 tests only.
 #[derive(Debug, Default)]
 pub struct FakeLlamaCppTransport {
@@ -405,6 +414,7 @@ pub struct LlamaCppConformanceRunner<T> {
     transport: T,
     observed_at: String,
     runtime: RuntimeIdentity,
+    evidence_class: String,
 }
 
 impl<T> LlamaCppConformanceRunner<T> {
@@ -413,6 +423,20 @@ impl<T> LlamaCppConformanceRunner<T> {
             transport,
             observed_at: observed_at.into(),
             runtime,
+            evidence_class: "synthetic-protocol-validation-only".to_string(),
+        }
+    }
+
+    pub(crate) fn new_live(
+        transport: T,
+        observed_at: impl Into<String>,
+        runtime: RuntimeIdentity,
+    ) -> Self {
+        Self {
+            transport,
+            observed_at: observed_at.into(),
+            runtime,
+            evidence_class: "live-loopback-runtime-observation".to_string(),
         }
     }
 
@@ -480,10 +504,7 @@ impl<T: LlamaCppTransport> ConformanceRunner for LlamaCppConformanceRunner<T> {
     fn provenance(&self) -> BTreeMap<String, String> {
         BTreeMap::from([
             ("runner".to_string(), "llama.cpp-adapter".to_string()),
-            (
-                "evidence".to_string(),
-                "synthetic-protocol-validation-only".to_string(),
-            ),
+            ("evidence".to_string(), self.evidence_class.clone()),
         ])
     }
 }

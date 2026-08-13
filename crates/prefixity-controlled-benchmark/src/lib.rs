@@ -15,6 +15,7 @@ mod external_artifact_admission;
 mod fixtures;
 mod hashing;
 mod layout_planner;
+mod live_harness;
 mod llama_cpp;
 mod loader;
 mod materialization;
@@ -70,7 +71,7 @@ pub use diff::{
     ENVELOPE_DIFF_SCHEMA_ID, ENVELOPE_DIFF_SCHEMA_VERSION, PREFIX_DIFF_SCHEMA_ID,
     PREFIX_DIFF_SCHEMA_VERSION, REQUEST_DIFF_SCHEMA_ID, REQUEST_DIFF_SCHEMA_VERSION,
 };
-pub use error::{BenchmarkError, MaterializationErrorCode};
+pub use error::{BenchmarkError, LivePreparationErrorCode, MaterializationErrorCode};
 pub use external_artifact_admission::{
     canonical_manifest_json, derive_admission, parse_manifest_json, validate_manifest,
     AdmissionDecision, AdmissionDecisionReport, AdmissionError, AdmissionReason,
@@ -92,6 +93,16 @@ pub use layout_planner::{
     PreserveOrderReason, RejectedLayoutCandidate, RejectionReason, StructuralLayoutEffect,
     CONTEXT_LAYOUT_PLAN_SCHEMA_ID, CONTEXT_LAYOUT_PLAN_SCHEMA_VERSION, MAX_LAYOUT_CANDIDATES,
     MAX_LAYOUT_CONSTRAINTS, MAX_LAYOUT_PROVENANCE, MAX_LAYOUT_REJECTIONS, MAX_LAYOUT_TEXT_BYTES,
+};
+pub use live_harness::{
+    build_live_experiment_definition, execute_live_experiment, live_experiment_identity,
+    preflight_live_experiment, EnvironmentObservation, LiveEnvironmentManifest, LiveEvidenceState,
+    LiveExperimentDefinition, LiveFailure, LiveRawEvidenceSource, LiveReadinessRecord,
+    LiveRunRecord, LiveSequenceRelation, LiveSequenceRole, LiveSequenceStep, LlamaCppLiveConfig,
+    LoopbackEndpoint, LoopbackLlamaCppTransport, RawLlamaCppEvidence,
+    ENVIRONMENT_MANIFEST_SCHEMA_ID, ENVIRONMENT_MANIFEST_SCHEMA_VERSION, LIVE_CONFIG_SCHEMA_ID,
+    LIVE_CONFIG_SCHEMA_VERSION, LIVE_HARNESS_SCHEMA_ID, LIVE_HARNESS_SCHEMA_VERSION,
+    RAW_EVIDENCE_SCHEMA_ID, RAW_EVIDENCE_SCHEMA_VERSION,
 };
 pub use llama_cpp::{
     normalize_llama_cpp_response, project_llama_cpp_request, FakeLlamaCppTransport,

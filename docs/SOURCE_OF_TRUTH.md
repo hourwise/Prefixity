@@ -246,6 +246,17 @@ benchmark, predict cache behavior, or claim performance; cache impact and
 performance remain unknown/unverified. See
 docs/phase-0/CANDIDATE_MATERIALIZATION.md.
 
+P0-L6A prepares, but does not execute, the first local llama.cpp experiment.
+The `prefixity-controlled-benchmark` live harness validates only HTTP loopback
+endpoints, requires an explicit opt-in for socket use, and exposes a dry-run
+readiness record with zero network calls. It binds the P0-L13 certified
+control/treatment pair to the fixed A1/A2/C1/C2/B1/A3/C3 sequence, preserves
+unknown environment fields, and keeps raw llama response evidence separate
+from P0-L5 normalization and later P0-L8/P0-L12 interpretation. P0-L6A adds
+no inference, tuning, model loading, benchmark inspection, cache admission, or
+performance claim; the live run remains pending and environment-blocked. See
+`docs/phase-0/LIVE_EXPERIMENT_HARNESS_PREPARATION.md`.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.
@@ -428,13 +439,14 @@ not prevent unrelated offline or research-infrastructure work.
   later execution scope is separately authorized. Stage 0 is complete;
   automatic compression remains deferred, and Phase 1B.0 only supports its
   contract class.
-- P0-L6 runtime integration and cache probing, automatic context
-  rewriting, cache routing, KV quantisation, cache simulation, benchmark
-  scoring, and public performance claims remain separately deferred. P0-L6 is
-  environment-blocked because no existing usable `llama-server` or suitable
-  GGUF was available in the inspected environment. P0-L4 and P0-L5 fake
-  runners are not live inference, P0-L7 diagnostics do not create runtime
-  evidence, and P0-L9 registry knowledge does not create runtime observations.
+- P0-L6 runtime execution and cache probing, automatic context rewriting,
+  cache routing, KV quantisation, cache simulation, benchmark scoring, and
+  public performance claims remain separately deferred. P0-L6A preparation is
+  implemented, but P0-L6 is environment-blocked because no existing usable
+  `llama-server` or suitable GGUF was available in the inspected environment.
+  P0-L4/P0-L5 fake runners and P0-L6A preflight are not live inference; P0-L7
+  diagnostics do not create runtime evidence, and P0-L9 registry knowledge
+  does not create runtime observations.
 
 ## Constraints and invariants
 

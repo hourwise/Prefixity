@@ -83,6 +83,9 @@ host-RAM benefit, latency reduction, or performance improvement is claimed.
 
 ## Next boundary
 
-P0-L6 is the planned first real local llama.cpp conformance/session-cache
-experiment using the P0-L4 harness and this P0-L5 adapter. P0-L6 is not
-implemented here.
+P0-L6A prepares the first real local llama.cpp conformance/session-cache
+experiment using the P0-L4 harness and this P0-L5 adapter. Its loopback-only
+transport, explicit execution gate, preflight/readiness record, and bounded
+evidence types are documented in
+`docs/phase-0/LIVE_EXPERIMENT_HARNESS_PREPARATION.md`. P0-L6 live execution is
+not complete and remains environment-blocked.
