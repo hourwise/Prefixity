@@ -1,9 +1,9 @@
 use prefixity_controlled_benchmark::{
-    build_synthetic_paired_mutation_seed, preflight_paired_mutation_experiment,
-    prepare_paired_mutation_experiment, BenchmarkError, LiveEvidenceState,
-    LivePreparationErrorCode, LiveRawEvidenceSource, LlamaCppLiveConfig, LlamaCppRequest,
-    LlamaCppResponse, LlamaCppTransport, LoopbackEndpoint, PairedMutationDefinition,
-    PairedMutationRunRecord, RuntimeProfileReference,
+    build_paired_mutation_conformance_experiment, build_synthetic_paired_mutation_seed,
+    preflight_paired_mutation_experiment, prepare_paired_mutation_experiment, BenchmarkError,
+    CaseRelationship, LiveEvidenceState, LivePreparationErrorCode, LiveRawEvidenceSource,
+    LlamaCppLiveConfig, LlamaCppRequest, LlamaCppResponse, LlamaCppTransport, LoopbackEndpoint,
+    MutationClass, PairedMutationDefinition, PairedMutationRunRecord, RuntimeProfileReference,
 };
 use prefixity_core::observation::{Observed, RuntimeIdentity};
 use std::collections::BTreeMap;
@@ -263,6 +263,76 @@ fn preflight_is_zero_network_and_records_comparisons() {
 }
 
 #[test]
+fn paired_generic_conformance_has_one_a0_baseline_and_traceable_c0_layout() {
+    let experiment = build_paired_mutation_conformance_experiment(&prepared()).unwrap();
+    experiment.validate().unwrap();
+    assert_eq!(
+        experiment
+            .cases
+            .iter()
+            .filter(|case| case.relationship == CaseRelationship::Baseline)
+            .count(),
+        1
+    );
+    assert_eq!(
+        experiment
+            .cases
+            .iter()
+            .filter(|case| case.mutation == MutationClass::Baseline)
+            .count(),
+        1
+    );
+    let a0 = &experiment.cases[0];
+    let a1 = &experiment.cases[1];
+    let b1 = &experiment.cases[2];
+    let c0 = &experiment.cases[3];
+    let c1 = &experiment.cases[4];
+    assert_eq!(a0.case_id, "A0");
+    assert_eq!(a0.relationship, CaseRelationship::Baseline);
+    assert_eq!(a0.mutation, MutationClass::Baseline);
+    assert_eq!(a1.mutation, MutationClass::VolatileArtifactContent);
+    assert_eq!(
+        a1.relationship,
+        CaseRelationship::MutationOf("A0".to_string())
+    );
+    assert_eq!(
+        b1.relationship,
+        CaseRelationship::MutationOf("A0".to_string())
+    );
+    assert_eq!(c0.mutation, MutationClass::ArtifactOrder);
+    assert_eq!(
+        c0.relationship,
+        CaseRelationship::MutationOf("A0".to_string())
+    );
+    assert_eq!(c1.mutation, MutationClass::VolatileArtifactContent);
+    assert_eq!(
+        c1.relationship,
+        CaseRelationship::MutationOf("C0".to_string())
+    );
+}
+
+#[test]
+fn duplicated_baseline_fixture_fails_at_shared_preflight_boundary() {
+    let definition = prepared();
+    let mut experiment = build_paired_mutation_conformance_experiment(&definition).unwrap();
+    let baseline_request = experiment.baseline_request.clone();
+    let c0 = experiment
+        .cases
+        .iter_mut()
+        .find(|case| case.case_id == "C0")
+        .unwrap();
+    c0.mutation = MutationClass::Baseline;
+    c0.relationship = CaseRelationship::Baseline;
+    c0.request = baseline_request;
+    let error = experiment.validate().unwrap_err();
+    assert!(error.to_string().contains("exactly one baseline"));
+    assert!(
+        preflight_paired_mutation_experiment(&definition, &config(false, true)).is_ok(),
+        "the valid preflight must use the same validated construction path"
+    );
+}
+
+#[test]
 fn fresh_server_is_a_caller_assertion() {
     let error =
         preflight_paired_mutation_experiment(&prepared(), &config(false, false)).unwrap_err();
@@ -296,6 +366,31 @@ impl LiveRawEvidenceSource for CountingTransport {
     }
 }
 
+#[derive(Default)]
+struct OfflineTransport {
+    calls: usize,
+}
+
+impl LlamaCppTransport for OfflineTransport {
+    fn chat_completion(
+        &mut self,
+        _request: &LlamaCppRequest,
+    ) -> Result<LlamaCppResponse, BenchmarkError> {
+        self.calls += 1;
+        Ok(LlamaCppResponse {
+            timings: None,
+            usage: None,
+            raw_telemetry: BTreeMap::new(),
+        })
+    }
+}
+
+impl LiveRawEvidenceSource for OfflineTransport {
+    fn raw_evidence(&self) -> Vec<prefixity_controlled_benchmark::RawLlamaCppEvidence> {
+        Vec::new()
+    }
+}
+
 #[test]
 fn paired_execution_requires_explicit_opt_in_without_network() {
     let mut transport = CountingTransport::default();
@@ -313,6 +408,20 @@ fn paired_execution_requires_explicit_opt_in_without_network() {
         }
     ));
     assert_eq!(transport.calls, 0);
+}
+
+#[test]
+fn offline_execution_passes_generic_validation_without_a_real_socket() {
+    let mut transport = OfflineTransport::default();
+    let record = prefixity_controlled_benchmark::execute_paired_mutation_experiment(
+        &prepared(),
+        &config(true, true),
+        &mut transport,
+    )
+    .unwrap();
+    assert_eq!(transport.calls, 5);
+    assert_eq!(record.completed_steps, 5);
+    assert_eq!(record.state, LiveEvidenceState::Normalized);
 }
 
 #[test]

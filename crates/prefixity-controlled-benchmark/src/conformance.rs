@@ -40,6 +40,7 @@ pub enum MutationClass {
     Baseline,
     ExactRepeat,
     VolatileArtifactContent,
+    ArtifactOrder,
     StableContentBeginning,
     CurrentContentEnd,
     WhitespaceOnly,

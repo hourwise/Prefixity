@@ -1,7 +1,8 @@
 # Active Task — Phase 0 Foundation Slice (P0-L13)
 
-Status: P0-L6B preparation complete; P0-L6 remains environment-blocked and
-live-run-pending. P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
+Status: P0-L6C-R1 repair complete; P0-L6C Attempt 001 remains
+preflight-blocked / failed before inference, and Attempt 002 is not authorized.
+P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
 
 ## P0-L6A completion record
 
@@ -54,6 +55,55 @@ separately authorized live execution, and recorded evidence are still pending.
   Prefixity improvement evidence. No inference, localhost contact, model
   loading, benchmark rerun, tokenizer, statistics, ContextBench, or P0-L14
   work occurred.
+
+## P0-L6C first live attempt record
+
+- Baseline was verified before execution: `main`, HEAD and `origin/main` at
+  `fda0e9b9ec13cc6e61d655b82a6d9d8337c224d6`, clean worktree, no Git lock, and
+  the approved manually started loopback runtime present.
+- Bounded non-inference metadata established `llama.cpp` build
+  `b10217-ddd4ec142`, model alias `ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, Q4_0
+  quantization, context 8192, one slot, and metrics enabled. Threads, batch,
+  KV precision, GPU offload, and other unqueried settings remain unknown.
+- The P0-L6B dry-run passed with zero network/completion calls, exact
+  `A0/A1/B1/C0/C1` sequence, independent C0/C1 certificates, exact P0-L7
+  diffs, P0-L10 records, fresh-server assertion, bounded workload, and frozen
+  identity. The live harness then failed before the first transport call
+  because both A0 and C0 were classified as baseline while the conformance
+  validator requires exactly one baseline case.
+- Accurate final state is `preflight-blocked`/failed-before-inference with
+  `completed_steps=0`, no raw response evidence, no normalized result, no
+  P0-L8 diagnostics, and no P0-L12 runtime evaluation. No retry was attempted;
+  no live result, performance claim, or capability promotion is supported.
+- Bounded local artifacts are preserved under the ignored
+  `experiments/runs/p0-l6c-first-live-paired-mutation-01/` directory. Because
+  all five inference requests did not complete, no P0-L6C commit or push was
+  authorized.
+
+## P0-L6C-R1 repair record
+
+- Isolated the root cause to paired-harness baseline classification: the
+  generic conformance experiment had mapped both A0 and C0 to the baseline
+  relationship, while the unchanged generic contract requires exactly one
+  baseline case.
+- Added the narrow backward-compatible `ArtifactOrder` mutation class. A0 is
+  now the sole generic baseline; A1 is a volatile mutation of A0; B1 remains
+  an interference mutation in the A0 lineage; C0 is an artifact-order/layout
+  mutation of A0; and C1 is a volatile mutation of C0.
+- Centralized construction in the validated
+  `build_paired_mutation_conformance_experiment` helper. Both preflight and
+  execution use that same five-case `ConformanceExperiment`, and construction
+  runs the ordinary generic `ConformanceExperiment::validate()` path before
+  readiness or transport access.
+- Added focused regressions for exactly one A0 baseline, truthful C0 layout
+  semantics, duplicated-baseline failure at the shared validation boundary,
+  zero-network preflight, offline fake execution, deterministic sequencing,
+  and preservation of P0-L7/P0-L10/P0-L13 contracts. The generic exactly-one-
+  baseline invariant was not weakened.
+- Attempt 001 remains historical `preflight-blocked`: zero inference
+  requests, no runtime observations, no experimental cache evidence, and no
+  causal result. Its ignored artifacts were not overwritten or reused. No
+  Attempt 002, runtime contact, tuning, ContextBench, or P0-L14 work occurred.
 
 ## P0-L13 completion record
 

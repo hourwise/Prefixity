@@ -146,13 +146,13 @@ pub use observation_diagnostics::{
 };
 pub use oracle::{evaluate_case, evaluate_envelopes};
 pub use paired_mutation::{
-    build_synthetic_paired_mutation_seed, execute_paired_mutation_experiment,
-    live_paired_mutation_identity, preflight_paired_mutation_experiment,
-    prepare_paired_mutation_experiment, PairedComparisonKind, PairedMutationComparison,
-    PairedMutationDefinition, PairedMutationRunRecord, PairedMutationSeed,
-    PairedMutationSequenceRelation, PairedMutationSequenceRole, PairedMutationSequenceStep,
-    PairedOutcomeExpectation, PairedReadinessRecord, PairedWorkloadSummary,
-    PAIRED_MUTATION_SCHEMA_ID, PAIRED_MUTATION_SCHEMA_VERSION,
+    build_paired_mutation_conformance_experiment, build_synthetic_paired_mutation_seed,
+    execute_paired_mutation_experiment, live_paired_mutation_identity,
+    preflight_paired_mutation_experiment, prepare_paired_mutation_experiment, PairedComparisonKind,
+    PairedMutationComparison, PairedMutationDefinition, PairedMutationRunRecord,
+    PairedMutationSeed, PairedMutationSequenceRelation, PairedMutationSequenceRole,
+    PairedMutationSequenceStep, PairedOutcomeExpectation, PairedReadinessRecord,
+    PairedWorkloadSummary, PAIRED_MUTATION_SCHEMA_ID, PAIRED_MUTATION_SCHEMA_VERSION,
 };
 pub use phase1b9::{
     blinded_trace_json, canonical_phase1b9_report_json, preregistration_hash, run_phase1b9_study,

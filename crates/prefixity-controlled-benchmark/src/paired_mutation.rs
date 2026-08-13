@@ -661,6 +661,7 @@ pub fn preflight_paired_mutation_experiment(
     config: &LlamaCppLiveConfig,
 ) -> Result<PairedReadinessRecord, BenchmarkError> {
     definition.validate()?;
+    let _experiment = build_paired_mutation_conformance_experiment(definition)?;
     if !config.fresh_server_for_run {
         return Err(BenchmarkError::live_harness(
             LivePreparationErrorCode::FreshServerAssertionRequired,
@@ -748,54 +749,7 @@ pub fn execute_paired_mutation_experiment<T: LlamaCppTransport + LiveRawEvidence
             "paired live execution requires execute_live=true",
         ));
     }
-    let cases = definition
-        .sequence
-        .iter()
-        .map(|step| ConformanceCase {
-            case_id: step.step_id.clone(),
-            mutation: match step.step_id.as_str() {
-                "A0" | "C0" => MutationClass::Baseline,
-                "A1" | "C1" => MutationClass::VolatileArtifactContent,
-                _ => MutationClass::CurrentContentEnd,
-            },
-            request: match step.step_id.as_str() {
-                "A0" => definition.control_initial.clone(),
-                "A1" => definition.control_mutated.clone(),
-                "B1" => definition.interference.clone(),
-                "C0" => definition.treatment_initial.materialized_request.clone(),
-                "C1" => definition.treatment_mutated.materialized_request.clone(),
-                _ => unreachable!(),
-            },
-            relationship: match &step.relation {
-                PairedMutationSequenceRelation::Initial => CaseRelationship::Baseline,
-                PairedMutationSequenceRelation::VolatileMutationOf(id) => {
-                    CaseRelationship::MutationOf(id.clone())
-                }
-                PairedMutationSequenceRelation::Independent => {
-                    CaseRelationship::MutationOf("A0".to_string())
-                }
-            },
-            expected_observation: ExpectedObservationMetadata {
-                cache_reuse: ExpectedObservationState::ToBeObserved,
-                cache_write: ExpectedObservationState::ToBeObserved,
-                notes:
-                    "No expected direction; record cache/prefill accounting and descriptive timing."
-                        .to_string(),
-            },
-        })
-        .collect::<Vec<_>>();
-    let experiment = ConformanceExperiment {
-        schema_id: crate::conformance::CONFORMANCE_SCHEMA_ID.to_string(),
-        schema_version: crate::conformance::CONFORMANCE_SCHEMA_VERSION,
-        experiment_id: definition.experiment_id.clone(),
-        baseline_request: definition.control_initial.clone(),
-        cases,
-        runtime_profile: definition.runtime_profile.clone(),
-        metadata: BTreeMap::from([(
-            "experiment_type".to_string(),
-            "p0-l6b-paired-mutation".to_string(),
-        )]),
-    };
+    let experiment = build_paired_mutation_conformance_experiment(definition)?;
     let observed_at = config
         .provenance
         .get("observed_at")
@@ -851,6 +805,70 @@ pub fn execute_paired_mutation_experiment<T: LlamaCppTransport + LiveRawEvidence
             Ok(record)
         }
     }
+}
+
+/// Construct and validate the one generic conformance experiment used by both
+/// paired preflight and execution. A0 is the sole generic baseline; C0 is a
+/// certified artifact-order mutation derived from A0 rather than a second
+/// baseline.
+pub fn build_paired_mutation_conformance_experiment(
+    definition: &PairedMutationDefinition,
+) -> Result<ConformanceExperiment, BenchmarkError> {
+    definition.validate()?;
+    let cases = definition
+        .sequence
+        .iter()
+        .map(|step| ConformanceCase {
+            case_id: step.step_id.clone(),
+            mutation: match step.step_id.as_str() {
+                "A0" => MutationClass::Baseline,
+                "A1" | "C1" => MutationClass::VolatileArtifactContent,
+                "B1" => MutationClass::CurrentContentEnd,
+                "C0" => MutationClass::ArtifactOrder,
+                _ => unreachable!(),
+            },
+            request: match step.step_id.as_str() {
+                "A0" => definition.control_initial.clone(),
+                "A1" => definition.control_mutated.clone(),
+                "B1" => definition.interference.clone(),
+                "C0" => definition.treatment_initial.materialized_request.clone(),
+                "C1" => definition.treatment_mutated.materialized_request.clone(),
+                _ => unreachable!(),
+            },
+            relationship: match step.step_id.as_str() {
+                "A0" => CaseRelationship::Baseline,
+                "A1" => CaseRelationship::MutationOf("A0".to_string()),
+                "B1" => CaseRelationship::MutationOf("A0".to_string()),
+                "C0" => CaseRelationship::MutationOf("A0".to_string()),
+                "C1" => CaseRelationship::MutationOf("C0".to_string()),
+                _ => unreachable!(),
+            },
+            expected_observation: ExpectedObservationMetadata {
+                cache_reuse: ExpectedObservationState::ToBeObserved,
+                cache_write: ExpectedObservationState::ToBeObserved,
+                notes:
+                    "No expected direction; record cache/prefill accounting and descriptive timing."
+                        .to_string(),
+            },
+        })
+        .collect::<Vec<_>>();
+    let experiment = ConformanceExperiment {
+        schema_id: crate::conformance::CONFORMANCE_SCHEMA_ID.to_string(),
+        schema_version: crate::conformance::CONFORMANCE_SCHEMA_VERSION,
+        experiment_id: definition.experiment_id.clone(),
+        baseline_request: definition.control_initial.clone(),
+        cases,
+        runtime_profile: definition.runtime_profile.clone(),
+        metadata: BTreeMap::from([
+            (
+                "experiment_type".to_string(),
+                "p0-l6b-paired-mutation".to_string(),
+            ),
+            ("baseline_case".to_string(), "A0".to_string()),
+        ]),
+    };
+    experiment.validate()?;
+    Ok(experiment)
 }
 
 fn comparison(

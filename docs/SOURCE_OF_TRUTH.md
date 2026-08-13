@@ -268,6 +268,17 @@ direction. P0-L6B is preparation only: it produces no live evidence, makes no
 performance or causal claim, and does not alter the existing P0-L6A sequence.
 See `docs/phase-0/PAIRED_MUTATION_EXPERIMENT_PREPARATION.md`.
 
+P0-L6C Attempt 001 is recorded as `preflight-blocked` / failed before
+inference: the dry-run made zero completion requests, and the paired harness
+then exposed a generic conformance construction error before transport. The
+historical attempt and its ignored bounded artifacts are preserved; they are
+not experimental cache evidence and do not support a causal or performance
+claim. P0-L6C-R1 repaired this boundary offline by adding the narrow
+`ArtifactOrder` mutation class for C0, keeping A0 as the sole generic
+baseline, and routing both preflight and execution through one validated
+five-case conformance-construction helper. Attempt 002 remains separately
+unauthorized; no live retry, ContextBench integration, or P0-L14 work began.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.
