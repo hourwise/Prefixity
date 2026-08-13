@@ -105,6 +105,10 @@ pub struct LlamaCppLiveConfig {
     pub kv_cache: Option<String>,
     pub batch_size: Option<u32>,
     pub generation_limit: u32,
+    #[serde(default = "default_parallel_slots")]
+    pub parallel_slots: u32,
+    #[serde(default = "default_metrics_enabled")]
+    pub metrics_enabled: bool,
     pub temperature: Option<f64>,
     pub top_p: Option<f64>,
     pub seed: Option<u64>,
@@ -115,6 +119,8 @@ pub struct LlamaCppLiveConfig {
     pub evidence_location: String,
     #[serde(default)]
     pub execute_live: bool,
+    #[serde(default)]
+    pub fresh_server_for_run: bool,
     pub runtime_profile: RuntimeProfileReference,
     #[serde(default)]
     pub provenance: BTreeMap<String, String>,
@@ -167,6 +173,12 @@ impl LlamaCppLiveConfig {
                 "threads and batch size must be positive when supplied",
             ));
         }
+        if self.parallel_slots == 0 {
+            return Err(live_error(
+                LivePreparationErrorCode::InvalidConfiguration,
+                "parallel_slots must be positive",
+            ));
+        }
         for (field, value) in [("temperature", self.temperature), ("top_p", self.top_p)] {
             if let Some(value) = value {
                 if !value.is_finite() || value < 0.0 {
@@ -191,6 +203,14 @@ impl LlamaCppLiveConfig {
         }
         validate_provenance(&self.provenance)
     }
+}
+
+fn default_parallel_slots() -> u32 {
+    1
+}
+
+fn default_metrics_enabled() -> bool {
+    true
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

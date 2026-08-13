@@ -257,6 +257,17 @@ no inference, tuning, model loading, benchmark inspection, cache admission, or
 performance claim; the live run remains pending and environment-blocked. See
 `docs/phase-0/LIVE_EXPERIMENT_HARNESS_PREPARATION.md`.
 
+P0-L6B adds a separate paired-mutation preparation path over that harness.
+It constructs synthetic explicit stable/volatile/stable context, creates V0
+and a deterministic V1-only mutation, and independently materializes C0 from
+A0 and C1 from A1 through P0-L11/P0-L12/P0-L13. The exact offline sequence is
+A0/A1/B1/C0/C1, with P0-L7 mutation/layout checks, P0-L10 inversion and
+leading-region records, a caller assertion that the later run begins on a
+fresh server, and a primary cache/prefill accounting endpoint with no required
+direction. P0-L6B is preparation only: it produces no live evidence, makes no
+performance or causal claim, and does not alter the existing P0-L6A sequence.
+See `docs/phase-0/PAIRED_MUTATION_EXPERIMENT_PREPARATION.md`.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.

@@ -39,6 +39,7 @@ const MAX_METADATA_FIELDS: usize = 64;
 pub enum MutationClass {
     Baseline,
     ExactRepeat,
+    VolatileArtifactContent,
     StableContentBeginning,
     CurrentContentEnd,
     WhitespaceOnly,

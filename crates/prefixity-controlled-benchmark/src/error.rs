@@ -37,6 +37,7 @@ pub enum LivePreparationErrorCode {
     UnsafeMaterializedCandidate,
     EvidenceStateMismatch,
     ResponseTooLarge,
+    FreshServerAssertionRequired,
 }
 
 impl std::fmt::Display for LivePreparationErrorCode {
@@ -58,6 +59,7 @@ impl std::fmt::Display for LivePreparationErrorCode {
             Self::UnsafeMaterializedCandidate => "unsafe_materialized_candidate",
             Self::EvidenceStateMismatch => "evidence_state_mismatch",
             Self::ResponseTooLarge => "response_too_large",
+            Self::FreshServerAssertionRequired => "fresh_server_assertion_required",
         };
         formatter.write_str(value)
     }

@@ -1,6 +1,6 @@
 # Active Task — Phase 0 Foundation Slice (P0-L13)
 
-Status: P0-L6A preparation complete; P0-L6 remains environment-blocked and
+Status: P0-L6B preparation complete; P0-L6 remains environment-blocked and
 live-run-pending. P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
 
 ## P0-L6A completion record
@@ -31,6 +31,29 @@ live-run-pending. P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
 
 P0-L6 itself is not complete. A suitable local llama-server/GGUF environment,
 separately authorized live execution, and recorded evidence are still pending.
+
+## P0-L6B completion record
+
+- Added a separate paired-mutation experiment definition; the P0-L6A
+  A1/A2/C1/C2/B1/A3/C3 definition remains intact and unchanged.
+- Added synthetic stable-A / volatile-V / stable-B requests with explicit
+  P0-L10 metadata, a moderate bounded workload, deterministic V0→V1 content
+  mutation, and explicit movement permission for the approved P0-L11 layout.
+- Built C0 from A0 and C1 independently from A1 through the existing
+  P0-L11/P0-L12/P0-L13 planning, evaluation, and materialization path. Both
+  treatment states carry independent safety certificates.
+- Added exact P0-L7 mutation/layout comparisons, P0-L10 inversion/leading-region
+  records, deterministic A0/A1/B1/C0/C1 sequencing, semantic identity, a
+  caller assertion for `fresh_server_for_run`, and a no-required-direction
+  primary cache/prefill outcome contract.
+- Reused the P0-L5 normalization and P0-L6A raw-evidence/opt-in flow; no
+  duplicate observation implementation or automatic retry/admission was
+  introduced. Added 20 focused offline paired-mutation tests.
+- P0-L6B prepares this experiment but produces no live evidence. Exploratory
+  llama.cpp mutation measurements motivate the hypothesis only; they are not
+  Prefixity improvement evidence. No inference, localhost contact, model
+  loading, benchmark rerun, tokenizer, statistics, ContextBench, or P0-L14
+  work occurred.
 
 ## P0-L13 completion record
 

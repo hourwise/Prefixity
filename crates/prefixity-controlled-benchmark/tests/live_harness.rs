@@ -149,6 +149,8 @@ fn config(execute_live: bool) -> LlamaCppLiveConfig {
         kv_cache: Some("default".to_string()),
         batch_size: Some(128),
         generation_limit: 64,
+        parallel_slots: 1,
+        metrics_enabled: true,
         temperature: Some(0.0),
         top_p: Some(1.0),
         seed: Some(7),
@@ -158,6 +160,7 @@ fn config(execute_live: bool) -> LlamaCppLiveConfig {
         max_context_bytes: 1024 * 1024,
         evidence_location: "evidence/p0-l6".to_string(),
         execute_live,
+        fresh_server_for_run: true,
         runtime_profile: profile(),
         provenance: BTreeMap::from([("caller".to_string(), "offline-test".to_string())]),
     }
