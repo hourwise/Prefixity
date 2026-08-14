@@ -1,9 +1,11 @@
 use prefixity_controlled_benchmark::{
     build_paired_mutation_conformance_experiment, build_synthetic_paired_mutation_seed,
-    preflight_paired_mutation_experiment, prepare_paired_mutation_experiment, BenchmarkError,
-    CaseRelationship, LiveEvidenceState, LivePreparationErrorCode, LiveRawEvidenceSource,
-    LlamaCppLiveConfig, LlamaCppRequest, LlamaCppResponse, LlamaCppTransport, LoopbackEndpoint,
-    MutationClass, PairedMutationDefinition, PairedMutationRunRecord, RuntimeProfileReference,
+    preflight_paired_mutation_experiment, prepare_paired_mutation_experiment,
+    project_llama_cpp_request, project_llama_cpp_request_with_generation_limit,
+    validate_llama_cpp_generation_limit, BenchmarkError, CaseRelationship, LiveEvidenceState,
+    LivePreparationErrorCode, LiveRawEvidenceSource, LlamaCppLiveConfig, LlamaCppRequest,
+    LlamaCppResponse, LlamaCppTransport, LoopbackEndpoint, MutationClass, PairedMutationDefinition,
+    PairedMutationRunRecord, RuntimeProfileReference,
 };
 use prefixity_core::observation::{Observed, RuntimeIdentity};
 use std::collections::BTreeMap;
@@ -369,14 +371,19 @@ impl LiveRawEvidenceSource for CountingTransport {
 #[derive(Default)]
 struct OfflineTransport {
     calls: usize,
+    bodies: Vec<Vec<u8>>,
 }
 
 impl LlamaCppTransport for OfflineTransport {
     fn chat_completion(
         &mut self,
-        _request: &LlamaCppRequest,
+        request: &LlamaCppRequest,
     ) -> Result<LlamaCppResponse, BenchmarkError> {
         self.calls += 1;
+        self.bodies.push(
+            serde_json::to_vec(request)
+                .map_err(|error| BenchmarkError::validation(error.to_string()))?,
+        );
         Ok(LlamaCppResponse {
             timings: None,
             usage: None,
@@ -412,9 +419,21 @@ fn paired_execution_requires_explicit_opt_in_without_network() {
 
 #[test]
 fn offline_execution_passes_generic_validation_without_a_real_socket() {
+    let definition = prepared();
+    let experiment = build_paired_mutation_conformance_experiment(&definition).unwrap();
+    let expected_bodies = experiment
+        .cases
+        .iter()
+        .map(|case| {
+            serde_json::to_vec(
+                &project_llama_cpp_request_with_generation_limit(&case.request, 1).unwrap(),
+            )
+            .unwrap()
+        })
+        .collect::<Vec<_>>();
     let mut transport = OfflineTransport::default();
     let record = prefixity_controlled_benchmark::execute_paired_mutation_experiment(
-        &prepared(),
+        &definition,
         &config(true, true),
         &mut transport,
     )
@@ -422,6 +441,27 @@ fn offline_execution_passes_generic_validation_without_a_real_socket() {
     assert_eq!(transport.calls, 5);
     assert_eq!(record.completed_steps, 5);
     assert_eq!(record.state, LiveEvidenceState::Normalized);
+    assert_eq!(transport.bodies, expected_bodies);
+    for body in &transport.bodies {
+        let value: serde_json::Value = serde_json::from_slice(body).unwrap();
+        assert_eq!(
+            value.get("max_tokens").and_then(serde_json::Value::as_u64),
+            Some(1)
+        );
+    }
+}
+
+#[test]
+fn live_readiness_generation_validator_rejects_an_omitted_bound() {
+    let definition = prepared();
+    let experiment = build_paired_mutation_conformance_experiment(&definition).unwrap();
+    let unbounded = project_llama_cpp_request(&experiment.cases[0].request).unwrap();
+    assert!(validate_llama_cpp_generation_limit(&unbounded, 1).is_err());
+
+    let bounded =
+        project_llama_cpp_request_with_generation_limit(&experiment.cases[0].request, 1).unwrap();
+    validate_llama_cpp_generation_limit(&bounded, 1).unwrap();
+    preflight_paired_mutation_experiment(&definition, &config(false, true)).unwrap();
 }
 
 #[test]

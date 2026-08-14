@@ -19,7 +19,10 @@ use crate::layout_planner::{plan_request_layout, LayoutPlanningConstraints, Orde
 use crate::live_harness::{
     LiveEvidenceState, LiveRawEvidenceSource, LlamaCppLiveConfig, RawLlamaCppEvidence,
 };
-use crate::llama_cpp::{project_llama_cpp_request, LlamaCppConformanceRunner, LlamaCppTransport};
+use crate::llama_cpp::{
+    project_llama_cpp_request, project_llama_cpp_request_with_generation_limit,
+    validate_llama_cpp_generation_limit, LlamaCppConformanceRunner, LlamaCppTransport,
+};
 use crate::materialization::{materialize_candidate, MaterializedCandidate};
 use prefixity_core::model::{EvidenceOrigin, EvidenceProvenance};
 use prefixity_core::observation::{
@@ -681,7 +684,9 @@ pub fn preflight_paired_mutation_experiment(
         &definition.treatment_initial.materialized_request,
         &definition.treatment_mutated.materialized_request,
     ] {
-        let projected = project_llama_cpp_request(request)?;
+        let projected =
+            project_llama_cpp_request_with_generation_limit(request, config.generation_limit)?;
+        validate_llama_cpp_generation_limit(&projected, config.generation_limit)?;
         let bytes = serde_json::to_vec(&projected)
             .map_err(|error| BenchmarkError::validation(error.to_string()))?;
         if bytes.len() > config.max_context_bytes {
@@ -755,10 +760,11 @@ pub fn execute_paired_mutation_experiment<T: LlamaCppTransport + LiveRawEvidence
         .get("observed_at")
         .cloned()
         .unwrap_or_else(|| "caller-supplied-observation-time-required".to_string());
-    let mut runner = LlamaCppConformanceRunner::new_live(
+    let mut runner = LlamaCppConformanceRunner::new_live_with_generation_limit(
         transport,
         observed_at,
         definition.runtime_profile.identity.clone(),
+        config.generation_limit,
     );
     match experiment.run(&mut runner) {
         Ok(result) => {

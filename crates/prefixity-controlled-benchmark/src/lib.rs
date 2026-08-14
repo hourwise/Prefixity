@@ -106,11 +106,12 @@ pub use live_harness::{
     RAW_EVIDENCE_SCHEMA_ID, RAW_EVIDENCE_SCHEMA_VERSION,
 };
 pub use llama_cpp::{
-    normalize_llama_cpp_response, project_llama_cpp_request, FakeLlamaCppTransport,
-    LlamaCppConformanceRunner, LlamaCppFunction, LlamaCppJsonObject, LlamaCppMessage,
-    LlamaCppPromptTokenDetails, LlamaCppRequest, LlamaCppResponse, LlamaCppResponseFormat,
-    LlamaCppTimings, LlamaCppTool, LlamaCppTransport, LlamaCppUsage, LLAMA_CPP_ADAPTER_VERSION,
-    LLAMA_CPP_PROTOCOL_ID,
+    normalize_llama_cpp_response, project_llama_cpp_request,
+    project_llama_cpp_request_with_generation_limit, validate_llama_cpp_generation_limit,
+    FakeLlamaCppTransport, LlamaCppConformanceRunner, LlamaCppFunction, LlamaCppJsonObject,
+    LlamaCppMessage, LlamaCppPromptTokenDetails, LlamaCppRequest, LlamaCppResponse,
+    LlamaCppResponseFormat, LlamaCppTimings, LlamaCppTool, LlamaCppTransport, LlamaCppUsage,
+    LLAMA_CPP_ADAPTER_VERSION, LLAMA_CPP_PROTOCOL_ID,
 };
 pub use loader::{
     canonical_envelope_json, envelope_hash, load_envelope, load_envelope_from_path, manifest_hash,

@@ -14,8 +14,8 @@ use crate::conformance::{
 use crate::error::{BenchmarkError, LivePreparationErrorCode};
 use crate::hashing::{canonical_hash, canonical_json, sha256_hex};
 use crate::llama_cpp::{
-    project_llama_cpp_request, LlamaCppConformanceRunner, LlamaCppRequest, LlamaCppResponse,
-    LlamaCppTransport,
+    project_llama_cpp_request_with_generation_limit, validate_llama_cpp_generation_limit,
+    LlamaCppConformanceRunner, LlamaCppRequest, LlamaCppResponse, LlamaCppTransport,
 };
 use crate::materialization::{
     build_candidate_experiment_pair, CandidateExperimentPair, MaterializedCandidate,
@@ -785,7 +785,9 @@ pub fn preflight_live_experiment(
         &definition.treatment.materialized_request,
         &definition.interference_request,
     ] {
-        let projected = project_llama_cpp_request(request)?;
+        let projected =
+            project_llama_cpp_request_with_generation_limit(request, config.generation_limit)?;
+        validate_llama_cpp_generation_limit(&projected, config.generation_limit)?;
         let bytes = serde_json::to_vec(&projected)
             .map_err(|error| BenchmarkError::validation(error.to_string()))?;
         if bytes.len() > config.max_context_bytes {
@@ -849,7 +851,12 @@ where
         .get("observed_at")
         .cloned()
         .unwrap_or_else(|| "caller-supplied-observation-time-required".to_string());
-    let mut runner = LlamaCppConformanceRunner::new_live(transport, observed_at, runtime);
+    let mut runner = LlamaCppConformanceRunner::new_live_with_generation_limit(
+        transport,
+        observed_at,
+        runtime,
+        config.generation_limit,
+    );
     match experiment.run(&mut runner) {
         Ok(normalized_result) => {
             let record = LiveRunRecord {

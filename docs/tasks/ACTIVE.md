@@ -2,10 +2,10 @@
 
 Status: P0-L6C-R1 repair complete; P0-L6C Attempt 002 is preserved as
 runtime-blocked / failed before inference, Attempt 003 is readiness-blocked
-before inference, and Attempt 004 is readiness-blocked before preflight.
-P0-L6C remains incomplete; the next action is a separately authorized
-Attempt 005 from a clean repository baseline after operator-confirmed
-listener-ready llama.cpp state.
+before inference, Attempt 004 is readiness-blocked before preflight, and
+Attempt 005 is an execution-invalidated partial live run caused by a missing
+generation bound in the projected request. P0-L6C remains incomplete; no
+further live attempt is authorized by this run.
 P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
 
 ## P0-L6A completion record
@@ -182,11 +182,57 @@ separately authorized live execution, and recorded evidence are still pending.
   timeout or execution identity was frozen, and no live attempt occurred.
 - A live attempt number is consumed when substantive readiness/runtime
   observations are recorded, even if no inference request is sent. Attempt
-  004 must not be reused. The next action is narrowly to obtain
-  operator-confirmed listener-ready llama.cpp state, then begin a separately
-  authorized Attempt 005 from a clean repository baseline. No commit or push
-  was performed for the live attempt; no tuning, second experiment,
-  ContextBench integration, or P0-L14 work occurred.
+  004 must not be reused. That earlier next-action note is superseded by the
+  Attempt 005 result below; no further live attempt is authorized by this run.
+  No tuning, second experiment, ContextBench integration, or P0-L14 work
+  occurred.
+
+## P0-L6C Attempt 005 execution and R2 forensic record
+
+- The repository baseline was verified at
+  `d31c6dcdbdc0f9143ffd018c1b65cba3616691da`, with `main` aligned to
+  `origin/main`, only the two pre-existing status-document modifications, no
+  Git lock, and the existing Attempt 005 directory containing only six bounded
+  preparation/identity artifacts. The operator supplied current `model loaded`
+  and `listening on http://127.0.0.1:8080` confirmation, and the one permitted
+  non-inference
+  listener check returned positive.
+- The repaired shared preflight passed with zero network calls, exact
+  `A0/A1/B1/C0/C1` sequencing, the single A0 baseline, independent C0/C1
+  safety certificates, `generation_limit=1`, and the approved
+  `connect_timeout_ms=1000` / `request_timeout_ms=600000` configuration. The
+  semantic experiment ID remained
+  `0c8d479c092359941747f640552077400bc61e88b56a6ebd70c9ccfec9dd4a11`.
+- Operator console diagnostics show server task 0 prompt evaluation of 1172
+  tokens in approximately 12.6 seconds, followed by 7020 generated tokens in
+  approximately 503.4 seconds, filling the 8192-token context and reporting
+  `truncated=1`. The generation bound was absent from the pre-repair
+  serialized request because `LlamaCppLiveConfig.generation_limit` was not
+  carried into `LlamaCppRequest`. The existing adapter contract uses the
+  OpenAI-compatible `max_tokens` field; R2 now projects and validates
+  `max_tokens=1` for every live case. The console's `graphs reused=6992` is
+  retained as execution-diagnostic information only, not cache-token
+  evidence.
+- `ConformanceExperiment::run` submits cases sequentially: the prior
+  `chat_completion()` must return successfully, normalization must complete,
+  and only then is the next case submitted. Therefore task 7026, if issued by
+  this runner, can only be A1. Its identity is not independently persisted,
+  so the corrected accounting distinguishes evidence: one Prefixity
+  transport attempt is proven; a second A1 attempt is inferred only if task
+  7026 belongs to this runner; two server-side tasks were observed, one
+  completed and one canceled; zero Prefixity completed cases, complete raw
+  responses, and normalized case results were retained.
+- No run record, P0-L8 comparison, or P0-L12 evaluation was produced. The
+  paired path constructs its run record only after the full sequence returns,
+  which is a documented partial-run durability gap; incremental persistence
+  was not added in R2. The original six Attempt 005 artifacts remain
+  unmodified, and separate ignored `forensic-r2.json` preserves their
+  pre-repair hashes and bounded diagnostic reconciliation.
+- Attempt 005 is `execution-invalidated` / a partial live run caused by the
+  generation-bound projection defect. It is not a result for or against the
+  hypothesis: `hypothesis=unmeasured / insufficient` and
+  `causality=not_established`. No retry, Attempt 006, tuning, second
+  experiment, ContextBench integration, or P0-L14 work occurred.
 
 ## P0-L13 completion record
 

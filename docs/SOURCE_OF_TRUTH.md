@@ -318,6 +318,41 @@ reused. The next action is to obtain operator-confirmed listener-ready
 llama.cpp state, then begin a separately authorized Attempt 005 from a clean
 repository baseline.
 
+P0-L6C Attempt 005 passed the current operator confirmation, the bounded
+non-inference listener check, and the repaired zero-network preflight with the
+unchanged semantic experiment ID, `generation_limit=1`, and approved 600000 ms
+client timeout. The original six bounded Attempt 005 artifacts are preserved
+byte-for-byte; a separate `forensic-r2.json` records their hashes and the
+bounded reconciliation.
+
+The operator console establishes that server task 0 completed prompt
+processing in approximately 12.6 seconds, then generated 7020 tokens over
+approximately 503.4 seconds until the 8192-token context was truncated. The
+configured generation limit was not present in the pre-repair projected JSON:
+the request omitted the existing OpenAI-compatible `max_tokens` field. This
+projection defect allowed llama.cpp's default generation to run to the
+context limit; the console's `graphs reused=6992` remains execution-diagnostic
+only and is not cached prompt-token evidence.
+
+The exact runner path is sequential: `chat_completion()` must return
+successfully, response normalization must complete, and only then can the
+next conformance case be submitted. Therefore task 7026, if it came from this
+runner, can only be A1. The retained artifacts do not independently identify
+task 7026 as a Prefixity request, so that attribution is not proven. The
+bounded accounting is consequently: one Prefixity transport attempt is
+proven, a second A1 attempt is inferred only if task 7026 belongs to this
+runner, two server-side tasks were observed (one completed and one canceled),
+and zero Prefixity case results, complete raw responses, or normalized results
+were persisted. No P0-L8 or P0-L12 result was produced.
+
+Attempt 005 is `execution-invalidated` / a partial live run caused by the
+generation-bound projection defect. It is not evidence for or against the
+cache hypothesis; `hypothesis=unmeasured / insufficient` and
+`causality=not_established` remain unchanged. The run-record durability gap is
+also recorded: the paired path only constructs its bounded run record after
+the full sequence returns. P0-L6C remains incomplete and no further live
+attempt is authorized by this run.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.

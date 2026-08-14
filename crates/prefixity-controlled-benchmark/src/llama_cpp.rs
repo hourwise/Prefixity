@@ -32,6 +32,13 @@ pub struct LlamaCppRequest {
     pub tools: Vec<LlamaCppTool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub response_format: Option<LlamaCppResponseFormat>,
+    /// The OpenAI-compatible llama-server output bound used by live runs.
+    ///
+    /// This remains optional on the neutral projection so existing offline
+    /// adapter callers retain their previous wire shape. Live harnesses must
+    /// use `project_llama_cpp_request_with_generation_limit`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_tokens: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -231,7 +238,41 @@ pub fn project_llama_cpp_request(
         messages,
         tools,
         response_format,
+        max_tokens: None,
     })
+}
+
+/// Project a request for a live llama-server call with the caller-supplied
+/// OpenAI-compatible generation bound.
+pub fn project_llama_cpp_request_with_generation_limit(
+    request: &ConformanceRequest,
+    generation_limit: u32,
+) -> Result<LlamaCppRequest, BenchmarkError> {
+    if generation_limit == 0 {
+        return Err(validation("llama.cpp generation limit must be positive"));
+    }
+    let mut projected = project_llama_cpp_request(request)?;
+    projected.max_tokens = Some(generation_limit);
+    validate_llama_cpp_generation_limit(&projected, generation_limit)?;
+    Ok(projected)
+}
+
+/// Verify that a projected live request contains the exact configured bound.
+/// Shared preflight uses this check so an omitted wire field fails before any
+/// live execution can begin.
+pub fn validate_llama_cpp_generation_limit(
+    request: &LlamaCppRequest,
+    generation_limit: u32,
+) -> Result<(), BenchmarkError> {
+    if generation_limit == 0 {
+        return Err(validation("llama.cpp generation limit must be positive"));
+    }
+    if request.max_tokens != Some(generation_limit) {
+        return Err(validation(format!(
+            "llama.cpp live request must contain max_tokens={generation_limit}"
+        )));
+    }
+    Ok(())
 }
 
 /// Normalize a parsed llama-server response into the existing P0-L2 contract.
@@ -415,6 +456,7 @@ pub struct LlamaCppConformanceRunner<T> {
     observed_at: String,
     runtime: RuntimeIdentity,
     evidence_class: String,
+    generation_limit: Option<u32>,
 }
 
 impl<T> LlamaCppConformanceRunner<T> {
@@ -424,6 +466,7 @@ impl<T> LlamaCppConformanceRunner<T> {
             observed_at: observed_at.into(),
             runtime,
             evidence_class: "synthetic-protocol-validation-only".to_string(),
+            generation_limit: None,
         }
     }
 
@@ -437,7 +480,19 @@ impl<T> LlamaCppConformanceRunner<T> {
             observed_at: observed_at.into(),
             runtime,
             evidence_class: "live-loopback-runtime-observation".to_string(),
+            generation_limit: None,
         }
+    }
+
+    pub(crate) fn new_live_with_generation_limit(
+        transport: T,
+        observed_at: impl Into<String>,
+        runtime: RuntimeIdentity,
+        generation_limit: u32,
+    ) -> Self {
+        let mut runner = Self::new_live(transport, observed_at, runtime);
+        runner.generation_limit = Some(generation_limit);
+        runner
     }
 
     pub fn transport(&self) -> &T {
@@ -459,7 +514,13 @@ impl<T: LlamaCppTransport> ConformanceRunner for LlamaCppConformanceRunner<T> {
                 "runner runtime does not match experiment profile",
             ));
         }
-        let request = project_llama_cpp_request(&case.request).map_err(|error| {
+        let request_result = match self.generation_limit {
+            Some(generation_limit) => {
+                project_llama_cpp_request_with_generation_limit(&case.request, generation_limit)
+            }
+            None => project_llama_cpp_request(&case.request),
+        };
+        let request = request_result.map_err(|error| {
             case_error(
                 experiment_id,
                 case,
