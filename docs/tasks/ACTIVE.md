@@ -14,6 +14,14 @@ P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete. P0-L6D is an
 offline evidence-admission and experiment-adequacy audit; it does not authorize
 another live attempt.
 
+P0-L6E fresh-arm deconfounded preparation is now complete. It defines separate
+control `A0/A1` and treatment `C0/C1` epochs, removes `B1` from that design,
+adds explicit epoch/config/runtime identity gates, and permits each arm to be
+finalized and persisted independently. This is offline preparation only; no
+Attempt 007 was executed or authorized by this slice. A future live run still
+requires a separately authorized operator-confirmed fresh listener for each
+arm boundary.
+
 ## P0-L6A completion record
 
 - Added a versioned loopback-only HTTP transport boundary for the existing
@@ -362,6 +370,41 @@ separately authorized live execution, and recorded evidence are still pending.
   layout effect. The partial-run durability gap remains deferred; it was not
   required for identity correctness in this audit. No Attempt 007, runtime
   contact, inference, ContextBench integration, or P0-L14 work began.
+
+## P0-L6E fresh-arm deconfounded preparation
+
+- Added an independent two-arm preparation path. The control arm is exactly
+  `A0` → `A1`; the treatment arm is exactly `C0` → `C1`. `B1` is not included,
+  because the fresh-server boundary replaces the in-sequence interference
+  case for this design. The two arms use distinct caller-supplied epoch IDs
+  and each asserts `fresh_server_for_arm=true`.
+- Reused the existing P0-L7, P0-L10, P0-L11, P0-L12, and P0-L13 contracts.
+  The candidate diagnostic is the certified A1-to-C1 relationship, while the
+  within-arm C0-to-C1 comparison remains the treatment mutation diagnostic.
+  Existing P0-L13 certificates and materialization pair identities are not
+  regenerated or altered.
+- Added exact Attempt 006 configuration enforcement: llama.cpp family and
+  retained Q4_0 model contract, context 8192, one slot, metrics enabled,
+  `connect_timeout_ms=1000`, `request_timeout_ms=600000`, and generation
+  bound `max_tokens=1` on every projected request. Preflight is explicitly
+  zero-network and records all four step IDs.
+- Added arm-local run records with explicit state, epoch identity, request
+  fingerprints, transport/response accounting, raw evidence, normalized
+  result, failure, and provenance. A completed control record can be
+  finalized and persisted before the operator confirms a fresh runtime for
+  treatment. Partial records cannot carry complete normalized results.
+- Added deterministic semantic identity covering the fresh-arm design,
+  parent experiment, exact diffs, P0-L13 pair identity, runtime profile, and
+  configuration fingerprint. Epoch IDs are deliberately excluded from the
+  semantic identity. Offline aggregation requires both independently valid
+  arms and constructs source-aware P0-L8 control, treatment, and A1-to-C1
+  candidate diagnostics before P0-L12 evaluation.
+- Added 14 focused offline fresh-arm tests. The suite confirms no composite
+  score, `causality=not_established`, and disallowed performance/application
+  claims; it does not promote capability beyond the existing documented
+  profile. No listener check, localhost contact, inference, llama.cpp process
+  control, evidence-directory mutation, Attempt 007, ContextBench, or P0-L14
+  work occurred.
 
 ## P0-L13 completion record
 

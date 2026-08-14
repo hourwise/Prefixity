@@ -457,6 +457,55 @@ equal A1/C1 accounting. Partial-run durability remains separate deferred work.
 No Attempt 007, localhost contact, inference, ContextBench integration, or
 P0-L14 work began in this reconciliation.
 
+P0-L6E is the offline deconfounded preparation that follows that audit. It
+defines two independently executable fresh-server epochs: control `A0` to
+`A1`, then treatment `C0` to `C1` after the control record is finalized and
+persisted and an operator confirms a fresh listener. `B1` is intentionally
+removed from this design because the fresh-server boundary replaces the
+in-sequence interference case. The implementation does not automate the
+restart or contact a runtime. No Attempt 007 was executed by P0-L6E.
+
+The fresh-arm contract reuses the existing P0-L7 request diffs, P0-L10
+structural analysis, P0-L11 candidate, P0-L12 evaluator, and P0-L13 C0/C1
+materialization certificates. The candidate diagnostic remains A1-to-C1; the
+treatment arm's C0-to-C1 relationship is its mutation diagnostic. Caller-
+supplied control and treatment epoch IDs must be distinct. Each arm asserts
+`fresh_server_for_arm=true`, and aggregation rejects missing, duplicate,
+stale, or mismatched epoch/config/model/protocol/runtime identity.
+
+Every projected request has generation limit `1` and wire `max_tokens=1`. The
+runtime contract retains the Attempt 006 bounds: llama.cpp family and Q4_0
+model configuration, context 8192, one slot, metrics enabled,
+`connect_timeout_ms=1000`, and `request_timeout_ms=600000`. Preparation and
+preflight are zero-network and never start, stop, probe, or configure
+llama.cpp.
+
+Arm-local run records explicitly persist state, epoch identity, request
+fingerprints, transport attempts, complete responses, normalized cases, raw
+evidence, normalized result or failure, and provenance. A complete record must
+contain exactly its two certified cases; partial or failed records cannot carry
+a complete normalized result. This closes the new fresh-arm durability boundary
+without rewriting the historical P0-L6C runner or its Attempt 001-006
+evidence.
+
+The fresh-arm semantic experiment ID is deterministic and distinct from the
+P0-L6B parent. It includes the design schema/version, parent identity, exact
+control/treatment and A1-to-C1 diffs, the P0-L13 candidate-pair identity,
+runtime profile, and configuration fingerprint. Epoch IDs are excluded so
+re-arming the same design does not alter semantic identity, and prompts are
+not perturbed. Offline aggregation produces source-aware P0-L8 control,
+treatment, and A1-to-C1 diagnostics and then uses the corrected P0-L12
+provenance/envelope paths. There is no composite score; positive, equivalent,
+worse, insufficient, and mismatch outcomes remain distinct. Causality is
+`not_established`, and performance/application claims remain disallowed.
+
+The P0-L6E focused offline suite covers arm shape, B1 removal, identity and
+freshness gates, exact runtime/generation bounds, zero-network preflight,
+independent fake execution, arm-local persistence, aggregation, evidence
+source, P0-L13 identity reuse, claim permissions, and deterministic identity.
+No listener check, localhost contact, inference, evidence-directory change,
+Attempt 007, ContextBench, or P0-L14 work occurred.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.

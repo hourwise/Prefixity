@@ -13,6 +13,7 @@ mod diff;
 mod error;
 mod external_artifact_admission;
 mod fixtures;
+mod fresh_arm;
 mod hashing;
 mod layout_planner;
 mod live_harness;
@@ -87,6 +88,14 @@ pub use external_artifact_admission::{
     EXTERNAL_ARTIFACT_ADMISSION_SCHEMA_VERSION, MAX_MANIFEST_BYTES,
 };
 pub use fixtures::build_seed;
+pub use fresh_arm::{
+    aggregate_fresh_arm_results, execute_fresh_arm, finalize_fresh_arm_record,
+    fresh_arm_config_fingerprint, persist_fresh_arm_record, preflight_fresh_arm_experiment,
+    prepare_fresh_arm_experiment, FreshArmAggregationRecord, FreshArmDefinition,
+    FreshArmExperimentDefinition, FreshArmKind, FreshArmReadiness, FreshArmReadinessRecord,
+    FreshArmRunRecord, FreshArmStep, FRESH_ARM_AGGREGATION_SCHEMA_ID,
+    FRESH_ARM_AGGREGATION_SCHEMA_VERSION, FRESH_ARM_SCHEMA_ID, FRESH_ARM_SCHEMA_VERSION,
+};
 pub use layout_planner::{
     plan_context_layout, plan_request_layout, CandidateSafetyStatus, ContextLayoutPlan,
     LayoutCandidate, LayoutPlanningConstraints, LayoutSegmentReference, LayoutStructuralMetrics,
