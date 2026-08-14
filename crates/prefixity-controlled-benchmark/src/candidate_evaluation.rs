@@ -6,6 +6,7 @@
 //! claim.
 
 use crate::capability_registry::{CapabilityKey, CapabilityProfile, CapabilityState};
+use crate::diff::EnvelopeDiff;
 use crate::error::BenchmarkError;
 use crate::hashing::canonical_hash;
 use crate::layout_planner::{CandidateSafetyStatus, LayoutCandidate};
@@ -639,6 +640,11 @@ fn classify_observation(
     }
     if diagnostic.request_diff != candidate.request_diff {
         reasons.insert(ObservationRelevanceReason::CandidateMutationMismatch);
+    }
+    if !envelope_compatible(
+        &diagnostic.request_diff.envelope_diff,
+        &candidate.request_diff.envelope_diff,
+    ) {
         reasons.insert(ObservationRelevanceReason::EnvelopeCompatibilityMismatch);
     }
     if matches!(
@@ -682,6 +688,18 @@ fn classify_observation(
         association: diagnostic.evidence.association,
         causality: diagnostic.evidence.causality,
     }
+}
+
+/// Compare envelope semantics without treating the request fingerprints that
+/// identify the surrounding request pair as envelope fields.  A context or
+/// ordering mutation can legitimately change those fingerprints while the
+/// provider envelope remains identical.
+fn envelope_compatible(left: &EnvelopeDiff, right: &EnvelopeDiff) -> bool {
+    left.schema_id == right.schema_id
+        && left.schema_version == right.schema_version
+        && left.identical == right.identical
+        && left.changes == right.changes
+        && left.cache_impact == right.cache_impact
 }
 
 fn add_identity_reasons(
@@ -1144,6 +1162,48 @@ mod tests {
         assert!(evaluation
             .blockers
             .contains(&EvidenceBlocker::ObservationIdentityMismatch));
+    }
+
+    #[test]
+    fn unrelated_request_fingerprint_does_not_imply_envelope_mismatch() {
+        let candidate = candidate();
+        let mut diagnostic = diagnostic(
+            &candidate,
+            EvidenceSourceClass::ExperimentallyObservedRuntime,
+            50,
+        );
+        diagnostic.request_diff.left_request_fingerprint = "unrelated-left".to_string();
+        diagnostic.request_diff.right_request_fingerprint = "unrelated-right".to_string();
+        let evaluation = evaluate(&candidate, Some(&profile()), &[diagnostic]);
+        assert_eq!(
+            evaluation.observations[0].relevance,
+            ObservationRelevance::Rejected
+        );
+        assert!(evaluation.observations[0]
+            .reasons
+            .contains(&ObservationRelevanceReason::CandidateMutationMismatch));
+        assert!(!evaluation.observations[0]
+            .reasons
+            .contains(&ObservationRelevanceReason::EnvelopeCompatibilityMismatch));
+    }
+
+    #[test]
+    fn genuine_envelope_difference_remains_rejected_as_envelope_mismatch() {
+        let candidate = candidate();
+        let mut diagnostic = diagnostic(
+            &candidate,
+            EvidenceSourceClass::ExperimentallyObservedRuntime,
+            50,
+        );
+        diagnostic.request_diff.envelope_diff.identical = false;
+        let evaluation = evaluate(&candidate, Some(&profile()), &[diagnostic]);
+        assert_eq!(
+            evaluation.observations[0].relevance,
+            ObservationRelevance::Rejected
+        );
+        assert!(evaluation.observations[0]
+            .reasons
+            .contains(&ObservationRelevanceReason::EnvelopeCompatibilityMismatch));
     }
 
     #[test]

@@ -400,6 +400,63 @@ historical Attempt 001, Attempt 002, and Attempt 005 artifacts remain
 unchanged. P0-L6C live execution is complete for this authorized bounded run;
 no Attempt 007, ContextBench integration, or P0-L14 work began.
 
+P0-L6D reconciled the complete Attempt 006 evidence offline. The audit started
+from `main` and `origin/main` at
+`bd57147a85e7908c75678af8ee4daccf0256b98b` with a clean worktree, confirmed the
+recorded Attempt 001-006 history and no Attempt 007 directory, and preserved
+all fifteen original Attempt 006 artifacts byte-for-byte. The derived record is
+`docs/phase-0/evidence/p0-l6d-attempt-006-derived-reconciliation.json`; it is
+not a replacement for the original ignored run evidence.
+
+The original P0-L12 audit distinguishes three supplied diagnostics. A0-to-A1
+and C0-to-C1 were control/treatment mutation pairs, not the materialized
+candidate relationship, so their candidate-mutation rejection was correct. The
+candidate relationship is A1-to-C1, as established by the P0-L11/P0-L13
+materialization identities and the paired definition's `primary_comparison`:
+source `a6945fde5281b924592b91179c1523cc17ec7dfd0c0b2ff2ad68922890d9aff3`,
+candidate `c176a81ed1de20882cdc402b72870f5ac6900b8df24dc0c1333ee3cefbf8d32b`,
+RequestDiff `b74a3d636a3cd73c1bcf69965e88b1d503331ff77ed1b5bcf7c0336dd84766a2`.
+P0-L8 runtime identity, model/provider/protocol/build identity,
+comparability, alignment, and accounting fields passed. The old evaluator's
+envelope rejection for the two unrelated diagnostics was a bounded mapping
+defect: it compared the complete RequestDiff, so different request-pair
+fingerprints were mistaken for different provider envelopes. Genuine envelope
+differences remain rejecting.
+
+The other bounded wiring defect was provenance projection. The conformance
+diagnostic constructor defaulted every case to `synthetic_protocol_test`, even
+when the live runner's provenance described a loopback runtime observation. A
+source-aware constructor now preserves the caller's evidence class; the old
+default remains synthetic, and synthetic evidence cannot become experimental
+without an explicit source supplied by the live evidence path. No P0-L12 gate
+was weakened.
+
+The existing documented P0-L9 llama.cpp protocol profile was selected only at
+its existing `supported_documented` strength (profile
+`02e24385723dc1df1c57d4a0bca0fd92d75bb57ac269429e1068b7349efa4e47`; model and
+runtime-version unknown; documented protocol scope). It was not promoted by
+the Attempt 006 token accounting. Offline production projection reconstructed
+A0/A1/B1/C0/C1 with `max_tokens=1` for all five; normalized request identities
+and persisted provider-body SHA-256 identities matched. Provider-body byte
+common prefixes were 5592, 8442, and 5582 for A0/A1, C0/C1, and A1/C1
+respectively. Token-level prefix lengths were not inferred.
+
+The derived P0-L12 evaluation admits only A1-to-C1 as relevant and returns
+`unsupported_by_current_evidence` from its unchanged
+`no_observed_cache_reuse_change` assessment. A0-to-A1 and C0-to-C1 remain
+rejected as unrelated. Causality remains `not_established`; performance,
+causal, and automatic-application claims remain disallowed. The historical
+Attempt 006 evaluation remains `structural_only` and is not rewritten as if it
+had contained the derived profile or source class.
+
+Attempt 006 is therefore classified as structurally discriminating but with
+runtime-accounting interpretation insufficient/mixed for the intended
+stable-before-volatile hypothesis. The one-slot A0/A1/B1/C0/C1 order, the C0
+to C1 adjacency, and prior-state carryover prevent a causal interpretation of
+equal A1/C1 accounting. Partial-run durability remains separate deferred work.
+No Attempt 007, localhost contact, inference, ContextBench integration, or
+P0-L14 work began in this reconciliation.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.

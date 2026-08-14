@@ -121,6 +121,20 @@ impl ObservationReference {
 
     /// Build a compact reference to a controlled conformance result.
     pub fn from_conformance_case(result: &ConformanceCaseResult, profile_id: Option<&str>) -> Self {
+        Self::from_conformance_case_with_source(
+            result,
+            profile_id,
+            EvidenceSourceClass::SyntheticProtocolTest,
+        )
+    }
+
+    /// Build a compact reference to a controlled conformance result while
+    /// preserving the evidence origin assigned by the caller.
+    pub fn from_conformance_case_with_source(
+        result: &ConformanceCaseResult,
+        profile_id: Option<&str>,
+        source: EvidenceSourceClass,
+    ) -> Self {
         Self::from_observation(
             &result.observation,
             ReferenceMetadata {
@@ -130,7 +144,7 @@ impl ObservationReference {
                 context_fingerprint: Some(result.context_fingerprint.clone()),
                 envelope_fingerprint: None,
                 profile_id: profile_id.map(str::to_owned),
-                source: EvidenceSourceClass::SyntheticProtocolTest,
+                source,
             },
         )
     }
@@ -444,7 +458,31 @@ pub fn diagnose_conformance_cache(
     right: &ConformanceCaseResult,
     profile_id: Option<&str>,
 ) -> CacheDiagnostic {
-    let comparison = compare_conformance_cases(left, right, profile_id);
+    diagnose_conformance_cache_with_source(
+        request_diff,
+        left,
+        right,
+        profile_id,
+        EvidenceSourceClass::SyntheticProtocolTest,
+    )
+}
+
+/// Variant of [`diagnose_conformance_cache`] that preserves the evidence
+/// origin supplied by the caller.  The default constructor remains synthetic
+/// for backwards compatibility with protocol-only fixtures.
+pub fn diagnose_conformance_cache_with_source(
+    request_diff: &RequestDiff,
+    left: &ConformanceCaseResult,
+    right: &ConformanceCaseResult,
+    profile_id: Option<&str>,
+    source: EvidenceSourceClass,
+) -> CacheDiagnostic {
+    let comparison = compare_observations_with_references(
+        &left.observation,
+        &right.observation,
+        ObservationReference::from_conformance_case_with_source(left, profile_id, source),
+        ObservationReference::from_conformance_case_with_source(right, profile_id, source),
+    );
     build_diagnostic(request_diff.clone(), comparison)
 }
 
@@ -1095,7 +1133,10 @@ fn alignment_name(alignment: RequestObservationAlignment) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{request_diff, ConformanceRequest, RequestContext, RequestEnvelope};
+    use crate::{
+        request_diff, CaseRelationship, ConformanceCaseResult, ConformanceRequest, MutationClass,
+        RequestContext, RequestEnvelope,
+    };
     use prefixity_core::observation::{
         CacheBehavior, ContextIdentity, ObservationOutcome, ResourceUsage, RuntimeIdentity,
         TimingObservation, TokenAccounting, CACHE_OBSERVATION_SCHEMA_VERSION,
@@ -1326,6 +1367,32 @@ mod tests {
             .evidence
             .statement
             .contains("causality=not_established"));
+    }
+
+    #[test]
+    fn conformance_reference_preserves_explicit_evidence_source() {
+        let result = ConformanceCaseResult {
+            experiment_id: "experiment".to_string(),
+            case_id: "case".to_string(),
+            mutation: MutationClass::Baseline,
+            relationship: CaseRelationship::Baseline,
+            request_fingerprint: "request".to_string(),
+            context_fingerprint: "context".to_string(),
+            observation: observation("observation"),
+        };
+        assert_eq!(
+            ObservationReference::from_conformance_case(&result, None).source,
+            EvidenceSourceClass::SyntheticProtocolTest
+        );
+        assert_eq!(
+            ObservationReference::from_conformance_case_with_source(
+                &result,
+                None,
+                EvidenceSourceClass::ExperimentallyObservedRuntime,
+            )
+            .source,
+            EvidenceSourceClass::ExperimentallyObservedRuntime
+        );
     }
 
     #[test]

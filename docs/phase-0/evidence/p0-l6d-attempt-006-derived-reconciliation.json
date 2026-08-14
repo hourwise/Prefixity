@@ -1,0 +1,157 @@
+{
+  "admission": [
+    {
+      "assessment": "mixed_observations",
+      "causality": "not_established",
+      "left_observation_id": "observation-8881fefee4246caa286be0a4",
+      "reasons": [
+        "candidate_mutation_mismatch"
+      ],
+      "relevance": "rejected",
+      "right_observation_id": "observation-f54708cd0201db976cb6dc12",
+      "source": "experimentally_observed_runtime"
+    },
+    {
+      "assessment": "no_observed_cache_reuse_change",
+      "causality": "not_established",
+      "left_observation_id": "observation-da26e3ab0a7524eee1ea64db",
+      "reasons": [
+        "candidate_mutation_mismatch"
+      ],
+      "relevance": "rejected",
+      "right_observation_id": "observation-ca2d9559ea09b9a5c7910c58",
+      "source": "experimentally_observed_runtime"
+    },
+    {
+      "assessment": "no_observed_cache_reuse_change",
+      "causality": "not_established",
+      "left_observation_id": "observation-f54708cd0201db976cb6dc12",
+      "reasons": [],
+      "relevance": "relevant",
+      "right_observation_id": "observation-ca2d9559ea09b9a5c7910c58",
+      "source": "experimentally_observed_runtime"
+    }
+  ],
+  "candidate_relationship": "A1_to_C1",
+  "diagnostic_source": "experimentally_observed_runtime",
+  "interpretation": {
+    "application_claims": "not_allowed",
+    "causality": "not_established",
+    "performance_claims": "not_allowed",
+    "scope": "Attempt 006 only; no generalized cache or performance claim"
+  },
+  "original_evidence_path": "experiments/runs/p0-l6c-first-live-paired-mutation-06",
+  "original_evidence_unchanged": true,
+  "p0_l12_evaluation": {
+    "blockers": [
+      "observation_identity_mismatch",
+      "no_observed_cache_benefit"
+    ],
+    "candidate": {
+      "candidate_id": "layout-e7fc579745aeabf52c215ec124df66d5c5c4cf97e2af8336d63fabb0f6ead97b",
+      "candidate_request_fingerprint": "c176a81ed1de20882cdc402b72870f5ac6900b8df24dc0c1333ee3cefbf8d32b",
+      "layout_fingerprint": "e7fc579745aeabf52c215ec124df66d5c5c4cf97e2af8336d63fabb0f6ead97b",
+      "request_diff_fingerprint": "b74a3d636a3cd73c1bcf69965e88b1d503331ff77ed1b5bcf7c0336dd84766a2",
+      "source_request_fingerprint": "a6945fde5281b924592b91179c1523cc17ec7dfd0c0b2ff2ad68922890d9aff3"
+    },
+    "capability": {
+      "capability": "prefix_reuse",
+      "profile": {
+        "identity_fingerprint": "e7e51658958d726749df39146bf6e466235a59d499b0f2bd4e4db27d9747c1b4",
+        "profile_id": "02e24385723dc1df1c57d4a0bca0fd92d75bb57ac269429e1068b7349efa4e47"
+      },
+      "state": "supported_documented"
+    },
+    "claim_permissions": {
+      "application_claims": "not_allowed",
+      "capability_claims": "allowed_if_evidenced",
+      "causal_claims": "not_allowed",
+      "observation_claims": "allowed_if_real_observation",
+      "performance_claims": "not_allowed",
+      "structural_claims": "allowed"
+    },
+    "evidence_state": "unsupported_by_current_evidence",
+    "experiment_readiness": {
+      "design": "ready",
+      "environment": "available",
+      "execution": "ready"
+    },
+    "hypothesis": "reduced_stability_inversion_may_increase_reusable_leading_context",
+    "next_action": "no_action",
+    "observations": [
+      {
+        "assessment": "mixed_observations",
+        "association": "structural_difference_with_observed_reuse_signal",
+        "causality": "not_established",
+        "diagnostic_fingerprint": "0f573f149d0a2c16e0d37f409f3b6490d636366fd78c92b82a2f0230828f8d33",
+        "left_observation_id": "observation-8881fefee4246caa286be0a4",
+        "reasons": [
+          "candidate_mutation_mismatch"
+        ],
+        "relevance": "rejected",
+        "right_observation_id": "observation-f54708cd0201db976cb6dc12",
+        "source": "experimentally_observed_runtime"
+      },
+      {
+        "assessment": "no_observed_cache_reuse_change",
+        "association": "structural_difference_with_observed_metric_change",
+        "causality": "not_established",
+        "diagnostic_fingerprint": "fde2e2b1424068ff908d6be7a41d186b361a0ac0e795f22a729355fcb6928ce0",
+        "left_observation_id": "observation-da26e3ab0a7524eee1ea64db",
+        "reasons": [
+          "candidate_mutation_mismatch"
+        ],
+        "relevance": "rejected",
+        "right_observation_id": "observation-ca2d9559ea09b9a5c7910c58",
+        "source": "experimentally_observed_runtime"
+      },
+      {
+        "assessment": "no_observed_cache_reuse_change",
+        "association": "structural_difference_with_observed_metric_change",
+        "causality": "not_established",
+        "diagnostic_fingerprint": "958ec52ffb507a9f25bb0334d98e33c5c79152235d618d9185b962198ae281bd",
+        "left_observation_id": "observation-f54708cd0201db976cb6dc12",
+        "reasons": [],
+        "relevance": "relevant",
+        "right_observation_id": "observation-ca2d9559ea09b9a5c7910c58",
+        "source": "experimentally_observed_runtime"
+      }
+    ],
+    "provenance": {
+      "environment": "available",
+      "evaluator_version": "p0-l12-v1",
+      "source": "p0-l10-p0-l11-candidate-plus-p0-l8-p0-l9-evidence"
+    },
+    "runtime_profile": {
+      "identity_fingerprint": "e7e51658958d726749df39146bf6e466235a59d499b0f2bd4e4db27d9747c1b4",
+      "profile_id": "02e24385723dc1df1c57d4a0bca0fd92d75bb57ac269429e1068b7349efa4e47"
+    },
+    "schema_id": "prefixity.candidate-evaluation",
+    "schema_version": 1,
+    "structural": {
+      "cache_impact": "unknown",
+      "candidate_inversion_count": 0,
+      "candidate_leading_segments": 5,
+      "candidate_unknown_boundary_count": 0,
+      "changed_relative_relationships": 1,
+      "moved_segment_count": 2,
+      "safety": "ordering_safe_under_declared_constraints",
+      "source_inversion_count": 1,
+      "source_leading_segments": 3,
+      "source_unknown_boundary_count": 0
+    }
+  },
+  "record_kind": "p0-l6d-derived-offline-reconciliation",
+  "selected_capability_profile": {
+    "backend": "llama.cpp",
+    "model": "unknown",
+    "prefix_reuse_state": "supported_documented",
+    "profile_id": "02e24385723dc1df1c57d4a0bca0fd92d75bb57ac269429e1068b7349efa4e47",
+    "protocol": "known:llama.cpp-openai-chat-v1",
+    "provider": "known:local",
+    "runtime": "known:llama.cpp",
+    "runtime_version": "unknown"
+  },
+  "selected_capability_profile_scope": "documented_protocol_surface_only",
+  "semantic_experiment_id": "0c8d479c092359941747f640552077400bc61e88b56a6ebd70c9ccfec9dd4a11"
+}

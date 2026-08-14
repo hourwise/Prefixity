@@ -91,6 +91,18 @@ present, request fingerprints, candidate mutation relationship, envelope
 alignment and P0-L8 comparability. Unrelated observations are retained as
 rejected evidence and do not influence the state.
 
+Request-pair fingerprints identify the compared requests; they are not
+themselves envelope fields. P0-L12 therefore compares the semantic envelope
+schema/state/changes/cache-impact projection separately from the surrounding
+RequestDiff fingerprints. A genuine envelope difference remains a rejection,
+while a context or ordering mutation with an identical envelope cannot acquire
+an envelope-mismatch reason merely because its request fingerprints differ.
+
+Controlled conformance diagnostics default to `synthetic_protocol_test` for
+offline fixtures. A live evidence path must explicitly provide
+`experimentally_observed_runtime`; the source-aware constructor preserves that
+provenance and does not promote synthetic evidence.
+
 Mixed signals remain mixed. For example, increased reused tokens combined with
 worse timing is not flattened into a validation result. A contrary observation
 can produce `unsupported_by_current_evidence`; Prefixity is allowed to

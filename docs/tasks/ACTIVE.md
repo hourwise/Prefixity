@@ -10,7 +10,9 @@ accounting observations, but P0-L8 causality remains not_established and
 P0-L12 remains structural_only; no capability, performance, or causal claim is
 supported. P0-L6C live execution is complete for this bounded run; no further
 live attempt is authorized by this run.
-P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
+P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete. P0-L6D is an
+offline evidence-admission and experiment-adequacy audit; it does not authorize
+another live attempt.
 
 ## P0-L6A completion record
 
@@ -290,6 +292,76 @@ separately authorized live execution, and recorded evidence are still pending.
   historical Attempt 001, Attempt 002, and Attempt 005 artifacts remain
   unchanged. P0-L6C live execution is complete for this authorized run, with
   no Attempt 007, ContextBench integration, or P0-L14 work started.
+
+## P0-L6D Attempt 006 evidence audit
+
+- The audit baseline was `main` at
+  `bd57147a85e7908c75678af8ee4daccf0256b98b`, matching `origin/main`, with a
+  clean tracked worktree, no Git lock or concurrent Prefixity writer, all
+  recorded Attempt 001-006 history present, and no Attempt 007 directory.
+  The fifteen original Attempt 006 artifacts were enumerated and hashed before
+  analysis. They remain byte-for-byte unchanged under the ignored run
+  directory. The separately identified derived record is
+  `docs/phase-0/evidence/p0-l6d-attempt-006-derived-reconciliation.json`.
+- The original P0-L12 rejection was audited field-by-field. P0-L8 runtime,
+  model, provider, protocol, runtime-version, identity-fingerprint,
+  comparability, alignment, and observation accounting fields were directly
+  comparable and passed. The candidate reference is exactly
+  `layout-e7fc579745aeabf52c215ec124df66d5c5c4cf97e2af8336d63fabb0f6ead97b`,
+  with source request fingerprint
+  `a6945fde5281b924592b91179c1523cc17ec7dfd0c0b2ff2ad68922890d9aff3`,
+  candidate request fingerprint
+  `c176a81ed1de20882cdc402b72870f5ac6900b8df24dc0c1333ee3cefbf8d32b`, and
+  RequestDiff fingerprint
+  `b74a3d636a3cd73c1bcf69965e88b1d503331ff77ed1b5bcf7c0336dd84766a2`.
+- The original A0-to-A1 diagnostic used request fingerprints
+  `83867458364518c6193f25e2eaca4d56e168d05bf20b9922df731781e61b4168` to
+  `a6945fde5281b924592b91179c1523cc17ec7dfd0c0b2ff2ad68922890d9aff3`; the
+  original C0-to-C1 diagnostic used
+  `51fdc731e55f13c05eb9607b244e5b9161da5afbfff3e9c0e8fe12b7c1d1632d` to
+  `c176a81ed1de20882cdc402b72870f5ac6900b8df24dc0c1333ee3cefbf8d32b`.
+  Both were correctly rejected as unrelated to the candidate mutation. Their
+  envelopes were nevertheless semantically identical; the old evaluator's
+  additional `envelope_compatibility_mismatch` was an incorrect mapping caused
+  by comparing the complete RequestDiff, including request-pair fingerprints.
+  The A1-to-C1 diagnostic is the semantically correct candidate relationship.
+- The original diagnostics were labelled `synthetic_protocol_test` because
+  the conformance-reference constructor hard-coded that source class. The
+  live runner's provenance did not reach the diagnostic records. The bounded
+  repair adds an explicit source-aware constructor and diagnostic function;
+  the existing default remains synthetic. P0-L12's safety criteria were not
+  weakened. The separate envelope comparison now ignores surrounding request
+  fingerprints while still rejecting genuine schema, envelope-state, field,
+  or cache-impact differences.
+- The P0-L9 documented llama.cpp protocol profile was selected by an exact
+  protocol query at its existing evidence strength:
+  profile `02e24385723dc1df1c57d4a0bca0fd92d75bb57ac269429e1068b7349efa4e47`,
+  `prefix_reuse=supported_documented`, model and runtime-version unknown, and
+  documented protocol scope only. Attempt 006 did not promote capability to
+  experimentally observed.
+- Offline production projection reconstructed A0/A1/B1/C0/C1 exactly. Every
+  projected request had `max_tokens=1`; normalized neutral request identities
+  and persisted provider-body SHA-256 identities all matched the historical
+  records. Serialized provider-body sizes were 8766, 8766, 8798, 8766, and
+  8766 bytes. Byte common prefixes were A0/A1=5592, C0/C1=8442, and
+  A1/C1=5582; the first difference was at each reported boundary. These are
+  byte-level quantities only, not token-level estimates.
+- The derived P0-L12 record admits only A1-to-C1 as relevant. A0-to-A1 and
+  C0-to-C1 remain rejected for `candidate_mutation_mismatch`; the corrected
+  diagnostic source is experimentally observed runtime, while causality stays
+  `not_established`. With the documented capability profile, the natural
+  derived state is `unsupported_by_current_evidence` because A1-to-C1 is
+  `no_observed_cache_reuse_change`. Performance, causal, and automatic
+  application claims remain disallowed. The original Attempt 006 state remains
+  `structural_only`; the derived result is not a rewritten historical result.
+- The experiment was structurally discriminating but runtime-accounting
+  interpretation is insufficient/mixed for the stable-before-volatile
+  hypothesis. The A0/A1, B1, C0, and C1 order was certified, but the one-slot
+  sequence `A0/A1/B1/C0/C1`, C0 immediately preceding C1, and prior-state
+  carryover make equal A1/C1 accounting insufficient to establish a causal
+  layout effect. The partial-run durability gap remains deferred; it was not
+  required for identity correctness in this audit. No Attempt 007, runtime
+  contact, inference, ContextBench integration, or P0-L14 work began.
 
 ## P0-L13 completion record
 
