@@ -353,6 +353,53 @@ also recorded: the paired path only constructs its bounded run record after
 the full sequence returns. P0-L6C remains incomplete and no further live
 attempt is authorized by this run.
 
+P0-L6C Attempt 006 is the first complete bounded live paired-mutation run.
+Before runtime contact, `main` and `origin/main` were verified at
+`ef41dd45805fb2da17afe38b9c324f1866333e1e` with a clean tracked worktree and
+the prior Attempt 001/002/005 artifacts preserved. The operator confirmed a
+fresh llama.cpp process with the model loaded and listening on
+`http://127.0.0.1:8080`; the task did not start, stop, or reconfigure that
+process. The zero-network preflight passed with the unchanged semantic
+experiment ID
+`0c8d479c092359941747f640552077400bc61e88b56a6ebd70c9ccfec9dd4a11`, exact
+`A0/A1/B1/C0/C1` sequencing, independent C0/C1 safety certificates,
+`generation_limit=1`, `connect_timeout_ms=1000`, and
+`request_timeout_ms=600000`. The frozen run identity is
+`f51be70e8c68f1648700e7822cca04d5c8623b155574286ff47a66e5d124079`, live
+identity is `6a2a7fd3cbe5a1469c85cca435394e4b2935af484763b2c40f2f1fb4072a74df`,
+and the runtime configuration fingerprint is
+`70d4495d9fdd8e42632556df083541d66205bd7f696c6ae08579655a785f50f1`.
+
+After the one permitted bounded TCP listener check passed, exactly five
+sequential transport requests were sent and every projected request contained
+`max_tokens=1`. Five complete HTTP responses were received, five cases were
+normalized, and five cases completed without retry or a second run. The
+bounded accounting was `A0=1172 transmitted / 0 cached / 1172 fresh / 1
+output`, `A1=1172 / 656 / 516 / 1`, `B1=1191 / 0 / 1191 / 1`,
+`C0=1172 / 656 / 516 / 1`, and `C1=1172 / 656 / 516 / 1`. Prompt-processing
+timings were approximately 30980, 10643, 64478, 12906, and 19573 ms in
+sequence. Time-to-first-token, wall duration, reconstructed context, and
+resource metrics were not observed.
+
+P0-L8 classified A0-to-A1 as `mixed_observations` with an observed reuse
+signal, while C0-to-C1 and A1-vs-C1 were both
+`no_observed_cache_reuse_change`; the latter two pairs had unchanged
+`656 cached / 516 fresh` accounting. These are bounded observations, not
+generalized cache evidence, and every causality field is
+`not_established`. P0-L12 evaluated the materialized candidate through the
+existing evaluator as `evidence_state=structural_only`; its observations were
+rejected for candidate/envelope mismatch or insufficient observation fields,
+capability evidence was not provided, and causal/performance claims remain
+disallowed. The scoped interpretation is
+`hypothesis=bounded_observed_result_requires_scoped_interpretation` with
+`causality=not_established`.
+
+The complete bounded Attempt 006 evidence is preserved under the ignored
+`experiments/runs/p0-l6c-first-live-paired-mutation-06/` directory, and the
+historical Attempt 001, Attempt 002, and Attempt 005 artifacts remain
+unchanged. P0-L6C live execution is complete for this authorized bounded run;
+no Attempt 007, ContextBench integration, or P0-L14 work began.
+
 Phase 1A tooling is repository-level evidence tooling rather than a new runtime
 crate: the existing thin importer/adapter in `tools/phase1a_tracebench.py`
 preserves source provenance and keeps evaluation labels outside observer inputs.

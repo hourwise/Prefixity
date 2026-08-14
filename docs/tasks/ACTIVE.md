@@ -2,10 +2,14 @@
 
 Status: P0-L6C-R1 repair complete; P0-L6C Attempt 002 is preserved as
 runtime-blocked / failed before inference, Attempt 003 is readiness-blocked
-before inference, Attempt 004 is readiness-blocked before preflight, and
-Attempt 005 is an execution-invalidated partial live run caused by a missing
-generation bound in the projected request. P0-L6C remains incomplete; no
-further live attempt is authorized by this run.
+before inference, Attempt 004 is readiness-blocked before preflight, Attempt
+005 is an execution-invalidated partial live run caused by a missing generation
+bound in the projected request, and Attempt 006 is the first complete bounded
+live paired-mutation run. Attempt 006 produced bounded structural/cache
+accounting observations, but P0-L8 causality remains not_established and
+P0-L12 remains structural_only; no capability, performance, or causal claim is
+supported. P0-L6C live execution is complete for this bounded run; no further
+live attempt is authorized by this run.
 P0-L1 through P0-L5 and P0-L7 through P0-L13 remain complete.
 
 ## P0-L6A completion record
@@ -233,6 +237,59 @@ separately authorized live execution, and recorded evidence are still pending.
   hypothesis: `hypothesis=unmeasured / insufficient` and
   `causality=not_established`. No retry, Attempt 006, tuning, second
   experiment, ContextBench integration, or P0-L14 work occurred.
+
+## P0-L6C Attempt 006 execution record
+
+- Before runtime contact, the baseline was verified on `main` at
+  `ef41dd45805fb2da17afe38b9c324f1866333e1e`, matching `origin/main`, with a
+  clean tracked worktree, no Git lock, and the prior Attempt 001/002/005
+  evidence preserved. CI run `#58` was successful. The operator supplied a
+  fresh `model loaded` / `listening on http://127.0.0.1:8080` confirmation; the
+  existing llama.cpp process was not started, stopped, or reconfigured by this
+  task.
+- The zero-network preflight passed with the unchanged semantic experiment ID
+  `0c8d479c092359941747f640552077400bc61e88b56a6ebd70c9ccfec9dd4a11`, exact
+  sequence `A0/A1/B1/C0/C1`, one A0 baseline, independent C0/C1 safety
+  certificates, `generation_limit=1`, and
+  `connect_timeout_ms=1000` / `request_timeout_ms=600000`. The frozen run
+  identity is `f51be70e8c68f1648700e7822cca04d5c8623b155574286ff47a66e5d124079`,
+  live identity is
+  `6a2a7fd3cbe5a1469c85cca435394e4b2935af484763b2c40f2f1fb4072a74df`, and
+  runtime configuration fingerprint is
+  `70d4495d9fdd8e42632556df083541d66205bd7f696c6ae08579655a785f50f1`.
+- After the permitted bounded TCP listener check passed, exactly five
+  sequential transport requests were sent. Every projected request contained
+  `max_tokens=1`; all five returned complete HTTP responses, normalized
+  successfully, and completed. No retry, second run, unbounded generation, or
+  additional request occurred. The bounded case accounting was:
+  `A0=1172 transmitted / 0 cached / 1172 fresh / 1 output`,
+  `A1=1172 / 656 / 516 / 1`, `B1=1191 / 0 / 1191 / 1`,
+  `C0=1172 / 656 / 516 / 1`, and `C1=1172 / 656 / 516 / 1`.
+  Prompt-processing timings were approximately 30980, 10643, 64478, 12906,
+  and 19573 ms respectively. Time-to-first-token, wall duration, reconstructed
+  context, and resource metrics were not observed.
+- P0-L8 classified A0-to-A1 as `mixed_observations` with an observed reuse
+  signal (`provider_cached_tokens` increased from 0 to 656 and fresh prefill
+  decreased from 1172 to 516), C0-to-C1 as
+  `no_observed_cache_reuse_change`, and A1-vs-C1 as
+  `no_observed_cache_reuse_change`. The latter two pairs had unchanged
+  `656 cached / 516 fresh` accounting; the C0 observation is retained as
+  observed runtime behavior, not generalized cache evidence. All comparisons
+  were directly comparable and all causality fields are
+  `not_established`.
+- P0-L12 evaluated the materialized A1-to-C1 candidate through the existing
+  evaluator and returned `evidence_state=structural_only`. The observations
+  were rejected for candidate/envelope mismatch or insufficient observation
+  fields, capability evidence was not provided, and causal/performance claims
+  remain disallowed. The bounded interpretation is
+  `hypothesis=bounded_observed_result_requires_scoped_interpretation` and
+  `causality=not_established`; this is not a capability or general cache
+  conclusion.
+- The complete bounded evidence is preserved under the ignored
+  `experiments/runs/p0-l6c-first-live-paired-mutation-06/` directory. The
+  historical Attempt 001, Attempt 002, and Attempt 005 artifacts remain
+  unchanged. P0-L6C live execution is complete for this authorized run, with
+  no Attempt 007, ContextBench integration, or P0-L14 work started.
 
 ## P0-L13 completion record
 
