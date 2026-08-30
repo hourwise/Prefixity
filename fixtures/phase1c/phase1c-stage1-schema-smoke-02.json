@@ -1,0 +1,24 @@
+{
+  "fixture_id": "phase-1c-stage1-schema-smoke-02",
+  "fixture_version": 1,
+  "phase": "phase-1c",
+  "purpose": "schema_smoke_only",
+  "scored": false,
+  "scored_task_ids": [],
+  "contains_evaluator_answer_material": false,
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are performing a schema and transport validation. Return only one JSON object matching the requested fields. Do not include Markdown or explanatory prose."
+    },
+    {
+      "role": "user",
+      "content": "Return a JSON object containing exactly these semantic values: schema_version=phase1c-stage1-smoke-v1; status=ok; marker=PREFIXITY_PHASE1C_STAGE1."
+    }
+  ],
+  "expected_payload": {
+    "schema_version": "phase1c-stage1-smoke-v1",
+    "status": "ok",
+    "marker": "PREFIXITY_PHASE1C_STAGE1"
+  }
+}

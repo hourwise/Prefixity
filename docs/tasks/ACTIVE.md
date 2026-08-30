@@ -1585,3 +1585,63 @@ No live action occurred during the review: new inference requests `0`, review
 network calls `0`, retries `0`, scored capability requests `0`, and Prefixity
 behavioral changes `0`. The raw evidence, runtime contract, and adapter remain
 unchanged. Remediation options are documented for separate authorization only.
+
+## Phase 1C Stage 1 reasoning-off remediation preparation
+
+The accepted Stage 1 preparation, failed smoke, and offline forensic review
+lineage was promoted to `main` by fast-forward. Canonical `main` and
+`origin/main` both resolve to `74f4db764d398711006fd20017e186febeb3ee14`.
+The remediation branch was created from that promoted tip as
+`agent/phase-1c-stage1-reasoning-off-smoke`; it is intentionally not merged
+back to `main`.
+
+Smoke 01 remains permanently consumed and frozen. Its preserved response
+SHA-256 remains
+`223006f5bed5fec81dae02097e3e723d8c8d3a5997c8ebb116841e95914eb048`, and the
+accepted forensic-review SHA-256 remains
+`f9ef96b36ba42da544adaeccafc9e38830e1efa9d7e456d4214c7df3e9a8705c`.
+
+The new offline-only V2 runtime contract is
+`docs/phase-1/PHASE_1C_STAGE1_LOCAL_QWEN_RUNTIME_CONTRACT_V2.json`, with
+canonical SHA-256
+`b57462a22c91649e9e629b22d65214cdea7a47a38570506256c0b945467fe882`.
+It retains the V1 model, Q4_0 quantization, llama.cpp engine, context `8192`,
+parallelism `1`, metrics, loopback endpoint, generation settings, request and
+output contracts, retry ceiling `0`, and request ceiling `1`. Its only runtime
+behavioral delta is the explicit llama.cpp setting `reasoning=off`, selected
+to address the reviewed `THINKING_BUDGET_EXHAUSTION` failure while preserving
+the content-only response contract. The V2 sidecar records the same
+canonical fingerprint.
+
+The distinct non-scored Smoke 02 identity is
+`phase-1c-stage1-schema-smoke-02`, with fixture
+`fixtures/phase1c/phase1c-stage1-schema-smoke-02.json`. Its semantic request
+content and generation parameters are unchanged from Smoke 01; its request
+projection and wire-request SHA-256 are both
+`49cbcae3c82924542434d5e8f8f92994096d9ce032b99e475a89cdcdc8805b94`.
+The estimated input size is `122` tokens against the `4096` bound. The fixture
+has no scored task IDs, and its planned evidence location is
+`experiments/runs/phase1c-stage1-schema-smoke-02`.
+
+The checked-in Rust helper
+`phase1c_stage1_reasoning_off_preflight` performs only bounded offline
+contract, fixture, lineage, fingerprint, and evidence-integrity validation.
+The existing V1 live adapter was not changed; no production behavior was
+changed. The preflight returned `PREPARED` with `network_calls=0` and
+`inference_requests=0`, verified that the Smoke 02 evidence location is
+absent, and revalidated the frozen Smoke 01 and forensic-review hashes.
+
+Validation completed offline: package tests passed (`42` library tests plus
+all controlled-benchmark integration groups), formatting passed, and the
+reasoning-off preflight binary passed. No server was started, no listener
+check was performed, and no inference request was issued during this
+preparation. The scored capability cohort remains at zero requests, and the
+scored reasoning decision remains undecided.
+
+This branch is ready only for a separately authorized Smoke 02 execution
+gate. Before any live action, the operator must freshly confirm the exact
+model `ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, Q4_0 quantization, context `8192`,
+parallel slots `1`, metrics enabled, `reasoning=off`, endpoint base
+`http://127.0.0.1:8080`, and zero inference requests since startup. A future
+authorized execution may then perform exactly one permitted listener check
+and exactly one Smoke 02 request, with no retry or additional inference.

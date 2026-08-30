@@ -1,0 +1,155 @@
+{
+  "contract_version": "phase1c-stage1-local-qwen-runtime-v2",
+  "experiment_id": "phase-1c-stage1-schema-smoke-02",
+  "phase": "phase-1c",
+  "purpose": "schema_smoke_only",
+  "engine": "llama.cpp",
+  "server_executable_family": ["llama", "llama-server"],
+  "api_surface": "llama.cpp-openai-compatible-chat-completions-v1",
+  "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+  "host": "127.0.0.1",
+  "port": 8080,
+  "model": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+  "quantization": "Q4_0",
+  "context_size": 8192,
+  "parallel_slots": 1,
+  "metrics": "enabled",
+  "credential_policy": {
+    "required": false,
+    "authorization_header": "none",
+    "account": "not applicable",
+    "region": "not applicable",
+    "pricing_spend_profile": "local runtime \u2014 no provider spend",
+    "provider_api_key_read": false
+  },
+  "generation": {
+    "temperature": 0,
+    "top_p": 1,
+    "max_tokens": 256,
+    "stream": false,
+    "seed": {
+      "value": 1,
+      "status": "applied"
+    }
+  },
+  "timeout_policy": {
+    "connect_timeout_ms": 1000,
+    "complete_request_timeout_ms": 600000,
+    "supervisor_timeout_ms": 660000
+  },
+  "retry_policy": {
+    "automatic_retries": 0,
+    "fallback_requests": 0,
+    "adaptive_replicates": 0
+  },
+  "request_ceiling": 1,
+  "input_schema_id": "prefixity.phase1c.stage1.local-qwen-request-v1",
+  "output_schema_id": "prefixity.phase1c.stage1.smoke-v1",
+  "freshness": {
+    "required": true,
+    "zero_inference_requests_since_startup": true,
+    "maximum_non_inference_listener_checks": 1
+  },
+  "runtime_settings": {
+    "reasoning": "off"
+  },
+  "launch": {
+    "executable": "llama",
+    "arguments": [
+      "serve",
+      "-hf",
+      "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+      "-c",
+      "8192",
+      "-np",
+      "1",
+      "--metrics",
+      "--reasoning",
+      "off",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8080"
+    ]
+  },
+  "parent_contract": {
+    "path": "docs/phase-1/PHASE_1C_STAGE1_LOCAL_QWEN_RUNTIME_CONTRACT.json",
+    "sha256": "6d32375c24d51b98d82a8873d6e0f03f1d8c9b59799b843cd3a3d69c05b097b3"
+  },
+  "parent_experiment_id": "phase-1c-stage1-schema-smoke-01",
+  "forensic_basis": {
+    "review_path": "docs/phase-1/PHASE_1C_STAGE1_FAILED_SMOKE_FORENSIC_REVIEW.md",
+    "review_sha256": "f9ef96b36ba42da544adaeccafc9e38830e1efa9d7e456d4214c7df3e9a8705c",
+    "primary_classification": "THINKING_BUDGET_EXHAUSTION",
+    "secondary_classification": "RUNTIME_RESPONSE_SHAPE_INCOMPATIBILITY",
+    "failed_response_sha256": "223006f5bed5fec81dae02097e3e723d8c8d3a5997c8ebb116841e95914eb048"
+  },
+  "remediation": {
+    "id": "reasoning-off",
+    "changed_runtime_field": "reasoning",
+    "changed_runtime_value": "off",
+    "reason": "Prevent separate reasoning output from consuming the fixed completion limit before ordinary message.content JSON is emitted.",
+    "scope": "this non-scored Stage 1 schema smoke only",
+    "scored_capability_decision": "undecided and separately gated"
+  },
+  "unchanged_runtime_fields": [
+    "engine",
+    "server_executable_family",
+    "api_surface",
+    "endpoint",
+    "host",
+    "port",
+    "model",
+    "quantization",
+    "context_size",
+    "parallel_slots",
+    "metrics",
+    "credential_policy",
+    "generation",
+    "timeout_policy",
+    "retry_policy",
+    "request_ceiling",
+    "input_schema_id",
+    "output_schema_id",
+    "freshness",
+    "contamination_rules",
+    "prohibited_claims",
+    "candidate_source_commit",
+    "design_commit"
+  ],
+  "changed_runtime_fields": ["reasoning"],
+  "contamination_rules": [
+    "dedicated non-scored fixture only",
+    "no h001-h012 scored cohort task material",
+    "no evaluator answer material or gold labels from the scored cohort",
+    "no response-format grammar or JSON-schema constrained decoding",
+    "no credentials or authorization headers",
+    "no automatic retry, fallback, warmup, or calibration"
+  ],
+  "permitted_claims": [
+    "PHASE 1C STAGE 1 LOCAL QWEN REASONING-OFF SCHEMA SMOKE PASSED",
+    "live request-response-normalization-evidence pipeline structurally validated"
+  ],
+  "prohibited_claims": [
+    "Prefixity preserves capability",
+    "Prefixity improves capability",
+    "Prefixity reduces context safely",
+    "Prefixity beats BASELINE or NO_OP",
+    "Qwen performance, cache, latency, or application outcome improved"
+  ],
+  "invalidation_rules": [
+    "any existing smoke-02 evidence directory invalidates preparation",
+    "any model, quantization, context, slot, metrics, endpoint, credential, or generation drift invalidates preparation",
+    "any nonzero retry, fallback, replicate, or second request invalidates the smoke",
+    "nonempty reasoning_content under reasoning=off is recorded as a contract violation and cannot be substituted for message.content",
+    "malformed, fenced, prose, or semantically incorrect message.content fails the smoke"
+  ],
+  "candidate_source_commit": "748e4673e8454d2ac3e27cefabee9259992038aa",
+  "design_commit": "36f960579e55c7ad48e54e4cb2670cc55cd1ef3e",
+  "evidence_location": "experiments/runs/phase1c-stage1-schema-smoke-02",
+  "fingerprint": {
+    "algorithm": "SHA-256",
+    "canonicalization": "sorted JSON object keys; arrays preserve order",
+    "recorded_in": "docs/phase-1/PHASE_1C_STAGE1_LOCAL_QWEN_RUNTIME_CONTRACT_V2.sha256"
+  }
+}

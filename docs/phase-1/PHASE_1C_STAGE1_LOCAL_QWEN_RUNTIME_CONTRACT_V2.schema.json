@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prefixity.phase1c.stage1.local-qwen-runtime-v2",
+  "title": "Prefixity Phase 1C Stage 1 local Qwen reasoning-off runtime contract",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "contract_version",
+    "experiment_id",
+    "parent_contract",
+    "parent_experiment_id",
+    "forensic_basis",
+    "remediation",
+    "runtime_settings",
+    "launch",
+    "changed_runtime_fields",
+    "invalidation_rules"
+  ],
+  "properties": {
+    "contract_version": {"const": "phase1c-stage1-local-qwen-runtime-v2"},
+    "experiment_id": {"const": "phase-1c-stage1-schema-smoke-02"},
+    "parent_contract": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "docs/phase-1/PHASE_1C_STAGE1_LOCAL_QWEN_RUNTIME_CONTRACT.json"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "parent_experiment_id": {"const": "phase-1c-stage1-schema-smoke-01"},
+    "forensic_basis": {"type": "object", "required": ["review_path", "review_sha256", "failed_response_sha256"]},
+    "remediation": {"type": "object", "required": ["id", "changed_runtime_field", "changed_runtime_value"]},
+    "runtime_settings": {
+      "type": "object",
+      "required": ["reasoning"],
+      "properties": {"reasoning": {"const": "off"}}
+    },
+    "launch": {
+      "type": "object",
+      "required": ["executable", "arguments"],
+      "properties": {
+        "executable": {"const": "llama"},
+        "arguments": {"type": "array", "contains": {"const": "--reasoning"}}
+      }
+    },
+    "changed_runtime_fields": {"const": ["reasoning"]},
+    "invalidation_rules": {"type": "array", "minItems": 1}
+  }
+}
