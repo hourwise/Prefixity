@@ -1487,3 +1487,45 @@ explicit action/result/dependency/removability identity and task-quality joins.
 Do not begin that task or Phase 1C as part of this completion.
 
 Findings: `docs/phase-1/PHASE_1B4_EVIDENCE_ADAPTER_RECHARACTERIZATION.md`.
+
+## Phase 1C Stage 1 local Qwen preparation record
+
+The explicitly authorized local runtime contract is now tracked at
+`docs/phase-1/PHASE_1C_STAGE1_LOCAL_QWEN_RUNTIME_CONTRACT.json`, with its
+canonical SHA-256 persisted in the adjacent `.sha256` file. The dedicated,
+non-scored fixture is
+`phase1c-stage1-schema-smoke-01`; it is not one of `h001` through `h012` and
+contains no evaluator-answer material. Request and output schemas are tracked
+under `docs/phase-1/schemas/`.
+
+An isolated llama.cpp OpenAI-compatible Chat Completions adapter was added to
+`prefixity-controlled-benchmark`; `prefixity-live` and production Prefixity
+provider, candidate, arm, and planner behavior were not changed. The adapter
+freezes model `ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, Q4_0, context 8192, one slot,
+metrics enabled, temperature 0, top-p 1, max-tokens 256, stream false, seed 1,
+one request maximum, zero retries/fallbacks/replicates, and the authorized
+loopback endpoint. It performs at most one non-inference TCP listener check and
+will not perform it until fresh-runtime confirmation is explicitly supplied.
+
+Offline evidence: the real-file preflight passed with contract SHA
+`6d32375c24d51b98d82a8873d6e0f03f1d8c9b59799b843cd3a3d69c05b097b3`, fixture
+SHA `98b6141de86b56c0e8f2f75633e67c88c4c26f344a020a347c004b704cd68584`,
+request-schema SHA `23d7c3202b12d5f5517f2f0e0156bfa1523a0ecd363cddc7835dc42716acceca`,
+output-schema SHA `d8abcc102303dc8e19b80d9647ece9103909a88accf620dd0efdc04e1b7bf51b`,
+request-projection SHA `ec8ffc0d3ffba782c48f0d49f12a43a357098f7a2f6bdda7bc6146c00a2b6c2d`,
+and wire-request SHA
+`ec97953bbb9e9115d9ae63885092fbc0d606daf192dcaafc47c069d45900592d`.
+Estimated input size is 123 tokens against the 4096-token bound. Package tests
+(40 library tests and all controlled-benchmark integration groups) and strict
+offline clippy passed; formatting and diff checks passed. This preparation
+performed zero network calls, zero readiness checks, and zero inference
+requests. It does not authorize or claim a schema-smoke result.
+
+The execution branch remains
+`agent/phase-1c-capability-stage1-smoke`, separate from canonical `main`.
+Execution is pending the operator's explicit current confirmation that the
+fresh server has the exact model loaded, context 8192, one parallel slot,
+metrics enabled, endpoint base `http://127.0.0.1:8080`, and zero inference
+requests since startup. After that confirmation, the next execution turn may
+perform exactly one listener check and exactly one non-scored schema-smoke
+request, with no retry.

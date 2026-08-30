@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prefixity.phase1c.stage1.local-qwen-request-v1",
+  "title": "Prefixity Phase 1C Stage 1 local Qwen smoke request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["model", "messages", "temperature", "top_p", "max_tokens", "stream", "seed"],
+  "properties": {
+    "model": {"const": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0"},
+    "messages": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "content"],
+        "properties": {
+          "role": {"enum": ["system", "user"]},
+          "content": {"type": "string"}
+        }
+      }
+    },
+    "temperature": {"const": 0},
+    "top_p": {"const": 1},
+    "max_tokens": {"const": 256},
+    "stream": {"const": false},
+    "seed": {"const": 1}
+  }
+}
