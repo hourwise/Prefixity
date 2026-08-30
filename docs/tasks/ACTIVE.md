@@ -1529,3 +1529,39 @@ metrics enabled, endpoint base `http://127.0.0.1:8080`, and zero inference
 requests since startup. After that confirmation, the next execution turn may
 perform exactly one listener check and exactly one non-scored schema-smoke
 request, with no retry.
+
+## Phase 1C Stage 1 local Qwen execution record
+
+The operator supplied the explicit fresh-runtime confirmation for the exact
+local llama.cpp selection: model `ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, context
+8192, one parallel slot, metrics enabled, loopback base
+`http://127.0.0.1:8080`, and zero requests since startup. The isolated runner
+performed exactly one non-inference TCP listener check; it passed in 6 ms.
+
+The dedicated fixture `phase1c-stage1-schema-smoke-01` then received exactly
+one HTTP Chat Completions request. The request used the frozen projection
+fingerprint `ec97953bbb9e9115d9ae63885092fbc0d606daf192dcaafc47c069d45900592d`,
+with one transport attempt, one inference request, and zero automatic retries,
+fallbacks, or replicate requests. No scored task was consumed and no second
+request was issued.
+
+The server returned HTTP 200 with a complete 1,909-byte response. Its response
+body SHA-256 is
+`223006f5bed5fec81dae02097e3e723d8c8d3a5997c8ebb116841e95914eb048`.
+Recorded usage is `prompt_tokens=79`, `completion_tokens=256`,
+`total_tokens=335`, with `cached_tokens=0`; recorded timings remain raw
+llama.cpp telemetry. The exact extractor found an empty
+`choices[0].message.content`, so no semantic JSON payload could be parsed or
+normalized. The response also reported `finish_reason=length`; this is an
+execution observation only and does not establish a capability or performance
+claim.
+
+Final Stage 1 state is `FAILED` for the schema pipeline, not a pass and not a
+capability result. Evidence is preserved under the ignored directory
+`experiments/runs/phase1c-stage1-schema-smoke-01/`, including the preflight,
+readiness, request, raw response body, and final result record. The raw body
+was not repaired, the empty assistant content was not substituted, and no
+retry or additional inference is authorized from this result. Phase 1C
+inference accounting is now one request for this non-scored smoke; the scored
+capability cohort remains at zero requests. P0-L6 evidence and production
+provider behavior remain unchanged.
