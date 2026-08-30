@@ -22,6 +22,16 @@ Attempt 007 was executed or authorized by this slice. A future live run still
 requires a separately authorized operator-confirmed fresh listener for each
 arm boundary.
 
+The separately authorized Attempt 008 control and treatment epochs are now
+complete and durably persisted. The permitted deterministic aggregation is
+also persisted. No additional inference, B1 execution, or causal claim is
+permitted from this bounded result.
+
+Current P0-L6 status: `P0-L6 CLOSED — STRUCTURAL EVIDENCE ONLY — NEXT ACTION:
+GATHER CAPABILITY EVIDENCE`. Attempt 008 contains four certified inference
+requests total, exactly once each: A0, A1, C0, and C1. No B1 request was
+issued.
+
 ## P0-L6A completion record
 
 - Added a versioned loopback-only HTTP transport boundary for the existing
@@ -405,6 +415,190 @@ separately authorized live execution, and recorded evidence are still pending.
   profile. No listener check, localhost contact, inference, llama.cpp process
   control, evidence-directory mutation, Attempt 007, ContextBench, or P0-L14
   work occurred.
+
+## P0-L6E Attempt 008 control epoch
+
+- Authorization was limited to fresh control epoch
+  `attempt-008-control-epoch-01`, with exactly two requests: `A0` then `A1`.
+  Attempt 007 remains permanently closed as `INCONCLUSIVE / AMBIGUOUS` and was
+  not retried, reconstructed, or aggregated.
+- Pre-live gates passed: branch `main`; HEAD and local `origin/main` both
+  `63653c7a45916f3ac9e0319b0b13b01bad227f30`; tracked worktree clean; no Git
+  lock; no concurrent Prefixity/cargo/rustc experiment writer detected; the
+  Attempt 008 directory initially contained only `prepared.json`; and the
+  certified Attempt 008 inference count was `0`.
+- The operator confirmed a fresh, unused llama.cpp server with model
+  `ggml-org/Qwen3.5-0.8B-GGUF:Q4_0` loaded, context 8192, one slot, and
+  listening at `http://127.0.0.1:8080`. The single permitted non-inference
+  TCP listener check passed and recorded zero HTTP/inference requests.
+- The direct already-built executable performed an offline preflight with
+  `network_calls=0`, then sent exactly A0 and A1 under the frozen
+  `max_tokens=1`, `connect_timeout_ms=1000`, and
+  `request_timeout_ms=600000` contract. No `cargo run`, live compilation,
+  retry, warmup, calibration request, automatic restart, or treatment request
+  occurred. Both responses were complete HTTP 200 responses and both cases
+  normalized successfully. The control record final state is `normalized`.
+
+Measured control telemetry:
+
+| Case | Input/transmitted | Cached prompt | Fresh prefill | Output | Prompt time | Generation time | HTTP | Body bytes | Transport elapsed |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A0 | 1172 | 0 | 1172 | 1 | 60635 ms | 0 ms | 200 | 658 | 60720 ms |
+| A1 | 1172 | 656 | 516 | 1 | 26129 ms | 0 ms | 200 | 660 | 26233 ms |
+
+Native llama.cpp prompt timings were A0 `60635.306 ms` and A1
+`26128.949 ms`; native predicted timings were `0.001 ms` with one predicted
+token in each response. TTFT and wall-duration observations were not
+observed. Raw response-body fingerprints and wire-request fingerprints remain
+in the persisted control record.
+
+- The A0 -> A1 P0-L8 diagnostic is aligned and classifies the result as
+  `mixed_observations`, with association
+  `structural_difference_with_observed_reuse_signal` and
+  `causality=not_established`. The structural change is
+  `artifact_content_changed`; cached prompt tokens increased from 0 to 656,
+  fresh prefill decreased from 1172 to 516, transmitted input and output
+  tokens were unchanged, and prompt-processing time decreased. Both
+  observation references are classified as
+  `experimentally_observed_runtime`. This is a bounded association only, not
+  a causal, performance, capability, or application claim.
+- The prepared metadata SHA-256 is unchanged:
+  `19372E833090C1C3A7EDB38E338C377640CF44D69E206E379E475DB788C24317`.
+  Persisted Attempt 008 evidence is:
+  `experiments/runs/p0-l6-fresh-arm-attempt-008/prepared.json` (same SHA),
+  `experiments/runs/p0-l6-fresh-arm-attempt-008/control-arm.json`
+  (`F90B86A611EB99ADB692155BA53DB79C0E28AAA095AE682291169BF3E79029FA`),
+  and `experiments/runs/p0-l6-fresh-arm-attempt-008/control-diagnostic.json`
+  (`7E4FC6B23CF1CD93C59DF4A153B0E838A5A2610F2761B728644F029A2933E713`).
+  The directory contains no treatment, C0, or C1 evidence.
+- Candidate identity remains
+  `e7fc579745aeabf52c215ec124df66d5c5c4cf97e2af8336d63fabb0f6ead97b`;
+  pair identity remains
+  `fed1a73f84a4a06bc7d6516b5ea47ddadb91da07ca06894a4729e5d5aa36ff1d`;
+  safety certificate remains
+  `7375cebd045e529e879ab4dbe50379e4d6f024dc4ca9b018c3833e6e3889a55d`.
+  Semantic experiment ID remains
+  `2c80b9273970af54289acd9b7d8a4e0cffc3d7e56596d71247b27d56377388a9`,
+  parent ID remains
+  `730c9785aee03483ba8d169e68d8c41a4788abce6c08a3ec83de73017fa539bd`, and
+  runtime configuration fingerprint remains
+  `43038980202a0d6054df881cd76130a9ebe49c23ada628153f1b03547ef8dea5`.
+- Final repository verification: HEAD and local `origin/main` remain
+  `63653c7a45916f3ac9e0319b0b13b01bad227f30` on `main`; tracked worktree is
+  clean before this required task-record update; no Git lock is present; and
+  `git diff --check` passes. Mandatory stop: do not execute
+  `attempt-008-treatment-epoch-01` until separately authorized.
+
+## P0-L6E Attempt 008 treatment epoch
+
+- Separate authorization was received for exactly
+  `attempt-008-treatment-epoch-01`: execute C0 followed by C1 on a fresh
+  server. A0/A1 were not re-executed; B1 was absent and prohibited; Attempt
+  007 was not recovered or reused; and no retry, warmup, calibration,
+  diagnostic inference, additional probe, automatic restart, runtime/config
+  substitution, commit, push, or later task was performed.
+- The operator confirmed the prior control server was stopped and a fresh
+  unchanged server was started with model
+  `ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, context 8192, one parallel slot, metrics
+  enabled, and endpoint `http://127.0.0.1:8080`; the operator confirmed zero
+  inference requests since startup. The one permitted non-inference TCP
+  listener readiness check completed before dispatch and sent no HTTP request.
+- The direct already-built executor passed offline preflight with
+  `network_calls=0`, the frozen runtime configuration fingerprint, and the
+  exact C0/C1 projection with `max_tokens=1`. It then issued exactly two
+  transport requests in order, C0 then C1, and persisted the normalized
+  treatment record before writing diagnostics or aggregation. No `cargo run`,
+  live compilation, retry, timeout recovery, or extra live request occurred.
+
+Measured treatment telemetry:
+
+| Case | Request fingerprint | Input/transmitted | Cached prompt | Fresh prefill | Output | Normalized prompt | Native prompt | Generation | HTTP | Body bytes | Transport elapsed |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| C0 | `51fdc731e55f13c05eb9607b244e5b9161da5afbfff3e9c0e8fe12b7c1d1632d` | 1172 | 0 | 1172 | 1 | 53435 ms | 53435.469 ms | 0 ms | 200 | 658 | 53498 ms |
+| C1 | `c176a81ed1de20882cdc402b72870f5ac6900b8df24dc0c1333ee3cefbf8d32b` | 1172 | 656 | 516 | 1 | 18580 ms | 18580.499 ms | 0 ms | 200 | 666 | 18774 ms |
+
+- Native llama.cpp telemetry was C0 `prompt_n=1172`, `cache_n=0`,
+  `predicted_n=1`, `predicted_ms=0.001`; and C1 `prompt_n=516`,
+  `cache_n=656`, `predicted_n=1`, `predicted_ms=0.001`. TTFT and wall-duration
+  observations were not observed. C0 wire-request fingerprint is
+  `78915eb8e77e1c96def07b38f75a449a3bd7332be0d77d6c7414880ac43ca11e` and raw
+  response-body fingerprint is
+  `36f4e81838b3ae3877ea3fcf18e21bf4a9291ea3fcccdcbcbd8ab9b87516e845`; C1
+  wire-request fingerprint is
+  `4ed5e162e155567764c531fac1b1dee5f7023c578cbf8de2485791f61595c50e` and
+  raw response-body fingerprint is
+  `ba92400d69ed529da29162505195d53cc5cd05dec74eb0e19bcdc6e2e553a722`.
+- The treatment record is `state=normalized`, with
+  `expected_steps=2`, `completed_steps=2`, `transport_attempts=2`,
+  `complete_http_responses=2`, and `normalized_cases=2`. C0 and C1 both
+  carried one completion token, with total usage 1173 tokens. The result
+  preserves semantic experiment ID
+  `2c80b9273970af54289acd9b7d8a4e0cffc3d7e56596d71247b27d56377388a9`, parent
+  ID `730c9785aee03483ba8d169e68d8c41a4788abce6c08a3ec83de73017fa539bd`, and
+  runtime configuration fingerprint
+  `43038980202a0d6054df881cd76130a9ebe49c23ada628153f1b03547ef8dea5`.
+
+Treatment interpretation and permitted offline derivations:
+
+- The C0 -> C1 P0-L8 treatment diagnostic is aligned and classifies the
+  result as `mixed_observations`, with association
+  `structural_difference_with_observed_reuse_signal` and
+  `causality=not_established`. The structural category is
+  `artifact_content_changed`; cached prompt tokens increased from 0 to 656,
+  fresh prefill decreased from 1172 to 516, transmitted input and output
+  tokens were unchanged, and prompt-processing time decreased. Both
+  observation references are `experimentally_observed_runtime`. This is a
+  bounded association, not a causal, performance, capability, or application
+  claim.
+- The frozen A1 -> C1 candidate diagnostic is aligned and classifies the
+  result as `no_observed_cache_reuse_change`, with association
+  `structural_difference_with_observed_metric_change` and
+  `causality=not_established`. Its structural category is
+  `artifact_order_changed`; transmitted input, cached prompt, fresh prefill,
+  and output tokens were unchanged, while prompt-processing time decreased.
+  Both observation references are `experimentally_observed_runtime`.
+- The explicitly permitted P0-L12 aggregation was deterministic and
+  non-inference over persisted A0/A1/C0/C1 only. It reports control mutation
+  `mixed_observations`, treatment mutation `mixed_observations`, candidate
+  comparison `no_observed_cache_reuse_change`, and candidate evaluation
+  `evidence_state=structural_only`, `next_action=gather_capability_evidence`.
+  The evaluator retained blockers `runtime_capability_pending`,
+  `observation_identity_mismatch`, `no_experimental_observation`, and
+  `insufficient_observation_fields`; no causal, performance, capability, or
+  application permission was upgraded.
+- The seven runtime evidence files remain intentionally ignored under the
+  repository's existing `experiments/runs/` local-artifact policy. They are
+  preserved locally by their sealed hashes; none was force-added to Git.
+
+Durable treatment evidence and hashes:
+
+- `experiments/runs/p0-l6-fresh-arm-attempt-008/treatment-arm.json`:
+  `7DBD5DE87E4847580195EC52CFA236C9893E654F69FD49F63920A64D9BD0E0BB`.
+- `experiments/runs/p0-l6-fresh-arm-attempt-008/treatment-diagnostic.json`:
+  `CFF57EBF889F51BA7A54D66B726C8E3684AB2C70B001EBEF3E91F39A8CF6CEE7`.
+- `experiments/runs/p0-l6-fresh-arm-attempt-008/candidate-diagnostic.json`:
+  `5AA4B923A10402CC2CF923C75234D758286A9DA32C8FFFAE9A994A34F06ED7A5`.
+- `experiments/runs/p0-l6-fresh-arm-attempt-008/aggregation.json`:
+  `75C50BBB712BCFD1B0A61C75BD20C98B9006501C6133F5F8D3089312369C1504`.
+- Accepted control evidence remained byte-for-byte unchanged:
+  `prepared.json` `19372E833090C1C3A7EDB38E338C377640CF44D69E206E379E475DB788C24317`,
+  `control-arm.json` `F90B86A611EB99ADB692155BA53DB79C0E28AAA095AE682291169BF3E79029FA`,
+  and `control-diagnostic.json`
+  `7E4FC6B23CF1CD93C59DF4A153B0E838A5A2610F2761B728644F029A2933E713`.
+- The candidate identity remains
+  `e7fc579745aeabf52c215ec124df66d5c5c4cf97e2af8336d63fabb0f6ead97b`, pair
+  identity remains
+  `fed1a73f84a4a06bc7d6516b5ea47ddadb91da07ca06894a4729e5d5aa36ff1d`, and
+  safety certificate remains
+  `7375cebd045e529e879ab4dbe50379e4d6f024dc4ca9b018c3833e6e3889a55d`.
+
+- Final validation: the focused fresh-arm regression passed all 14 tests;
+  `cargo fmt --all -- --check` passed; the pre-treatment `ACTIVE.md` hash
+  `D874B2161345E5BAC21900B161D8DAEDC40918A23EDFC39F43AEAD79069CFB85` was
+  unchanged throughout the live epoch; and the treatment executor source,
+  build artifact, and temporary executable were removed after use. Mandatory
+  stop: no more Attempt 008 requests, no B1, no Attempt 007 recovery, no
+  ContextBench/P0-L14 work, and no Attempt 009 may begin from this result.
 
 ## P0-L13 completion record
 
