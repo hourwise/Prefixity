@@ -32,6 +32,18 @@ GATHER CAPABILITY EVIDENCE`. Attempt 008 contains four certified inference
 requests total, exactly once each: A0, A1, C0, and C1. No B1 request was
 issued.
 
+The next capability-evidence design is the existing **Phase 1C — Quality-
+gated controlled replay** programme, not a new P0-L14 phase. The design-only
+addendum is being prepared on branch
+`agent/phase-1c-capability-evidence-design`, rooted at the sealed P0-L6
+commit `748e4673e8454d2ac3e27cefabee9259992038aa`, in
+`docs/phase-1/PHASE_1C_CAPABILITY_EVIDENCE_DESIGN.md`. It makes task
+capability primary, keeps token/cache/timing measurements secondary, reuses
+the certified Phase 1C Stage 0 infrastructure, and leaves the external
+evidence blocker and all Stage 1/Stage 2 execution authorization gates intact.
+No capability inference, provider call, implementation change, structured
+state work, or later phase is authorized by this design work.
+
 ## P0-L6A completion record
 
 - Added a versioned loopback-only HTTP transport boundary for the existing
