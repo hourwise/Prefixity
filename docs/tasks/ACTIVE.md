@@ -44,6 +44,21 @@ evidence blocker and all Stage 1/Stage 2 execution authorization gates intact.
 No capability inference, provider call, implementation change, structured
 state work, or later phase is authorized by this design work.
 
+Phase 1C design promotion is complete: accepted design commit
+`36f960579e55c7ad48e54e4cb2670cc55cd1ef3e` was fast-forwarded from
+`748e4673e8454d2ac3e27cefabee9259992038aa` to `main` and verified directly on
+`origin/main`. The separate execution branch
+`agent/phase-1c-capability-stage1-smoke` was created from that canonical main.
+Offline preflight and full offline workspace validation passed, with no
+network or credential reads. Stage 1 is blocked before readiness because the
+accepted design and Stage 0 manifest leave provider, model, API surface,
+endpoint, account/region, credential boundary, model settings, cache controls,
+timeout, request/token/spend ceilings, and pricing unresolved; the existing
+`prefixity-live` schema-smoke is a Phase 0B harness and does not select a
+Phase 1C runtime. No readiness probe, provider call, or inference request has
+been made; automatic retries remain zero. A separate exact runtime contract
+and operator confirmation are required before any readiness check.
+
 ## P0-L6A completion record
 
 - Added a versioned loopback-only HTTP transport boundary for the existing
