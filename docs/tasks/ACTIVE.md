@@ -1565,3 +1565,23 @@ retry or additional inference is authorized from this result. Phase 1C
 inference accounting is now one request for this non-scored smoke; the scored
 capability cohort remains at zero requests. P0-L6 evidence and production
 provider behavior remain unchanged.
+
+## Phase 1C Stage 1 failed-smoke forensic review
+
+The first authorized Stage 1 local-Qwen schema smoke is confirmed as a valid
+bounded failure and is now reviewed offline in
+`docs/phase-1/PHASE_1C_STAGE1_FAILED_SMOKE_FORENSIC_REVIEW.md`. The preserved
+HTTP 200 response contains a non-empty `choices[0].message.reasoning_content`
+field (1,226 UTF-8 bytes; exact field SHA recorded in the review) while
+`choices[0].message.content` is an empty string. It reports
+`completion_tokens=256`, `timings.predicted_n=256`, and `finish_reason=length`.
+The primary classification is `THINKING_BUDGET_EXHAUSTION`, established at the
+response level with high confidence; the content-only Stage 1 contract is also
+incompatible with the observed reasoning-bearing response shape. The adapter
+behaved correctly under its registered contract and did not repair or fall
+back to reasoning text.
+
+No live action occurred during the review: new inference requests `0`, review
+network calls `0`, retries `0`, scored capability requests `0`, and Prefixity
+behavioral changes `0`. The raw evidence, runtime contract, and adapter remain
+unchanged. Remediation options are documented for separate authorization only.
