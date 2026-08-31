@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "tool_contract_version": "phase1c-h001-no-tools-v1",
+  "experiment_id": "phase-1c-scored-capability-v1",
+  "task_id": "h001",
+  "visible_tools": [],
+  "permitted_model_actions": ["return_terminal_json_answer"],
+  "forbidden_model_actions": ["tool_call", "external_request", "follow_up_recovery_request"],
+  "tool_outputs_visible_to_model": [],
+  "state_transition_semantics": "No tool or external state transition is available; the task terminates on a structurally valid final answer.",
+  "completion_criteria": [
+    "one assistant final message is present",
+    "the final message is a JSON object matching the task response shape",
+    "no tool call is present"
+  ],
+  "same_across_arms": true
+}

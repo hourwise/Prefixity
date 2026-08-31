@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "state_version": "phase1c-h001-required-state-v1",
+  "experiment_id": "phase-1c-scored-capability-v1",
+  "task_id": "h001",
+  "visibility": "evaluator_only",
+  "required_facts": [
+    {"fact_id": "action_identity", "source_id": "h001-action-a003-identity", "field": "action_id"},
+    {"fact_id": "explicit_dependency", "source_id": "h001-event-e003-content", "field": "reference_event_ids", "required_value": "e001"},
+    {"fact_id": "required_message_content", "source_id": "h001-event-e001-content", "field": "content_hash"}
+  ],
+  "required_dependencies": [
+    {"consumer": "a003", "provider": "e001", "relation": "explicit_reference"}
+  ],
+  "protocol_obligations": [
+    "return one terminal JSON object",
+    "use exactly action_id, required_event_id, and required_content_hash",
+    "do not call tools"
+  ],
+  "forbidden_contradictions": [
+    "required_event_id is not e001",
+    "required_content_hash is not the e001 content hash",
+    "action_id is not a003",
+    "a duplicate is treated as the explicit dependency"
+  ],
+  "minimum_terminal_state": {
+    "task_success": true,
+    "final_answer_fields": {
+      "action_id": "a003",
+      "required_event_id": "e001",
+      "required_content_hash": "16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075"
+    },
+    "required_context_source_ids": [
+      "h001-task-system",
+      "h001-task-user",
+      "h001-event-e001-content",
+      "h001-event-e003-content",
+      "h001-action-a003-identity"
+    ]
+  },
+  "critical_loss_conditions": [
+    "explicit e003 to e001 dependency is lost",
+    "required e001 content identity is lost",
+    "terminal answer is unavailable or structurally incomplete",
+    "unexpected tool call or recovery request occurs"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "evaluator_version": "stage0-deterministic-evaluator-v1",
+  "evaluator_instance": "phase1c-h001-deterministic-evaluator-v1",
+  "experiment_id": "phase-1c-scored-capability-v1",
+  "task_id": "h001",
+  "visibility": "evaluator_only",
+  "input_contract": {
+    "final_answer_source": "normalized-turn-<n>.json.final_content",
+    "reasoning_source": "normalized-turn-<n>.json.reasoning_content_diagnostic",
+    "reasoning_is_scored": false,
+    "raw_trajectory_required": true,
+    "tool_outcomes_required": false
+  },
+  "expected_final_answer": {
+    "action_id": "a003",
+    "required_event_id": "e001",
+    "required_content_hash": "16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075"
+  },
+  "metrics": {
+    "task_success": "final answer object exactly equals expected_final_answer",
+    "required_context_recall": {
+      "required_source_ids": [
+        "h001-task-system",
+        "h001-task-user",
+        "h001-event-e001-content",
+        "h001-event-e003-content",
+        "h001-action-a003-identity"
+      ],
+      "denominator": 5,
+      "success_threshold": 1.0
+    },
+    "dependency_protocol_validity": "final answer identifies action a003's explicit e003 to e001 dependency and contains no tool call",
+    "critical_regressions": [
+      "wrong required event",
+      "wrong required content hash",
+      "missing or extra final-answer field",
+      "missing terminal final content",
+      "tool call emitted"
+    ],
+    "recovery_behavior": "zero recovery turns and zero unplanned requests are required",
+    "evaluator_completeness": "all required identity, accounting, response, and reasoning-isolation fields are present"
+  },
+  "result_classes": ["PASS", "FAIL", "INCONCLUSIVE"],
+  "inconclusive_rules": [
+    "dispatch or completion accounting is ambiguous",
+    "response is partial or malformed",
+    "terminal final content is missing",
+    "required evidence field is missing"
+  ],
+  "reasoning_content_rule": "retain separately for diagnostics; never parse, score, or append it to another turn or arm",
+  "model_visible_separation": "expected_final_answer and evaluator-only required state are never included in the task artifact or arm request"
+}

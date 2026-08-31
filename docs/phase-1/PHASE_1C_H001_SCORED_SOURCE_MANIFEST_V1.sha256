@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_H001_SCORED_SOURCE_MANIFEST_V1.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "da397d5ebaa4bbbc48f7f84cb1a0c3f6480d20c7cadfad96231b596b5074cc4a"
+}

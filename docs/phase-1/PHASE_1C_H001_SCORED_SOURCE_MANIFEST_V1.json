@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "manifest_version": "phase1c-h001-scored-source-manifest-v1",
+  "experiment_id": "phase-1c-scored-capability-v1",
+  "task_id": "h001",
+  "task_version": "phase1c-h001-scored-task-v1",
+  "provenance_policy": {
+    "source_population": "repository-owned self-authored synthetic material",
+    "external_sources": [],
+    "contextbench_used": false,
+    "permission_status": "permission-cleared-local-repository-content"
+  },
+  "source_revision": {
+    "source_locator": "crates/prefixity-controlled-benchmark/src/phase1b9.rs::build_held_out_cases::h001",
+    "source_revision": "phase1b9-structural-v1",
+    "source_commit": "748e4673e8454d2ac3e27cefabee9259992038aa",
+    "source_file_sha256": "2f1dae56606815034530b9a7114170eea08b9269eed57b18a4fb5d9747830a33"
+  },
+  "source_records": [
+    {
+      "source_id": "h001-task-system",
+      "source_type": "task_instruction",
+      "provenance": "authored for the frozen h001 capability task from its reviewed structural objective",
+      "exact_content": "You are a careful context-reasoning assistant. Use only the model-visible records supplied in the user message. Return the requested JSON object as the final answer. Do not call tools and do not add commentary outside the JSON object.",
+      "sha256": "6447dbe7cc20f8dce14787c6ccc4a0e4549b04dbde7bc22aa7cf4e63f008c202",
+      "inclusion_role": "task_instruction",
+      "model_visible": true
+    },
+    {
+      "source_id": "h001-task-user",
+      "source_type": "task_instruction",
+      "provenance": "authored for the frozen h001 capability task from its reviewed structural objective",
+      "exact_content": "Review the ordered event records below. Identify the message event directly referenced by action a003. The two message records may contain the same content. Return exactly one JSON object with these string fields: action_id, required_event_id, required_content_hash. Use the action's explicit reference_event_ids; do not choose a message solely because it appears later or is a duplicate. Do not add any other fields.",
+      "sha256": "7456ed540b5e9fa68b387bba0722afc7b6b22c093302e91a56d551c13aa1690e",
+      "inclusion_role": "task_instruction",
+      "model_visible": true
+    },
+    {
+      "source_id": "h001-event-e001-content",
+      "source_type": "structural_event_content",
+      "provenance": "phase1b9-structural-v1 h001 e001 content token",
+      "exact_content": "dup-a",
+      "sha256": "16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075",
+      "inclusion_role": "required",
+      "model_visible": true
+    },
+    {
+      "source_id": "h001-event-e002-content",
+      "source_type": "structural_event_content",
+      "provenance": "phase1b9-structural-v1 h001 e002 content token",
+      "exact_content": "dup-a",
+      "sha256": "16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075",
+      "inclusion_role": "exact_duplicate_distractor",
+      "model_visible": true
+    },
+    {
+      "source_id": "h001-event-e003-content",
+      "source_type": "structural_event_content",
+      "provenance": "phase1b9-structural-v1 h001 e003 content token",
+      "exact_content": "act-a",
+      "sha256": "a5206015acca47bc61b8a07436de0683e76ddf1c996bb30f18a2b7e9dc8581c5",
+      "inclusion_role": "procedural_action_context",
+      "model_visible": true
+    },
+    {
+      "source_id": "h001-action-a003-identity",
+      "source_type": "action_identity",
+      "provenance": "phase1b9-structural-v1 h001 e003 action identity",
+      "exact_content": "a003",
+      "sha256": "346b230a970504e4e6bd546400a9ea80fdc879ad786fe18b46217b5931ee42f4",
+      "inclusion_role": "procedural_action_context",
+      "model_visible": true
+    },
+    {
+      "source_id": "h001-relation-q001",
+      "source_type": "structural_relation",
+      "provenance": "phase1b9-structural-v1 h001 q001",
+      "exact_content": "same_state_revision|e001|e002",
+      "sha256": "c56cf3d7b191c14cffcd1175fe74cd7e4632463c54c07abf9b5da3e2ec529e60",
+      "inclusion_role": "evaluator_only_provenance",
+      "model_visible": false
+    }
+  ]
+}

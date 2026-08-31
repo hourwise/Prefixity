@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_H001_SCORED_TASK_V1.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "4597b25cac114899d7e52ff67e7fb2297442c954cb10bffba2aab94cc20ef7c8"
+}

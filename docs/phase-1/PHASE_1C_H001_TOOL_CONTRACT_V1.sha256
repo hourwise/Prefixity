@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_H001_TOOL_CONTRACT_V1.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "1105e16039acc4d9f1db6d784f6a5eb0653d4601117aeefcc8686338df7552a9"
+}

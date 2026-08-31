@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "arm_materialization_version": "phase1c-h001-arm-projections-v1",
+  "experiment_id": "phase-1c-scored-capability-v1",
+  "task_id": "h001",
+  "replicate": 1,
+  "projection_identity": "SHA-256 of the canonical request object; arm metadata is excluded",
+  "arms": [
+    {
+      "arm": "BASELINE",
+      "source_ids": ["h001-task-system", "h001-task-user", "h001-event-e001-content", "h001-event-e002-content", "h001-event-e003-content", "h001-action-a003-identity"],
+      "treatment": {"operation": "none"},
+      "request": {
+        "model": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+        "messages": [
+          {"role": "system", "content": "You are a careful context-reasoning assistant. Use only the model-visible records supplied in the user message. Return the requested JSON object as the final answer. Do not call tools and do not add commentary outside the JSON object."},
+          {"role": "user", "content": "Review the ordered event records below. Identify the message event directly referenced by action a003. The two message records may contain the same content. Return exactly one JSON object with these string fields: action_id, required_event_id, required_content_hash. Use the action's explicit reference_event_ids; do not choose a message solely because it appears later or is a duplicate. Do not add any other fields.\n\nOrdered source context:\n1. event_id=e001; sequence_index=0; event_type=message; content_hash=16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075\n2. event_id=e002; sequence_index=1; event_type=message; content_hash=16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075\n3. event_id=e003; sequence_index=2; event_type=action; action_id=a003; reference_event_ids=[e001]; content_hash=a5206015acca47bc61b8a07436de0683e76ddf1c996bb30f18a2b7e9dc8581c5"}
+        ],
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 2048,
+        "stream": false,
+        "seed": 1
+      }
+    },
+    {
+      "arm": "NO_OP",
+      "source_ids": ["h001-task-system", "h001-task-user", "h001-event-e001-content", "h001-event-e002-content", "h001-event-e003-content", "h001-action-a003-identity"],
+      "treatment": {"operation": "frozen_do_nothing_control"},
+      "request": {
+        "model": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+        "messages": [
+          {"role": "system", "content": "You are a careful context-reasoning assistant. Use only the model-visible records supplied in the user message. Return the requested JSON object as the final answer. Do not call tools and do not add commentary outside the JSON object."},
+          {"role": "user", "content": "Review the ordered event records below. Identify the message event directly referenced by action a003. The two message records may contain the same content. Return exactly one JSON object with these string fields: action_id, required_event_id, required_content_hash. Use the action's explicit reference_event_ids; do not choose a message solely because it appears later or is a duplicate. Do not add any other fields.\n\nOrdered source context:\n1. event_id=e001; sequence_index=0; event_type=message; content_hash=16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075\n2. event_id=e002; sequence_index=1; event_type=message; content_hash=16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075\n3. event_id=e003; sequence_index=2; event_type=action; action_id=a003; reference_event_ids=[e001]; content_hash=a5206015acca47bc61b8a07436de0683e76ddf1c996bb30f18a2b7e9dc8581c5"}
+        ],
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 2048,
+        "stream": false,
+        "seed": 1
+      }
+    },
+    {
+      "arm": "INTERVENTION",
+      "source_ids": ["h001-task-system", "h001-task-user", "h001-event-e001-content", "h001-event-e003-content", "h001-action-a003-identity"],
+      "treatment": {
+        "operation": "remove_exact_duplicate",
+        "target_event_id": "e002",
+        "target_source_id": "h001-event-e002-content",
+        "candidate_identity": "e7fc579745aeabf52c215ec124df66d5c5c4cf97e2af8336d63fabb0f6ead97b"
+      },
+      "request": {
+        "model": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+        "messages": [
+          {"role": "system", "content": "You are a careful context-reasoning assistant. Use only the model-visible records supplied in the user message. Return the requested JSON object as the final answer. Do not call tools and do not add commentary outside the JSON object."},
+          {"role": "user", "content": "Review the ordered event records below. Identify the message event directly referenced by action a003. The two message records may contain the same content. Return exactly one JSON object with these string fields: action_id, required_event_id, required_content_hash. Use the action's explicit reference_event_ids; do not choose a message solely because it appears later or is a duplicate. Do not add any other fields.\n\nOrdered source context:\n1. event_id=e001; sequence_index=0; event_type=message; content_hash=16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075\n3. event_id=e003; sequence_index=2; event_type=action; action_id=a003; reference_event_ids=[e001]; content_hash=a5206015acca47bc61b8a07436de0683e76ddf1c996bb30f18a2b7e9dc8581c5"}
+        ],
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 2048,
+        "stream": false,
+        "seed": 1
+      }
+    }
+  ]
+}

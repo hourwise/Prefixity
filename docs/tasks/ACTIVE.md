@@ -1825,3 +1825,109 @@ check was performed, and no live or localhost request was issued during
 promotion or preparation. Phase 1C live inference accounting remains exactly
 `2` historical schema-smoke requests, scored capability requests remain `0`,
 automatic retries remain `0`, and P0-L6 evidence modification remains `0`.
+
+## Phase 1C scored pilot h001 offline task materialization
+
+The preregistered h001 scored capability slice is now materialized as a
+checked-in, experiment-only task package on
+`agent/phase-1c-scored-pilot-h001`. This is an offline preparation record only:
+the Stage 0 mock payloads were not promoted as model results, no ContextBench
+material was admitted, and the reviewed h001 structural intent was converted
+into a separate model-visible task artifact plus separate evaluator-only state.
+
+The frozen h001 task tests explicit dependency retention under duplicate
+content. Model-visible records contain message events `e001` and `e002` with
+the same content hash, plus action `a003` whose explicit
+`reference_event_ids` value is `[e001]`; the intervention removes only `e002`.
+The evaluator-only expected terminal object is exactly:
+
+```json
+{
+  "action_id": "a003",
+  "required_event_id": "e001",
+  "required_content_hash": "16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075"
+}
+```
+
+The evaluator-only relation/state material records the `e003 -> e001`
+explicit dependency and required context source IDs. It is never included in
+the model-visible prompt. The tool contract is a no-tool contract with one
+terminal JSON answer; `reasoning_content`, if returned by the runtime, is
+retained only as a diagnostic and is never scored or appended to another turn
+or arm.
+
+The checked-in artifacts and canonical SHA-256 identities are:
+
+- task artifact
+  `docs/phase-1/PHASE_1C_H001_SCORED_TASK_V1.json` —
+  `4597b25cac114899d7e52ff67e7fb2297442c954cb10bffba2aab94cc20ef7c8`;
+- source manifest
+  `docs/phase-1/PHASE_1C_H001_SCORED_SOURCE_MANIFEST_V1.json` —
+  `da397d5ebaa4bbbc48f7f84cb1a0c3f6480d20c7cadfad96231b596b5074cc4a`;
+- required state
+  `docs/phase-1/PHASE_1C_H001_REQUIRED_STATE_V1.json` —
+  `459f5e093e540e146179399b3263e168642b2044578db59239badc9bfb5e0b8a`;
+- tool contract
+  `docs/phase-1/PHASE_1C_H001_TOOL_CONTRACT_V1.json` —
+  `1105e16039acc4d9f1db6d784f6a5eb0653d4601117aeefcc8686338df7552a9`;
+- evaluator
+  `docs/phase-1/PHASE_1C_H001_EVALUATOR_V1.json` —
+  `5fc19f47bd36e8625535e63939caebbb0e9ca1a458bb41b357de9d3f6d1f7fe3`;
+- arm materialization
+  `docs/phase-1/PHASE_1C_H001_ARM_PROJECTIONS_V1.json` —
+  `1e09aaf51d1b93bddadb54e198b987481490083405a0de8d480b18393cb81416`;
+- h001 task manifest
+  `docs/phase-1/PHASE_1C_H001_SCORED_TASK_MANIFEST_V1.json` —
+  `a107f741a632b0865717b1a81412fbf2dc464e11edb3c90376fe8bd90946b8d8`.
+
+The source manifest contains seven exact permission-cleared source records,
+and its source revision file is
+`crates/prefixity-controlled-benchmark/src/phase1b9.rs` with SHA-256
+`2f1dae56606815034530b9a7114170eea08b9269eed57b18a4fb5d9747830a33`.
+The task prompt fingerprint is
+`79691addddf3fdaaa9e5364bec578d4eae307fdcc2fc1af34d0bf7445d5e0d5f`.
+The BASELINE and NO_OP projections are canonical-identical at
+`26bc77415683d81c9f3af4e556151d8abab775b48dd5f4632ed6caba1ad25a2a`; the
+INTERVENTION projection is
+`9fa2765fd2e0701d9d588dbcb1e60834eff6ea0750be1e7852bf322d3c90b1d2`.
+The h001 package is bound to scored runtime contract
+`2f05440eb66d195d5362b9ad3a5dfc1708c4b8902cf8cd5774d26076c9aa1520`, its
+contract schema fingerprint
+`ad42524c6fb2f75056391754cfedd3d84658d797199429f0b68827fdb33d80fb`, and
+the frozen pilot manifest
+`201c21d7472dcf274bb912488f9334ac264bbba4968262e4e9fa4939a2597552`.
+
+The isolated executor is
+`crates/prefixity-controlled-benchmark/src/phase1c_h001.rs` with binary
+`prefixity-phase1c-h001`. It supports offline `preflight`, `fingerprint`, and
+per-arm `dry-run` commands, plus an explicitly confirmed single-arm live
+command for a later authorization. It never starts or restarts llama.cpp,
+performs no HTTP readiness probe, retries no request, follows no redirect,
+reads no credential, auto-advances no arm, and writes no h001 evidence during
+offline preparation. The later live command permits only one bounded TCP
+listener check and one operator-selected arm request; ambiguous transport
+stops with an explicit ambiguous result.
+
+Offline evidence is `PREPARED`: h001 preflight and all three arm dry-runs
+returned `network_calls=0`, `credential_reads=0`, and `inference_requests=0`.
+The dry-run matrix verified the required BASELINE/NO_OP equality and exact
+INTERVENTION difference. Focused h001 tests passed (`4`); the full workspace
+test suite passed (`49` controlled-benchmark unit tests plus all workspace
+integration/doc suites), strict workspace Clippy with `-D warnings` passed,
+and `cargo fmt --all -- --check` passed. `git diff --check` passed. The h001
+evidence directory remains absent, so no live response or evaluator-result
+artifact exists.
+
+No current or prior llama.cpp server was contacted, no listener check was
+performed, and no inference request was issued in this materialization epoch.
+Phase 1C live inference accounting therefore remains exactly `2` historical
+schema-smoke requests; h001 scored requests are `0`, h001 scored evidence is
+`0`, automatic retries are `0`, ContextBench work is `0`, and P0-L6 evidence
+modification remains `0`. No production Prefixity behavior changed.
+
+The preparation gate is now closed at:
+
+`H001 BASELINE READY FOR SEPARATE LIVE AUTHORIZATION`
+
+No live authorization is implied by this record, and no later h001 arm or
+pilot case may be started from this preparation step.

@@ -25,6 +25,7 @@ mod observation_diagnostics;
 mod oracle;
 mod paired_mutation;
 mod phase1b9;
+mod phase1c_h001;
 mod phase1c_scored_design;
 mod phase1c_stage0;
 mod phase1c_stage1_local_qwen;
@@ -174,6 +175,10 @@ pub use phase1b9::{
     BlindedEvent, BlindedRelation, BlindedTrace, FrozenPlannerBaseline, Phase1b9DecisionRecord,
     Phase1b9Report, ResearchInterventionClass, ResearchPolicyDecision, PHASE_1B9_POLICY_VERSION,
     PHASE_1B9_SCOPE,
+};
+pub use phase1c_h001::{
+    dry_run_h001, execute_h001_arm, fingerprint_h001, preflight_h001, score_h001_arm, H001Arm,
+    H001Error,
 };
 pub use phase1c_scored_design::{
     fingerprint_scored_design, validate_scored_design, ScoredDesignError, ScoredDesignFingerprint,

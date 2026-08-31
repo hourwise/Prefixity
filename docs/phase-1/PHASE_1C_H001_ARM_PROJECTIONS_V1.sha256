@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_H001_ARM_PROJECTIONS_V1.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "1e09aaf51d1b93bddadb54e198b987481490083405a0de8d480b18393cb81416"
+}

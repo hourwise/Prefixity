@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "task_id": "h001",
+  "task_version": "phase1c-h001-scored-task-v1",
+  "capability_objective": "preserve an explicitly referenced required context item when an exact duplicate is pruned",
+  "source_population": "repository-owned self-authored synthetic material derived from the reviewed Phase 1B.9 h001 intent",
+  "model_visible": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a careful context-reasoning assistant. Use only the model-visible records supplied in the user message. Return the requested JSON object as the final answer. Do not call tools and do not add commentary outside the JSON object."
+      },
+      {
+        "role": "user",
+        "content": "Review the ordered event records below. Identify the message event directly referenced by action a003. The two message records may contain the same content. Return exactly one JSON object with these string fields: action_id, required_event_id, required_content_hash. Use the action's explicit reference_event_ids; do not choose a message solely because it appears later or is a duplicate. Do not add any other fields.\n\nOrdered source context:\n1. event_id=e001; sequence_index=0; event_type=message; content_hash=16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075\n2. event_id=e002; sequence_index=1; event_type=message; content_hash=16fb8d61491c85785ed6c26ba9f8ddb10596e45b5cc073d2eec140ccb8bee075\n3. event_id=e003; sequence_index=2; event_type=action; action_id=a003; reference_event_ids=[e001]; content_hash=a5206015acca47bc61b8a07436de0683e76ddf1c996bb30f18a2b7e9dc8581c5"
+      }
+    ],
+    "context_record_order": ["e001", "e002", "e003"],
+    "response_shape": {
+      "type": "object",
+      "required": ["action_id", "required_event_id", "required_content_hash"],
+      "additional_properties": false,
+      "all_values": "string"
+    }
+  },
+  "source_ids_order": [
+    "h001-task-system",
+    "h001-task-user",
+    "h001-event-e001-content",
+    "h001-event-e002-content",
+    "h001-event-e003-content",
+    "h001-action-a003-identity"
+  ],
+  "evaluator_only_source_ids": ["h001-relation-q001"],
+  "maximum_turns": 3,
+  "terminal_turn_required": true,
+  "invalidation_conditions": [
+    "prompt or context differs from this artifact",
+    "model-visible evaluator-only source is present",
+    "tool call is emitted despite the frozen no-tool contract",
+    "final answer is absent, malformed, or contains an extra field"
+  ]
+}
