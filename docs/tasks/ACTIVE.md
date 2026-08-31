@@ -2006,3 +2006,71 @@ changes `0`; and P0-L6 evidence changes `0`. The mandatory stop applies now:
 do not start or execute NO_OP, INTERVENTION, h004, or another replicate.
 NO_OP requires a separate fresh-runtime authorization after review of this
 inconclusive BASELINE record.
+
+## Phase 1C h001 BASELINE timeout forensic review
+
+The authorized timeout review is complete and preserved in
+`docs/phase-1/PHASE_1C_H001_BASELINE_TIMEOUT_FORENSIC_REVIEW.md`. The six
+BASELINE evidence files were revalidated with ordinary SHA-256 hashing and
+remain unchanged. The expected absent files remain absent:
+`response-turn-1.bin`, `normalized-turn-1.json`, and
+`evaluator-result.json`.
+
+The exact frozen request was `1310` bytes, with two model-visible messages,
+`max_tokens=2048`, `temperature=0`, `top_p=1`, `seed=1`, `stream=false`, the
+frozen Qwen model identifier, and no tool definitions. The request and wire
+fingerprint both remained
+`26bc77415683d81c9f3af4e556151d8abab775b48dd5f4632ed6caba1ad25a2a`. No
+model-independent h001 token estimate was persisted or introduced during
+review.
+
+The runner used the frozen `1000 ms` connect timeout and `600000 ms` reqwest
+request timeout. After one successful TCP readiness check, the request was
+dispatched once. `send()` returned an ambiguous error at exactly
+`600000 ms`; no response object, status, headers, body, usage, timing, or
+reasoning field was available. The runner then persisted the ambiguous
+trajectory and arm result as designed, with `completed_turns=0`,
+`transport_attempts=1`, `inference_requests=1`, and `next_arm=null`. Had a
+response object arrived before a later body timeout, the implementation would
+have preserved any bounded partial body, but that alternate path was not
+observed.
+
+The contract declares a `660000 ms` supervisor timeout, but the h001 binary
+does not implement a supervisor timer and the executed Cargo invocation did
+not provide an independently verified 60-second persistence margin.
+Compilation completed before the live invocation, so this is distinct from
+the Attempt 007 compilation/supervisor failure. The missing supervisor
+enforcement is recorded as an implementation/design gap, not asserted as
+the cause of the observed timeout.
+
+No server-side completion log was persisted. The required forensic boundary
+is therefore:
+`SERVER-SIDE COMPLETION STATE NOT ESTABLISHED`.
+The strongest supported classification is
+`REQUEST_TIMEOUT_BUDGET_EXHAUSTED`, with high confidence for the client-side
+deadline event but low confidence for the underlying server-side cause.
+Exceeding 600 seconds for a 2048-token reasoning-enabled execution is
+plausible but not established from the sparse prior Smoke 01/02 and P0-L6
+observations. Timeout/budget adequacy is classified `NOT_ESTABLISHED`, not a
+capability failure.
+
+The original BASELINE remains `AMBIGUOUS / INCONCLUSIVE`; the frozen
+deterministic evaluator was not invoked because no certifiable terminal
+response or normalized final content existed. NO_OP and INTERVENTION remain
+`BLOCKED`, and no valid h001 comparison exists.
+
+Remediation ranking is: (1) a new timeout-only V2 contract preserving all
+task/model/reasoning/generation semantics while increasing the documented
+request allowance and actually enforcing the supervisor margin; (2) reduced
+`max_tokens`, which changes capability semantics; (3) reasoning off, which
+also changes scored capability configuration; and (4) a different
+model/runtime/tuning, which is highest impact. No remediation was
+implemented or authorized. Any future corrected BASELINE requires a new
+runtime-contract version and distinct attempt/evidence identity; the original
+`h001 / replicate-1 / baseline` evidence must not be overwritten.
+
+Accounting remains: historical schema-smoke requests `2`, h001 BASELINE
+requests `1`, h001 NO_OP `0`, h001 INTERVENTION `0`, total Phase 1C live
+requests `3`, automatic retries `0`, ContextBench work `0`, Prefixity
+behavioral changes `0`, and P0-L6 evidence changes `0`. No new inference or
+localhost contact occurred during review.
