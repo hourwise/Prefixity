@@ -4,6 +4,8 @@
 //! llama.cpp, opens a socket, sends HTTP, retries, or selects another arm.
 
 use crate::phase1c_h001::H001Error;
+#[cfg(test)]
+use crate::phase1c_h001_v2::{parse_v2_cli_args, v2_live_child_args, V2CliCommand};
 use serde_json::{json, Value};
 use std::path::Path;
 use std::process::{Command, Stdio};
@@ -126,6 +128,14 @@ mod tests {
         assert_eq!(result["state"], "SUPERVISOR_TIMEOUT");
         assert_eq!(result["child_terminated"], true);
         assert_eq!(result["child_retries"], 0);
+    }
+
+    #[test]
+    fn registered_v2_child_args_are_accepted_by_child_cli() {
+        assert_eq!(
+            parse_v2_cli_args(v2_live_child_args()).unwrap(),
+            V2CliCommand::RunBaseline
+        );
     }
 
     #[cfg(windows)]

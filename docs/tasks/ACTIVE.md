@@ -2158,3 +2158,50 @@ requests `1`, V2 h001 BASELINE requests `0`, NO_OP `0`, INTERVENTION `0`, h004
 `0`, retries `0`, and Prefixity behavioral changes `0`.
 
 `H001 V2 BASELINE CHILD_FAILED BEFORE MODEL CONTACT — STOP`
+
+## Phase 1C h001 V2 BASELINE attempt 002 preparation record
+
+The approved offline remediation of V2 BASELINE launch attempt 001 is complete
+on branch `agent/phase-1c-h001-v2-cli-fix`. Attempt 001 remains permanently
+frozen at
+`experiments/runs/phase1c-scored-capability-v2/h001/replicate-1/baseline/supervisor-result.json`
+with SHA-256
+`bf65a2b4e9a326354566df8852d4d05e858f263e628cd46e046cb8d2f0492e5` and
+classification `CHILD_FAILED` before model contact. Its one child launch,
+zero readiness checks, zero HTTP requests, and zero inference requests are
+not retried or rewritten.
+
+The experiment-only V2 child CLI defect was repaired narrowly. The prior
+parser expected `(None, Some(flag), None)` after `run`; it now accepts the
+canonical `run --confirm-fresh-runtime` argv through a pure shared parser.
+Missing confirmation and malformed placement fail closed. The supervisor's
+registered child argv is tested against that parser, catching the exact
+attempt-001 defect. No task, request body, serializer, runtime contract,
+timeout, model, reasoning, generation, evaluator, evidence, or Prefixity
+behavior changed.
+
+New attempt-002 identity:
+`docs/phase-1/PHASE_1C_H001_V2_BASELINE_ATTEMPT_002_IDENTITY_V1.json`, canonical
+SHA-256
+`e8a28fb795f6c0ea635f2a8d9b5533f39b0ed33b7284d71449e8aa3b88f1a95c`. It binds
+V2 contract/pilot hashes, all frozen h001 artifact hashes, the exact 1310-byte
+BASELINE projection
+`26bc77415683d81c9f3af4e556151d8abab775b48dd5f4632ed6caba1ad25a2a`,
+replicate 1, BASELINE, attempt 002, the corrected CLI identity, and attempt-001
+lineage. Its distinct future evidence path is
+`experiments/runs/phase1c-scored-capability-v2/h001/replicate-1/baseline-attempt-002/`;
+that directory is absent. The old attempt-001 directory is not reused.
+
+Offline parser, supervisor, V2 identity, attempt-002 preflight, and dry-run
+checks pass. Preflight reports `PREPARED` with zero network calls, zero
+credential reads, zero listener checks, and zero inference requests. Dry-run
+reports the unchanged 1310-byte request and frozen projection hash. Attempt
+002 is prepared but not live-authorized: do not start Qwen, perform readiness,
+execute BASELINE, or run NO_OP, INTERVENTION, h004, or another replicate.
+
+Accounting remains: historical schema-smoke inference requests `2`, V1 h001
+BASELINE inference requests `1`, V2 launch attempt 001 inference requests `0`,
+V2 BASELINE attempt 002 inference requests `0`, NO_OP `0`, INTERVENTION `0`,
+h004 `0`, retries `0`, and Prefixity behavioral changes `0`.
+
+`H001 V2 BASELINE ATTEMPT 002 READY FOR SEPARATE LIVE AUTHORIZATION`

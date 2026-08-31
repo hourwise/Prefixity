@@ -183,10 +183,12 @@ pub use phase1c_h001::{
     H001Error,
 };
 pub use phase1c_h001_v2::{
-    dry_run_v2, execute_v2_baseline, fingerprint_v2, preflight_v2, score_v2_baseline,
+    dry_run_v2, dry_run_v2_attempt_002, execute_v2_baseline, fingerprint_v2, parse_v2_cli_args,
+    preflight_v2, preflight_v2_attempt_002, score_v2_baseline, v2_live_child_args, V2CliCommand,
     V2_BASELINE_IDENTITY_FINGERPRINT_PATH, V2_BASELINE_IDENTITY_PATH, V2_CONTRACT_FINGERPRINT_PATH,
-    V2_CONTRACT_PATH, V2_EVIDENCE_ROOT, V2_H001_EVIDENCE_ROOT, V2_PILOT_FINGERPRINT_PATH,
-    V2_PILOT_MANIFEST_PATH,
+    V2_CONTRACT_PATH, V2_EVIDENCE_ROOT, V2_H001_ATTEMPT_002_EVIDENCE_ROOT,
+    V2_H001_ATTEMPT_002_FINGERPRINT_PATH, V2_H001_ATTEMPT_002_IDENTITY_PATH, V2_H001_EVIDENCE_ROOT,
+    V2_LIVE_CONFIRMATION_FLAG, V2_PILOT_FINGERPRINT_PATH, V2_PILOT_MANIFEST_PATH,
 };
 pub use phase1c_live_supervisor::{
     persist_supervisor_result, run_supervised, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
