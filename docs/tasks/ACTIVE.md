@@ -1931,3 +1931,78 @@ The preparation gate is now closed at:
 
 No live authorization is implied by this record, and no later h001 arm or
 pilot case may be started from this preparation step.
+
+## Phase 1C h001 BASELINE live execution record
+
+The separately authorized first live arm was executed on the dedicated
+`agent/phase-1c-scored-pilot-h001` branch only. The operator supplied a new
+current confirmation for a fresh llama.cpp server specifically for
+`h001 / replicate 1 / BASELINE`: model
+`ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, Q4_0, context `8192`, one slot, metrics
+enabled, explicit `reasoning=on`, endpoint `127.0.0.1:8080`, zero requests
+since startup, and no manual prompt, browser request, warmup, or
+model-generating endpoint contact. The supplied startup log confirmed model
+load, `n_slots=1`, `n_ctx_slot=8192`, and the listener on
+`http://127.0.0.1:8080`.
+
+The checked-in runner performed exactly one bounded TCP listener check. It
+passed in `2` ms, with `listener_check_attempts=1` and readiness
+`inference_requests=0`. It then dispatched exactly one BASELINE request using
+the frozen projection and wire request SHA-256
+`26bc77415683d81c9f3af4e556151d8abab775b48dd5f4632ed6caba1ad25a2a`.
+Automatic retries, fallback requests, adaptive replicates, padding turns,
+and arm advancement were all `0`.
+
+The request did not produce a certifiable completion. The runner preserved the
+request and waited for the registered `600000` ms request ceiling; completion
+then resolved as an ambiguous dispatch/completion error. The arm result is
+therefore conservatively `AMBIGUOUS` / contract classification
+`INCONCLUSIVE`, with HTTP status `null`, response body bytes `null`, no raw
+response body, no normalized message content, no final answer, no usage or
+timing telemetry, and no reasoning field available. No retry was attempted.
+The recorded trajectory has `completed_turns=0`, `max_turns=3`,
+`transport_attempts=1`, `inference_requests=1`, and `next_arm=null`.
+
+The frozen deterministic evaluator was not invoked because there was no
+certifiable terminal response or normalized final content. Accordingly,
+task success, required-context recall, dependency/protocol validity, and
+critical-regression assessment are unavailable rather than fabricated;
+evaluator completeness is not met. This is an arm-level inconclusive result,
+not a Prefixity capability conclusion and not a cross-arm comparison.
+
+The persisted ignored evidence directory is
+`experiments/runs/phase1c-scored-capability-v1/h001/replicate-1/baseline/`.
+It contains exactly `preflight.json`, `runtime-confirmation.json`,
+`readiness.json`, `request-turn-1.json`, `trajectory-state.json`, and
+`arm-result.json`. Ordinary SHA-256 hashes are:
+
+- `preflight.json` —
+  `1072ff8ecdd503e665216ca3544ba4381b60f431eb4df47d05ebf5a219444f9`;
+- `runtime-confirmation.json` —
+  `bec37fc5982d2d775700a344dbac7a5a41bf4025d0f3ceede78196bde23441e6`;
+- `readiness.json` —
+  `1b96fcf761d07e5577d66d389d343d46b3ac87d7d047195c2110f181e02e6c7c`;
+- `request-turn-1.json` —
+  `26bc77415683d81c9f3af4e556151d8abab775b48dd5f4632ed6caba1ad25a2a`;
+- `trajectory-state.json` —
+  `dd5f1ce80a9f95f3216ab5b220658e94bc4ed0c25134e834f40a51fc6c59183c`;
+- `arm-result.json` —
+  `012b3dea5859e5279b3ddabf6a6ab7571104f9f4194975d2d9285e7b0ed453e5`.
+
+No response, normalized-turn, or evaluator-result file exists because no
+response completed. The evidence directory is ignored by
+`experiments/.gitignore`; no runtime evidence was force-added.
+
+Post-run checks were offline-only: bounded evidence listing and ordinary
+file hashing, frozen-identity-preserving repository checks, focused h001
+tests, workspace tests, strict Clippy, formatting, and `git diff --check`.
+No forensic PowerShell transformation was used, no Defender control was
+weakened, and no preserved prior evidence was modified.
+
+Phase 1C accounting is now: historical schema-smoke requests `2`; h001
+BASELINE requests `1`; h001 NO_OP requests `0`; h001 INTERVENTION requests
+`0`; automatic retries `0`; ContextBench work `0`; Prefixity behavioral
+changes `0`; and P0-L6 evidence changes `0`. The mandatory stop applies now:
+do not start or execute NO_OP, INTERVENTION, h004, or another replicate.
+NO_OP requires a separate fresh-runtime authorization after review of this
+inconclusive BASELINE record.
