@@ -1797,3 +1797,31 @@ full-cohort ceiling `216`. Strict workspace Clippy with `-D warnings`,
 only source ordering/wrapping fix; no contract, manifest, runtime, scoring,
 or Prefixity behavior changed. No P0-L6 evidence, ContextBench material, or
 live evidence was changed.
+
+## Phase 1C scored pilot h001 pre-live seal
+
+The scored-runtime design passed all authorized offline validation after
+recovery of the existing official Rustup installation. The validator-only
+formatting successor commit
+`46289a6c5f16bca0415ac7cd1419dfcbcf9e8f2e` was pushed on
+`agent/phase-1c-scored-runtime-design`, then fast-forwarded from the prior
+`main` commit `fea5b829a7c80bd3ad5feb23318309fecaf7a3ad`. The promoted commit
+was pushed and directly verified at `origin/main` with the same exact SHA.
+No contract, schema, manifest, prior smoke evidence, or production behavior
+was changed during promotion.
+
+The pre-live branch is now
+`agent/phase-1c-scored-pilot-h001`, created from the promoted `main` commit.
+The next and only authorized live slice is `h001`, in fixed order
+BASELINE -> NO_OP -> INTERVENTION, replicate `1`, with at most three model
+turns per arm and at most nine total inference requests. It must use the
+sealed scored contract: explicit `reasoning=on`, the fixed local Qwen runtime,
+fresh server process per arm, zero inference since startup, no warmup, and no
+retry. The slice must stop after `h001`; no other case, arm, replicate, or
+follow-up request is authorized by this preparation record.
+
+This branch is prepared only; no llama.cpp server was started, no listener
+check was performed, and no live or localhost request was issued during
+promotion or preparation. Phase 1C live inference accounting remains exactly
+`2` historical schema-smoke requests, scored capability requests remain `0`,
+automatic retries remain `0`, and P0-L6 evidence modification remains `0`.
