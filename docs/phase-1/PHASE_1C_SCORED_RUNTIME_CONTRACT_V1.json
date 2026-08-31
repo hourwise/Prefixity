@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_version": "phase1c-scored-runtime-local-qwen-v1",
+  "experiment_id": "phase-1c-scored-capability-v1",
+  "status": "DESIGN_ONLY_NO_INFERENCE_AUTHORIZED",
+  "phase": "phase-1c",
+  "purpose": "quality_gated_capability_replay",
+  "engine": "llama.cpp",
+  "runtime": "llama-server",
+  "runtime_version": "record_exact_at_execution",
+  "server_executable_family": ["llama", "llama-server"],
+  "api_surface": "llama.cpp-openai-compatible-chat-completions-v1",
+  "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+  "host": "127.0.0.1",
+  "port": 8080,
+  "model": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+  "quantization": "Q4_0",
+  "context_size": 8192,
+  "parallel_slots": 1,
+  "metrics": "enabled",
+  "chat_template": {
+    "policy": "model-embedded-default",
+    "override": false,
+    "record_resolved_template_at_execution": true
+  },
+  "credential_policy": {
+    "required": false,
+    "authorization_header": "none",
+    "credential_environment_variable": "none",
+    "account": "not applicable",
+    "region": "not applicable",
+    "pricing_spend_profile": "local runtime — no provider spend",
+    "provider_api_key_read": false
+  },
+  "generation": {
+    "temperature": 0,
+    "top_p": 1,
+    "max_tokens": 2048,
+    "stream": false,
+    "tool_choice": "task-declared",
+    "seed": {
+      "value": 1,
+      "policy": "fixed_and_recorded",
+      "status": "must_be_applied_or_abort"
+    },
+    "additional_sampling_parameters": {}
+  },
+  "timeout_policy": {
+    "connect_timeout_ms": 1000,
+    "complete_request_timeout_ms": 600000,
+    "supervisor_timeout_ms": 660000
+  },
+  "retry_policy": {
+    "automatic_retries": 0,
+    "fallback_requests": 0,
+    "adaptive_replicates": 0,
+    "post_consumption_recovery": "forbidden"
+  },
+  "request_ceiling": {
+    "per_arm_replicate_max_model_turns": 3,
+    "pilot_max_model_inference_requests": 54,
+    "full_cohort_planned_max_model_inference_requests": 216,
+    "unplanned_inference": "forbidden"
+  },
+  "input_output_budget": {
+    "input_context_ceiling_tokens": 6144,
+    "output_ceiling_tokens": 2048,
+    "context_plus_output_ceiling_tokens": 8192,
+    "analysis_basis": "offline review of the existing twelve-task cohort, evaluator obligations, and compact protocol/final-answer shapes",
+    "smoke_01_ceiling_tokens": 256,
+    "smoke_01_ceiling_is_not_reused": true,
+    "estimated_final_answer_ceiling_tokens": 512,
+    "estimated_reasoning_reserve_tokens": 1536,
+    "estimate_status": "design_estimate_not_measurement",
+    "truncation_policy": "finish_reason=length or missing terminal final content is INCONCLUSIVE; no retry or ceiling increase"
+  },
+  "runtime_settings": {
+    "reasoning": "on",
+    "reasoning_request_argument": ["--reasoning", "on"],
+    "same_for_all_arms_and_replicates": true
+  },
+  "launch": {
+    "executable": "llama",
+    "arguments": [
+      "serve",
+      "-hf",
+      "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+      "-c",
+      "8192",
+      "-np",
+      "1",
+      "--metrics",
+      "--reasoning",
+      "on",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8080"
+    ]
+  },
+  "freshness_cache_isolation": {
+    "fresh_server_process_per_arm_replicate": true,
+    "zero_inference_requests_since_startup": true,
+    "maximum_non_inference_listener_checks_per_server": 1,
+    "listener_check": "bounded TCP listener check only; no HTTP readiness probe",
+    "warmup": false,
+    "cache_reuse_across_arms": false,
+    "cache_reuse_across_replicates": false,
+    "cache_claim_boundary": "record runtime telemetry but make no provider-cache or billed-cost claim from local metrics alone",
+    "arm_advance_rule": "persist and validate the complete prior arm before starting the next arm"
+  },
+  "input_schema_id": "prefixity.phase1c.scored-capability-request-v1",
+  "output_schema_id": "prefixity.phase1c.scored-capability-evidence-v1",
+  "response_extraction": {
+    "final_content_json_pointer": "/choices/0/message/content",
+    "reasoning_content_json_pointer": "/choices/0/message/reasoning_content",
+    "tool_calls_json_pointer": "/choices/0/message/tool_calls",
+    "final_content_required_for_terminal_turn": true,
+    "intermediate_tool_turn_empty_content_allowed": true,
+    "missing_reasoning_content": "allowed_and_recorded",
+    "reasoning_content_status": "diagnostic_only_separate_field",
+    "reasoning_content_substitution_for_final_content": "forbidden",
+    "raw_response_retention": "bounded_and_hashed"
+  },
+  "reasoning_isolation": {
+    "fed_to_later_turns": false,
+    "fed_to_later_arms": false,
+    "fed_to_prefixity_treatment": false,
+    "fed_to_evaluator": false,
+    "affects_task_identity": false,
+    "affects_arm_identity": false,
+    "affects_treatment_identity": false,
+    "affects_expected_answer_or_hidden_labels": false,
+    "retained_separately_from_final_answer": true,
+    "privacy_review_required_before_retention": true
+  },
+  "evidence_persistence": {
+    "design_evidence_location": "experiments/runs/phase1c-scored-capability-v1",
+    "live_evidence_is_ignored_and_not_committed": true,
+    "per_arm_artifacts": [
+      "preflight.json",
+      "request-turn-<n>.json",
+      "response-turn-<n>.bin",
+      "normalized-turn-<n>.json",
+      "arm-result.json"
+    ],
+    "required_identity_fields": [
+      "experiment_id",
+      "task_id",
+      "arm",
+      "replicate",
+      "turn",
+      "runtime_contract_sha256",
+      "request_sha256",
+      "response_sha256"
+    ],
+    "credential_redaction": "required_before_persistence",
+    "preserved_reasoning_field": "normalized-turn-<n>.json.reasoning_content_diagnostic"
+  },
+  "scoring_boundary": {
+    "primary_evaluator": "Tier 0 structural plus Tier 2 deterministic task/tool checks",
+    "evaluator_version": "stage0-deterministic-evaluator-v1",
+    "evaluation_key": "sidecar_only_not_in_prompt_or_treatment_input",
+    "score_source": "terminal_final_message_content_and_declared_tool_outcomes",
+    "reasoning_score": "none",
+    "baseline_pass_intervention_fail": "hard_failure_not_averaged_away",
+    "incomplete_or_ambiguous": "INCONCLUSIVE",
+    "claim_scope": "named frozen cohort and exact registered local runtime only"
+  },
+  "arm_matching_requirements": [
+    "same contract, model, quantization, context, slots, metrics, reasoning, sampling, seed, timeouts, and retry policy",
+    "same task identity, system/developer instructions, tool contract, authentication material, and evaluator procedure",
+    "BASELINE and NO_OP request/context bytes are identical apart from run metadata",
+    "INTERVENTION differs only by the declared frozen candidate transformation on a disposable copy",
+    "same arm order and replicate policy for every task",
+    "reasoning content is never an arm-specific hidden variable"
+  ],
+  "candidate": {
+    "source_commit": "748e4673e8454d2ac3e27cefabee9259992038aa",
+    "design_base_commit": "fea5b829a7c80bd3ad5feb23318309fecaf7a3ad",
+    "candidate_materialization_identity": "e7fc579745aeabf52c215ec124df66d5c5c4cf97e2af8336d63fabb0f6ead97b",
+    "candidate_pair_identity": "fed1a73f84a4a06bc7d6516b5ea47ddadb91da07ca06894a4729e5d5aa36ff1d",
+    "safety_certificate": "7375cebd045e529e879ab4dbe50379e4d6f024dc4ca9b018c3833e6e3889a55d",
+    "p0_l6_runtime_configuration_fingerprint": "43038980202a0d6054df881cd76130a9ebe49c23ada628153f1b03547ef8dea5",
+    "production_behavior_change": false
+  },
+  "cohort_inputs": {
+    "held_out_set_hash": "10605a2e4b39f04dfbb9a26126a1a416dc036e185d719c32f4407115809b944b",
+    "stage0_cohort_manifest_hash": "3e75e1e2dddb5456f69b8a6470650ff27e88c6b187edfc307eb181e8c5f8d776",
+    "stage0_intervention_manifest_hash": "b17d8d96b5ca614b0095e245ffca84fed0052827024a63368de432ced5f4e5ac",
+    "phase1b9_policy_version": "controlled-evidence-policy-v1",
+    "phase1b9_policy_hash": "2139e084d97b16f3ae4ad36d95f0c73b4b1f448fe68f197139aa744dfe0e4",
+    "phase1b9_preregistration_hash": "e12846776660960093f9208b099ca171dc4b9c9583150b58de340e965409cd3b",
+    "evaluator_hash": "059caacecf53ccf26ffe6489b4fe9b1247bcaca382107f05b23a34359ed7f229"
+  },
+  "invalidation_rules": [
+    "any contract, source, task, transformation, evaluator, policy, or arm-order hash mismatch",
+    "any provider/model/API/endpoint/settings/seed/reasoning/timeout drift",
+    "any credential read, exposure, redirect, retry, fallback, warmup, or unplanned request",
+    "any missing required accounting, terminal content, tool outcome, or identity field",
+    "any reasoning-content leakage into treatment, later arm, evaluator, task identity, or hidden label",
+    "any BASELINE/NO_OP byte mismatch beyond run metadata",
+    "any undeclared intervention diff, hard safety failure, or baseline-pass to intervention-fail regression",
+    "any post-outcome task removal, denominator change, recovery request, or adaptive replicate"
+  ],
+  "fingerprint": {
+    "algorithm": "SHA-256",
+    "canonicalization": "sorted JSON object keys; arrays preserve order",
+    "recorded_in": "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V1.sha256"
+  }
+}

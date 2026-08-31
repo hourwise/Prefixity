@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prefixity.phase1c.scored-runtime-contract-v1",
+  "title": "Prefixity Phase 1C scored runtime contract v1",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "experiment_id",
+    "status",
+    "engine",
+    "model",
+    "quantization",
+    "context_size",
+    "parallel_slots",
+    "metrics",
+    "runtime_settings",
+    "generation",
+    "timeout_policy",
+    "retry_policy",
+    "freshness_cache_isolation",
+    "response_extraction",
+    "reasoning_isolation",
+    "scoring_boundary",
+    "arm_matching_requirements",
+    "candidate",
+    "cohort_inputs"
+  ],
+  "properties": {
+    "contract_version": {"const": "phase1c-scored-runtime-local-qwen-v1"},
+    "experiment_id": {"const": "phase-1c-scored-capability-v1"},
+    "status": {"const": "DESIGN_ONLY_NO_INFERENCE_AUTHORIZED"},
+    "engine": {"const": "llama.cpp"},
+    "runtime": {"const": "llama-server"},
+    "model": {"const": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0"},
+    "quantization": {"const": "Q4_0"},
+    "context_size": {"const": 8192},
+    "parallel_slots": {"const": 1},
+    "metrics": {"const": "enabled"},
+    "runtime_settings": {
+      "type": "object",
+      "required": ["reasoning", "same_for_all_arms_and_replicates"],
+      "properties": {
+        "reasoning": {"const": "on"},
+        "same_for_all_arms_and_replicates": {"const": true}
+      }
+    },
+    "generation": {
+      "type": "object",
+      "required": ["temperature", "top_p", "max_tokens", "stream", "seed"],
+      "properties": {
+        "temperature": {"const": 0},
+        "top_p": {"const": 1},
+        "max_tokens": {"const": 2048},
+        "stream": {"const": false},
+        "seed": {"type": "object", "required": ["value", "status"]}
+      }
+    },
+    "timeout_policy": {
+      "type": "object",
+      "required": ["connect_timeout_ms", "complete_request_timeout_ms", "supervisor_timeout_ms"]
+    },
+    "retry_policy": {
+      "type": "object",
+      "required": ["automatic_retries", "fallback_requests", "adaptive_replicates"],
+      "properties": {
+        "automatic_retries": {"const": 0},
+        "fallback_requests": {"const": 0},
+        "adaptive_replicates": {"const": 0}
+      }
+    },
+    "freshness_cache_isolation": {
+      "type": "object",
+      "required": ["fresh_server_process_per_arm_replicate", "zero_inference_requests_since_startup", "warmup"]
+    },
+    "response_extraction": {
+      "type": "object",
+      "required": ["final_content_json_pointer", "reasoning_content_json_pointer", "final_content_required_for_terminal_turn"]
+    },
+    "reasoning_isolation": {
+      "type": "object",
+      "required": ["fed_to_later_turns", "fed_to_later_arms", "fed_to_prefixity_treatment", "fed_to_evaluator", "retained_separately_from_final_answer"]
+    },
+    "scoring_boundary": {
+      "type": "object",
+      "required": ["primary_evaluator", "score_source", "reasoning_score", "incomplete_or_ambiguous"]
+    },
+    "arm_matching_requirements": {"type": "array", "minItems": 6},
+    "candidate": {"type": "object", "required": ["source_commit", "production_behavior_change"]},
+    "cohort_inputs": {"type": "object", "required": ["held_out_set_hash", "stage0_cohort_manifest_hash", "evaluator_hash"]}
+  },
+  "additionalProperties": true
+}

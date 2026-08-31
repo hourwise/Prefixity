@@ -1711,3 +1711,82 @@ capability programme remains separately gated. Smoke 01 evidence modification
 is `0`, P0-L6 evidence modification is `0`, and no production Prefixity
 behavior changed. No further localhost/model contact or scored work is
 authorized under this record.
+
+## Phase 1C scored-runtime decision and pilot design record
+
+Stage 1 Smoke 02 was sealed and promoted offline before this design work. The
+exact verified SHA-256 for
+`experiments/runs/phase1c-stage1-schema-smoke-02/readiness.json` is
+`43227aba1bc695f3a7f13dba6203ce67c7f37b90be63fc6b932eb53d229072e9`.
+The prior embedded space was transcription-only; the underlying preserved
+readiness artifact matched the exact 64-character hash. The other preserved
+Smoke 02 artifact hashes are: preflight
+`1eb0d8deb21ba317a3da3bfab02495282cb70448c1dbf8b17bf55a6b4afd8c69`, request
+`49cbcae3c82924542434d5e8f8f92994096d9ce032b99e475a89cdcdc8805b94`, response
+`20514424872eaee321405697287816fcb02d16f5a4be5e1f51aa5ee3c860b978`, and
+stage1-result
+`9049869b3f2ab6e4f49fe801d97dd07cfcdc94483c6984a472ae84636107592c`.
+The accepted execution was fast-forwarded to `main`, pushed, and directly
+verified at `origin/main`:
+`fea5b829a7c80bd3ad5feb23318309fecaf7a3ad`. No evidence was rewritten.
+
+The scored reasoning decision is **Option C: explicit `reasoning=on` with
+reasoning-aware evidence capture**. Option A (`reasoning=off`) is useful for
+bounded schema plumbing but could suppress capability. Option B
+(enabled/auto) preserves reasoning but leaves the runtime behavior less
+explicit and harder to match. Option C fixes the enabled setting identically
+for BASELINE, NO_OP, INTERVENTION, and all replicates, while retaining
+`reasoning_content` in a separate diagnostic field. Only terminal
+`choices[0].message.content` and declared task/tool outcomes are scored.
+Reasoning is never fed to a later turn, arm, treatment, evaluator, task
+identity, or hidden answer label. This is a capability-fairness decision, not
+an inference from Smoke 02's schema-only pass.
+
+The scored output ceiling is `2048` tokens. This is an offline design
+estimate, not a measurement: it is eight times the `256`-token Smoke 01
+ceiling, leaves a declared `512`-token final-answer allowance within the
+estimate, and reserves the remainder for enabled reasoning. A response that
+ends at the ceiling without terminal final content is `INCONCLUSIVE`; there
+is no retry or post-outcome ceiling increase. The exact new contract is
+`docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V1.json`, with canonical
+SHA-256
+`2f05440eb66d195d5362b9ad3a5dfc1708c4b8902cf8cd5774d26076c9aa1520` and
+contract-schema canonical SHA-256
+`ad42524c6fb2f75056391754cfedd3d84658d797199429f0b68827fdb33d80fb`.
+It fixes local `llama.cpp`/`llama-server`, model
+`ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, Q4_0, context `8192`, one slot, metrics,
+endpoint `http://127.0.0.1:8080/v1/chat/completions`, temperature `0`, top-p
+`1`, seed `1`, stream `false`, connect timeout `1000` ms, request timeout
+`600000` ms, supervisor timeout `660000` ms, and zero retries/fallbacks/
+adaptive replicates. Each arm/replicate requires a fresh server process with
+zero prior inference and no warmup; local telemetry does not support a
+provider-cache or billed-cost claim by itself.
+
+The first scored slice is preregistered in
+`docs/phase-1/PHASE_1C_SCORED_PILOT_MANIFEST_V1.json`, canonical SHA-256
+`201c21d7472dcf274bb912488f9334ac264bbba4968262e4e9fa4939a2597552`.
+Its fixed six cases are `h001`, `h004`, `h006`, `h007`, `h009`, and `h010`;
+the fixed arm order is BASELINE -> NO_OP -> INTERVENTION, with replicate `1`
+only and at most three model turns per arm/replicate. The maximum is
+`6 × 3 × 1 × 3 = 54` model inference requests. Four positive frozen
+intervention paths and two dependency/protocol no-op controls make this the
+smallest useful process-and-quality slice; it does not authorize scaling to
+the planned twelve-case, two-replicate, 216-request cohort. Any hard safety
+failure, baseline-pass to intervention-fail, identity/contract/hash drift,
+reasoning leakage, missing accounting/content/tool evidence, retry, redirect,
+fallback, warmup, undeclared diff, or post-outcome denominator change
+invalidates or makes the affected result inconclusive as specified in the
+manifest.
+
+Added isolated experiment-only Rust validation at
+`crates/prefixity-controlled-benchmark/src/phase1c_scored_design.rs` and its
+`prefixity-phase1c-scored-design` binary. It parses only the checked-in
+contract, schema, manifest, and fingerprint sidecars; it opens no socket,
+starts no runtime, reads no credentials, and reads no live evidence. A
+bounded offline JSON/canonical-fingerprint check passed with network calls,
+credential reads, and inference requests all `0`, 18 fixed arm boundaries,
+pilot ceiling `54`, and full-cohort ceiling `216`. The Rust source was not
+compiled in this shell because `cargo`, `rustc`, and `rustup` are unavailable;
+the applicable compile/test/format/clippy commands remain to be run in a
+Rust-equipped validation environment. No production Prefixity behavior,
+P0-L6 evidence, ContextBench material, or live evidence was changed.

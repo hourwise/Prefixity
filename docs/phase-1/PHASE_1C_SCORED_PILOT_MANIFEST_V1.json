@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "manifest_version": "phase1c-scored-pilot-manifest-v1",
+  "experiment_id": "phase-1c-scored-capability-v1",
+  "status": "PREREGISTERED_DESIGN_ONLY_NO_INFERENCE_AUTHORIZED",
+  "runtime_contract_path": "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V1.json",
+  "runtime_contract_sha256": "2f05440eb66d195d5362b9ad3a5dfc1708c4b8902cf8cd5774d26076c9aa1520",
+  "candidate_source_commit": "748e4673e8454d2ac3e27cefabee9259992038aa",
+  "design_base_commit": "fea5b829a7c80bd3ad5feb23318309fecaf7a3ad",
+  "cohort": {
+    "source": "Phase 1B.9 held-out cases and eligible Phase 1C Stage 0 identities",
+    "held_out_set_hash": "10605a2e4b39f04dfbb9a26126a1a416dc036e185d719c32f4407115809b944b",
+    "stage0_cohort_manifest_hash": "3e75e1e2dddb5456f69b8a6470650ff27e88c6b187edfc307eb181e8c5f8d776",
+    "eligible_population": ["h001", "h002", "h003", "h004", "h005", "h006", "h007", "h008", "h009", "h010", "h011", "h012"],
+    "pilot_case_ids": ["h001", "h004", "h006", "h007", "h009", "h010"],
+    "selection_rule": "fixed before inference; four frozen positive interventions plus two frozen safety/no-op controls; no outcome-based selection",
+    "case_metadata": [
+      {"case_id": "h001", "frozen_decision": "PRUNE", "target_event_id": "e002", "coverage": "positive exact duplicate with same-state revision"},
+      {"case_id": "h004", "frozen_decision": "PRUNE", "target_event_id": "e003", "coverage": "positive duplicate with distractor"},
+      {"case_id": "h006", "frozen_decision": "DO_NOTHING", "target_event_id": null, "coverage": "hidden load-bearing dependency no-op control"},
+      {"case_id": "h007", "frozen_decision": "DEFER", "target_event_id": "e001", "coverage": "positive explicit supersession with protocol order"},
+      {"case_id": "h009", "frozen_decision": "RELOCATE_CANDIDATE", "target_event_id": "e002", "coverage": "positive same-zone referenced result relocation"},
+      {"case_id": "h010", "frozen_decision": "DO_NOTHING", "target_event_id": null, "coverage": "protocol/dependency conflict no-op control"}
+    ],
+    "excluded_from_pilot": ["h002", "h003", "h005", "h008", "h011", "h012", "h013", "h014", "s015", "s016", "s017"],
+    "excluded_reason": "pilot is a process-and-quality slice; excluded eligible cases remain part of the later frozen full-cohort design, while procedure controls remain outside the scored denominator"
+  },
+  "arms": ["BASELINE", "NO_OP", "INTERVENTION"],
+  "arm_order": "for each case_id in pilot_case_ids order, replicate 1, execute BASELINE then NO_OP then INTERVENTION",
+  "replicates": [1],
+  "max_model_turns_per_arm_replicate": 3,
+  "max_model_inference_requests": 54,
+  "request_count_formula": "6 cases × 3 arms × 1 replicate × 3 turns",
+  "execution_order": [
+    {"case_id": "h001", "replicate": 1, "arm": "BASELINE"},
+    {"case_id": "h001", "replicate": 1, "arm": "NO_OP"},
+    {"case_id": "h001", "replicate": 1, "arm": "INTERVENTION"},
+    {"case_id": "h004", "replicate": 1, "arm": "BASELINE"},
+    {"case_id": "h004", "replicate": 1, "arm": "NO_OP"},
+    {"case_id": "h004", "replicate": 1, "arm": "INTERVENTION"},
+    {"case_id": "h006", "replicate": 1, "arm": "BASELINE"},
+    {"case_id": "h006", "replicate": 1, "arm": "NO_OP"},
+    {"case_id": "h006", "replicate": 1, "arm": "INTERVENTION"},
+    {"case_id": "h007", "replicate": 1, "arm": "BASELINE"},
+    {"case_id": "h007", "replicate": 1, "arm": "NO_OP"},
+    {"case_id": "h007", "replicate": 1, "arm": "INTERVENTION"},
+    {"case_id": "h009", "replicate": 1, "arm": "BASELINE"},
+    {"case_id": "h009", "replicate": 1, "arm": "NO_OP"},
+    {"case_id": "h009", "replicate": 1, "arm": "INTERVENTION"},
+    {"case_id": "h010", "replicate": 1, "arm": "BASELINE"},
+    {"case_id": "h010", "replicate": 1, "arm": "NO_OP"},
+    {"case_id": "h010", "replicate": 1, "arm": "INTERVENTION"}
+  ],
+  "session_isolation": {
+    "fresh_server_process_per_arm_replicate": true,
+    "zero_inference_since_startup": true,
+    "maximum_listener_checks_per_server": 1,
+    "no_http_probe_or_warmup": true,
+    "no_cache_carryover": true,
+    "persist_before_arm_advance": true
+  },
+  "scoring": {
+    "primary": "Tier 0 structural plus Tier 2 deterministic task/tool evaluator",
+    "evaluator_version": "stage0-deterministic-evaluator-v1",
+    "evaluation_key_sidecar_only": true,
+    "baseline_no_op_equivalence_required": true,
+    "intervention_diff_validator_required": true,
+    "required_context_retention": "100 percent",
+    "baseline_pass_to_intervention_fail_allowed": 0,
+    "critical_regressions_allowed": 0,
+    "incomplete_or_ambiguous": "INCONCLUSIVE",
+    "reasoning_content": "diagnostic-only and excluded from score"
+  },
+  "pilot_acceptance": {
+    "all_18_arm_boundaries_have_complete_identity_and_accounting": true,
+    "all_baseline_no_op_pairs_are_byte_equivalent_except_run_metadata": true,
+    "all_interventions_match_frozen_transformation_validator": true,
+    "no_reasoning_leakage": true,
+    "no_retry_redirect_fallback_or_unplanned_request": true,
+    "no_hard_safety_or_protocol_regression": true,
+    "does_not_authorize_full_cohort": true,
+    "scaling_requires_separate_authorization": true
+  },
+  "invalidation_rules": [
+    "manifest or runtime contract hash mismatch",
+    "case identity, source hash, evaluator, policy, or candidate identity mismatch",
+    "task or pilot case selected after observing any model outcome",
+    "any arm order, replicate, turn ceiling, request ceiling, or freshness violation",
+    "any retry, fallback, redirect, warmup, unplanned tool call, or recovery request",
+    "any missing terminal content, required accounting, tool outcome, or durable artifact",
+    "any reasoning-content leakage into treatment context, later arm, evaluator, task identity, or hidden label",
+    "any undeclared baseline/no-op or intervention byte difference",
+    "any hard safety failure or baseline-pass to intervention-fail result"
+  ],
+  "aggregation": {
+    "order": [
+      "validate manifest, runtime, candidate, task, arm, evaluator, and evidence identities",
+      "validate each arm boundary and baseline/no-op pairing",
+      "compute per-task PASS, FAIL, or INCONCLUSIVE before cohort totals",
+      "apply hard safety and completeness gates",
+      "retain all task and arm records including non-winning and inconclusive records",
+      "report pilot result separately from the full-cohort decision"
+    ],
+    "capability_result_classes": ["CAPABILITY_PRESERVED", "CAPABILITY_IMPROVED", "CAPABILITY_DEGRADED", "MIXED_INCONCLUSIVE", "INVALID_EXPERIMENT"],
+    "efficiency_is_separate_axis": true
+  },
+  "full_programme_boundary": {
+    "planned_case_ids": ["h001", "h002", "h003", "h004", "h005", "h006", "h007", "h008", "h009", "h010", "h011", "h012"],
+    "replicates": 2,
+    "maximum_model_inference_requests": 216,
+    "pilot_does_not_consume_full_cohort_budget": true,
+    "next_step": "separate direct authorization required; do not execute from this design commit"
+  },
+  "fingerprint": {
+    "algorithm": "SHA-256",
+    "canonicalization": "sorted JSON object keys; arrays preserve order",
+    "recorded_in": "docs/phase-1/PHASE_1C_SCORED_PILOT_MANIFEST_V1.sha256"
+  }
+}

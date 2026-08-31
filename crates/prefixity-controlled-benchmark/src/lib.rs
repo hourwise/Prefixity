@@ -30,6 +30,7 @@ mod phase1c_stage1_local_qwen;
 mod phase1c_stage1_reasoning_off_live;
 mod phase1c_stage1_reasoning_off_postrun;
 mod phase1c_stage1_reasoning_off_preflight;
+mod phase1c_scored_design;
 mod planner;
 mod world;
 
@@ -194,6 +195,11 @@ pub use phase1c_stage1_reasoning_off_postrun::{
 };
 pub use phase1c_stage1_reasoning_off_preflight::{
     preflight_stage1_reasoning_off_smoke, RemediationPreflight, RemediationPreflightError,
+};
+pub use phase1c_scored_design::{
+    fingerprint_scored_design, validate_scored_design, ScoredDesignError,
+    ScoredDesignFingerprint, SCORED_CONTRACT_FINGERPRINT_PATH, SCORED_CONTRACT_PATH,
+    SCORED_CONTRACT_SCHEMA_PATH, SCORED_PILOT_FINGERPRINT_PATH, SCORED_PILOT_MANIFEST_PATH,
 };
 pub use planner::{project_planner_evidence, run_frozen_planner};
 pub use world::{ExecutionStatus, ScriptedWorld, WorldExecution};
