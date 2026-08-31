@@ -2122,3 +2122,39 @@ request, NO_OP, INTERVENTION, other case, or additional replicate. The exact
 remaining state is:
 
 `H001 V2 BASELINE READY FOR SEPARATE LIVE AUTHORIZATION`
+
+## Phase 1C h001 V2 BASELINE live execution record
+
+The separately authorized h001 V2 BASELINE launch was attempted once through
+the checked-in `prefixity-phase1c-live-supervisor` using the already-built
+`prefixity-phase1c-h001-v2` child. The operator had supplied the required
+fresh-runtime confirmation for Qwen3.5-0.8B Q4_0, context 8192, one slot,
+metrics enabled, reasoning on, and `127.0.0.1:8080`, with zero requests since
+startup.
+
+The supervisor launched exactly one child with no retry. The child failed
+before V2 preflight and before the single TCP readiness check because the V2
+CLI parser expects the confirmation flag in the wrong tuple position at
+`crates/prefixity-controlled-benchmark/src/bin/phase1c_h001_v2.rs:13-14`.
+It printed usage and exited with code `1`. The supervisor persisted
+`CHILD_FAILED`; supervisor network calls and inference requests were `0`, and
+no localhost readiness check or HTTP request occurred.
+
+The bounded record is
+`experiments/runs/phase1c-scored-capability-v2/h001/replicate-1/baseline/supervisor-result.json`
+with ordinary SHA-256
+`bf65a2b4e9a326354566df8852d4d05e858f263e628cd46e046cb8d2f0492e5`. No
+request, response, normalized, trajectory, or arm-result artifact was
+fabricated. The V1 evidence tree and V2 contract/manifest/identity remain
+unchanged.
+
+This is a pre-inference runner failure, not a capability result. The V2
+BASELINE launch is consumed; no retry, patch-and-rerun, NO_OP, INTERVENTION,
+h004, or additional replicate is authorized by this record. Separate offline
+remediation and fresh live authorization are required for any corrected run.
+
+Accounting remains: historical schema-smoke requests `2`, V1 h001 BASELINE
+requests `1`, V2 h001 BASELINE requests `0`, NO_OP `0`, INTERVENTION `0`, h004
+`0`, retries `0`, and Prefixity behavioral changes `0`.
+
+`H001 V2 BASELINE CHILD_FAILED BEFORE MODEL CONTACT — STOP`
