@@ -1645,3 +1645,69 @@ parallel slots `1`, metrics enabled, `reasoning=off`, endpoint base
 `http://127.0.0.1:8080`, and zero inference requests since startup. A future
 authorized execution may then perform exactly one permitted listener check
 and exactly one Smoke 02 request, with no retry or additional inference.
+
+## Phase 1C Stage 1 Smoke 02 reasoning-off execution record
+
+The operator supplied fresh current confirmation for Smoke 02: model
+`ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, Q4_0 quantization, context `8192`, one
+parallel slot, metrics enabled, `reasoning=off`, endpoint base
+`http://127.0.0.1:8080`, a server freshly started specifically for Smoke 02,
+zero inference requests since startup, and no manual probe, warmup, completion,
+chat, browser, or other model request since startup.
+
+The dedicated reasoning-off runner performed exactly one non-inference TCP
+listener check. It passed in `2` ms, and readiness recorded
+`listener_check_attempts=1`, `network_calls=1`, and
+`inference_requests=0`. It then issued exactly one registered Smoke 02 HTTP
+request with one transport attempt and zero retries, fallbacks, or replicates.
+
+The request used the canonical projection and wire-request SHA-256
+`49cbcae3c82924542434d5e8f8f92994096d9ce032b99e475a89cdcdc8805b94`, with
+temperature `0`, top-p `1`, max tokens `256`, stream `false`, seed `1`, and
+estimated input size `122` tokens. No scored task was included or consumed.
+
+The request completed with HTTP `200` and a complete `754`-byte response in
+`4274` ms transport time. The raw response body is preserved at
+`experiments/runs/phase1c-stage1-schema-smoke-02/response-body.bin` with
+SHA-256
+`20514424872eaee321405697287816fcb02d16f5a4be5e1f51aa5ee3c860b978`.
+The response reported `finish_reason=stop`,
+`prompt_tokens=81`, `completion_tokens=29`, `total_tokens=110`, and
+`cached_tokens=0`. Raw llama.cpp timing telemetry is preserved: `prompt_n=81`,
+`prompt_ms=1218.0`, `predicted_n=29`, `predicted_ms=3017.873`, and
+`cache_n=0`, together with the other reported timing fields. No telemetry was
+fabricated or inferred.
+
+`choices[0].message.content` was non-empty at `94` bytes and `94` Unicode
+characters. No `reasoning_content` field was present. The content parsed as
+the exact required JSON and normalized to:
+
+```json
+{
+  "schema_version": "phase1c-stage1-smoke-v1",
+  "status": "ok",
+  "marker": "PREFIXITY_PHASE1C_STAGE1"
+}
+```
+
+The evidence record reports successful JSON parsing, exact semantic payload
+validation, schema normalization, and no scored-task consumption. The offline
+post-run validator returned `VALIDATED`, rechecked the V2 contract and fixture
+fingerprints, request identity, response-body hash, raw response fields,
+usage, timings, finish reason, and single-request accounting. No localhost or
+model contact occurred during post-run validation.
+
+Final Smoke 02 state is `PASSED`. Allowed conclusion:
+`PHASE 1C STAGE 1 LOCAL QWEN SCHEMA SMOKE 02 PASSED`. This establishes only
+that the registered reasoning-off local-Qwen runtime traversed the Stage 1
+schema evidence pipeline successfully; it is not a scored capability or
+performance result.
+
+Phase 1C live inference accounting is now exactly `2`: Smoke 01 `1` failed
+request plus Smoke 02 `1` passed request. Smoke 02 requests are exactly `1`,
+automatic retries are `0`, BASELINE/NO_OP/INTERVENTION scored requests are
+`0`, scored replicates are `0`, ContextBench work is `0`, and the scored
+capability programme remains separately gated. Smoke 01 evidence modification
+is `0`, P0-L6 evidence modification is `0`, and no production Prefixity
+behavior changed. No further localhost/model contact or scored work is
+authorized under this record.

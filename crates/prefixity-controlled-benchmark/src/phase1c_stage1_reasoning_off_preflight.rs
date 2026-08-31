@@ -79,6 +79,17 @@ pub struct RemediationPreflight {
 
 pub fn preflight_stage1_reasoning_off_smoke(
 ) -> Result<RemediationPreflight, RemediationPreflightError> {
+    preflight_stage1_reasoning_off_smoke_with_evidence_guard(true)
+}
+
+pub fn validate_stage1_reasoning_off_contract_and_fixture(
+) -> Result<RemediationPreflight, RemediationPreflightError> {
+    preflight_stage1_reasoning_off_smoke_with_evidence_guard(false)
+}
+
+fn preflight_stage1_reasoning_off_smoke_with_evidence_guard(
+    require_fresh_evidence_location: bool,
+) -> Result<RemediationPreflight, RemediationPreflightError> {
     let v1_contract = read_json(V1_CONTRACT_PATH)?;
     let v2_contract = read_json(V2_CONTRACT_PATH)?;
     let v1_fixture = read_json(V1_FIXTURE_PATH)?;
@@ -114,7 +125,7 @@ pub fn preflight_stage1_reasoning_off_smoke(
             "accepted forensic review hash changed".to_string(),
         ));
     }
-    if workspace_path(V2_EVIDENCE_DIR).exists() {
+    if require_fresh_evidence_location && workspace_path(V2_EVIDENCE_DIR).exists() {
         return Err(RemediationPreflightError::Validation(format!(
             "fresh Smoke 02 evidence location already exists: {V2_EVIDENCE_DIR}"
         )));
@@ -501,7 +512,7 @@ mod tests {
 
     #[test]
     fn actual_smoke02_contract_and_fixture_pass_offline_preflight() {
-        let report = preflight_stage1_reasoning_off_smoke().unwrap();
+        let report = validate_stage1_reasoning_off_contract_and_fixture().unwrap();
         assert_eq!(report.state, "PREPARED");
         assert_eq!(report.experiment_id, "phase-1c-stage1-schema-smoke-02");
         assert_eq!(report.reasoning, "off");

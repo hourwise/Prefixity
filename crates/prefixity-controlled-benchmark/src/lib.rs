@@ -27,6 +27,8 @@ mod paired_mutation;
 mod phase1b9;
 mod phase1c_stage0;
 mod phase1c_stage1_local_qwen;
+mod phase1c_stage1_reasoning_off_live;
+mod phase1c_stage1_reasoning_off_postrun;
 mod phase1c_stage1_reasoning_off_preflight;
 mod planner;
 mod world;
@@ -183,6 +185,12 @@ pub use phase1c_stage1_local_qwen::{
     execute_stage1_smoke, preflight_stage1_smoke, Stage1Error, Stage1Preflight, Stage1RunRecord,
     STAGE1_CONTRACT_PATH, STAGE1_EVIDENCE_DIR, STAGE1_FIXTURE_PATH, STAGE1_OUTPUT_SCHEMA_PATH,
     STAGE1_REQUEST_SCHEMA_PATH,
+};
+pub use phase1c_stage1_reasoning_off_live::{
+    execute_stage1_reasoning_off_smoke, ReasoningOffLiveError,
+};
+pub use phase1c_stage1_reasoning_off_postrun::{
+    validate_stage1_reasoning_off_evidence, ReasoningOffPostrunError,
 };
 pub use phase1c_stage1_reasoning_off_preflight::{
     preflight_stage1_reasoning_off_smoke, RemediationPreflight, RemediationPreflightError,
