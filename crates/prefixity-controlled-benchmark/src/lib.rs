@@ -25,12 +25,12 @@ mod observation_diagnostics;
 mod oracle;
 mod paired_mutation;
 mod phase1b9;
+mod phase1c_scored_design;
 mod phase1c_stage0;
 mod phase1c_stage1_local_qwen;
 mod phase1c_stage1_reasoning_off_live;
 mod phase1c_stage1_reasoning_off_postrun;
 mod phase1c_stage1_reasoning_off_preflight;
-mod phase1c_scored_design;
 mod planner;
 mod world;
 
@@ -175,6 +175,11 @@ pub use phase1b9::{
     Phase1b9Report, ResearchInterventionClass, ResearchPolicyDecision, PHASE_1B9_POLICY_VERSION,
     PHASE_1B9_SCOPE,
 };
+pub use phase1c_scored_design::{
+    fingerprint_scored_design, validate_scored_design, ScoredDesignError, ScoredDesignFingerprint,
+    SCORED_CONTRACT_FINGERPRINT_PATH, SCORED_CONTRACT_PATH, SCORED_CONTRACT_SCHEMA_PATH,
+    SCORED_PILOT_FINGERPRINT_PATH, SCORED_PILOT_MANIFEST_PATH,
+};
 pub use phase1c_stage0::{
     canonical_stage0_report_json, run_stage0_certification, stage0_design_hash, Stage0AbortProbe,
     Stage0CertificationStatus, Stage0EfficiencyGateResult, Stage0Manifest, Stage0Report,
@@ -195,11 +200,6 @@ pub use phase1c_stage1_reasoning_off_postrun::{
 };
 pub use phase1c_stage1_reasoning_off_preflight::{
     preflight_stage1_reasoning_off_smoke, RemediationPreflight, RemediationPreflightError,
-};
-pub use phase1c_scored_design::{
-    fingerprint_scored_design, validate_scored_design, ScoredDesignError,
-    ScoredDesignFingerprint, SCORED_CONTRACT_FINGERPRINT_PATH, SCORED_CONTRACT_PATH,
-    SCORED_CONTRACT_SCHEMA_PATH, SCORED_PILOT_FINGERPRINT_PATH, SCORED_PILOT_MANIFEST_PATH,
 };
 pub use planner::{project_planner_evidence, run_frozen_planner};
 pub use world::{ExecutionStatus, ScriptedWorld, WorldExecution};

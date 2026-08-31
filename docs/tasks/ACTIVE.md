@@ -1782,11 +1782,18 @@ Added isolated experiment-only Rust validation at
 `crates/prefixity-controlled-benchmark/src/phase1c_scored_design.rs` and its
 `prefixity-phase1c-scored-design` binary. It parses only the checked-in
 contract, schema, manifest, and fingerprint sidecars; it opens no socket,
-starts no runtime, reads no credentials, and reads no live evidence. A
-bounded offline JSON/canonical-fingerprint check passed with network calls,
-credential reads, and inference requests all `0`, 18 fixed arm boundaries,
-pilot ceiling `54`, and full-cohort ceiling `216`. The Rust source was not
-compiled in this shell because `cargo`, `rustc`, and `rustup` are unavailable;
-the applicable compile/test/format/clippy commands remain to be run in a
-Rust-equipped validation environment. No production Prefixity behavior,
-P0-L6 evidence, ContextBench material, or live evidence was changed.
+starts no runtime, reads no credentials, and reads no live evidence. The
+recovered official Rustup stable toolchain is `cargo 1.97.1` and `rustc
+1.97.1`, with `rustfmt` and `clippy` installed; the repository expectation is
+stable Rust with MSRV `1.86`.
+
+The focused controlled-benchmark package tests passed (`45` library tests and
+all package integration suites), the checked-in scored-design validator
+returned `VALIDATED_OFFLINE` with network calls, credential reads, and
+inference requests all `0`, 18 fixed arm boundaries, pilot ceiling `54`, and
+full-cohort ceiling `216`. Strict workspace Clippy with `-D warnings`,
+`cargo fmt --all -- --check`, and full `cargo test --workspace --offline
+--locked` all passed. The formatter required a minimal experiment-validator-
+only source ordering/wrapping fix; no contract, manifest, runtime, scoring,
+or Prefixity behavior changed. No P0-L6 evidence, ContextBench material, or
+live evidence was changed.

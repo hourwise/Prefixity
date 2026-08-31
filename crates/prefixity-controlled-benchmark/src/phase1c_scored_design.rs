@@ -11,12 +11,10 @@ use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub const SCORED_CONTRACT_PATH: &str =
-    "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V1.json";
+pub const SCORED_CONTRACT_PATH: &str = "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V1.json";
 pub const SCORED_CONTRACT_SCHEMA_PATH: &str =
     "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V1.schema.json";
-pub const SCORED_PILOT_MANIFEST_PATH: &str =
-    "docs/phase-1/PHASE_1C_SCORED_PILOT_MANIFEST_V1.json";
+pub const SCORED_PILOT_MANIFEST_PATH: &str = "docs/phase-1/PHASE_1C_SCORED_PILOT_MANIFEST_V1.json";
 pub const SCORED_CONTRACT_FINGERPRINT_PATH: &str =
     "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V1.sha256";
 pub const SCORED_PILOT_FINGERPRINT_PATH: &str =
@@ -129,7 +127,11 @@ fn validate_contract(value: &Value) -> Result<(), ScoredDesignError> {
     expect_string(value, "status", "DESIGN_ONLY_NO_INFERENCE_AUTHORIZED")?;
     expect_string(value, "engine", "llama.cpp")?;
     expect_string(value, "runtime", "llama-server")?;
-    expect_string(value, "api_surface", "llama.cpp-openai-compatible-chat-completions-v1")?;
+    expect_string(
+        value,
+        "api_surface",
+        "llama.cpp-openai-compatible-chat-completions-v1",
+    )?;
     expect_string(value, "endpoint", EXPECTED_ENDPOINT)?;
     expect_string(value, "host", "127.0.0.1")?;
     expect_u64(value, "port", 8080)?;
@@ -139,7 +141,11 @@ fn validate_contract(value: &Value) -> Result<(), ScoredDesignError> {
     expect_u64(value, "parallel_slots", 1)?;
     expect_string(value, "metrics", "enabled")?;
     expect_string(value, "runtime_settings.reasoning", "on")?;
-    expect_bool(value, "runtime_settings.same_for_all_arms_and_replicates", true)?;
+    expect_bool(
+        value,
+        "runtime_settings.same_for_all_arms_and_replicates",
+        true,
+    )?;
     expect_u64(value, "generation.max_tokens", 2048)?;
     expect_number(value, "generation.temperature", 0.0)?;
     expect_number(value, "generation.top_p", 1.0)?;
@@ -152,8 +158,16 @@ fn validate_contract(value: &Value) -> Result<(), ScoredDesignError> {
     expect_u64(value, "retry_policy.automatic_retries", 0)?;
     expect_u64(value, "retry_policy.fallback_requests", 0)?;
     expect_u64(value, "retry_policy.adaptive_replicates", 0)?;
-    expect_u64(value, "request_ceiling.per_arm_replicate_max_model_turns", 3)?;
-    expect_u64(value, "request_ceiling.pilot_max_model_inference_requests", 54)?;
+    expect_u64(
+        value,
+        "request_ceiling.per_arm_replicate_max_model_turns",
+        3,
+    )?;
+    expect_u64(
+        value,
+        "request_ceiling.pilot_max_model_inference_requests",
+        54,
+    )?;
     expect_u64(
         value,
         "request_ceiling.full_cohort_planned_max_model_inference_requests",
@@ -216,7 +230,11 @@ fn validate_contract(value: &Value) -> Result<(), ScoredDesignError> {
 
 fn validate_schema(value: &Value) -> Result<(), ScoredDesignError> {
     expect_string(value, "$id", "prefixity.phase1c.scored-runtime-contract-v1")?;
-    expect_string(value, "title", "Prefixity Phase 1C scored runtime contract v1")?;
+    expect_string(
+        value,
+        "title",
+        "Prefixity Phase 1C scored runtime contract v1",
+    )?;
     expect_string(value, "type", "object")?;
     for field in [
         "contract_version",
@@ -246,7 +264,11 @@ fn validate_schema(value: &Value) -> Result<(), ScoredDesignError> {
 }
 
 fn validate_manifest(value: &Value) -> Result<(), ScoredDesignError> {
-    expect_string(value, "manifest_version", "phase1c-scored-pilot-manifest-v1")?;
+    expect_string(
+        value,
+        "manifest_version",
+        "phase1c-scored-pilot-manifest-v1",
+    )?;
     expect_string(value, "experiment_id", EXPECTED_EXPERIMENT_ID)?;
     expect_string(
         value,
@@ -281,8 +303,8 @@ fn validate_manifest(value: &Value) -> Result<(), ScoredDesignError> {
     }
     let eligible = array_strings_at(value, "cohort.eligible_population")?;
     let expected_eligible = [
-        "h001", "h002", "h003", "h004", "h005", "h006", "h007", "h008", "h009",
-        "h010", "h011", "h012",
+        "h001", "h002", "h003", "h004", "h005", "h006", "h007", "h008", "h009", "h010", "h011",
+        "h012",
     ]
     .iter()
     .map(|case_id| case_id.to_string())
@@ -331,14 +353,26 @@ fn validate_manifest(value: &Value) -> Result<(), ScoredDesignError> {
         "session_isolation.fresh_server_process_per_arm_replicate",
         true,
     )?;
-    expect_bool(value, "session_isolation.zero_inference_since_startup", true)?;
+    expect_bool(
+        value,
+        "session_isolation.zero_inference_since_startup",
+        true,
+    )?;
     expect_bool(value, "session_isolation.no_http_probe_or_warmup", true)?;
     expect_bool(value, "session_isolation.no_cache_carryover", true)?;
     expect_bool(value, "scoring.evaluation_key_sidecar_only", true)?;
     expect_bool(value, "scoring.baseline_no_op_equivalence_required", true)?;
     expect_bool(value, "scoring.intervention_diff_validator_required", true)?;
-    expect_bool(value, "pilot_acceptance.does_not_authorize_full_cohort", true)?;
-    expect_bool(value, "pilot_acceptance.scaling_requires_separate_authorization", true)?;
+    expect_bool(
+        value,
+        "pilot_acceptance.does_not_authorize_full_cohort",
+        true,
+    )?;
+    expect_bool(
+        value,
+        "pilot_acceptance.scaling_requires_separate_authorization",
+        true,
+    )?;
     expect_u64(
         value,
         "full_programme_boundary.maximum_model_inference_requests",
@@ -347,24 +381,31 @@ fn validate_manifest(value: &Value) -> Result<(), ScoredDesignError> {
     Ok(())
 }
 
-fn manifest_counts(
-    value: &Value,
-) -> Result<(usize, usize, usize, u64, u64), ScoredDesignError> {
+fn manifest_counts(value: &Value) -> Result<(usize, usize, usize, u64, u64), ScoredDesignError> {
     let cases = array_strings_at(value, "cohort.pilot_case_ids")?;
     let arms = array_strings_at(value, "arms")?;
     let replicates = array_u64_at(value, "replicates")?;
     let pilot_max = value_at(value, "max_model_inference_requests")?
         .as_u64()
         .ok_or_else(|| invalid_type("max_model_inference_requests", "unsigned integer"))?;
-    let full_max = value_at(value, "full_programme_boundary.maximum_model_inference_requests")?
-        .as_u64()
-        .ok_or_else(|| {
-            invalid_type(
-                "full_programme_boundary.maximum_model_inference_requests",
-                "unsigned integer",
-            )
-        })?;
-    Ok((cases.len(), arms.len(), replicates.len(), pilot_max, full_max))
+    let full_max = value_at(
+        value,
+        "full_programme_boundary.maximum_model_inference_requests",
+    )?
+    .as_u64()
+    .ok_or_else(|| {
+        invalid_type(
+            "full_programme_boundary.maximum_model_inference_requests",
+            "unsigned integer",
+        )
+    })?;
+    Ok((
+        cases.len(),
+        arms.len(),
+        replicates.len(),
+        pilot_max,
+        full_max,
+    ))
 }
 
 fn validate_sidecar(
@@ -381,7 +422,10 @@ fn validate_sidecar(
         "sorted JSON object keys; arrays preserve order",
     )?;
     expect_string(&sidecar, "canonical_sha256", expected_hash)?;
-    if expected_hash.len() != 64 || !expected_hash.chars().all(|character| character.is_ascii_hexdigit())
+    if expected_hash.len() != 64
+        || !expected_hash
+            .chars()
+            .all(|character| character.is_ascii_hexdigit())
     {
         return Err(ScoredDesignError::Validation(format!(
             "invalid canonical SHA-256 for {artifact_path}"
@@ -395,7 +439,9 @@ fn read_json(path: &str) -> Result<Value, ScoredDesignError> {
 }
 
 fn workspace_path(path: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../..").join(path)
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .join(path)
 }
 
 fn value_at<'a>(value: &'a Value, path: &str) -> Result<&'a Value, ScoredDesignError> {
