@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_SCORED_PILOT_MANIFEST_V2.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "f8548455180f0e75d3e35a5662bbef3f79e2aca4ef506e281800c82a8feefb9e"
+}

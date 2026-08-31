@@ -2074,3 +2074,51 @@ requests `1`, h001 NO_OP `0`, h001 INTERVENTION `0`, total Phase 1C live
 requests `3`, automatic retries `0`, ContextBench work `0`, Prefixity
 behavioral changes `0`, and P0-L6 evidence changes `0`. No new inference or
 localhost contact occurred during review.
+
+## Phase 1C h001 timeout-only V2 preparation record
+
+The approved offline-only timeout remediation preparation is complete on
+branch `agent/phase-1c-h001-timeout-v2-prep`. Accepted h001 V1 history was
+first promoted to `main` at `80152eb5ef55fa8e1c38d6ea97602cccbc615e63`; the V2
+branch is rooted at that promoted commit and has not been merged to `main`.
+
+The new V2 runtime contract, pilot manifest, and h001 BASELINE execution
+identity are checked in under `docs/phase-1/` with SHA-256 sidecars:
+
+- contract:
+  `75dcc6a8a4db162e38557487c516ebe102ffebaa55c3e10a89a33d7d2c76b620`;
+- pilot manifest:
+  `f8548455180f0e75d3e35a5662bbef3f79e2aca4ef506e281800c82a8feefb9e`;
+- h001 V2 BASELINE identity:
+  `dea4c693bcea61e7951c49d8d95b7d83294d10409d5c606b6d0f6a004f154bcc`.
+
+The V2 validator proves that model, quantization, context, parallelism,
+metrics, reasoning mode, sampling, seed, model-visible request, task/source/
+required/tool/evaluator/arm identities, pilot cases, arm order, replicate,
+generation bound, retry policy, and freshness/cache semantics are unchanged
+from V1. The only runtime budget delta is `complete_request_timeout_ms`
+`600000 -> 1200000`; the outer supervisor is implemented and actually
+enforced at `1320000` ms. Connect timeout remains `1000` ms. The V2 h001
+BASELINE projection remains exactly 1310 bytes and hash
+`26bc77415683d81c9f3af4e556151d8abab775b48dd5f4632ed6caba1ad25a2a`.
+
+The experiment-only `prefixity-phase1c-live-supervisor` binary launches one
+already-built child runner, performs no network/inference/retry/arm advance,
+and distinguishes `COMPLETED`, `CHILD_FAILED`, and
+`SUPERVISOR_TIMEOUT`. Bounded tests cover normal completion, child failure,
+and timeout termination without waiting 22 minutes. The future V2 h001 runner
+is bound to the V2 contract and evidence root
+`experiments/runs/phase1c-scored-capability-v2/h001/replicate-1/baseline/`.
+
+Offline V2 fingerprint, preflight, dry-run, focused V2 tests, supervisor
+tests, formatting, and strict Clippy passed. The preflight/dry-run accounting
+is zero network calls, zero credential reads, and zero inference requests.
+No V2 evidence directory was created; V1 evidence remains frozen and was not
+modified. No large inline PowerShell forensic command was used and endpoint
+protection was not weakened.
+
+This preparation stops before any Qwen start, listener check, V2 BASELINE
+request, NO_OP, INTERVENTION, other case, or additional replicate. The exact
+remaining state is:
+
+`H001 V2 BASELINE READY FOR SEPARATE LIVE AUTHORIZATION`

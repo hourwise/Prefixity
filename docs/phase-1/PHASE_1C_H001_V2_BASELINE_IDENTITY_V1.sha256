@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_H001_V2_BASELINE_IDENTITY_V1.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "dea4c693bcea61e7951c49d8d95b7d83294d10409d5c606b6d0f6a004f154bcc"
+}

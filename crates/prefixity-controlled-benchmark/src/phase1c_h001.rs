@@ -73,7 +73,7 @@ impl H001Arm {
         }
     }
 
-    fn as_str(self) -> &'static str {
+    pub(crate) fn as_str(self) -> &'static str {
         match self {
             Self::Baseline => "BASELINE",
             Self::NoOp => "NO_OP",
@@ -202,19 +202,39 @@ pub fn dry_run_h001(arm: H001Arm) -> Result<Value, H001Error> {
 }
 
 pub fn execute_h001_arm(arm: H001Arm, confirm_fresh_runtime: bool) -> Result<Value, H001Error> {
+    let preflight = preflight_h001()?;
+    let artifacts = load_artifacts()?;
+    validate_artifacts(&artifacts)?;
+    let request = request_for_arm(&artifacts.arms, arm)?;
+    execute_h001_arm_with_spec(
+        arm,
+        confirm_fresh_runtime,
+        &preflight,
+        &artifacts.contract,
+        &request,
+        arm_evidence_dir(arm),
+        EXPERIMENT_ID,
+    )
+}
+
+pub(crate) fn execute_h001_arm_with_spec(
+    arm: H001Arm,
+    confirm_fresh_runtime: bool,
+    preflight: &Value,
+    contract: &Value,
+    request: &Value,
+    evidence_dir: PathBuf,
+    experiment_id: &str,
+) -> Result<Value, H001Error> {
     if !confirm_fresh_runtime {
         return Err(H001Error::Validation(
             "explicit fresh-runtime confirmation is required before the listener check".to_string(),
         ));
     }
 
-    let preflight = preflight_h001()?;
-    let artifacts = load_artifacts()?;
-    let request = request_for_arm(&artifacts.arms, arm)?;
     let request_bytes = serde_json::to_vec(&request)?;
     let request_sha256 = canonical_hash(&request)?;
     let wire_request_sha256 = sha256_hex(&request_bytes);
-    let evidence_dir = arm_evidence_dir(arm);
     if evidence_dir.exists() {
         return Err(H001Error::Validation(format!(
             "h001 arm evidence already exists: {}",
@@ -225,10 +245,7 @@ pub fn execute_h001_arm(arm: H001Arm, confirm_fresh_runtime: bool) -> Result<Val
     let readiness_started = Instant::now();
     let readiness = TcpStream::connect_timeout(
         &SocketAddr::from(([127, 0, 0, 1], PORT)),
-        Duration::from_millis(contract_u64(
-            &artifacts.contract,
-            "timeout_policy.connect_timeout_ms",
-        )?),
+        Duration::from_millis(contract_u64(contract, "timeout_policy.connect_timeout_ms")?),
     );
     let readiness_elapsed_ms = readiness_started.elapsed().as_millis() as u64;
     if let Err(error) = readiness {
@@ -238,7 +255,7 @@ pub fn execute_h001_arm(arm: H001Arm, confirm_fresh_runtime: bool) -> Result<Val
     }
 
     fs::create_dir_all(&evidence_dir)?;
-    write_json(&evidence_dir.join("preflight.json"), &preflight)?;
+    write_json(&evidence_dir.join("preflight.json"), preflight)?;
     write_json(
         &evidence_dir.join("runtime-confirmation.json"),
         &json!({
@@ -274,11 +291,11 @@ pub fn execute_h001_arm(arm: H001Arm, confirm_fresh_runtime: bool) -> Result<Val
 
     let client = Client::builder()
         .connect_timeout(Duration::from_millis(contract_u64(
-            &artifacts.contract,
+            contract,
             "timeout_policy.connect_timeout_ms",
         )?))
         .timeout(Duration::from_millis(contract_u64(
-            &artifacts.contract,
+            contract,
             "timeout_policy.complete_request_timeout_ms",
         )?))
         .redirect(Policy::none())
@@ -295,15 +312,16 @@ pub fn execute_h001_arm(arm: H001Arm, confirm_fresh_runtime: bool) -> Result<Val
     let response = match response {
         Ok(response) => response,
         Err(error) => {
-            let result = ambiguous_result(
+            let result = ambiguous_result(AmbiguousResultInput {
                 arm,
-                &request_sha256,
-                &wire_request_sha256,
-                request_bytes.len(),
+                request_sha256: &request_sha256,
+                wire_request_sha256: &wire_request_sha256,
+                request_bytes: request_bytes.len(),
                 readiness_elapsed_ms,
                 transport_elapsed_ms,
-                format!("request dispatch/completion is ambiguous: {error}"),
-            );
+                error: format!("request dispatch/completion is ambiguous: {error}"),
+                experiment_id,
+            });
             persist_ambiguous(&evidence_dir, &result)?;
             return Ok(result);
         }
@@ -320,15 +338,16 @@ pub fn execute_h001_arm(arm: H001Arm, confirm_fresh_runtime: bool) -> Result<Val
     let response_body_sha256 = sha256_hex(&response_body);
     write_bytes(&evidence_dir.join("response-turn-1.bin"), &response_body)?;
     if let Err(error) = body_result {
-        let result = ambiguous_result(
+        let result = ambiguous_result(AmbiguousResultInput {
             arm,
-            &request_sha256,
-            &wire_request_sha256,
-            request_bytes.len(),
+            request_sha256: &request_sha256,
+            wire_request_sha256: &wire_request_sha256,
+            request_bytes: request_bytes.len(),
             readiness_elapsed_ms,
             transport_elapsed_ms,
-            format!("response body read is ambiguous: {error}"),
-        );
+            error: format!("response body read is ambiguous: {error}"),
+            experiment_id,
+        });
         persist_ambiguous(&evidence_dir, &result)?;
         return Ok(result);
     }
@@ -417,7 +436,7 @@ pub fn execute_h001_arm(arm: H001Arm, confirm_fresh_runtime: bool) -> Result<Val
     let result = json!({
         "schema_id": "prefixity.phase1c.h001.arm-result",
         "schema_version": 1,
-        "experiment_id": EXPERIMENT_ID,
+        "experiment_id": experiment_id,
         "task_id": TASK_ID,
         "arm": arm.as_str(),
         "replicate": 1,
@@ -463,9 +482,12 @@ pub fn execute_h001_arm(arm: H001Arm, confirm_fresh_runtime: bool) -> Result<Val
 }
 
 pub fn score_h001_arm(arm: H001Arm) -> Result<Value, H001Error> {
+    score_h001_arm_at(arm, arm_evidence_dir(arm))
+}
+
+pub(crate) fn score_h001_arm_at(arm: H001Arm, evidence_dir: PathBuf) -> Result<Value, H001Error> {
     let artifacts = load_artifacts()?;
     validate_artifacts(&artifacts)?;
-    let evidence_dir = arm_evidence_dir(arm);
     let arm_result = read_json(&evidence_dir.join("arm-result.json"))?;
     let normalized = read_json(&evidence_dir.join("normalized-turn-1.json"))?;
     if arm_result.get("arm").and_then(Value::as_str) != Some(arm.as_str()) {
@@ -1078,21 +1100,24 @@ fn prompt_sha256(task: &Value) -> Result<String, H001Error> {
     Ok(canonical_hash(messages)?)
 }
 
-fn ambiguous_result(
+struct AmbiguousResultInput<'a> {
     arm: H001Arm,
-    request_sha256: &str,
-    wire_request_sha256: &str,
+    request_sha256: &'a str,
+    wire_request_sha256: &'a str,
     request_bytes: usize,
     readiness_elapsed_ms: u64,
     transport_elapsed_ms: u64,
     error: String,
-) -> Value {
+    experiment_id: &'a str,
+}
+
+fn ambiguous_result(input: AmbiguousResultInput<'_>) -> Value {
     json!({
         "schema_id": "prefixity.phase1c.h001.arm-result",
         "schema_version": 1,
-        "experiment_id": EXPERIMENT_ID,
+        "experiment_id": input.experiment_id,
         "task_id": TASK_ID,
-        "arm": arm.as_str(),
+        "arm": input.arm.as_str(),
         "replicate": 1,
         "state": "AMBIGUOUS",
         "request": {
@@ -1101,14 +1126,14 @@ fn ambiguous_result(
             "transport_attempts": 1,
             "inference_requests": 1,
             "automatic_retries": 0,
-            "request_sha256": request_sha256,
-            "wire_request_sha256": wire_request_sha256,
-            "request_body_bytes": request_bytes,
+            "request_sha256": input.request_sha256,
+            "wire_request_sha256": input.wire_request_sha256,
+            "request_body_bytes": input.request_bytes,
             "request_file": "request-turn-1.json"
         },
-        "readiness": {"listener_check_attempts": 1, "inference_requests": 0, "elapsed_ms": readiness_elapsed_ms},
-        "response": {"complete": false, "http_status": null, "response_body_bytes": null, "response_body_sha256": null, "response_body_file": null, "transport_elapsed_ms": transport_elapsed_ms},
-        "validation": {"response_json_parsed": false, "final_content_available": false, "terminal_final_content": false, "reasoning_diagnostic_only": true, "error": error},
+        "readiness": {"listener_check_attempts": 1, "inference_requests": 0, "elapsed_ms": input.readiness_elapsed_ms},
+        "response": {"complete": false, "http_status": null, "response_body_bytes": null, "response_body_sha256": null, "response_body_file": null, "transport_elapsed_ms": input.transport_elapsed_ms},
+        "validation": {"response_json_parsed": false, "final_content_available": false, "terminal_final_content": false, "reasoning_diagnostic_only": true, "error": input.error},
         "next_arm": null
     })
 }
@@ -1122,7 +1147,11 @@ fn persist_ambiguous(evidence_dir: &Path, result: &Value) -> Result<(), H001Erro
 }
 
 fn arm_evidence_dir(arm: H001Arm) -> PathBuf {
-    workspace_path(H001_EVIDENCE_ROOT)
+    arm_evidence_dir_at(&workspace_path(H001_EVIDENCE_ROOT), arm)
+}
+
+pub(crate) fn arm_evidence_dir_at(root: &Path, arm: H001Arm) -> PathBuf {
+    root.to_path_buf()
         .join("replicate-1")
         .join(arm.as_str().to_ascii_lowercase())
 }

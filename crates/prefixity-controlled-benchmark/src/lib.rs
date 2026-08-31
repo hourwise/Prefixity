@@ -26,6 +26,8 @@ mod oracle;
 mod paired_mutation;
 mod phase1b9;
 mod phase1c_h001;
+mod phase1c_h001_v2;
+mod phase1c_live_supervisor;
 mod phase1c_scored_design;
 mod phase1c_stage0;
 mod phase1c_stage1_local_qwen;
@@ -179,6 +181,15 @@ pub use phase1b9::{
 pub use phase1c_h001::{
     dry_run_h001, execute_h001_arm, fingerprint_h001, preflight_h001, score_h001_arm, H001Arm,
     H001Error,
+};
+pub use phase1c_h001_v2::{
+    dry_run_v2, execute_v2_baseline, fingerprint_v2, preflight_v2, score_v2_baseline,
+    V2_BASELINE_IDENTITY_FINGERPRINT_PATH, V2_BASELINE_IDENTITY_PATH, V2_CONTRACT_FINGERPRINT_PATH,
+    V2_CONTRACT_PATH, V2_EVIDENCE_ROOT, V2_H001_EVIDENCE_ROOT, V2_PILOT_FINGERPRINT_PATH,
+    V2_PILOT_MANIFEST_PATH,
+};
+pub use phase1c_live_supervisor::{
+    persist_supervisor_result, run_supervised, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
 };
 pub use phase1c_scored_design::{
     fingerprint_scored_design, validate_scored_design, ScoredDesignError, ScoredDesignFingerprint,

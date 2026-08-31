@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V2.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "75dcc6a8a4db162e38557487c516ebe102ffebaa55c3e10a89a33d7d2c76b620"
+}
