@@ -28,6 +28,7 @@ mod phase1b9;
 mod phase1c_h001;
 mod phase1c_h001_v2;
 mod phase1c_live_supervisor;
+mod phase1c_reasoning_budget_calibration;
 mod phase1c_scored_design;
 mod phase1c_stage0;
 mod phase1c_stage1_local_qwen;
@@ -192,6 +193,13 @@ pub use phase1c_h001_v2::{
 };
 pub use phase1c_live_supervisor::{
     persist_supervisor_result, run_supervised, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
+};
+pub use phase1c_reasoning_budget_calibration::{
+    dry_run_calibration, execute_calibration, fingerprint_calibration, next_candidate_budget,
+    parse_calibration_cli_args, preflight_calibration, summarize_calibration_budget,
+    CalibrationCliCommand, ReasoningBudgetCalibrationError, CALIBRATION_BUDGETS,
+    CALIBRATION_CASE_IDS, CALIBRATION_EVIDENCE_ROOT, CALIBRATION_MANIFEST_FINGERPRINT_PATH,
+    CALIBRATION_MANIFEST_PATH,
 };
 pub use phase1c_scored_design::{
     fingerprint_scored_design, validate_scored_design, ScoredDesignError, ScoredDesignFingerprint,

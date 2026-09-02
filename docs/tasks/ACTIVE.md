@@ -2270,3 +2270,71 @@ requests `1`, NO_OP `0`, INTERVENTION `0`, h004 `0`, automatic retries `0`,
 and Prefixity behavioral changes `0`.
 
 `H001 V2 BASELINE ATTEMPT 002 INCONCLUSIVE - DO NOT RETRY OR EXTEND TIMEOUT`
+
+## Phase 1C h001 V2 closeout and reasoning-budget calibration preparation
+
+The accepted h001 V2 BASELINE result is closed as
+`PHASE 1C h001 V2 - INCOMPLETE / NON-COMPARABLE`. BASELINE is
+`INCONCLUSIVE - GENERATION CEILING EXHAUSTED`; it returned HTTP `200` with
+2048 completion tokens, `finish_reason=length`, present reasoning content,
+and no terminal final content. The deterministic evaluator was not run.
+NO_OP and INTERVENTION were not executed. V1 and V2 evidence remain
+immutable, and no future calibration result may be combined with either
+scored lineage.
+
+The accepted execution record commit
+`f430688b3e327a42bd407185f2a847a4af318dcf` was fast-forward promoted to
+`main` and directly verified at `origin/main` with the same SHA. The current
+preparation branch is `agent/phase-1c-reasoning-budget-calibration`, created
+from that promoted main. No h001 retry, timeout extension, V3, NO_OP, or
+INTERVENTION was started.
+
+Offline inspection of the installed local llama.cpp executable reported build
+`b10217-ddd4ec142`. Its `serve --help` exposes server-side
+`--reasoning-budget N` with semantics `-1=unrestricted`, `0=immediate end`,
+and `N>0=token budget for thinking`, plus
+`--reasoning-budget-message MESSAGE`. The calibration uses only the budget
+flag, leaves the message unset, and keeps explicit `--reasoning on`.
+No server was started and no localhost contact occurred during this design.
+
+The independent non-scored calibration manifest is
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_CALIBRATION_MANIFEST_V1.json` with
+canonical SHA-256
+`4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b` and
+sidecar
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_CALIBRATION_MANIFEST_V1.sha256`.
+It freezes exactly `rbcal-001`, `rbcal-002`, and `rbcal-003`, in that order,
+with request hashes
+`f32863dfb1da27c00a61d54986d4984569c87e9636cf5c6263c69906cb336461`,
+`e9cb29143ed1be27ce5c5b27bda4daa546ff63825189b170b37083624534c1b3`, and
+`2c9839a9482080b3d03fa89d908c63d442d35ec64e142d5c573d276e801aec7e`.
+The only candidates are `1024 -> 512 -> 256`; maximum requests are `9`.
+Each candidate requires a fresh server, reasoning on, total `max_tokens=2048`,
+and zero retries. The candidate passes only if all three cases return HTTP
+200, complete non-length terminal output, and the exact structural JSON
+response.
+
+The experiment-only runner is
+`crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs`
+with binary
+`prefixity-phase1c-reasoning-budget-calibration`. Its offline commands are
+`fingerprint`, `preflight`, and `dry-run`; the future live command is
+`run --budget {1024|512|256} --confirm-fresh-runtime`. It keeps the budget out
+of the model-visible request, captures reasoning in a separate diagnostic
+artifact, never scores reasoning, enforces candidate order/stopping, and
+never retries.
+
+Offline `fingerprint`, `preflight`, and all-nine-combination `dry-run` checks
+passed with network calls `0` and inference requests `0`. Focused runner tests
+cover manifest independence, request hashes, candidate order, stopping,
+server-budget argument binding, malformed CLI rejection, zero retry, and
+reasoning/final-content isolation. Full workspace tests, strict Clippy,
+rustfmt, and `git diff --check` all passed before the preparation branch was
+pushed.
+
+This calibration preparation stops before server startup, listener readiness,
+HTTP, inference, warmup, or any candidate execution. A later authorization
+must name the frozen manifest and candidate, provide a fresh-runtime
+confirmation, and explicitly authorize the bounded live calibration.
+
+`PHASE 1C REASONING-BUDGET CALIBRATION READY FOR SEPARATE LIVE AUTHORIZATION`

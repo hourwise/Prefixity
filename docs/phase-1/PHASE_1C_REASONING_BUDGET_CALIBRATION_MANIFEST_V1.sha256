@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_CALIBRATION_MANIFEST_V1.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b"
+}

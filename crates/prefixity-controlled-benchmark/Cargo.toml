@@ -38,6 +38,10 @@ path = "src/bin/phase1c_h001_v2.rs"
 name = "prefixity-phase1c-live-supervisor"
 path = "src/bin/phase1c_live_supervisor.rs"
 
+[[bin]]
+name = "prefixity-phase1c-reasoning-budget-calibration"
+path = "src/bin/phase1c_reasoning_budget_calibration.rs"
+
 [dependencies]
 prefixity-core = { path = "../prefixity-core" }
 serde = { workspace = true }
