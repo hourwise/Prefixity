@@ -2205,3 +2205,68 @@ V2 BASELINE attempt 002 inference requests `0`, NO_OP `0`, INTERVENTION `0`,
 h004 `0`, retries `0`, and Prefixity behavioral changes `0`.
 
 `H001 V2 BASELINE ATTEMPT 002 READY FOR SEPARATE LIVE AUTHORIZATION`
+
+## Phase 1C h001 V2 BASELINE attempt 002 live execution record
+
+The separately authorized h001 V2 BASELINE attempt 002 was executed once on
+2026-09-02 from branch `agent/phase-1c-h001-v2-baseline-attempt-002` at
+`984b075cfe5eb776030c7bcc62b91043becb679c`. The operator confirmed a fresh
+`ggml-org/Qwen3.5-0.8B-GGUF:Q4_0` llama.cpp server with context `8192`, one
+parallel slot, metrics enabled, reasoning explicitly `on`, endpoint
+`127.0.0.1:8080`, and zero prior inference requests or model-generating
+probes. The V2 contract, pilot, h001 manifest, attempt-002 identity, and
+frozen BASELINE projection matched their accepted hashes before model contact.
+
+The checked-in `prefixity-phase1c-live-supervisor` launched the child exactly
+once with canonical argv `run --confirm-fresh-runtime`. The one permitted TCP
+listener check passed in `3 ms` with `inference_requests=0`. The child exited
+with code `0`; the supervisor classified the run `COMPLETED`, enforced the
+`1320000 ms` outer deadline, and recorded zero supervisor retries and zero
+supervisor network calls.
+
+BASELINE dispatched exactly one request and completed one turn. The request
+and wire request fingerprints were both
+`26bc77415683d81c9f3af4e556151d8abab775b48dd5f4632ed6caba1ad25a2a` for the
+frozen 1310-byte projection. The response was HTTP `200`, 5387 bytes, with
+SHA-256
+`deb00a0e9d3579a93023166498a7763e7b5cd9222d29afc81912940a453eba70` and
+transport elapsed `598717 ms`. Prompt tokens were `389`, completion tokens
+were `2048`, cached tokens were reported as `0`, and the finish reason was
+`length`. Reasoning content was present as diagnostic evidence only and was
+not scored; final content was available, but terminal final content was
+false, with no tool call. The trajectory therefore classified the BASELINE
+as `INCONCLUSIVE` after one completed turn, with no recovery turn and no
+automatic retry.
+
+The deterministic evaluator was not run because the BASELINE did not reach a
+certifiable terminal state. The exact reason recorded by the runner is
+`terminal final content was unavailable before the registered ceiling`.
+No task-success or cross-arm claim is made.
+
+Attempt-002 evidence is preserved only under
+`experiments/runs/phase1c-scored-capability-v2/h001/replicate-1/baseline-attempt-002/`.
+The persisted artifacts and ordinary SHA-256 values are:
+
+- `supervisor-result.json`: `0f99a2936e369a155708d8001157280911cf02af53b14c7b04222ab39bd13f32`;
+- `replicate-1/baseline/preflight.json`: `1ef65defa6a40eaeaf76323131b51cad2c2bada0dce3eb4784e4a4624b766e00`;
+- `replicate-1/baseline/runtime-confirmation.json`: `5305f9507af6e21d3042229c6a84c72470bce7da772cc5524a3026bc54d5470c`;
+- `replicate-1/baseline/readiness.json`: `f10f17b2edf567bdc7701fd668818322eac6b71e986282d2f81b2da938d84565`;
+- `replicate-1/baseline/request-turn-1.json`: `26bc77415683d81c9f3af4e556151d8abab775b48dd5f4632ed6caba1ad25a2a`;
+- `replicate-1/baseline/response-turn-1.bin`: `deb00a0e9d3579a93023166498a7763e7b5cd9222d29afc81912940a453eba70`;
+- `replicate-1/baseline/normalized-turn-1.json`: `6a34df1215aa0a69dd79d31976a984ffb4246d68b0a91b9501b58c6a9e15bfb2`;
+- `replicate-1/baseline/trajectory-state.json`: `93c35767e59d64f2cd06a5516f9e6005c9575070ef3f613284aefa29a78e0e0b`;
+- `replicate-1/baseline/arm-result.json`: `bc2ab460fa6546987ab02b8c6d48f47c75646a39e38d47e18312033896d4f6d5`.
+
+The runtime evidence remains ignored experiment output and was not force-added.
+Attempt 001 and all V1 evidence remain unchanged. Post-run offline focused V2
+tests (10), supervisor tests (4), formatting, and strict Clippy passed. The
+three lifecycle-sensitive preparation tests now explicitly verify the
+attempt-002 evidence guard after the canonical run; no runtime behavior was
+changed. No further localhost contact occurred after the BASELINE completed.
+
+Accounting is: historical schema-smoke inference requests `2`, V1 h001
+BASELINE requests `1`, V2 attempt 001 requests `0`, V2 attempt 002 BASELINE
+requests `1`, NO_OP `0`, INTERVENTION `0`, h004 `0`, automatic retries `0`,
+and Prefixity behavioral changes `0`.
+
+`H001 V2 BASELINE ATTEMPT 002 INCONCLUSIVE - DO NOT RETRY OR EXTEND TIMEOUT`

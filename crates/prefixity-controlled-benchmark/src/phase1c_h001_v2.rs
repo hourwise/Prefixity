@@ -699,12 +699,11 @@ mod tests {
     }
 
     #[test]
-    fn v2_dry_run_has_no_transport_and_attempt_002_evidence_is_absent() {
+    fn v2_dry_run_has_no_transport_and_preserves_attempt_lineage() {
         let result = dry_run_v2().unwrap();
         assert_eq!(result["network_calls"], 0);
         assert_eq!(result["inference_requests"], 0);
         assert!(workspace_path(V2_H001_EVIDENCE_ROOT).exists());
-        assert!(!workspace_path(V2_H001_ATTEMPT_002_EVIDENCE_ROOT).exists());
     }
 
     #[test]
@@ -736,23 +735,37 @@ mod tests {
     }
 
     #[test]
-    fn attempt_002_preflight_is_offline_and_ready() {
-        let result = preflight_v2_attempt_002().unwrap();
-        assert_eq!(result["state"], "PREPARED");
-        assert_eq!(result["launch_attempt"], 2);
-        assert_eq!(result["listener_checks"], 0);
-        assert_eq!(result["network_calls"], 0);
-        assert_eq!(result["inference_requests"], 0);
+    fn attempt_002_preflight_is_offline_and_respects_evidence_lifecycle() {
+        if workspace_path(V2_H001_ATTEMPT_002_EVIDENCE_ROOT).exists() {
+            let error = preflight_v2_attempt_002().unwrap_err();
+            assert!(error
+                .to_string()
+                .contains("attempt-002 evidence already exists"));
+        } else {
+            let result = preflight_v2_attempt_002().unwrap();
+            assert_eq!(result["state"], "PREPARED");
+            assert_eq!(result["launch_attempt"], 2);
+            assert_eq!(result["listener_checks"], 0);
+            assert_eq!(result["network_calls"], 0);
+            assert_eq!(result["inference_requests"], 0);
+        }
     }
 
     #[test]
     fn attempt_002_dry_run_preserves_request_and_has_no_transport() {
-        let result = dry_run_v2_attempt_002().unwrap();
-        assert_eq!(result["state"], "DRY_RUN");
-        assert_eq!(result["request_bytes"], 1310);
-        assert_eq!(result["request_sha256"], V1_BASELINE_REQUEST_SHA256);
-        assert_eq!(result["network_calls"], 0);
-        assert_eq!(result["listener_checks"], 0);
-        assert_eq!(result["inference_requests"], 0);
+        if workspace_path(V2_H001_ATTEMPT_002_EVIDENCE_ROOT).exists() {
+            let error = dry_run_v2_attempt_002().unwrap_err();
+            assert!(error
+                .to_string()
+                .contains("attempt-002 evidence already exists"));
+        } else {
+            let result = dry_run_v2_attempt_002().unwrap();
+            assert_eq!(result["state"], "DRY_RUN");
+            assert_eq!(result["request_bytes"], 1310);
+            assert_eq!(result["request_sha256"], V1_BASELINE_REQUEST_SHA256);
+            assert_eq!(result["network_calls"], 0);
+            assert_eq!(result["listener_checks"], 0);
+            assert_eq!(result["inference_requests"], 0);
+        }
     }
 }
