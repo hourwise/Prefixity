@@ -195,11 +195,14 @@ pub use phase1c_live_supervisor::{
     persist_supervisor_result, run_supervised, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
 };
 pub use phase1c_reasoning_budget_calibration::{
-    dry_run_calibration, execute_calibration, fingerprint_calibration, next_candidate_budget,
-    parse_calibration_cli_args, preflight_calibration, summarize_calibration_budget,
-    CalibrationCliCommand, ReasoningBudgetCalibrationError, CALIBRATION_BUDGETS,
-    CALIBRATION_CASE_IDS, CALIBRATION_EVIDENCE_ROOT, CALIBRATION_MANIFEST_FINGERPRINT_PATH,
-    CALIBRATION_MANIFEST_PATH,
+    attempt_002_exclusivity_preflight, attempt_002_runtime_ownership, dry_run_attempt_002,
+    dry_run_calibration, execute_attempt_002, execute_calibration, fingerprint_attempt_002,
+    fingerprint_calibration, next_candidate_budget, parse_calibration_cli_args,
+    preflight_attempt_002, preflight_calibration, summarize_attempt_002_budget,
+    summarize_calibration_budget, CalibrationCliCommand, ReasoningBudgetCalibrationError,
+    CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT, CALIBRATION_ATTEMPT_002_IDENTITY_FINGERPRINT_PATH,
+    CALIBRATION_ATTEMPT_002_IDENTITY_PATH, CALIBRATION_BUDGETS, CALIBRATION_CASE_IDS,
+    CALIBRATION_EVIDENCE_ROOT, CALIBRATION_MANIFEST_FINGERPRINT_PATH, CALIBRATION_MANIFEST_PATH,
 };
 pub use phase1c_scored_design::{
     fingerprint_scored_design, validate_scored_design, ScoredDesignError, ScoredDesignFingerprint,

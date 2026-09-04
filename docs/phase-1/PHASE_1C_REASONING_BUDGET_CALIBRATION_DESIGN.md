@@ -143,6 +143,70 @@ responses, normalized final-content records, separate reasoning diagnostics,
 per-case results, and a candidate aggregate. Reasoning content is never used
 as final content, scored, or passed to another case.
 
+## 1024 launch attempt-001 closeout and attempt-002 preparation
+
+The first live 1024 launch is immutable and classified as:
+
+`1024 / LAUNCH ATTEMPT 001 - INVALID / AMBIGUOUS`
+
+The reason is:
+
+`LLAMA_RUNTIME_FAILURE_WITH_UNCERTAIN_REQUEST_COMPLETION`
+
+`rbcal-001` produced a persisted request record, but no response was
+persisted and the llama.cpp runtime subsequently failed. `rbcal-002` and
+`rbcal-003` were not run. The result is not a structural infeasibility
+finding, and the root cause is recorded as `ROOT CAUSE NOT ESTABLISHED`.
+
+Attempt 002 has a separate tracked identity at
+`PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_002_IDENTITY_V1.json`, with canonical
+SHA-256
+`7d9dd05ed5c855f02dc5b37a70e7cac257af03ce5dc87686acf1e64590f37610`.
+It binds the unchanged calibration manifest
+`4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b`, budget
+`1024`, the unchanged three case hashes, the attempt-001 evidence root and
+classification, the llama.cpp build, the three-request maximum, zero retries,
+fresh-server requirement, and runtime exclusivity requirement. Its evidence
+root is the distinct
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-002/`;
+attempt 001 is not reused or overwritten.
+
+The checked-in runner exposes offline attempt-002 commands:
+
+```text
+prefixity-phase1c-reasoning-budget-calibration attempt-002-fingerprint
+prefixity-phase1c-reasoning-budget-calibration attempt-002-preflight
+prefixity-phase1c-reasoning-budget-calibration attempt-002-dry-run
+prefixity-phase1c-reasoning-budget-calibration attempt-002-exclusivity-preflight --confirm-no-other-workflow
+```
+
+The future live command is strict and requires the operator-supplied server
+PID plus both confirmations:
+
+```text
+prefixity-phase1c-reasoning-budget-calibration run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime
+```
+
+Before server startup, the exclusivity preflight uses bounded operating-system
+inspection (`tasklist /FO CSV /NH` and `netstat -ano -p tcp`) to require no
+`llama.exe`, no listener on port `8080`, and no other Prefixity/Qwen/Luna/Codex
+workflow process. It also requires an explicit operator attestation that no
+other Luna, Codex, helper, browser, terminal, or automation workflow is
+configured to interact with the runtime. After server startup and before any
+calibration request, the runner records the expected PID, registered
+executable path, port owner, and fresh-start identity; exactly one llama PID
+must own the listener. Any mismatch blocks inference.
+
+From fresh-server confirmation until the candidate finishes or stops, the
+runtime is exclusive: no other agent, terminal workflow, automation, browser,
+Luna process, Codex helper, or manual action may probe, invoke, restart, stop,
+or otherwise interact with the Qwen/llama runtime or port `8080`.
+
+Attempt-002 preparation does not change the manifest, cases, request hashes,
+runtime settings, generation settings, timeout policy, candidate ordering, or
+retry policy. No server was started, no listener check was run, and no
+localhost or inference contact occurred during this preparation.
+
 ## Live boundary
 
 This preparation performs no server startup, listener check, HTTP request,

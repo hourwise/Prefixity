@@ -1,0 +1,70 @@
+{
+  "identity_version": "phase1c-reasoning-budget-1024-attempt-002-v1",
+  "status": "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+  "experiment_id": "phase1c-reasoning-budget-calibration",
+  "attempt": 2,
+  "candidate": {
+    "reasoning_budget": 1024,
+    "case_order": [
+      "rbcal-001",
+      "rbcal-002",
+      "rbcal-003"
+    ],
+    "maximum_requests": 3,
+    "automatic_retries": 0,
+    "fresh_server_required": true,
+    "runtime_exclusivity_required": true
+  },
+  "manifest": {
+    "path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_CALIBRATION_MANIFEST_V1.json",
+    "sha256": "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b"
+  },
+  "frozen_request_hashes": {
+    "rbcal-001": "f32863dfb1da27c00a61d54986d4984569c87e9636cf5c6263c69906cb336461",
+    "rbcal-002": "e9cb29143ed1be27ce5c5b27bda4daa546ff63825189b170b37083624534c1b3",
+    "rbcal-003": "2c9839a9482080b3d03fa89d908c63d442d35ec64e142d5c573d276e801aec7e"
+  },
+  "lineage": {
+    "attempt_001_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/",
+    "attempt_001_request_sha256": "f32863dfb1da27c00a61d54986d4984569c87e9636cf5c6263c69906cb336461",
+    "attempt_001_classification": "INVALID / AMBIGUOUS",
+    "attempt_001_reason": "LLAMA_RUNTIME_FAILURE_WITH_UNCERTAIN_REQUEST_COMPLETION",
+    "attempt_001_request_attempts": 1,
+    "attempt_001_rbcal_001_structural_result": "unavailable",
+    "attempt_001_rbcal_002": "not run",
+    "attempt_001_rbcal_003": "not run",
+    "attempt_001_immutable": true,
+    "root_cause": "ROOT CAUSE NOT ESTABLISHED"
+  },
+  "attempt_002_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-002/",
+  "runtime": {
+    "engine": "llama.cpp",
+    "server_build": "b10217-ddd4ec142",
+    "model": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+    "quantization": "Q4_0",
+    "context_size": 8192,
+    "parallel_slots": 1,
+    "metrics": "enabled",
+    "reasoning": "on",
+    "reasoning_budget_message": "unset",
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "runtime_exclusivity": {
+    "pre_server_process_check": "no llama.exe process",
+    "pre_server_port_check": "port 8080 not owned or listening",
+    "competing_runner_check": "no other Prefixity or Qwen runner",
+    "workflow_attestation": "no Luna, Codex, or helper workflow configured to interact with the runtime",
+    "live_epoch_rule": "From fresh-server confirmation until the candidate finishes or stops, no other agent, terminal workflow, automation, browser, Luna process, Codex helper, or manual action may probe, invoke, restart, stop, or otherwise interact with the Qwen/llama runtime or localhost port 8080.",
+    "post_start_pid_record_required": true,
+    "single_llama_pid_required": true,
+    "port_owner_must_match_pid": true
+  },
+  "evidence_policy": {
+    "attempt_002_root_must_begin_absent": true,
+    "attempt_001_must_not_be_overwritten": true,
+    "no_manifest_copy": true,
+    "no_response_repair": true,
+    "no_retry": true
+  }
+}

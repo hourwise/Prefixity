@@ -2395,3 +2395,76 @@ No response hash exists because no response file was persisted. The
 evidence root remains ignored and no evidence was force-added. Post-stop
 offline validation and a narrowly scoped execution-record commit are required
 before this branch is pushed.
+
+## Phase 1C reasoning-budget 1024 launch attempt-001 closeout and attempt-002 preparation
+
+The first live 1024 calibration launch is permanently recorded as
+`1024 / LAUNCH ATTEMPT 001 - INVALID / AMBIGUOUS` for
+`LLAMA_RUNTIME_FAILURE_WITH_UNCERTAIN_REQUEST_COMPLETION`. Its request
+attempt count is `1`; `rbcal-001` has no structural result because no response
+was persisted; `rbcal-002` and `rbcal-003` were not run. No structural
+feasibility conclusion is drawn, and the root cause remains
+`ROOT CAUSE NOT ESTABLISHED`. Attempt-001 evidence remains immutable.
+
+The invalid-attempt history was fast-forward promoted to `main` and directly
+verified at `origin/main`:
+
+`e5c6bec173d9c1b1e371fbc32624ca74adb0605a`
+
+The new preparation branch is
+`agent/phase-1c-reasoning-budget-calibration-1024-attempt-002-prep`, created
+from canonical main. The tracked attempt-002 identity is
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_002_IDENTITY_V1.json`
+with canonical SHA-256
+`7d9dd05ed5c855f02dc5b37a70e7cac257af03ce5dc87686acf1e64590f37610` and a
+sidecar at
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_002_IDENTITY_V1.sha256`.
+It binds manifest SHA
+`4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b`, budget
+`1024`, the unchanged case order and request hashes, the attempt-001 root and
+classification, llama.cpp build `b10217-ddd4ec142`, maximum requests `3`,
+zero retries, fresh-server requirement, and runtime exclusivity.
+
+Attempt-002 uses the distinct evidence root
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-002/`.
+It must begin absent; attempt-001's
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/` root must
+not be reused or overwritten. The manifest, cases, request hashes, runtime
+settings, generation settings, timeout policy, candidate order, and retry
+policy are unchanged.
+
+The checked-in runner now exposes offline `attempt-002-fingerprint`,
+`attempt-002-preflight`, and `attempt-002-dry-run` commands. The dry-run
+projects exactly the three `1024` cases with unchanged request bytes and
+hashes, the isolated root, network calls `0`, listener checks `0`, and
+inference requests `0`.
+
+Before a future server startup, the required OS-only exclusivity preflight
+uses bounded `tasklist /FO CSV /NH` and `netstat -ano -p tcp` inspection to
+require no `llama.exe`, no listener on port `8080`, and no other Prefixity or
+Qwen runner. It also requires explicit operator attestation that no Luna,
+Codex, helper, browser, terminal, or automation workflow is configured to
+interact with the runtime. After startup and before inference, the future
+runner records the single expected server PID, registered executable path,
+port owner, and fresh-start identity; any multiple-PID or ownership mismatch
+stops before inference.
+
+The exclusive live-window rule is registered: from fresh-server confirmation
+until candidate completion or stop, no other agent, terminal workflow,
+automation, browser, Luna process, Codex helper, or manual action may probe,
+invoke, restart, stop, or otherwise interact with the Qwen/llama runtime or
+port `8080`.
+
+Offline implementation checks include workspace all-target check, identity
+fingerprinting, attempt-002 preflight, and attempt-002 dry-run, all with zero
+model contact. Focused calibration tests (`12`), attempt-identity tests,
+exclusivity parser tests, serialized supervisor tests (`4`), full workspace
+tests, strict Clippy, rustfmt, and `git diff --check` all passed. No Qwen
+startup, listener check, localhost contact, or inference occurred in this
+preparation.
+
+The preparation branch is ready to push after the final staged diff review.
+
+`ROOT CAUSE NOT ESTABLISHED`
+
+`REASONING BUDGET 1024 ATTEMPT 002 READY FOR SEPARATE LIVE AUTHORIZATION`
