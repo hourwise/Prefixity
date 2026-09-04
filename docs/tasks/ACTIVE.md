@@ -2406,14 +2406,19 @@ was persisted; `rbcal-002` and `rbcal-003` were not run. No structural
 feasibility conclusion is drawn, and the root cause remains
 `ROOT CAUSE NOT ESTABLISHED`. Attempt-001 evidence remains immutable.
 
-The invalid-attempt history was fast-forward promoted to `main` and directly
-verified at `origin/main`:
+The accepted invalid-attempt history is prepared for fast-forward promotion to
+`main` at:
 
 `e5c6bec173d9c1b1e371fbc32624ca74adb0605a`
 
+The direct remote check in this closeout still reports `origin/main` at
+`cecc6368b5e1255fecb333ff2d2712417fc7e961`. The requested fast-forward was
+blocked by the execution-policy boundary, so no remote `main` mutation was
+completed here.
+
 The new preparation branch is
 `agent/phase-1c-reasoning-budget-calibration-1024-attempt-002-prep`, created
-from canonical main. The tracked attempt-002 identity is
+from the accepted attempt-001 commit above. The tracked attempt-002 identity is
 `docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_002_IDENTITY_V1.json`
 with canonical SHA-256
 `7d9dd05ed5c855f02dc5b37a70e7cac257af03ce5dc87686acf1e64590f37610` and a
@@ -2463,7 +2468,8 @@ tests, strict Clippy, rustfmt, and `git diff --check` all passed. No Qwen
 startup, listener check, localhost contact, or inference occurred in this
 preparation.
 
-The preparation commit is `e243fb0c653ea9858a12ee434d58865bcca41285`, and the
+The preparation commits are `e243fb0c653ea9858a12ee434d58865bcca41285` and
+the documentation closeout at `e8d6c022cff4312ceac33829a3581573cf6a159d`, and the
 preparation branch has been pushed. No live execution is authorized by this
 closeout.
 
