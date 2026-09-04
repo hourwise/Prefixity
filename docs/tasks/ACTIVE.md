@@ -2463,7 +2463,9 @@ tests, strict Clippy, rustfmt, and `git diff --check` all passed. No Qwen
 startup, listener check, localhost contact, or inference occurred in this
 preparation.
 
-The preparation branch is ready to push after the final staged diff review.
+The preparation commit is `e243fb0c653ea9858a12ee434d58865bcca41285`, and the
+preparation branch has been pushed. No live execution is authorized by this
+closeout.
 
 `ROOT CAUSE NOT ESTABLISHED`
 
