@@ -2338,3 +2338,60 @@ must name the frozen manifest and candidate, provide a fresh-runtime
 confirmation, and explicitly authorize the bounded live calibration.
 
 `PHASE 1C REASONING-BUDGET CALIBRATION READY FOR SEPARATE LIVE AUTHORIZATION`
+
+## Phase 1C reasoning-budget calibration 1024 execution stop
+
+The separately authorized candidate-1024 execution was stopped after the
+llama.cpp server crashed during the first case. The dedicated live branch is
+`agent/phase-1c-reasoning-budget-calibration-1024`, based on promoted commit
+`cecc6368b5e1255fecb333ff2d2712417fc7e961`. Before execution,
+`origin/main`, the preparation branch, and local HEAD were directly verified
+at that commit. The frozen manifest SHA remained
+`4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b` and all
+three registered case request hashes remained unchanged.
+
+The operator confirmed model
+`ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, Q4_0, context `8192`, one slot, metrics
+enabled, reasoning `on`, reasoning budget `1024`, no reasoning-budget message,
+endpoint `127.0.0.1:8080`, fresh candidate-specific startup, zero prior
+inference requests, and no warmup or manual/browser/API request. The server
+was started with only the registered flags. The single registered listener
+check passed once in `2 ms`, with inference requests `0`.
+
+The runner then created exactly one `rbcal-001` request record using the
+frozen request projection. No response, normalized response, reasoning
+diagnostic, or structural result was persisted. The server failure left
+dispatch and transport completion unverified. The runner was stopped
+immediately; no retry, second listener check, or additional inference was
+issued. Residual llama processes were then stopped, and no llama process
+remained. No Defender or other endpoint-security intervention occurred.
+
+Case accounting is:
+
+- `rbcal-001`: one request attempt; HTTP status, prompt tokens, completion
+  tokens, reasoning presence, finish reason, terminal content, transport
+  elapsed, response hash, and structural result are unavailable because no
+  response artifact exists; classification `INVALID / AMBIGUOUS`.
+- `rbcal-002`: not run after the mandatory infrastructure stop.
+- `rbcal-003`: not run after the mandatory infrastructure stop.
+
+The candidate result is exactly
+`REASONING BUDGET 1024 - INVALID / AMBIGUOUS`. This is an infrastructure /
+transport-ambiguity result, not a structural feasibility failure and not a
+Prefixity capability claim. Candidate `512`, candidate `256`, V3, h001,
+NO_OP, INTERVENTION, and h004 remain unexecuted and unauthorized.
+
+Preserved ignored evidence is under
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/`.
+Ordinary SHA-256 values are:
+
+- `preflight.json`: `51145B675531A9E42E6C2FF2A9F560ADF256D3CBB7512757CB536A276C61A2B8`;
+- `runtime-confirmation.json`: `2F6C917AED5B938418F295827B46E295F3AEC0FBE23AD606F17C06203F61527E`;
+- `readiness.json`: `DCCCD1282BBE076DD6AE2E1461D7C7ED9A3556F39A22E78D1688E6698FDD49AD`;
+- `rbcal-001/request-turn-1.json`:
+  `F32863DFB1DA27C00A61D54986D4984569C87E9636CF5C6263C69906CB336461`.
+
+No response hash exists because no response file was persisted. The
+evidence root remains ignored and no evidence was force-added. Post-stop
+offline validation and a narrowly scoped execution-record commit are required
+before this branch is pushed.
