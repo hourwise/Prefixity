@@ -2476,3 +2476,28 @@ closeout.
 `ROOT CAUSE NOT ESTABLISHED`
 
 `REASONING BUDGET 1024 ATTEMPT 002 READY FOR SEPARATE LIVE AUTHORIZATION`
+
+## Phase 1C reasoning-budget 1024 Attempt 002 pre-server exclusivity stop
+
+The explicitly authorized Attempt 002 live branch is
+`agent/phase-1c-reasoning-budget-calibration-1024-attempt-002`, created from
+preparation commit `bdcc357d62236da9b2511c4aa60fc967d99cc8f8`, pushed before
+any runtime action. The authorized fast-forward was completed and directly
+verified: `origin/main` is
+`e5c6bec173d9c1b1e371fbc32624ca74adb0605a`.
+
+On 2026-09-05 the checked-in, registered pre-server exclusivity command was
+invoked with the required no-other-workflow confirmation. Its bounded
+`tasklist /FO CSV /NH` inspection returned `ERROR: Access denied`, so process
+exclusivity could not be established. Per the live authorization, execution
+stopped before Qwen startup. No port inspection was completed after that
+failure, and there was no server start, listener check, localhost contact,
+warmup, inference request, or retry.
+
+Attempt 002 therefore has zero inference requests and no new evidence root;
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-002/`
+remains absent. Attempt 001 remains immutable. No structural candidate result
+is claimed, and no alternate shell syntax or unregistered runtime probe was
+used to bypass the failed exclusivity gate.
+
+`REASONING BUDGET 1024 ATTEMPT 002 INVALID — STOP FOR RUNTIME INVESTIGATION`
