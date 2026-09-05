@@ -71,8 +71,8 @@ remain respectively:
 
 The focused calibration, supervisor, and native runtime-exclusivity tests
 passed after the closeout bookkeeping change. Rust formatting, strict
-workspace clippy, and the repository diff check are required before the
-execution-record commit is pushed. This record is scoped to the Attempt 004
+workspace clippy, and the repository diff check also passed before the
+execution-record commit was pushed. This record is scoped to the Attempt 004
 branch; it is not merged to main.
 
 The next permitted action is runtime investigation of the missing supervisor

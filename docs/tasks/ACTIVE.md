@@ -2675,8 +2675,8 @@ The execution record and evidence hashes are documented in
 docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_004_EXECUTION_RECORD.md.
 Prior Attempt 003 evidence was not modified. Focused calibration, supervisor,
 and native exclusivity tests passed after closeout bookkeeping; final
-formatting, clippy, and diff checks are required before the scoped execution
-record is committed and pushed to the Attempt 004 branch. It will not be
+formatting, clippy, and diff checks also passed before the scoped execution
+record was committed and pushed to the Attempt 004 branch. It will not be
 merged to main.
 
 The next permitted action is runtime investigation of the missing supervisor
