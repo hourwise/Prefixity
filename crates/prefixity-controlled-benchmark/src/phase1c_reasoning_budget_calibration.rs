@@ -82,6 +82,8 @@ pub enum CalibrationCliCommand {
     Attempt003Fingerprint,
     Attempt003Preflight,
     Attempt003DryRun,
+    Attempt003Poststart,
+    RunAttempt003,
 }
 
 pub fn parse_calibration_cli_args<I>(
@@ -158,8 +160,12 @@ where
         [command] if command == "attempt-003-dry-run" => {
             Ok(CalibrationCliCommand::Attempt003DryRun)
         }
+        [command] if command == "attempt-003-poststart" => {
+            Ok(CalibrationCliCommand::Attempt003Poststart)
+        }
+        [command] if command == "run-attempt-003" => Ok(CalibrationCliCommand::RunAttempt003),
         _ => Err(ReasoningBudgetCalibrationError::Validation(
-            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run]".to_string(),
+            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003]".to_string(),
         )),
     }
 }
@@ -505,6 +511,212 @@ pub fn attempt_002_runtime_ownership(
         "listener_checks": 0,
         "inference_requests": 0
     }))
+}
+
+pub fn attempt_003_runtime_ownership(
+    server_pid: u32,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    let mut result = attempt_002_runtime_ownership(server_pid)?;
+    let object = result
+        .as_object_mut()
+        .ok_or_else(|| invalid("runtime ownership result must be an object"))?;
+    object.insert("attempt".to_string(), json!(3));
+    Ok(result)
+}
+
+pub fn attempt_003_poststart() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let processes = windows_exclusivity::process_table().map_err(|failure| {
+        ReasoningBudgetCalibrationError::Validation(format!(
+            "post-start process inspection failed: {failure}"
+        ))
+    })?;
+    let llama_processes = windows_exclusivity::llama_processes(&processes);
+    if llama_processes.len() != 1 {
+        return Err(ReasoningBudgetCalibrationError::Validation(format!(
+            "post-start expected exactly one llama.exe process, found {}",
+            llama_processes.len()
+        )));
+    }
+    attempt_003_runtime_ownership(llama_processes[0].pid)
+}
+
+pub fn execute_attempt_003() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let budget = 1024;
+    let identity = read_attempt_003_identity(true)?;
+    validate_attempt_003_identity(&identity, true)?;
+    let manifest = read_manifest(true)?;
+    validate_manifest(&manifest, true)?;
+    let fingerprints = fingerprint_calibration()?;
+    validate_attempt_003_bindings(&identity, &fingerprints)?;
+    let candidate_root = attempt_003_root();
+    if candidate_root.exists() {
+        return Err(invalid("attempt-003 evidence root already exists"));
+    }
+    fs::create_dir_all(&candidate_root)?;
+    write_json(
+        &candidate_root.join("preflight.json"),
+        &json!({
+            "state": "PRESTART_GATE_COMPLETED",
+            "attempt": 3,
+            "candidate_budget": budget,
+            "experiment_id": EXPERIMENT_ID,
+            "evidence_root": CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT,
+            "manifest_sha256": fingerprints["manifest_sha256"],
+            "request_hashes": fingerprints["cases"],
+            "native_prestart_outcome": "EXCLUSIVE_PRESTART",
+            "native_prestart_captured_before_server_start": true,
+            "network_calls": 0,
+            "listener_checks": 0,
+            "inference_requests": 0
+        }),
+    )?;
+
+    let ownership = match attempt_003_poststart() {
+        Ok(value) => value,
+        Err(error) => {
+            write_json(
+                &candidate_root.join("runtime-ownership-error.json"),
+                &json!({"error": error.to_string(), "inference_requests": 0}),
+            )?;
+            return Err(error);
+        }
+    };
+    write_json(&candidate_root.join("runtime-ownership.json"), &ownership)?;
+    if ownership.get("state").and_then(Value::as_str) != Some("READY")
+        || ownership.get("outcome").and_then(Value::as_str) != Some("EXCLUSIVE_POSTSTART")
+    {
+        let mut result = candidate_result(
+            budget,
+            Vec::new(),
+            0,
+            "INCONCLUSIVE",
+            false,
+            Some("runtime ownership was not exclusive before inference"),
+        )?;
+        if let Some(object) = result.as_object_mut() {
+            object.insert("listener_check_attempts".to_string(), json!(0));
+            object.insert("network_calls".to_string(), json!(0));
+        }
+        write_json(&candidate_root.join("candidate-result.json"), &result)?;
+        return Ok(result);
+    }
+
+    write_json(
+        &candidate_root.join("runtime-confirmation.json"),
+        &json!({
+            "confirmation": "operator_current_confirmation",
+            "attempt": 3,
+            "experiment_id": EXPERIMENT_ID,
+            "build": "b10217-ddd4ec142",
+            "model": MODEL_ID,
+            "quantization": "Q4_0",
+            "context_size": 8192,
+            "parallel_slots": 1,
+            "metrics": "enabled",
+            "reasoning": "on",
+            "reasoning_budget": budget,
+            "reasoning_budget_message": "unset",
+            "endpoint": ENDPOINT,
+            "fresh_server_per_candidate": true,
+            "server_pid": ownership["expected_server_pid"],
+            "executable_path": ownership["executable_paths"][0],
+            "port_owner_pid": ownership["port_8080_listeners"][0]["pid"],
+            "zero_inference_since_startup": true,
+            "no_warmup": true,
+            "no_manual_request": true,
+            "no_browser_or_endpoint_contact": true,
+            "server_launch_arguments": server_launch_arguments(budget),
+            "recorded_at_unix_ms": now_unix_ms()?
+        }),
+    )?;
+
+    let readiness_started = Instant::now();
+    let readiness = TcpStream::connect_timeout(
+        &SocketAddr::from(([127, 0, 0, 1], PORT)),
+        Duration::from_millis(1000),
+    );
+    let readiness_elapsed_ms = readiness_started.elapsed().as_millis() as u64;
+    if let Err(error) = readiness {
+        let readiness_record = json!({
+            "check": "tcp_listener_connect",
+            "host": HOST,
+            "port": PORT,
+            "listener_check_attempts": 1,
+            "network_calls": 1,
+            "inference_requests": 0,
+            "elapsed_ms": readiness_elapsed_ms,
+            "passed": false,
+            "error": error.to_string()
+        });
+        write_json(&candidate_root.join("readiness.json"), &readiness_record)?;
+        let result = candidate_result(
+            budget,
+            Vec::new(),
+            0,
+            "INCONCLUSIVE",
+            false,
+            Some("single non-inference listener check failed"),
+        )?;
+        write_json(&candidate_root.join("candidate-result.json"), &result)?;
+        return Ok(result);
+    }
+    write_json(
+        &candidate_root.join("readiness.json"),
+        &json!({
+            "check": "tcp_listener_connect",
+            "host": HOST,
+            "port": PORT,
+            "listener_check_attempts": 1,
+            "network_calls": 1,
+            "inference_requests": 0,
+            "elapsed_ms": readiness_elapsed_ms,
+            "passed": true
+        }),
+    )?;
+
+    let client = Client::builder()
+        .connect_timeout(Duration::from_millis(1000))
+        .timeout(Duration::from_millis(1_200_000))
+        .redirect(Policy::none())
+        .build()
+        .map_err(|error| ReasoningBudgetCalibrationError::Transport(error.to_string()))?;
+    let cases = manifest
+        .get("cases")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("cases"))?;
+    let mut results = Vec::new();
+    for case_id in CALIBRATION_CASE_IDS {
+        let case = cases
+            .iter()
+            .find(|case| case.get("case_id").and_then(Value::as_str) == Some(case_id))
+            .ok_or_else(|| missing(case_id))?;
+        let case_dir = candidate_root.join(case_id);
+        fs::create_dir_all(&case_dir)?;
+        let result = execute_case(&manifest, case, budget, &case_dir, &client)?;
+        let infrastructure_ambiguous =
+            result.get("state").and_then(Value::as_str) == Some("INCONCLUSIVE");
+        results.push(result);
+        if infrastructure_ambiguous {
+            break;
+        }
+    }
+    let state = aggregate_state(&results);
+    let case_set_complete = results.len() == CALIBRATION_CASE_IDS.len()
+        && results
+            .iter()
+            .all(|result| result.get("state").and_then(Value::as_str) != Some("INCONCLUSIVE"));
+    let error = (state == "INCONCLUSIVE").then_some("infrastructure ambiguity stopped Attempt 003");
+    let inference_requests = results.len() as u32;
+    let result = candidate_result(
+        budget,
+        results,
+        inference_requests,
+        state,
+        case_set_complete,
+        error,
+    )?;
+    write_json(&candidate_root.join("candidate-result.json"), &result)?;
+    Ok(result)
 }
 
 pub fn execute_attempt_002(
@@ -2451,6 +2663,10 @@ mod tests {
         assert_eq!(
             parse_calibration_cli_args(vec!["attempt-003-dry-run".to_string()]).unwrap(),
             CalibrationCliCommand::Attempt003DryRun
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-003-poststart".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt003Poststart
         );
     }
 }

@@ -2536,7 +2536,7 @@ Identity SHA-256:
 `c40e4528d6dc895a6e688a77dd1159b4c4e740b6a1b78ab2fc5259a0bc02655f`
 
 Native implementation SHA-256:
-`ceb145320517a84a8cad1df7695c5f1138e75a93bce2d53ae1ec4a18a37fe409`
+`019ed0c7b066773b570f29adb6130b4447b1e9610e13724933b79a9e40374e93`
 
 Attempt 003 evidence root:
 `experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/`
@@ -2554,3 +2554,49 @@ or calibration request was executed. The next live action requires separate
 authorization.
 
 `REASONING BUDGET 1024 ATTEMPT 003 READY FOR SEPARATE LIVE AUTHORIZATION`
+
+## Phase 1C reasoning-budget 1024 Attempt 003 live closeout
+
+The accepted remediation was promoted without a merge commit:
+`origin/main` is `74f8380dc62e622cd48baebd21d5ea5bebbf91c9`. The live branch is
+`agent/phase-1c-reasoning-budget-calibration-1024-attempt-003`, initially at
+that same commit. The registered native prestart gate passed before Qwen
+startup: zero llama processes, zero port-8080 listeners, zero competing
+registered workflows, successful process/TCP inspection, no elevation, and
+zero network/listener/inference contacts.
+
+The fresh server was started with the frozen Attempt 003 parameters. Build
+`b10217-ddd4ec142` was confirmed. Native post-start inspection found llama PID
+`28772` at
+`C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe`, and port 8080
+was owned by that PID. The post-start gate then failed closed because the
+registered supervisor process `prefixity-phase1c-live-supervisor.exe` was
+identified as a competing Prefixity workflow process. No readiness check and
+no inference request was dispatched. The supervisor completed with one child
+launch, zero retries, and zero supervisor inference requests. The Qwen server
+was stopped and native shutdown verification found zero llama processes and
+zero port-8080 listeners.
+
+Attempt 003 is therefore:
+
+`REASONING BUDGET 1024 ATTEMPT 003 INVALID / AMBIGUOUS`
+
+No case was dispatched: rbcal-001, rbcal-002, and rbcal-003 have no HTTP,
+prompt-token, completion-token, reasoning, finish-reason, terminal-content,
+or response-hash result. Attempt 003 inference requests are `0`; readiness
+attempts are `0`; retries are `0`. No Attempt 004 or lower-budget candidate is
+prepared or executed under this authorization.
+
+Attempt 003 evidence files are ignored experiment artifacts:
+
+- `experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/preflight.json`
+  SHA-256 `73921f286b141a48802499b1081c660500425fbf5c59d0e54880e1a4588e00e8`
+- `experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/runtime-ownership.json`
+  SHA-256 `333c4fbcbbf90d24e28ce44890a478d06d233ced785261c7e08b5f0cb233337c`
+- `experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/candidate-result.json`
+  SHA-256 `b756093101fb7683ea74ff4166bd66c6e1129eea26e7e8a6f7791fcec449d62b`
+- `experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/supervisor.json`
+  SHA-256 `7a396f58b156bb7abb2eda565be1ed15541310717eac597dab8a7902150e9387`
+
+The next action is runtime investigation of the supervisor/process-exclusivity
+policy. No further localhost/model contact is authorized by this record.

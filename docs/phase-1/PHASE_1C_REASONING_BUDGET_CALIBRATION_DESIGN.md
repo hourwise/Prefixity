@@ -253,7 +253,7 @@ SHA-256
 It binds the unchanged manifest SHA, all three request hashes, the Attempt 001
 invalid/ambiguous lineage, the Attempt 002 pre-server invalid lineage and
 execution-record commit, and the native implementation source fingerprint
-`ceb145320517a84a8cad1df7695c5f1138e75a93bce2d53ae1ec4a18a37fe409`.
+`019ed0c7b066773b570f29adb6130b4447b1e9610e13724933b79a9e40374e93`.
 
 The distinct Attempt 003 evidence root is
 `experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/`.
