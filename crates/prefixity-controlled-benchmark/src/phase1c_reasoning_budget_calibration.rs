@@ -12,6 +12,7 @@ use reqwest::blocking::Client;
 use reqwest::redirect::Policy;
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
+use std::env;
 use std::fs;
 use std::io::Read;
 use std::net::{SocketAddr, TcpStream};
@@ -35,8 +36,16 @@ pub const CALIBRATION_ATTEMPT_003_IDENTITY_FINGERPRINT_PATH: &str =
     "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_003_IDENTITY_V1.sha256";
 pub const CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT: &str =
     "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003";
+pub const CALIBRATION_ATTEMPT_004_IDENTITY_PATH: &str =
+    "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_004_IDENTITY_V1.json";
+pub const CALIBRATION_ATTEMPT_004_IDENTITY_FINGERPRINT_PATH: &str =
+    "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_004_IDENTITY_V1.sha256";
+pub const CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT: &str =
+    "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-004";
 pub const CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH: &str =
     "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs";
+const ATTEMPT_003_SEALED_IMPLEMENTATION_SHA256: &str =
+    "019ed0c7b066773b570f29adb6130b4447b1e9610e13724933b79a9e40374e93";
 pub const CALIBRATION_CASE_IDS: [&str; 3] = ["rbcal-001", "rbcal-002", "rbcal-003"];
 pub const CALIBRATION_BUDGETS: [u32; 3] = [1024, 512, 256];
 
@@ -84,6 +93,9 @@ pub enum CalibrationCliCommand {
     Attempt003DryRun,
     Attempt003Poststart,
     RunAttempt003,
+    Attempt004Fingerprint,
+    Attempt004Preflight,
+    Attempt004DryRun,
 }
 
 pub fn parse_calibration_cli_args<I>(
@@ -164,8 +176,17 @@ where
             Ok(CalibrationCliCommand::Attempt003Poststart)
         }
         [command] if command == "run-attempt-003" => Ok(CalibrationCliCommand::RunAttempt003),
+        [command] if command == "attempt-004-fingerprint" => {
+            Ok(CalibrationCliCommand::Attempt004Fingerprint)
+        }
+        [command] if command == "attempt-004-preflight" => {
+            Ok(CalibrationCliCommand::Attempt004Preflight)
+        }
+        [command] if command == "attempt-004-dry-run" => {
+            Ok(CalibrationCliCommand::Attempt004DryRun)
+        }
         _ => Err(ReasoningBudgetCalibrationError::Validation(
-            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003]".to_string(),
+            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003|attempt-004-fingerprint|attempt-004-preflight|attempt-004-dry-run]".to_string(),
         )),
     }
 }
@@ -516,12 +537,76 @@ pub fn attempt_002_runtime_ownership(
 pub fn attempt_003_runtime_ownership(
     server_pid: u32,
 ) -> Result<Value, ReasoningBudgetCalibrationError> {
-    let mut result = attempt_002_runtime_ownership(server_pid)?;
-    let object = result
-        .as_object_mut()
-        .ok_or_else(|| invalid("runtime ownership result must be an object"))?;
-    object.insert("attempt".to_string(), json!(3));
-    Ok(result)
+    let identity = expected_workflow_identity_from_supervisor_env()?;
+    attempt_003_runtime_ownership_with_expected_workflow(server_pid, &identity)
+}
+
+pub fn attempt_003_runtime_ownership_with_expected_workflow(
+    server_pid: u32,
+    expected_workflow: &windows_exclusivity::ExpectedWorkflowIdentity,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    if server_pid == 0 {
+        return Err(invalid("server PID must be nonzero"));
+    }
+    let processes = windows_exclusivity::process_table();
+    let port_listeners = windows_exclusivity::tcp_listener_table(PORT);
+    let process_records = processes.as_ref().ok().cloned().unwrap_or_default();
+    let listener_records = port_listeners.as_ref().ok().cloned().unwrap_or_default();
+    let llama_processes = windows_exclusivity::llama_processes(&process_records);
+    let competing_processes = windows_exclusivity::competing_processes_for_expected_workflow(
+        &process_records,
+        expected_workflow,
+    );
+    let outcome = windows_exclusivity::classify_poststart_with_expected_workflow(
+        server_pid,
+        &processes,
+        &port_listeners,
+        expected_workflow,
+    );
+    let single_llama_pid = outcome == windows_exclusivity::ExclusivityOutcome::ExclusivePoststart;
+    let single_port_pid = listener_records.len() == 1
+        && listener_records
+            .first()
+            .is_some_and(|listener| listener.pid == server_pid);
+    let no_unexpected_processes = competing_processes.is_empty();
+    let exclusive = single_llama_pid && single_port_pid && no_unexpected_processes;
+    Ok(json!({
+        "state": if exclusive { "READY" } else { "BLOCKED" },
+        "attempt": 3,
+        "check": "runtime_ownership_before_inference",
+        "outcome": outcome.as_str(),
+        "expected_server_pid": server_pid,
+        "llama_processes": llama_processes,
+        "port_8080_listeners": listener_records,
+        "other_prefixity_qwen_workflow_processes": competing_processes,
+        "expected_workflow_identity": expected_workflow,
+        "expected_workflow_state": if exclusive {
+            "NO_UNEXPECTED_WORKFLOW_PROCESSES"
+        } else {
+            outcome.as_str()
+        },
+        "executable_paths": llama_processes.iter().filter_map(|process| process.executable_path.clone()).collect::<Vec<_>>(),
+        "server_start_identity": "fresh candidate-1024 llama.cpp process",
+        "single_expected_llama_process": single_llama_pid,
+        "port_owner_matches_server_pid": single_port_pid,
+        "no_competing_processes": no_unexpected_processes,
+        "inspection_mechanisms": {
+            "processes": "CreateToolhelp32Snapshot + Process32FirstW + Process32NextW",
+            "tcp_listeners": "GetExtendedTcpTable(TCP_TABLE_OWNER_PID_LISTENER, AF_INET)",
+            "executable_path": "OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION) + QueryFullProcessImageNameW",
+            "admin_required": false,
+            "localhost_contact": false
+        },
+        "process_inspection": probe_result_status(&processes),
+        "port_inspection": probe_result_status(&port_listeners),
+        "os_table_inspections": {
+            "process_table": 1,
+            "tcp_listener_table": 1
+        },
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
 }
 
 pub fn attempt_003_poststart() -> Result<Value, ReasoningBudgetCalibrationError> {
@@ -537,7 +622,43 @@ pub fn attempt_003_poststart() -> Result<Value, ReasoningBudgetCalibrationError>
             llama_processes.len()
         )));
     }
-    attempt_003_runtime_ownership(llama_processes[0].pid)
+    let expected_workflow = expected_workflow_identity_from_supervisor_env()?;
+    attempt_003_runtime_ownership_with_expected_workflow(llama_processes[0].pid, &expected_workflow)
+}
+
+pub fn expected_workflow_identity_from_supervisor_env(
+) -> Result<windows_exclusivity::ExpectedWorkflowIdentity, ReasoningBudgetCalibrationError> {
+    let launch_identity = env::var(crate::phase1c_live_supervisor::WORKFLOW_LAUNCH_IDENTITY_ENV)
+        .map_err(|_| {
+            invalid("expected workflow launch identity was not handed off by supervisor")
+        })?;
+    let supervisor_pid = env::var(crate::phase1c_live_supervisor::WORKFLOW_SUPERVISOR_PID_ENV)
+        .map_err(|_| invalid("expected supervisor PID was not handed off by supervisor"))?
+        .parse::<u32>()
+        .map_err(|_| invalid("expected supervisor PID handoff was not numeric"))?;
+    let supervisor_path = env::var(crate::phase1c_live_supervisor::WORKFLOW_SUPERVISOR_PATH_ENV)
+        .map_err(|_| invalid("expected supervisor path was not handed off by supervisor"))?;
+    let child_path = env::current_exe()?.to_string_lossy().into_owned();
+    let child_pid = std::process::id();
+    if supervisor_pid == 0 || child_pid == 0 || supervisor_pid == child_pid {
+        return Err(invalid(
+            "expected workflow supervisor and child identities are invalid",
+        ));
+    }
+    Ok(windows_exclusivity::ExpectedWorkflowIdentity {
+        launch_identity,
+        supervisor: windows_exclusivity::ExpectedProcessIdentity {
+            pid: supervisor_pid,
+            executable_path: supervisor_path,
+            parent_pid: None,
+        },
+        calibration_child: windows_exclusivity::ExpectedProcessIdentity {
+            pid: child_pid,
+            executable_path: child_path,
+            parent_pid: Some(supervisor_pid),
+        },
+        inspector: None,
+    })
 }
 
 pub fn execute_attempt_003() -> Result<Value, ReasoningBudgetCalibrationError> {
@@ -955,6 +1076,95 @@ pub fn dry_run_attempt_003() -> Result<Value, ReasoningBudgetCalibrationError> {
     Ok(json!({
         "state": "DRY_RUN",
         "attempt": 3,
+        "budget": 1024,
+        "preflight": preflight,
+        "combinations": combinations,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+pub fn fingerprint_attempt_004() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_attempt_004_identity(false)?;
+    validate_attempt_004_identity(&identity, false)?;
+    let fingerprints = fingerprint_calibration()?;
+    validate_attempt_004_bindings(&identity, &fingerprints)?;
+    Ok(json!({
+        "identity_sha256": canonical_hash(&identity)?,
+        "implementation_source_sha256": implementation_source_sha256()?,
+        "manifest_sha256": fingerprints["manifest_sha256"],
+        "candidate_budget": 1024,
+        "case_order": CALIBRATION_CASE_IDS,
+        "cases": fingerprints["cases"],
+        "attempt": 4,
+        "evidence_root": CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+pub fn preflight_attempt_004() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_attempt_004_identity(true)?;
+    validate_attempt_004_identity(&identity, true)?;
+    let fingerprints = fingerprint_calibration()?;
+    validate_attempt_004_bindings(&identity, &fingerprints)?;
+    validate_attempt_004_evidence_state()?;
+    let os_inspection = windows_native_prestart_value(4, true);
+    Ok(json!({
+        "state": "PREPARED",
+        "attempt": 4,
+        "experiment_id": EXPERIMENT_ID,
+        "candidate_budget": 1024,
+        "case_order": CALIBRATION_CASE_IDS,
+        "manifest_sha256": fingerprints["manifest_sha256"],
+        "request_hashes": fingerprints["cases"],
+        "evidence_root": CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT,
+        "evidence_root_absent": true,
+        "attempt_001_immutable": true,
+        "attempt_002_root_absent": true,
+        "attempt_003_immutable": true,
+        "windows_native_exclusivity": os_inspection,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+pub fn dry_run_attempt_004() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let preflight = preflight_attempt_004()?;
+    let manifest = read_manifest(true)?;
+    let cases = manifest
+        .get("cases")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("cases"))?;
+    let combinations = CALIBRATION_CASE_IDS
+        .iter()
+        .map(|case_id| {
+            let case = cases
+                .iter()
+                .find(|case| case.get("case_id").and_then(Value::as_str) == Some(case_id))
+                .ok_or_else(|| missing(case_id))?;
+            Ok(json!({
+                "attempt": 4,
+                "budget": 1024,
+                "case_id": case_id,
+                "evidence_root": format!("{CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT}/{case_id}"),
+                "server_reasoning_budget": 1024,
+                "request_has_reasoning_budget_field": false,
+                "request_sha256": case["request_sha256"],
+                "wire_request_sha256": case["wire_request_sha256"],
+                "request_bytes": case["request_bytes"],
+                "network_calls": 0,
+                "listener_checks": 0,
+                "inference_requests": 0
+            }))
+        })
+        .collect::<Result<Vec<_>, ReasoningBudgetCalibrationError>>()?;
+    Ok(json!({
+        "state": "DRY_RUN",
+        "attempt": 4,
         "budget": 1024,
         "preflight": preflight,
         "combinations": combinations,
@@ -1952,7 +2162,7 @@ fn validate_attempt_003_identity(
     expect_string(
         identity,
         "exclusivity_implementation.source_sha256",
-        &implementation_source_sha256()?,
+        ATTEMPT_003_SEALED_IMPLEMENTATION_SHA256,
     )?;
     expect_bool(
         identity,
@@ -2074,6 +2284,292 @@ fn validate_attempt_003_bindings(
         }
     }
     Ok(())
+}
+
+fn read_attempt_004_identity(
+    verify_sidecar: bool,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_json(CALIBRATION_ATTEMPT_004_IDENTITY_PATH)?;
+    if verify_sidecar {
+        validate_attempt_004_identity_sidecar(&identity)?;
+    }
+    Ok(identity)
+}
+
+fn validate_attempt_004_identity(
+    identity: &Value,
+    verify_sidecar: bool,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    expect_string(
+        identity,
+        "identity_version",
+        "phase1c-reasoning-budget-1024-attempt-004-v1",
+    )?;
+    expect_string(
+        identity,
+        "status",
+        "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+    )?;
+    expect_string(identity, "experiment_id", EXPERIMENT_ID)?;
+    expect_u64(identity, "attempt", 4)?;
+    expect_u64(identity, "candidate.reasoning_budget", 1024)?;
+    if identity.pointer("/candidate/case_order") != Some(&json!(CALIBRATION_CASE_IDS))
+        || identity.pointer("/candidate/maximum_requests") != Some(&json!(3))
+        || identity.pointer("/candidate/automatic_retries") != Some(&json!(0))
+        || identity.pointer("/candidate/fresh_server_required") != Some(&Value::Bool(true))
+        || identity.pointer("/candidate/runtime_exclusivity_required") != Some(&Value::Bool(true))
+    {
+        return Err(invalid("attempt-004 candidate identity changed"));
+    }
+    expect_string(identity, "manifest.path", CALIBRATION_MANIFEST_PATH)?;
+    expect_string(
+        identity,
+        "manifest.sha256",
+        "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b",
+    )?;
+    validate_frozen_request_hashes(identity, "attempt-004")?;
+    expect_string(
+        identity,
+        "lineage.attempt_001_evidence_root",
+        "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_001_classification",
+        "INVALID / AMBIGUOUS",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_001_reason",
+        "LLAMA_RUNTIME_FAILURE_WITH_UNCERTAIN_REQUEST_COMPLETION",
+    )?;
+    expect_u64(identity, "lineage.attempt_001_request_attempts", 1)?;
+    expect_bool(identity, "lineage.attempt_001_immutable", true)?;
+    let attempt_002_root = format!("{CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT}/");
+    expect_string(
+        identity,
+        "lineage.attempt_002_evidence_root",
+        &attempt_002_root,
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_002_classification",
+        "INVALID BEFORE QWEN STARTUP",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_002_reason",
+        "PROCESS_INSPECTION_PERMISSION_FAILURE",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_002_execution_record_commit",
+        "a27b4fb411a284a6503d9a1c5525e30b1ae8862c",
+    )?;
+    expect_u64(identity, "lineage.attempt_002_inference_requests", 0)?;
+    expect_bool(identity, "lineage.attempt_002_root_absent", true)?;
+    let attempt_003_root = format!("{CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT}/");
+    expect_string(
+        identity,
+        "lineage.attempt_003_evidence_root",
+        &attempt_003_root,
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_003_classification",
+        "INVALID BEFORE READINESS / INFERENCE",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_003_reason",
+        "EXPECTED_SUPERVISOR_MISCLASSIFIED_AS_COMPETING_WORKFLOW",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_003_execution_record_commit",
+        "dc0a8801cee4ddf6f3bc928ecb6bfd954ec7eeec",
+    )?;
+    expect_u64(identity, "lineage.attempt_003_inference_requests", 0)?;
+    expect_u64(identity, "lineage.attempt_003_readiness_checks", 0)?;
+    expect_string(
+        identity,
+        "lineage.root_cause",
+        "EXPECTED_SUPERVISOR_MISCLASSIFIED_AS_COMPETING_WORKFLOW",
+    )?;
+    expect_string(
+        identity,
+        "attempt_004_evidence_root",
+        &format!("{CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT}/"),
+    )?;
+    expect_string(identity, "runtime.engine", "llama.cpp")?;
+    expect_string(identity, "runtime.server_build", "b10217-ddd4ec142")?;
+    expect_string(identity, "runtime.model", MODEL_ID)?;
+    expect_string(identity, "runtime.quantization", "Q4_0")?;
+    expect_u64(identity, "runtime.context_size", 8192)?;
+    expect_u64(identity, "runtime.parallel_slots", 1)?;
+    expect_string(identity, "runtime.metrics", "enabled")?;
+    expect_string(identity, "runtime.reasoning", "on")?;
+    expect_u64(identity, "runtime.reasoning_budget", 1024)?;
+    expect_string(identity, "runtime.reasoning_budget_message", "unset")?;
+    expect_string(identity, "runtime.host", HOST)?;
+    expect_u64(identity, "runtime.port", PORT as u64)?;
+    expect_u64(identity, "generation.max_tokens", 2048)?;
+    expect_u64(identity, "generation.temperature", 0)?;
+    expect_u64(identity, "generation.top_p", 1)?;
+    expect_u64(identity, "generation.seed", 1)?;
+    expect_u64(identity, "timeouts.request_ms", 1_200_000)?;
+    expect_u64(identity, "timeouts.supervisor_ms", 1_320_000)?;
+    expect_string(
+        identity,
+        "exclusivity_implementation.source_path",
+        CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
+    )?;
+    expect_string(
+        identity,
+        "exclusivity_implementation.source_sha256",
+        &implementation_source_sha256()?,
+    )?;
+    for path in [
+        "exclusivity_implementation.native_process_table",
+        "exclusivity_implementation.native_tcp_owner_table",
+        "exclusivity_implementation.native_parent_process_table",
+        "exclusivity_implementation.launch_specific_expected_identity",
+        "exclusivity_implementation.no_shell_commands",
+        "exclusivity_implementation.no_admin_required",
+        "exclusivity_implementation.read_only",
+        "exclusivity_implementation.localhost_contact",
+    ] {
+        let expected = !path.ends_with("localhost_contact");
+        expect_bool(identity, path, expected)?;
+    }
+    expect_bool(
+        identity,
+        "evidence_policy.attempt_001_must_not_be_overwritten",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "evidence_policy.attempt_002_root_must_remain_absent",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "evidence_policy.attempt_003_root_must_remain_immutable",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "evidence_policy.attempt_004_root_must_begin_absent",
+        true,
+    )?;
+    expect_bool(identity, "evidence_policy.no_manifest_copy", true)?;
+    expect_bool(identity, "evidence_policy.no_response_repair", true)?;
+    expect_bool(identity, "evidence_policy.no_retry", true)?;
+    if verify_sidecar {
+        validate_attempt_004_identity_sidecar(identity)?;
+    }
+    Ok(())
+}
+
+fn validate_attempt_004_identity_sidecar(
+    identity: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    let sidecar = read_json(CALIBRATION_ATTEMPT_004_IDENTITY_FINGERPRINT_PATH)?;
+    if sidecar.get("artifact_path").and_then(Value::as_str)
+        != Some(CALIBRATION_ATTEMPT_004_IDENTITY_PATH)
+        || sidecar.get("algorithm").and_then(Value::as_str) != Some("SHA-256")
+        || sidecar.get("canonicalization").and_then(Value::as_str)
+            != Some("sorted JSON object keys; arrays preserve order")
+        || sidecar.get("canonical_sha256").and_then(Value::as_str)
+            != Some(canonical_hash(identity)?.as_str())
+    {
+        return Err(invalid("attempt-004 identity fingerprint sidecar mismatch"));
+    }
+    Ok(())
+}
+
+fn validate_attempt_004_bindings(
+    identity: &Value,
+    fingerprints: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    if identity.pointer("/manifest/sha256") != fingerprints.get("manifest_sha256") {
+        return Err(invalid("attempt-004 manifest binding mismatch"));
+    }
+    let expected_cases = identity
+        .get("frozen_request_hashes")
+        .and_then(Value::as_object)
+        .ok_or_else(|| missing("frozen_request_hashes"))?;
+    let actual_cases = fingerprints
+        .get("cases")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("cases"))?;
+    for case_id in CALIBRATION_CASE_IDS {
+        let expected = expected_cases
+            .get(case_id)
+            .and_then(Value::as_str)
+            .ok_or_else(|| missing(case_id))?;
+        let actual = actual_cases
+            .iter()
+            .find(|case| case.get("case_id").and_then(Value::as_str) == Some(case_id))
+            .and_then(|case| case.get("request_sha256"))
+            .and_then(Value::as_str);
+        if actual != Some(expected) {
+            return Err(invalid("attempt-004 request binding mismatch"));
+        }
+    }
+    Ok(())
+}
+
+fn validate_attempt_004_evidence_state() -> Result<(), ReasoningBudgetCalibrationError> {
+    let attempt_001_root =
+        workspace_path("experiments/runs/phase1c-reasoning-budget-calibration/budget-1024");
+    if !attempt_001_root.exists() {
+        return Err(invalid("attempt-001 evidence root is absent"));
+    }
+    if attempt_002_root().exists() {
+        return Err(invalid("attempt-002 evidence root must remain absent"));
+    }
+    if !attempt_003_root().exists() {
+        return Err(invalid("attempt-003 evidence root is absent"));
+    }
+    if attempt_004_root().exists() {
+        return Err(invalid("attempt-004 evidence root must remain absent"));
+    }
+    for (name, expected_hash) in attempt_003_evidence_hashes() {
+        let path = attempt_003_root().join(name);
+        let actual_hash = sha256_hex(&fs::read(&path).map_err(|error| {
+            invalid(&format!(
+                "unable to read preserved attempt-003 evidence {name}: {error}"
+            ))
+        })?);
+        if actual_hash != expected_hash {
+            return Err(invalid(&format!(
+                "preserved attempt-003 evidence hash mismatch for {name}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn attempt_003_evidence_hashes() -> [(&'static str, &'static str); 4] {
+    [
+        (
+            "preflight.json",
+            "73921f286b141a48802499b1081c660500425fbf5c59d0e54880e1a4588e00e8",
+        ),
+        (
+            "runtime-ownership.json",
+            "333c4fbcbbf90d24e28ce44890a478d06d233ced785261c7e08b5f0cb233337c",
+        ),
+        (
+            "candidate-result.json",
+            "b756093101fb7683ea74ff4166bd66c6e1129eea26e7e8a6f7791fcec449d62b",
+        ),
+        (
+            "supervisor.json",
+            "7a396f58b156bb7abb2eda565be1ed15541310717eac597dab8a7902150e9387",
+        ),
+    ]
 }
 
 fn implementation_source_sha256() -> Result<String, ReasoningBudgetCalibrationError> {
@@ -2333,6 +2829,10 @@ fn attempt_002_result_path() -> PathBuf {
 
 fn attempt_003_root() -> PathBuf {
     workspace_path(CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT)
+}
+
+fn attempt_004_root() -> PathBuf {
+    workspace_path(CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT)
 }
 
 fn workspace_path(path: &str) -> PathBuf {
@@ -2617,7 +3117,7 @@ mod tests {
         );
         assert_eq!(
             identity["exclusivity_implementation"]["source_sha256"],
-            implementation_source_sha256().unwrap()
+            ATTEMPT_003_SEALED_IMPLEMENTATION_SHA256
         );
     }
 
@@ -2667,6 +3167,70 @@ mod tests {
         assert_eq!(
             parse_calibration_cli_args(vec!["attempt-003-poststart".to_string()]).unwrap(),
             CalibrationCliCommand::Attempt003Poststart
+        );
+    }
+
+    #[test]
+    fn attempt_004_identity_is_fingerprinted_and_binds_attempt003_evidence() {
+        let identity = read_attempt_004_identity(true).unwrap();
+        validate_attempt_004_identity(&identity, true).unwrap();
+        assert_eq!(
+            canonical_hash(&identity).unwrap(),
+            "7e59288ccc2847298482dfe6aa4dfe0e2d3e4197fdfbe72031f9551e51c675c9"
+        );
+        validate_attempt_004_evidence_state().unwrap();
+        assert_eq!(
+            identity["attempt_004_evidence_root"],
+            format!("{CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT}/")
+        );
+        assert_eq!(
+            identity["lineage"]["attempt_003_evidence_sha256"]["supervisor.json"],
+            "7a396f58b156bb7abb2eda565be1ed15541310717eac597dab8a7902150e9387"
+        );
+    }
+
+    #[test]
+    fn attempt_004_dry_run_is_isolated_and_zero_contact() {
+        if attempt_004_root().exists() {
+            return;
+        }
+        let result = dry_run_attempt_004().unwrap();
+        assert_eq!(result["state"], "DRY_RUN");
+        assert_eq!(result["attempt"], 4);
+        assert_eq!(result["budget"], 1024);
+        assert_eq!(result["combinations"].as_array().unwrap().len(), 3);
+        assert_eq!(result["network_calls"], 0);
+        assert_eq!(result["listener_checks"], 0);
+        assert_eq!(result["inference_requests"], 0);
+        assert!(result["combinations"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|case| {
+                case["budget"] == 1024
+                    && case["request_has_reasoning_budget_field"] == false
+                    && case["network_calls"] == 0
+                    && case["listener_checks"] == 0
+                    && case["inference_requests"] == 0
+                    && case["evidence_root"]
+                        .as_str()
+                        .is_some_and(|path| path.starts_with(CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT))
+            }));
+    }
+
+    #[test]
+    fn attempt_004_cli_commands_are_offline_only() {
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-004-fingerprint".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt004Fingerprint
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-004-preflight".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt004Preflight
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-004-dry-run".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt004DryRun
         );
     }
 }

@@ -193,20 +193,27 @@ pub use phase1c_h001_v2::{
     V2_LIVE_CONFIRMATION_FLAG, V2_PILOT_FINGERPRINT_PATH, V2_PILOT_MANIFEST_PATH,
 };
 pub use phase1c_live_supervisor::{
-    persist_supervisor_result, run_supervised, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
+    persist_supervisor_result, run_supervised, run_supervised_with_expected_workflow_identity,
+    PRODUCTION_SUPERVISOR_TIMEOUT_MS, WORKFLOW_LAUNCH_IDENTITY_ENV, WORKFLOW_SUPERVISOR_PATH_ENV,
+    WORKFLOW_SUPERVISOR_PID_ENV,
 };
 pub use phase1c_reasoning_budget_calibration::{
     attempt_002_exclusivity_preflight, attempt_002_runtime_ownership, attempt_003_poststart,
-    attempt_003_runtime_ownership, dry_run_attempt_002, dry_run_attempt_003, dry_run_calibration,
-    execute_attempt_002, execute_attempt_003, execute_calibration, fingerprint_attempt_002,
-    fingerprint_attempt_003, fingerprint_calibration, next_candidate_budget,
-    parse_calibration_cli_args, preflight_attempt_002, preflight_attempt_003,
-    preflight_calibration, summarize_attempt_002_budget, summarize_calibration_budget,
-    CalibrationCliCommand, ReasoningBudgetCalibrationError, CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT,
+    attempt_003_runtime_ownership, attempt_003_runtime_ownership_with_expected_workflow,
+    dry_run_attempt_002, dry_run_attempt_003, dry_run_attempt_004, dry_run_calibration,
+    execute_attempt_002, execute_attempt_003, execute_calibration,
+    expected_workflow_identity_from_supervisor_env, fingerprint_attempt_002,
+    fingerprint_attempt_003, fingerprint_attempt_004, fingerprint_calibration,
+    next_candidate_budget, parse_calibration_cli_args, preflight_attempt_002,
+    preflight_attempt_003, preflight_attempt_004, preflight_calibration,
+    summarize_attempt_002_budget, summarize_calibration_budget, CalibrationCliCommand,
+    ReasoningBudgetCalibrationError, CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT,
     CALIBRATION_ATTEMPT_002_IDENTITY_FINGERPRINT_PATH, CALIBRATION_ATTEMPT_002_IDENTITY_PATH,
     CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT, CALIBRATION_ATTEMPT_003_IDENTITY_FINGERPRINT_PATH,
-    CALIBRATION_ATTEMPT_003_IDENTITY_PATH, CALIBRATION_BUDGETS, CALIBRATION_CASE_IDS,
-    CALIBRATION_EVIDENCE_ROOT, CALIBRATION_MANIFEST_FINGERPRINT_PATH, CALIBRATION_MANIFEST_PATH,
+    CALIBRATION_ATTEMPT_003_IDENTITY_PATH, CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT,
+    CALIBRATION_ATTEMPT_004_IDENTITY_FINGERPRINT_PATH, CALIBRATION_ATTEMPT_004_IDENTITY_PATH,
+    CALIBRATION_BUDGETS, CALIBRATION_CASE_IDS, CALIBRATION_EVIDENCE_ROOT,
+    CALIBRATION_MANIFEST_FINGERPRINT_PATH, CALIBRATION_MANIFEST_PATH,
     CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
 };
 pub use phase1c_scored_design::{

@@ -15,7 +15,23 @@ pub const LLAMA_PROCESS_IMAGE: &str = "llama.exe";
 pub struct ProcessRecord {
     pub image_name: String,
     pub pid: u32,
+    pub parent_pid: u32,
     pub executable_path: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ExpectedProcessIdentity {
+    pub pid: u32,
+    pub executable_path: String,
+    pub parent_pid: Option<u32>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ExpectedWorkflowIdentity {
+    pub launch_identity: String,
+    pub supervisor: ExpectedProcessIdentity,
+    pub calibration_child: ExpectedProcessIdentity,
+    pub inspector: Option<ExpectedProcessIdentity>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -78,6 +94,11 @@ pub enum ExclusivityOutcome {
     MultipleOrInconsistentListeners,
     PidPortMismatch,
     CompetingWorkflowProcess,
+    ExpectedWorkflowIdentityInvalid,
+    ExpectedSupervisorPidMissing,
+    ExpectedSupervisorPathMismatch,
+    ExpectedChildPathMismatch,
+    UnexpectedWorkflowProcess,
     OperatorAttestationMissing,
     ProcessInspectionFailed,
     PortInspectionFailed,
@@ -97,6 +118,11 @@ impl ExclusivityOutcome {
             Self::MultipleOrInconsistentListeners => "MULTIPLE_OR_INCONSISTENT_LISTENERS",
             Self::PidPortMismatch => "PID_PORT_MISMATCH",
             Self::CompetingWorkflowProcess => "COMPETING_WORKFLOW_PROCESS",
+            Self::ExpectedWorkflowIdentityInvalid => "EXPECTED_WORKFLOW_IDENTITY_INVALID",
+            Self::ExpectedSupervisorPidMissing => "EXPECTED_SUPERVISOR_PID_MISSING",
+            Self::ExpectedSupervisorPathMismatch => "EXPECTED_SUPERVISOR_PATH_MISMATCH",
+            Self::ExpectedChildPathMismatch => "EXPECTED_CHILD_PATH_MISMATCH",
+            Self::UnexpectedWorkflowProcess => "UNEXPECTED_WORKFLOW_PROCESS",
             Self::OperatorAttestationMissing => "OPERATOR_ATTESTATION_MISSING",
             Self::ProcessInspectionFailed => "PROCESS_INSPECTION_FAILED",
             Self::PortInspectionFailed => "PORT_INSPECTION_FAILED",
@@ -123,6 +149,137 @@ pub fn competing_processes(processes: &[ProcessRecord], current_pid: u32) -> Vec
         .filter(|process| process.pid != current_pid && is_competing_process(&process.image_name))
         .cloned()
         .collect()
+}
+
+pub fn competing_processes_for_expected_workflow(
+    processes: &[ProcessRecord],
+    identity: &ExpectedWorkflowIdentity,
+) -> Vec<ProcessRecord> {
+    let expected_pids = expected_workflow_pids(identity);
+    processes
+        .iter()
+        .filter(|process| {
+            !expected_pids.contains(&process.pid) && is_competing_process(&process.image_name)
+        })
+        .cloned()
+        .collect()
+}
+
+pub fn validate_expected_workflow_identity(
+    processes: &[ProcessRecord],
+    identity: &ExpectedWorkflowIdentity,
+) -> Result<(), ExclusivityOutcome> {
+    if identity.launch_identity.trim().is_empty()
+        || identity.supervisor.pid == 0
+        || identity.calibration_child.pid == 0
+        || identity.supervisor.executable_path.trim().is_empty()
+        || identity.calibration_child.executable_path.trim().is_empty()
+    {
+        return Err(ExclusivityOutcome::ExpectedWorkflowIdentityInvalid);
+    }
+    let expected_pids = expected_workflow_pids(identity);
+    if expected_pids.len() != 2 + usize::from(identity.inspector.as_ref().is_some())
+        || expected_pids
+            .iter()
+            .enumerate()
+            .any(|(index, pid)| expected_pids[..index].contains(pid))
+    {
+        return Err(ExclusivityOutcome::ExpectedWorkflowIdentityInvalid);
+    }
+
+    let supervisor = processes
+        .iter()
+        .find(|process| process.pid == identity.supervisor.pid)
+        .ok_or(ExclusivityOutcome::ExpectedSupervisorPidMissing)?;
+    if !same_executable_path(
+        supervisor.executable_path.as_deref(),
+        &identity.supervisor.executable_path,
+    ) {
+        return Err(ExclusivityOutcome::ExpectedSupervisorPathMismatch);
+    }
+    if let Some(expected_parent_pid) = identity.supervisor.parent_pid {
+        if supervisor.parent_pid != expected_parent_pid {
+            return Err(ExclusivityOutcome::ExpectedWorkflowIdentityInvalid);
+        }
+    }
+
+    let child = processes
+        .iter()
+        .find(|process| process.pid == identity.calibration_child.pid)
+        .ok_or(ExclusivityOutcome::ExpectedWorkflowIdentityInvalid)?;
+    if !same_executable_path(
+        child.executable_path.as_deref(),
+        &identity.calibration_child.executable_path,
+    ) {
+        return Err(ExclusivityOutcome::ExpectedChildPathMismatch);
+    }
+    if child.parent_pid != identity.supervisor.pid
+        || identity
+            .calibration_child
+            .parent_pid
+            .is_some_and(|parent_pid| parent_pid != identity.supervisor.pid)
+    {
+        return Err(ExclusivityOutcome::ExpectedWorkflowIdentityInvalid);
+    }
+
+    if let Some(inspector_identity) = &identity.inspector {
+        let inspector = processes
+            .iter()
+            .find(|process| process.pid == inspector_identity.pid)
+            .ok_or(ExclusivityOutcome::ExpectedWorkflowIdentityInvalid)?;
+        if !same_executable_path(
+            inspector.executable_path.as_deref(),
+            &inspector_identity.executable_path,
+        ) {
+            return Err(ExclusivityOutcome::ExpectedWorkflowIdentityInvalid);
+        }
+        if let Some(expected_parent_pid) = inspector_identity.parent_pid {
+            if inspector.parent_pid != expected_parent_pid {
+                return Err(ExclusivityOutcome::ExpectedWorkflowIdentityInvalid);
+            }
+        }
+    }
+
+    Ok(())
+}
+
+pub fn classify_poststart_with_expected_workflow(
+    expected_pid: u32,
+    processes: &ProbeResult<Vec<ProcessRecord>>,
+    listeners: &ProbeResult<Vec<ListenerRecord>>,
+    expected_workflow: &ExpectedWorkflowIdentity,
+) -> ExclusivityOutcome {
+    let process_records = match processes {
+        Ok(records) => records,
+        Err(failure) => return failure_outcome(failure),
+    };
+    if let Err(failure) = listeners {
+        return failure_outcome(failure);
+    }
+    if let Err(outcome) = validate_expected_workflow_identity(process_records, expected_workflow) {
+        return outcome;
+    }
+    let outcome = classify_poststart(expected_pid, processes, listeners);
+    if outcome != ExclusivityOutcome::ExclusivePoststart {
+        return outcome;
+    }
+    if competing_processes_for_expected_workflow(process_records, expected_workflow).is_empty() {
+        ExclusivityOutcome::ExclusivePoststart
+    } else {
+        ExclusivityOutcome::UnexpectedWorkflowProcess
+    }
+}
+
+fn expected_workflow_pids(identity: &ExpectedWorkflowIdentity) -> Vec<u32> {
+    let mut pids = vec![identity.supervisor.pid, identity.calibration_child.pid];
+    if let Some(inspector) = &identity.inspector {
+        pids.push(inspector.pid);
+    }
+    pids
+}
+
+fn same_executable_path(actual: Option<&str>, expected: &str) -> bool {
+    actual.is_some_and(|actual| actual.eq_ignore_ascii_case(expected))
 }
 
 pub fn is_llama_process(image_name: &str) -> bool {
@@ -268,7 +425,9 @@ mod native {
                 ));
             }
             let image_name = utf16z(&entry.szExeFile);
-            let executable_path = if super::is_llama_process(&image_name) {
+            let executable_path = if super::is_llama_process(&image_name)
+                || super::is_competing_process(&image_name)
+            {
                 Some(query_executable_path(entry.th32ProcessID)?)
             } else {
                 None
@@ -276,6 +435,7 @@ mod native {
             records.push(ProcessRecord {
                 image_name,
                 pid: entry.th32ProcessID,
+                parent_pid: entry.th32ParentProcessID,
                 executable_path,
             });
 
@@ -443,6 +603,7 @@ mod tests {
         ProcessRecord {
             image_name: image_name.to_string(),
             pid,
+            parent_pid: 0,
             executable_path: None,
         }
     }
@@ -454,6 +615,55 @@ mod tests {
             pid,
             state: "LISTENING".to_string(),
         }
+    }
+
+    fn process_with_path(
+        image_name: &str,
+        pid: u32,
+        parent_pid: u32,
+        executable_path: &str,
+    ) -> ProcessRecord {
+        ProcessRecord {
+            image_name: image_name.to_string(),
+            pid,
+            parent_pid,
+            executable_path: Some(executable_path.to_string()),
+        }
+    }
+
+    fn expected_workflow() -> ExpectedWorkflowIdentity {
+        ExpectedWorkflowIdentity {
+            launch_identity: "attempt-003-launch-001".to_string(),
+            supervisor: ExpectedProcessIdentity {
+                pid: 10,
+                executable_path: r"D:\Prefixity\prefixity-phase1c-live-supervisor.exe".to_string(),
+                parent_pid: None,
+            },
+            calibration_child: ExpectedProcessIdentity {
+                pid: 11,
+                executable_path: r"D:\Prefixity\prefixity-phase1c-calibration.exe".to_string(),
+                parent_pid: Some(10),
+            },
+            inspector: None,
+        }
+    }
+
+    fn expected_workflow_processes() -> Vec<ProcessRecord> {
+        vec![
+            process_with_path(
+                "prefixity-phase1c-live-supervisor.exe",
+                10,
+                1,
+                r"D:\Prefixity\prefixity-phase1c-live-supervisor.exe",
+            ),
+            process_with_path(
+                "prefixity-phase1c-calibration.exe",
+                11,
+                10,
+                r"D:\Prefixity\prefixity-phase1c-calibration.exe",
+            ),
+            process_with_path("llama.exe", 20, 1, r"D:\llama\llama.exe"),
+        ]
     }
 
     #[test]
@@ -528,6 +738,101 @@ mod tests {
         assert_eq!(
             classify_prestart(&processes, &listeners, true),
             ExclusivityOutcome::ExecutablePathFailed
+        );
+    }
+
+    #[test]
+    fn registered_attempt003_workflow_is_exclusive_poststart() {
+        let processes = Ok(expected_workflow_processes());
+        let listeners = Ok(vec![listener(20)]);
+        assert_eq!(
+            classify_poststart_with_expected_workflow(
+                20,
+                &processes,
+                &listeners,
+                &expected_workflow()
+            ),
+            ExclusivityOutcome::ExclusivePoststart
+        );
+    }
+
+    #[test]
+    fn second_supervisor_is_an_unexpected_workflow_process() {
+        let mut records = expected_workflow_processes();
+        records.push(process_with_path(
+            "prefixity-phase1c-live-supervisor.exe",
+            12,
+            1,
+            r"D:\Prefixity\prefixity-phase1c-live-supervisor.exe",
+        ));
+        let processes = Ok(records);
+        let listeners = Ok(vec![listener(20)]);
+        assert_eq!(
+            classify_poststart_with_expected_workflow(
+                20,
+                &processes,
+                &listeners,
+                &expected_workflow()
+            ),
+            ExclusivityOutcome::UnexpectedWorkflowProcess
+        );
+    }
+
+    #[test]
+    fn unregistered_prefixity_runner_is_an_unexpected_workflow_process() {
+        let mut records = expected_workflow_processes();
+        records.push(process_with_path(
+            "prefixity-unregistered-runner.exe",
+            12,
+            1,
+            r"D:\Prefixity\prefixity-unregistered-runner.exe",
+        ));
+        let processes = Ok(records);
+        let listeners = Ok(vec![listener(20)]);
+        assert_eq!(
+            classify_poststart_with_expected_workflow(
+                20,
+                &processes,
+                &listeners,
+                &expected_workflow()
+            ),
+            ExclusivityOutcome::UnexpectedWorkflowProcess
+        );
+    }
+
+    #[test]
+    fn expected_supervisor_path_mismatch_fails_closed() {
+        let mut identity = expected_workflow();
+        identity.supervisor.executable_path = r"D:\Other\supervisor.exe".to_string();
+        let processes = Ok(expected_workflow_processes());
+        let listeners = Ok(vec![listener(20)]);
+        assert_eq!(
+            classify_poststart_with_expected_workflow(20, &processes, &listeners, &identity),
+            ExclusivityOutcome::ExpectedSupervisorPathMismatch
+        );
+    }
+
+    #[test]
+    fn expected_supervisor_absence_fails_closed() {
+        let mut identity = expected_workflow();
+        identity.supervisor.pid = 99;
+        let processes = Ok(expected_workflow_processes());
+        let listeners = Ok(vec![listener(20)]);
+        assert_eq!(
+            classify_poststart_with_expected_workflow(20, &processes, &listeners, &identity),
+            ExclusivityOutcome::ExpectedSupervisorPidMissing
+        );
+    }
+
+    #[test]
+    fn expected_child_path_mismatch_fails_closed() {
+        let mut identity = expected_workflow();
+        identity.calibration_child.executable_path = r"D:\Other\child.exe".to_string();
+        let processes = Ok(expected_workflow_processes());
+        let listeners = Ok(vec![listener(20)]);
+        assert_eq!(
+            classify_poststart_with_expected_workflow(20, &processes, &listeners, &identity),
+            ExclusivityOutcome::ExpectedChildPathMismatch
         );
     }
 }

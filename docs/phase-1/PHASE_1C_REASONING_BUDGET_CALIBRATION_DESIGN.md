@@ -275,3 +275,57 @@ request hashes and no model-visible reasoning-budget field.
 No Attempt 003 live branch or runtime execution is created here. A separate
 authorization is required before any future Qwen startup, readiness check, or
 calibration request.
+
+## Attempt 003 closeout and expected-workflow remediation
+
+Attempt 003 is accepted as `INVALID BEFORE READINESS / INFERENCE` with the
+immediate cause `EXPECTED_SUPERVISOR_MISCLASSIFIED_AS_COMPETING_WORKFLOW`.
+The native prestart and poststart records established the fresh llama process,
+PID/port ownership, and zero inference, but the prior classifier excluded only
+its current PID and then treated every `prefixity` or `qwen` image name as a
+competing workflow. The registered supervisor was therefore misclassified.
+Attempt 003 remains frozen at its four persisted evidence hashes; its execution
+record is commit `dc0a8801cee4ddf6f3bc928ecb6bfd954ec7eeec`.
+
+The remediation uses a launch-specific expected-workflow identity. A real
+supervisor generates a launch identity, its own PID, and its exact executable
+path when spawning the registered calibration child. The child binds its own
+PID and executable path, and the native process table supplies the read-only
+parent PID. Optional inspector identity is similarly exact. Only the
+registered PID/path participants are excluded. Any additional supervisor,
+Prefixity runner, or Qwen workflow remains a competing process and produces
+`UNEXPECTED_WORKFLOW_PROCESS`; missing or mismatched expected identities fail
+closed as `EXPECTED_WORKFLOW_IDENTITY_INVALID`,
+`EXPECTED_SUPERVISOR_PID_MISSING`, `EXPECTED_SUPERVISOR_PATH_MISMATCH`, or
+`EXPECTED_CHILD_PATH_MISMATCH`. The successful poststart state is
+`NO_UNEXPECTED_WORKFLOW_PROCESSES`. Existing llama/PID/port and native
+inspection failures remain fail-closed.
+
+The remediation does not change the manifest, model, quantization, context,
+parallelism, metrics, reasoning mode, reasoning budget, generation settings,
+request material, case order, retry ceiling, or inference ceiling.
+
+## Attempt 004 preparation-only identity
+
+Attempt 004 is registered in
+`PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_004_IDENTITY_V1.json` with candidate
+1024, three fixed cases, maximum three requests, zero retries, and the same
+frozen manifest/request hashes. It binds Attempt 001, Attempt 002, and the
+immutable Attempt 003 evidence hashes, plus the repaired native implementation
+source fingerprint
+`9dba33fdc0c4c9279e5df4eb12b3be0a0f5f99492f74efa548310ebf4163c37b`.
+Its evidence root must begin absent. The offline commands are:
+
+```text
+prefixity-phase1c-reasoning-budget-calibration attempt-004-fingerprint
+prefixity-phase1c-reasoning-budget-calibration attempt-004-preflight
+prefixity-phase1c-reasoning-budget-calibration attempt-004-dry-run
+```
+
+The preparation preflight performs one read-only native process/TCP-table
+inspection with no localhost connection. On the validated machine it reported
+`EXCLUSIVE_PRESTART`, zero llama processes, zero port-8080 listeners, zero
+network calls, and zero inference requests. The dry run projects exactly the
+three registered cases and retains the request contract without a
+model-visible reasoning-budget field. No Attempt 004 server, readiness check,
+or inference request is authorized by this document.

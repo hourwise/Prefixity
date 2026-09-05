@@ -1,8 +1,9 @@
 # Active Task — Phase 0 Foundation Slice (P0-L13)
 
 Status: P0-L6C-R1 repair complete; P0-L6C Attempt 002 is preserved as
-runtime-blocked / failed before inference, Attempt 003 is readiness-blocked
-before inference, Attempt 004 is readiness-blocked before preflight, Attempt
+runtime-blocked / failed before inference, Phase 1C Attempt 003 is accepted as
+invalid before readiness/inference, and Attempt 004 is prepared offline only;
+Attempt
 005 is an execution-invalidated partial live run caused by a missing generation
 bound in the projected request, and Attempt 006 is the first complete bounded
 live paired-mutation run. Attempt 006 produced bounded structural/cache
@@ -2600,3 +2601,41 @@ Attempt 003 evidence files are ignored experiment artifacts:
 
 The next action is runtime investigation of the supervisor/process-exclusivity
 policy. No further localhost/model contact is authorized by this record.
+
+## Phase 1C Attempt 003 closeout and Attempt 004 expected-workflow remediation
+
+Attempt 003 is accepted as `INVALID BEFORE READINESS / INFERENCE` with root
+cause `EXPECTED_SUPERVISOR_MISCLASSIFIED_AS_COMPETING_WORKFLOW`. Its accepted
+execution record was fast-forwarded to `main` and pushed as
+`dc0a8801cee4ddf6f3bc928ecb6bfd954ec7eeec`. The preserved evidence remains
+unchanged and hashes to:
+
+- `preflight.json`: `73921f286b141a48802499b1081c660500425fbf5c59d0e54880e1a4588e00e8`
+- `runtime-ownership.json`: `333c4fbcbbf90d24e28ce44890a478d06d233ced785261c7e08b5f0cb233337c`
+- `candidate-result.json`: `b756093101fb7683ea74ff4166bd66c6e1129eea26e7e8a6f7791fcec449d62b`
+- `supervisor.json`: `7a396f58b156bb7abb2eda565be1ed15541310717eac597dab8a7902150e9387`
+
+The remediation branch is
+`agent/phase-1c-expected-workflow-exclusivity-remediation`. The repaired
+classifier binds the supervisor PID/path, calibration-child PID/path and
+parent relationship, optional inspector identity, and a supervisor-generated
+launch identity. It never globally whitelists `prefixity-*` or
+`*-supervisor.exe`; unregistered or extra workflow processes remain
+`UNEXPECTED_WORKFLOW_PROCESS`, and missing/path-mismatched expected identities
+fail closed. The required successful poststart state is
+`NO_UNEXPECTED_WORKFLOW_PROCESSES`.
+
+Attempt 004 preparation is tracked by
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_004_IDENTITY_V1.json`,
+canonical SHA-256
+`7e59288ccc2847298482dfe6aa4dfe0e2d3e4197fdfbe72031f9551e51c675c9`, and
+repaired native implementation SHA-256
+`9dba33fdc0c4c9279e5df4eb12b3be0a0f5f99492f74efa548310ebf4163c37b`.
+The Attempt 004 root remains absent. Offline fingerprint, preflight, and
+three-case dry-run commands passed with the frozen manifest/request hashes,
+budget 1024, `EXCLUSIVE_PRESTART`, network calls `0`, listener checks `0`, and
+inference requests `0`. The live branch may be created from a promoted
+remediation commit, but no Qwen startup, readiness check, or inference is
+permitted in this task.
+
+`REASONING BUDGET 1024 ATTEMPT 004 READY FOR SEPARATE LIVE AUTHORIZATION`
