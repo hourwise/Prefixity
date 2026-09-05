@@ -2501,3 +2501,56 @@ is claimed, and no alternate shell syntax or unregistered runtime probe was
 used to bypass the failed exclusivity gate.
 
 `REASONING BUDGET 1024 ATTEMPT 002 INVALID — STOP FOR RUNTIME INVESTIGATION`
+
+## Phase 1C Attempt 002 closeout and Attempt 003 Windows exclusivity remediation
+
+Attempt 002 is accepted as `INVALID BEFORE QWEN STARTUP` for
+`PROCESS_INSPECTION_PERMISSION_FAILURE`. The registered `tasklist /FO CSV /NH`
+mechanism returned `ERROR: Access denied`. Its execution record is commit
+`a27b4fb411a284a6503d9a1c5525e30b1ae8862c`; the accounting is zero Qwen
+startup, zero listener checks, zero localhost contact, zero inference requests,
+zero calibration evidence-root creation, and zero retries. Attempt 001 remains
+immutable.
+
+The remediation branch is
+`agent/phase-1c-windows-runtime-exclusivity-remediation`, created from
+canonical `main` and fast-forwarded through the reviewed Attempt 002
+preparation/stop-record history. No live runtime action is authorized on this
+branch.
+
+The checked-in remediation replaces shell-dependent `tasklist` and `netstat`
+inspection with read-only Windows-native process, TCP owner-PID, and executable
+path inspection. It uses Toolhelp32 process enumeration,
+`GetExtendedTcpTable` filtered to port `8080`, and
+`QueryFullProcessImageNameW` under `PROCESS_QUERY_LIMITED_INFORMATION`. It
+does not elevate, terminate, modify, or contact localhost. Pure tests cover
+exclusive prestart, multiple llama processes, unrelated port ownership,
+PID/port mismatch, inspection failure, and executable-path failure. Luna,
+Codex, browser, terminal, and automation exclusivity remains an explicit
+operator attestation.
+
+Attempt 003 identity:
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_003_IDENTITY_V1.json`
+
+Identity SHA-256:
+`c40e4528d6dc895a6e688a77dd1159b4c4e740b6a1b78ab2fc5259a0bc02655f`
+
+Native implementation SHA-256:
+`ceb145320517a84a8cad1df7695c5f1138e75a93bce2d53ae1ec4a18a37fe409`
+
+Attempt 003 evidence root:
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/`
+
+The root remains absent. Offline fingerprint, preflight, and dry-run passed.
+The bounded native local probe completed without administrator elevation and
+reported no `llama.exe` process, no port-8080 listener, and
+`EXCLUSIVE_PRESTART`. OS-table inspections were separate from endpoint
+contact: network calls `0`, listener checks `0`, and inference requests `0`.
+The dry run projected exactly the three unchanged 1024 cases and request
+hashes.
+
+No Attempt 003 live branch was created and no Qwen runtime, readiness check,
+or calibration request was executed. The next live action requires separate
+authorization.
+
+`REASONING BUDGET 1024 ATTEMPT 003 READY FOR SEPARATE LIVE AUTHORIZATION`

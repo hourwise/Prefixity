@@ -7,6 +7,7 @@
 //! the h001 evaluator or any Prefixity treatment path.
 
 use crate::hashing::{canonical_hash, sha256_hex};
+use crate::phase1c_windows_runtime_exclusivity as windows_exclusivity;
 use reqwest::blocking::Client;
 use reqwest::redirect::Policy;
 use serde_json::{json, Value};
@@ -15,7 +16,6 @@ use std::fs;
 use std::io::Read;
 use std::net::{SocketAddr, TcpStream};
 use std::path::{Path, PathBuf};
-use std::process::Command;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 pub const CALIBRATION_MANIFEST_PATH: &str =
@@ -29,6 +29,14 @@ pub const CALIBRATION_ATTEMPT_002_IDENTITY_FINGERPRINT_PATH: &str =
     "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_002_IDENTITY_V1.sha256";
 pub const CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT: &str =
     "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-002";
+pub const CALIBRATION_ATTEMPT_003_IDENTITY_PATH: &str =
+    "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_003_IDENTITY_V1.json";
+pub const CALIBRATION_ATTEMPT_003_IDENTITY_FINGERPRINT_PATH: &str =
+    "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_003_IDENTITY_V1.sha256";
+pub const CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT: &str =
+    "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003";
+pub const CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH: &str =
+    "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs";
 pub const CALIBRATION_CASE_IDS: [&str; 3] = ["rbcal-001", "rbcal-002", "rbcal-003"];
 pub const CALIBRATION_BUDGETS: [u32; 3] = [1024, 512, 256];
 
@@ -71,6 +79,9 @@ pub enum CalibrationCliCommand {
     Attempt002ExclusivityPreflight,
     RunAttempt002 { budget: u32, server_pid: u32 },
     SummarizeAttempt002 { budget: u32 },
+    Attempt003Fingerprint,
+    Attempt003Preflight,
+    Attempt003DryRun,
 }
 
 pub fn parse_calibration_cli_args<I>(
@@ -138,8 +149,17 @@ where
             }
             Ok(CalibrationCliCommand::SummarizeAttempt002 { budget })
         }
+        [command] if command == "attempt-003-fingerprint" => {
+            Ok(CalibrationCliCommand::Attempt003Fingerprint)
+        }
+        [command] if command == "attempt-003-preflight" => {
+            Ok(CalibrationCliCommand::Attempt003Preflight)
+        }
+        [command] if command == "attempt-003-dry-run" => {
+            Ok(CalibrationCliCommand::Attempt003DryRun)
+        }
         _ => Err(ReasoningBudgetCalibrationError::Validation(
-            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024]".to_string(),
+            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run]".to_string(),
         )),
     }
 }
@@ -374,29 +394,32 @@ pub fn attempt_002_exclusivity_preflight(
     confirm_no_other_workflow: bool,
 ) -> Result<Value, ReasoningBudgetCalibrationError> {
     let current_pid = std::process::id();
-    let processes = tasklist_processes()?;
-    let llama_processes = processes
-        .iter()
-        .filter(|process| is_llama_process(&process.image_name))
-        .cloned()
-        .collect::<Vec<_>>();
-    let competing_processes = processes
-        .iter()
-        .filter(|process| process.pid != current_pid && is_competing_process(&process.image_name))
-        .cloned()
-        .collect::<Vec<_>>();
-    let port_listeners = netstat_port_listeners(PORT)?;
-    let passed = llama_processes.is_empty()
-        && port_listeners.is_empty()
-        && competing_processes.is_empty()
-        && confirm_no_other_workflow;
+    let processes = windows_exclusivity::process_table();
+    let port_listeners = windows_exclusivity::tcp_listener_table(PORT);
+    let process_records = processes.as_ref().ok().cloned().unwrap_or_default();
+    let listener_records = port_listeners.as_ref().ok().cloned().unwrap_or_default();
+    let llama_processes = windows_exclusivity::llama_processes(&process_records);
+    let competing_processes =
+        windows_exclusivity::competing_processes(&process_records, current_pid);
+    let mut outcome = windows_exclusivity::classify_prestart(
+        &processes,
+        &port_listeners,
+        confirm_no_other_workflow,
+    );
+    if outcome == windows_exclusivity::ExclusivityOutcome::ExclusivePrestart
+        && !competing_processes.is_empty()
+    {
+        outcome = windows_exclusivity::ExclusivityOutcome::CompetingWorkflowProcess;
+    }
+    let passed = outcome.is_ready() && competing_processes.is_empty() && confirm_no_other_workflow;
     Ok(json!({
         "state": if passed { "READY" } else { "BLOCKED" },
         "attempt": 2,
         "check": "runtime_exclusivity_before_server_start",
+        "outcome": outcome.as_str(),
         "current_preflight_pid": current_pid,
         "llama_processes": llama_processes,
-        "port_8080_listeners": port_listeners,
+        "port_8080_listeners": listener_records,
         "other_prefixity_qwen_workflow_processes": competing_processes,
         "operator_no_other_workflow_confirmed": confirm_no_other_workflow,
         "required_operator_checks": [
@@ -405,10 +428,19 @@ pub fn attempt_002_exclusivity_preflight(
             "no other Prefixity or Qwen runner is active",
             "no Luna, Codex, or helper workflow is configured to interact with this runtime"
         ],
-        "inspection_commands": [
-            "tasklist /FO CSV /NH",
-            "netstat -ano -p tcp"
-        ],
+        "inspection_mechanisms": {
+            "processes": "CreateToolhelp32Snapshot + Process32FirstW + Process32NextW",
+            "tcp_listeners": "GetExtendedTcpTable(TCP_TABLE_OWNER_PID_LISTENER, AF_INET)",
+            "executable_path": "OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION) + QueryFullProcessImageNameW",
+            "admin_required": false,
+            "localhost_contact": false
+        },
+        "process_inspection": probe_result_status(&processes),
+        "port_inspection": probe_result_status(&port_listeners),
+        "os_table_inspections": {
+            "process_table": 1,
+            "tcp_listener_table": 1
+        },
         "network_calls": 0,
         "listener_checks": 0,
         "inference_requests": 0
@@ -421,25 +453,24 @@ pub fn attempt_002_runtime_ownership(
     if server_pid == 0 {
         return Err(invalid("server PID must be nonzero"));
     }
-    let processes = tasklist_processes()?;
-    let llama_processes = processes
-        .iter()
-        .filter(|process| is_llama_process(&process.image_name))
-        .cloned()
-        .collect::<Vec<_>>();
+    let processes = windows_exclusivity::process_table();
+    let port_listeners = windows_exclusivity::tcp_listener_table(PORT);
+    let process_records = processes.as_ref().ok().cloned().unwrap_or_default();
+    let listener_records = port_listeners.as_ref().ok().cloned().unwrap_or_default();
+    let llama_processes = windows_exclusivity::llama_processes(&process_records);
     let current_pid = std::process::id();
-    let competing_processes = processes
-        .iter()
-        .filter(|process| process.pid != current_pid && is_competing_process(&process.image_name))
-        .cloned()
-        .collect::<Vec<_>>();
-    let port_listeners = netstat_port_listeners(PORT)?;
-    let single_llama_pid = llama_processes.len() == 1
-        && llama_processes
-            .first()
-            .is_some_and(|process| process.pid == server_pid);
-    let single_port_pid = port_listeners.len() == 1
-        && port_listeners
+    let competing_processes =
+        windows_exclusivity::competing_processes(&process_records, current_pid);
+    let mut outcome =
+        windows_exclusivity::classify_poststart(server_pid, &processes, &port_listeners);
+    if outcome == windows_exclusivity::ExclusivityOutcome::ExclusivePoststart
+        && !competing_processes.is_empty()
+    {
+        outcome = windows_exclusivity::ExclusivityOutcome::CompetingWorkflowProcess;
+    }
+    let single_llama_pid = outcome == windows_exclusivity::ExclusivityOutcome::ExclusivePoststart;
+    let single_port_pid = listener_records.len() == 1
+        && listener_records
             .first()
             .is_some_and(|listener| listener.pid == server_pid);
     let no_competing_processes = competing_processes.is_empty();
@@ -447,15 +478,29 @@ pub fn attempt_002_runtime_ownership(
         "state": if single_llama_pid && single_port_pid && no_competing_processes { "READY" } else { "BLOCKED" },
         "attempt": 2,
         "check": "runtime_ownership_before_inference",
+        "outcome": outcome.as_str(),
         "expected_server_pid": server_pid,
         "llama_processes": llama_processes,
-        "port_8080_listeners": port_listeners,
+        "port_8080_listeners": listener_records,
         "other_prefixity_qwen_workflow_processes": competing_processes,
-        "executable_path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+        "executable_paths": llama_processes.iter().filter_map(|process| process.executable_path.clone()).collect::<Vec<_>>(),
         "server_start_identity": "fresh candidate-1024 llama.cpp process",
         "single_expected_llama_process": single_llama_pid,
         "port_owner_matches_server_pid": single_port_pid,
         "no_competing_processes": no_competing_processes,
+        "inspection_mechanisms": {
+            "processes": "CreateToolhelp32Snapshot + Process32FirstW + Process32NextW",
+            "tcp_listeners": "GetExtendedTcpTable(TCP_TABLE_OWNER_PID_LISTENER, AF_INET)",
+            "executable_path": "OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION) + QueryFullProcessImageNameW",
+            "admin_required": false,
+            "localhost_contact": false
+        },
+        "process_inspection": probe_result_status(&processes),
+        "port_inspection": probe_result_status(&port_listeners),
+        "os_table_inspections": {
+            "process_table": 1,
+            "tcp_listener_table": 1
+        },
         "network_calls": 0,
         "listener_checks": 0,
         "inference_requests": 0
@@ -606,6 +651,150 @@ pub fn summarize_attempt_002_budget(budget: u32) -> Result<Value, ReasoningBudge
         return Err(invalid("attempt-002 is registered only for budget 1024"));
     }
     read_json_path(&attempt_002_result_path())
+}
+
+pub fn fingerprint_attempt_003() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_attempt_003_identity(false)?;
+    validate_attempt_003_identity(&identity, false)?;
+    let fingerprints = fingerprint_calibration()?;
+    validate_attempt_003_bindings(&identity, &fingerprints)?;
+    Ok(json!({
+        "identity_sha256": canonical_hash(&identity)?,
+        "implementation_source_sha256": implementation_source_sha256()?,
+        "manifest_sha256": fingerprints["manifest_sha256"],
+        "candidate_budget": 1024,
+        "case_order": CALIBRATION_CASE_IDS,
+        "cases": fingerprints["cases"],
+        "attempt": 3,
+        "evidence_root": CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+pub fn preflight_attempt_003() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_attempt_003_identity(true)?;
+    validate_attempt_003_identity(&identity, true)?;
+    let fingerprints = fingerprint_calibration()?;
+    validate_attempt_003_bindings(&identity, &fingerprints)?;
+    if attempt_003_root().exists() {
+        return Err(ReasoningBudgetCalibrationError::Validation(
+            "attempt-003 evidence root already exists; preparation is no longer pristine"
+                .to_string(),
+        ));
+    }
+    if attempt_002_root().exists() {
+        return Err(ReasoningBudgetCalibrationError::Validation(
+            "attempt-002 evidence root exists; attempt-003 lineage is not pristine".to_string(),
+        ));
+    }
+    let os_inspection = windows_native_prestart_value(3, true);
+    Ok(json!({
+        "state": "PREPARED",
+        "attempt": 3,
+        "experiment_id": EXPERIMENT_ID,
+        "candidate_budget": 1024,
+        "case_order": CALIBRATION_CASE_IDS,
+        "manifest_sha256": fingerprints["manifest_sha256"],
+        "request_hashes": fingerprints["cases"],
+        "evidence_root": CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT,
+        "evidence_root_absent": true,
+        "attempt_001_immutable": true,
+        "attempt_002_root_absent": true,
+        "windows_native_exclusivity": os_inspection,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+pub fn dry_run_attempt_003() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let preflight = preflight_attempt_003()?;
+    let manifest = read_manifest(true)?;
+    let cases = manifest
+        .get("cases")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("cases"))?;
+    let combinations = CALIBRATION_CASE_IDS
+        .iter()
+        .map(|case_id| {
+            let case = cases
+                .iter()
+                .find(|case| case.get("case_id").and_then(Value::as_str) == Some(case_id))
+                .ok_or_else(|| missing(case_id))?;
+            let request = build_request(&manifest, case)?;
+            Ok(json!({
+                "attempt": 3,
+                "budget": 1024,
+                "case_id": case_id,
+                "server_reasoning_budget": 1024,
+                "request_has_reasoning_budget_field": false,
+                "request_sha256": canonical_hash(&request)?,
+                "wire_request_sha256": sha256_hex(&serde_json::to_vec(&request)?),
+                "request_bytes": serde_json::to_vec(&request)?.len(),
+                "evidence_root": format!("{CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT}/{case_id}"),
+                "network_calls": 0,
+                "listener_checks": 0,
+                "inference_requests": 0
+            }))
+        })
+        .collect::<Result<Vec<_>, ReasoningBudgetCalibrationError>>()?;
+    Ok(json!({
+        "state": "DRY_RUN",
+        "attempt": 3,
+        "budget": 1024,
+        "preflight": preflight,
+        "combinations": combinations,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+fn windows_native_prestart_value(attempt: u32, operator_attested: bool) -> Value {
+    let current_pid = std::process::id();
+    let processes = windows_exclusivity::process_table();
+    let listeners = windows_exclusivity::tcp_listener_table(PORT);
+    let process_records = processes.as_ref().ok().cloned().unwrap_or_default();
+    let listener_records = listeners.as_ref().ok().cloned().unwrap_or_default();
+    let llama_processes = windows_exclusivity::llama_processes(&process_records);
+    let competing_processes =
+        windows_exclusivity::competing_processes(&process_records, current_pid);
+    let mut outcome =
+        windows_exclusivity::classify_prestart(&processes, &listeners, operator_attested);
+    if outcome == windows_exclusivity::ExclusivityOutcome::ExclusivePrestart
+        && !competing_processes.is_empty()
+    {
+        outcome = windows_exclusivity::ExclusivityOutcome::CompetingWorkflowProcess;
+    }
+    let ready = outcome.is_ready() && competing_processes.is_empty() && operator_attested;
+    json!({
+        "state": if ready { "READY" } else { "BLOCKED" },
+        "outcome": outcome.as_str(),
+        "attempt": attempt,
+        "current_preflight_pid": current_pid,
+        "llama_processes": llama_processes,
+        "port_8080_listeners": listener_records,
+        "other_prefixity_qwen_workflow_processes": competing_processes,
+        "operator_no_other_workflow_confirmed": operator_attested,
+        "inspection_mechanisms": {
+            "processes": "CreateToolhelp32Snapshot + Process32FirstW + Process32NextW",
+            "tcp_listeners": "GetExtendedTcpTable(TCP_TABLE_OWNER_PID_LISTENER, AF_INET)",
+            "executable_path": "OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION) + QueryFullProcessImageNameW",
+            "admin_required": false,
+            "localhost_contact": false
+        },
+        "process_inspection": probe_result_status(&processes),
+        "port_inspection": probe_result_status(&listeners),
+        "os_table_inspections": {
+            "process_table": 1,
+            "tcp_listener_table": 1
+        },
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    })
 }
 
 pub fn summarize_calibration_budget(budget: u32) -> Result<Value, ReasoningBudgetCalibrationError> {
@@ -1436,6 +1625,251 @@ fn validate_attempt_002_bindings(
     Ok(())
 }
 
+fn read_attempt_003_identity(
+    verify_sidecar: bool,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_json(CALIBRATION_ATTEMPT_003_IDENTITY_PATH)?;
+    if verify_sidecar {
+        validate_attempt_003_identity_sidecar(&identity)?;
+    }
+    Ok(identity)
+}
+
+fn validate_attempt_003_identity(
+    identity: &Value,
+    verify_sidecar: bool,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    expect_string(
+        identity,
+        "identity_version",
+        "phase1c-reasoning-budget-1024-attempt-003-v1",
+    )?;
+    expect_string(
+        identity,
+        "status",
+        "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+    )?;
+    expect_string(identity, "experiment_id", EXPERIMENT_ID)?;
+    expect_u64(identity, "attempt", 3)?;
+    expect_u64(identity, "candidate.reasoning_budget", 1024)?;
+    if identity.pointer("/candidate/case_order") != Some(&json!(CALIBRATION_CASE_IDS))
+        || identity.pointer("/candidate/maximum_requests") != Some(&json!(3))
+        || identity.pointer("/candidate/automatic_retries") != Some(&json!(0))
+        || identity.pointer("/candidate/fresh_server_required") != Some(&Value::Bool(true))
+        || identity.pointer("/candidate/runtime_exclusivity_required") != Some(&Value::Bool(true))
+    {
+        return Err(invalid("attempt-003 candidate identity changed"));
+    }
+    expect_string(identity, "manifest.path", CALIBRATION_MANIFEST_PATH)?;
+    expect_string(
+        identity,
+        "manifest.sha256",
+        "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b",
+    )?;
+    validate_frozen_request_hashes(identity, "attempt-003")?;
+    expect_string(
+        identity,
+        "lineage.attempt_001_evidence_root",
+        "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_001_classification",
+        "INVALID / AMBIGUOUS",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_001_reason",
+        "LLAMA_RUNTIME_FAILURE_WITH_UNCERTAIN_REQUEST_COMPLETION",
+    )?;
+    expect_u64(identity, "lineage.attempt_001_request_attempts", 1)?;
+    expect_bool(identity, "lineage.attempt_001_immutable", true)?;
+    let attempt_002_root = format!("{CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT}/");
+    expect_string(
+        identity,
+        "lineage.attempt_002_evidence_root",
+        &attempt_002_root,
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_002_classification",
+        "INVALID BEFORE QWEN STARTUP",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_002_reason",
+        "PROCESS_INSPECTION_PERMISSION_FAILURE",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_002_execution_record_commit",
+        "a27b4fb411a284a6503d9a1c5525e30b1ae8862c",
+    )?;
+    expect_u64(identity, "lineage.attempt_002_inference_requests", 0)?;
+    expect_bool(identity, "lineage.attempt_002_root_absent", true)?;
+    expect_string(
+        identity,
+        "lineage.root_cause",
+        "PROCESS_INSPECTION_PERMISSION_FAILURE",
+    )?;
+    let attempt_003_root = format!("{CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT}/");
+    expect_string(identity, "attempt_003_evidence_root", &attempt_003_root)?;
+    expect_string(identity, "runtime.engine", "llama.cpp")?;
+    expect_string(identity, "runtime.server_build", "b10217-ddd4ec142")?;
+    expect_string(identity, "runtime.model", MODEL_ID)?;
+    expect_string(identity, "runtime.quantization", "Q4_0")?;
+    expect_u64(identity, "runtime.context_size", 8192)?;
+    expect_u64(identity, "runtime.parallel_slots", 1)?;
+    expect_string(identity, "runtime.metrics", "enabled")?;
+    expect_string(identity, "runtime.reasoning", "on")?;
+    expect_u64(identity, "runtime.reasoning_budget", 1024)?;
+    expect_string(identity, "runtime.reasoning_budget_message", "unset")?;
+    expect_string(identity, "runtime.host", HOST)?;
+    expect_u64(identity, "runtime.port", PORT as u64)?;
+    expect_u64(identity, "generation.max_tokens", 2048)?;
+    expect_u64(identity, "generation.temperature", 0)?;
+    expect_u64(identity, "generation.top_p", 1)?;
+    expect_u64(identity, "generation.seed", 1)?;
+    expect_u64(identity, "timeouts.request_ms", 1_200_000)?;
+    expect_u64(identity, "timeouts.supervisor_ms", 1_320_000)?;
+    expect_string(
+        identity,
+        "exclusivity_implementation.source_path",
+        CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
+    )?;
+    expect_string(
+        identity,
+        "exclusivity_implementation.source_sha256",
+        &implementation_source_sha256()?,
+    )?;
+    expect_bool(
+        identity,
+        "exclusivity_implementation.native_process_table",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "exclusivity_implementation.native_tcp_owner_table",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "exclusivity_implementation.no_shell_commands",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "exclusivity_implementation.no_admin_required",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "evidence_policy.attempt_001_must_not_be_overwritten",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "evidence_policy.attempt_002_root_must_remain_absent",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "evidence_policy.attempt_003_root_must_begin_absent",
+        true,
+    )?;
+    expect_bool(identity, "evidence_policy.no_manifest_copy", true)?;
+    expect_bool(identity, "evidence_policy.no_response_repair", true)?;
+    expect_bool(identity, "evidence_policy.no_retry", true)?;
+    if verify_sidecar {
+        validate_attempt_003_identity_sidecar(identity)?;
+    }
+    Ok(())
+}
+
+fn validate_frozen_request_hashes(
+    identity: &Value,
+    label: &str,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    let frozen_hashes = identity
+        .get("frozen_request_hashes")
+        .and_then(Value::as_object)
+        .ok_or_else(|| missing("frozen_request_hashes"))?;
+    for (case_id, expected_hash) in [
+        (
+            "rbcal-001",
+            "f32863dfb1da27c00a61d54986d4984569c87e9636cf5c6263c69906cb336461",
+        ),
+        (
+            "rbcal-002",
+            "e9cb29143ed1be27ce5c5b27bda4daa546ff63825189b170b37083624534c1b3",
+        ),
+        (
+            "rbcal-003",
+            "2c9839a9482080b3d03fa89d908c63d442d35ec64e142d5c573d276e801aec7e",
+        ),
+    ] {
+        if frozen_hashes.get(case_id).and_then(Value::as_str) != Some(expected_hash) {
+            return Err(invalid(&format!("{label} request identity changed")));
+        }
+    }
+    Ok(())
+}
+
+fn validate_attempt_003_identity_sidecar(
+    identity: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    let sidecar = read_json(CALIBRATION_ATTEMPT_003_IDENTITY_FINGERPRINT_PATH)?;
+    if sidecar.get("artifact_path").and_then(Value::as_str)
+        != Some(CALIBRATION_ATTEMPT_003_IDENTITY_PATH)
+        || sidecar.get("algorithm").and_then(Value::as_str) != Some("SHA-256")
+        || sidecar.get("canonicalization").and_then(Value::as_str)
+            != Some("sorted JSON object keys; arrays preserve order")
+        || sidecar.get("canonical_sha256").and_then(Value::as_str)
+            != Some(canonical_hash(identity)?.as_str())
+    {
+        return Err(invalid("attempt-003 identity fingerprint sidecar mismatch"));
+    }
+    Ok(())
+}
+
+fn validate_attempt_003_bindings(
+    identity: &Value,
+    fingerprints: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    if identity.pointer("/manifest/sha256") != fingerprints.get("manifest_sha256") {
+        return Err(invalid("attempt-003 manifest binding mismatch"));
+    }
+    let expected_cases = identity
+        .get("frozen_request_hashes")
+        .and_then(Value::as_object)
+        .ok_or_else(|| missing("frozen_request_hashes"))?;
+    let actual_cases = fingerprints
+        .get("cases")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("cases"))?;
+    for case_id in CALIBRATION_CASE_IDS {
+        let expected = expected_cases
+            .get(case_id)
+            .and_then(Value::as_str)
+            .ok_or_else(|| missing(case_id))?;
+        let actual = actual_cases
+            .iter()
+            .find(|case| case.get("case_id").and_then(Value::as_str) == Some(case_id))
+            .and_then(|case| case.get("request_sha256"))
+            .and_then(Value::as_str);
+        if actual != Some(expected) {
+            return Err(invalid("attempt-003 request binding mismatch"));
+        }
+    }
+    Ok(())
+}
+
+fn implementation_source_sha256() -> Result<String, ReasoningBudgetCalibrationError> {
+    Ok(sha256_hex(&fs::read(workspace_path(
+        CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
+    ))?))
+}
+
 fn validate_candidate_order(budget: u32) -> Result<(), ReasoningBudgetCalibrationError> {
     if budget == CALIBRATION_BUDGETS[0] {
         return Ok(());
@@ -1585,102 +2019,15 @@ fn server_launch_arguments(budget: u32) -> Vec<String> {
     ]
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
-struct ProcessObservation {
-    image_name: String,
-    pid: u32,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
-struct ListenerObservation {
-    local_address: String,
-    pid: u32,
-    state: String,
-}
-
-const MAX_OS_INSPECTION_OUTPUT_BYTES: usize = 64 * 1024;
-
-fn tasklist_processes() -> Result<Vec<ProcessObservation>, ReasoningBudgetCalibrationError> {
-    let output = bounded_os_command("tasklist", &["/FO", "CSV", "/NH"])?;
-    Ok(String::from_utf8_lossy(&output)
-        .lines()
-        .filter_map(parse_tasklist_row)
-        .collect())
-}
-
-fn netstat_port_listeners(
-    port: u16,
-) -> Result<Vec<ListenerObservation>, ReasoningBudgetCalibrationError> {
-    let output = bounded_os_command("netstat", &["-ano", "-p", "tcp"])?;
-    Ok(String::from_utf8_lossy(&output)
-        .lines()
-        .filter_map(|line| parse_netstat_listener(line, port))
-        .collect())
-}
-
-fn bounded_os_command(
-    program: &str,
-    args: &[&str],
-) -> Result<Vec<u8>, ReasoningBudgetCalibrationError> {
-    let output = Command::new(program).args(args).output().map_err(|error| {
-        invalid(&format!(
-            "bounded OS inspection command {program} failed to start: {error}"
-        ))
-    })?;
-    if !output.status.success() {
-        return Err(invalid(&format!(
-            "bounded OS inspection command {program} failed: {}",
-            String::from_utf8_lossy(&output.stderr).trim()
-        )));
+fn probe_result_status<T>(result: &Result<T, windows_exclusivity::ProbeFailure>) -> Value {
+    match result {
+        Ok(_) => json!({"status": "ok"}),
+        Err(failure) => json!({
+            "status": "failed",
+            "outcome": failure.kind.outcome(),
+            "error": failure.message
+        }),
     }
-    if output.stdout.len() > MAX_OS_INSPECTION_OUTPUT_BYTES {
-        return Err(invalid(&format!(
-            "bounded OS inspection command {program} exceeded output limit"
-        )));
-    }
-    Ok(output.stdout)
-}
-
-fn parse_tasklist_row(line: &str) -> Option<ProcessObservation> {
-    let fields = line
-        .trim()
-        .strip_prefix('"')?
-        .strip_suffix('"')?
-        .split("\",\"")
-        .collect::<Vec<_>>();
-    Some(ProcessObservation {
-        image_name: fields.first()?.to_string(),
-        pid: fields.get(1)?.parse().ok()?,
-    })
-}
-
-fn parse_netstat_listener(line: &str, port: u16) -> Option<ListenerObservation> {
-    let fields = line.split_whitespace().collect::<Vec<_>>();
-    if fields.len() < 5 || !fields[0].eq_ignore_ascii_case("TCP") {
-        return None;
-    }
-    let local_address = fields[1];
-    let local_port = local_address.rsplit_once(':')?.1.parse::<u16>().ok()?;
-    if local_port != port || !fields[3].eq_ignore_ascii_case("LISTENING") {
-        return None;
-    }
-    Some(ListenerObservation {
-        local_address: local_address.to_string(),
-        pid: fields[4].parse().ok()?,
-        state: fields[3].to_string(),
-    })
-}
-
-fn is_llama_process(image_name: &str) -> bool {
-    let image_name = image_name.to_ascii_lowercase();
-    image_name == "llama.exe" || image_name.ends_with("\\llama.exe")
-}
-
-fn is_competing_process(image_name: &str) -> bool {
-    let image_name = image_name.to_ascii_lowercase();
-    ["prefixity", "qwen", "luna", "codex"]
-        .iter()
-        .any(|marker| image_name.contains(marker))
 }
 
 fn safe_headers(headers: &reqwest::header::HeaderMap) -> BTreeMap<String, String> {
@@ -1770,6 +2117,10 @@ fn attempt_002_root() -> PathBuf {
 
 fn attempt_002_result_path() -> PathBuf {
     attempt_002_root().join("candidate-result.json")
+}
+
+fn attempt_003_root() -> PathBuf {
+    workspace_path(CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT)
 }
 
 fn workspace_path(path: &str) -> PathBuf {
@@ -2041,27 +2392,65 @@ mod tests {
     }
 
     #[test]
-    fn bounded_runtime_inspection_parses_only_listeners_and_process_identity() {
+    fn attempt_003_identity_is_fingerprinted_and_binds_native_inspection() {
+        let identity = read_attempt_003_identity(true).unwrap();
+        validate_attempt_003_identity(&identity, true).unwrap();
         assert_eq!(
-            parse_tasklist_row("\"llama.exe\",\"14588\",\"Console\",\"1\",\"10,000 K\""),
-            Some(ProcessObservation {
-                image_name: "llama.exe".to_string(),
-                pid: 14588
-            })
+            canonical_hash(&identity).unwrap(),
+            "c40e4528d6dc895a6e688a77dd1159b4c4e740b6a1b78ab2fc5259a0bc02655f"
         );
         assert_eq!(
-            parse_netstat_listener(
-                "  TCP    127.0.0.1:8080    0.0.0.0:0    LISTENING    14588",
-                8080
-            ),
-            Some(ListenerObservation {
-                local_address: "127.0.0.1:8080".to_string(),
-                pid: 14588,
-                state: "LISTENING".to_string()
-            })
+            identity["attempt_003_evidence_root"],
+            format!("{CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT}/")
         );
-        assert!(is_llama_process("llama.exe"));
-        assert!(is_competing_process("prefixity-helper.exe"));
-        assert!(!is_competing_process("cargo.exe"));
+        assert_eq!(
+            identity["exclusivity_implementation"]["source_sha256"],
+            implementation_source_sha256().unwrap()
+        );
+    }
+
+    #[test]
+    fn attempt_003_dry_run_is_isolated_and_zero_contact() {
+        if attempt_003_root().exists() || attempt_002_root().exists() {
+            return;
+        }
+        let result = dry_run_attempt_003().unwrap();
+        assert_eq!(result["state"], "DRY_RUN");
+        assert_eq!(result["attempt"], 3);
+        assert_eq!(result["budget"], 1024);
+        assert_eq!(result["combinations"].as_array().unwrap().len(), 3);
+        assert_eq!(result["network_calls"], 0);
+        assert_eq!(result["listener_checks"], 0);
+        assert_eq!(result["inference_requests"], 0);
+        assert!(result["combinations"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|case| {
+                case["budget"] == 1024
+                    && case["request_has_reasoning_budget_field"] == false
+                    && case["network_calls"] == 0
+                    && case["listener_checks"] == 0
+                    && case["inference_requests"] == 0
+                    && case["evidence_root"]
+                        .as_str()
+                        .is_some_and(|path| path.starts_with(CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT))
+            }));
+    }
+
+    #[test]
+    fn attempt_003_cli_commands_are_offline_only() {
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-003-fingerprint".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt003Fingerprint
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-003-preflight".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt003Preflight
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-003-dry-run".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt003DryRun
+        );
     }
 }

@@ -35,6 +35,7 @@ mod phase1c_stage1_local_qwen;
 mod phase1c_stage1_reasoning_off_live;
 mod phase1c_stage1_reasoning_off_postrun;
 mod phase1c_stage1_reasoning_off_preflight;
+mod phase1c_windows_runtime_exclusivity;
 mod planner;
 mod world;
 
@@ -196,13 +197,17 @@ pub use phase1c_live_supervisor::{
 };
 pub use phase1c_reasoning_budget_calibration::{
     attempt_002_exclusivity_preflight, attempt_002_runtime_ownership, dry_run_attempt_002,
-    dry_run_calibration, execute_attempt_002, execute_calibration, fingerprint_attempt_002,
-    fingerprint_calibration, next_candidate_budget, parse_calibration_cli_args,
-    preflight_attempt_002, preflight_calibration, summarize_attempt_002_budget,
+    dry_run_attempt_003, dry_run_calibration, execute_attempt_002, execute_calibration,
+    fingerprint_attempt_002, fingerprint_attempt_003, fingerprint_calibration,
+    next_candidate_budget, parse_calibration_cli_args, preflight_attempt_002,
+    preflight_attempt_003, preflight_calibration, summarize_attempt_002_budget,
     summarize_calibration_budget, CalibrationCliCommand, ReasoningBudgetCalibrationError,
     CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT, CALIBRATION_ATTEMPT_002_IDENTITY_FINGERPRINT_PATH,
-    CALIBRATION_ATTEMPT_002_IDENTITY_PATH, CALIBRATION_BUDGETS, CALIBRATION_CASE_IDS,
-    CALIBRATION_EVIDENCE_ROOT, CALIBRATION_MANIFEST_FINGERPRINT_PATH, CALIBRATION_MANIFEST_PATH,
+    CALIBRATION_ATTEMPT_002_IDENTITY_PATH, CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT,
+    CALIBRATION_ATTEMPT_003_IDENTITY_FINGERPRINT_PATH, CALIBRATION_ATTEMPT_003_IDENTITY_PATH,
+    CALIBRATION_BUDGETS, CALIBRATION_CASE_IDS, CALIBRATION_EVIDENCE_ROOT,
+    CALIBRATION_MANIFEST_FINGERPRINT_PATH, CALIBRATION_MANIFEST_PATH,
+    CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
 };
 pub use phase1c_scored_design::{
     fingerprint_scored_design, validate_scored_design, ScoredDesignError, ScoredDesignFingerprint,

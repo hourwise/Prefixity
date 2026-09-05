@@ -1,0 +1,85 @@
+{
+  "identity_version": "phase1c-reasoning-budget-1024-attempt-003-v1",
+  "status": "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+  "experiment_id": "phase1c-reasoning-budget-calibration",
+  "attempt": 3,
+  "candidate": {
+    "reasoning_budget": 1024,
+    "case_order": [
+      "rbcal-001",
+      "rbcal-002",
+      "rbcal-003"
+    ],
+    "maximum_requests": 3,
+    "automatic_retries": 0,
+    "fresh_server_required": true,
+    "runtime_exclusivity_required": true
+  },
+  "manifest": {
+    "path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_CALIBRATION_MANIFEST_V1.json",
+    "sha256": "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b"
+  },
+  "frozen_request_hashes": {
+    "rbcal-001": "f32863dfb1da27c00a61d54986d4984569c87e9636cf5c6263c69906cb336461",
+    "rbcal-002": "e9cb29143ed1be27ce5c5b27bda4daa546ff63825189b170b37083624534c1b3",
+    "rbcal-003": "2c9839a9482080b3d03fa89d908c63d442d35ec64e142d5c573d276e801aec7e"
+  },
+  "lineage": {
+    "attempt_001_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/",
+    "attempt_001_classification": "INVALID / AMBIGUOUS",
+    "attempt_001_reason": "LLAMA_RUNTIME_FAILURE_WITH_UNCERTAIN_REQUEST_COMPLETION",
+    "attempt_001_request_attempts": 1,
+    "attempt_001_immutable": true,
+    "attempt_002_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-002/",
+    "attempt_002_classification": "INVALID BEFORE QWEN STARTUP",
+    "attempt_002_reason": "PROCESS_INSPECTION_PERMISSION_FAILURE",
+    "attempt_002_execution_record_commit": "a27b4fb411a284a6503d9a1c5525e30b1ae8862c",
+    "attempt_002_inference_requests": 0,
+    "attempt_002_root_absent": true,
+    "root_cause": "PROCESS_INSPECTION_PERMISSION_FAILURE"
+  },
+  "attempt_003_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/",
+  "runtime": {
+    "engine": "llama.cpp",
+    "server_build": "b10217-ddd4ec142",
+    "model": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+    "quantization": "Q4_0",
+    "context_size": 8192,
+    "parallel_slots": 1,
+    "metrics": "enabled",
+    "reasoning": "on",
+    "reasoning_budget": 1024,
+    "reasoning_budget_message": "unset",
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "generation": {
+    "max_tokens": 2048,
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 1
+  },
+  "timeouts": {
+    "request_ms": 1200000,
+    "supervisor_ms": 1320000
+  },
+  "exclusivity_implementation": {
+    "source_path": "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs",
+    "source_sha256": "019ed0c7b066773b570f29adb6130b4447b1e9610e13724933b79a9e40374e93",
+    "native_process_table": true,
+    "native_tcp_owner_table": true,
+    "native_executable_path_query": true,
+    "no_shell_commands": true,
+    "no_admin_required": true,
+    "read_only": true,
+    "localhost_contact": false
+  },
+  "evidence_policy": {
+    "attempt_001_must_not_be_overwritten": true,
+    "attempt_002_root_must_remain_absent": true,
+    "attempt_003_root_must_begin_absent": true,
+    "no_manifest_copy": true,
+    "no_response_repair": true,
+    "no_retry": true
+  }
+}

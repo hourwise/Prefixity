@@ -214,3 +214,64 @@ inference, warmup, or calibration. The calibration requires a later explicit
 authorization naming the manifest hash, candidate, fresh-server confirmation,
 server launch, supervisor boundary, and evidence retention. This document
 does not authorize V3 or any scored h001 replay.
+
+## Attempt 002 closeout and Attempt 003 Windows-native exclusivity remediation
+
+Attempt 002 is accepted as `INVALID BEFORE QWEN STARTUP` with immediate cause
+`PROCESS_INSPECTION_PERMISSION_FAILURE`. The registered
+`tasklist /FO CSV /NH` mechanism returned `ERROR: Access denied`. No
+administrator elevation, Defender change, alternate shell syntax, Qwen
+startup, port readiness check, localhost contact, inference request, or
+calibration evidence-root creation occurred. The execution record is commit
+`a27b4fb411a284a6503d9a1c5525e30b1ae8862c`; Attempt 001 remains immutable.
+
+The remediation replaces shell-parsed process and port inspection with the
+isolated Windows-native module
+`crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs`.
+The module is read-only and requires no administrator privileges. It uses
+`CreateToolhelp32Snapshot`, `Process32FirstW`, and `Process32NextW` for process
+enumeration; `GetExtendedTcpTable` with the owner-PID listener table for IPv4
+port ownership; and `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` plus
+`QueryFullProcessImageNameW` for the expected llama executable path. It never
+terminates processes, elevates privileges, or contacts localhost.
+
+The TCP adapter filters the native listener table to port `8080` before
+classification. Pure classification tests cover exclusive prestart, multiple
+llama processes, unrelated port ownership, PID/port mismatch, process/port
+inspection failure, and executable-path failure. Inspection failures remain
+fail-closed and report deterministic outcomes such as
+`PROCESS_INSPECTION_FAILED`, `PORT_INSPECTION_FAILED`,
+`EXECUTABLE_PATH_FAILED`, `PORT_ALREADY_OWNED`, and `PID_PORT_MISMATCH`.
+Luna/Codex/browser/terminal exclusivity remains an explicit operator
+attestation rather than an attempt to prove all higher-level workflow state by
+process enumeration.
+
+Attempt 003 is preparation-only. Its tracked identity is
+`PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_003_IDENTITY_V1.json` with canonical
+SHA-256
+`c40e4528d6dc895a6e688a77dd1159b4c4e740b6a1b78ab2fc5259a0bc02655f`.
+It binds the unchanged manifest SHA, all three request hashes, the Attempt 001
+invalid/ambiguous lineage, the Attempt 002 pre-server invalid lineage and
+execution-record commit, and the native implementation source fingerprint
+`ceb145320517a84a8cad1df7695c5f1138e75a93bce2d53ae1ec4a18a37fe409`.
+
+The distinct Attempt 003 evidence root is
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/`.
+It remains absent. Offline commands are:
+
+```text
+prefixity-phase1c-reasoning-budget-calibration attempt-003-fingerprint
+prefixity-phase1c-reasoning-budget-calibration attempt-003-preflight
+prefixity-phase1c-reasoning-budget-calibration attempt-003-dry-run
+```
+
+The bounded local native probe completed under the normal user identity with
+no `llama.exe` process and no port-8080 listener. It reported
+`EXCLUSIVE_PRESTART`; OS-table inspections were separate from network contact,
+with network calls `0`, listener checks `0`, and inference requests `0`.
+The dry run projected exactly the three frozen 1024 cases with unchanged
+request hashes and no model-visible reasoning-budget field.
+
+No Attempt 003 live branch or runtime execution is created here. A separate
+authorization is required before any future Qwen startup, readiness check, or
+calibration request.
