@@ -2639,3 +2639,47 @@ remediation commit, but no Qwen startup, readiness check, or inference is
 permitted in this task.
 
 `REASONING BUDGET 1024 ATTEMPT 004 READY FOR SEPARATE LIVE AUTHORIZATION`
+
+## Phase 1C Attempt 004 live closeout
+
+Attempt 004 was authorized for the fresh Qwen runtime with reasoning on and
+reasoning budget 1024. The pre-live repository gate passed at commit
+56cdcc879b0488ac9459ca234bb5c8ccd1dd70cc. The native prestart gate passed
+with EXCLUSIVE_PRESTART, zero llama processes, zero port-8080 listeners, zero
+unexpected processes, successful process/TCP inspection, no elevation, and
+zero network, listener, or inference contacts.
+
+The exact authorized llama.cpp command reached model-loaded and local-listener
+state with the frozen model, context, one slot, metrics, reasoning, budget,
+host, and port settings. Startup also reported an HTTPLIB repository-commit
+lookup failure while resolving the hf reference, but continued to local model
+load and listening. This was not a localhost readiness or inference request.
+
+The mandatory native poststart gate failed closed before readiness with
+EXPECTED_WORKFLOW_IDENTITY_INVALID: the expected workflow launch identity was
+not handed off by the supervisor. The server had been started directly from
+the authorized shell command, so no supervisor or calibration-child identity
+existed. No identity was fabricated and no second workflow was started. The
+observed server was stopped, and native shutdown verification returned
+EXCLUSIVE_PRESTART with zero llama processes and zero port-8080 listeners.
+
+Attempt 004 is INVALID / AMBIGUOUS before readiness and inference. No case
+was dispatched; rbcal-001, rbcal-002, and rbcal-003 remain unrun. Inference
+requests are 0, readiness attempts are 0, automatic retries are 0, and no
+request or response artifacts exist. The 512 and 256 candidates, NO_OP,
+INTERVENTION, V3, and Attempt 005 were not executed or authorized.
+
+Preserved ignored evidence is in
+experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-004/.
+The execution record and evidence hashes are documented in
+docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_004_EXECUTION_RECORD.md.
+Prior Attempt 003 evidence was not modified. Focused calibration, supervisor,
+and native exclusivity tests passed after closeout bookkeeping; final
+formatting, clippy, and diff checks are required before the scoped execution
+record is committed and pushed to the Attempt 004 branch. It will not be
+merged to main.
+
+The next permitted action is runtime investigation of the missing supervisor
+handoff. No further localhost/model contact is authorized by this record.
+
+REASONING BUDGET 1024 ATTEMPT 004 INVALID — STOP FOR RUNTIME INVESTIGATION

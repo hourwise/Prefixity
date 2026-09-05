@@ -2551,6 +2551,33 @@ fn validate_attempt_004_evidence_state() -> Result<(), ReasoningBudgetCalibratio
     Ok(())
 }
 
+#[cfg(test)]
+fn validate_attempt_004_execution_record() -> Result<(), ReasoningBudgetCalibrationError> {
+    if !attempt_004_root().exists() {
+        return Err(invalid("attempt-004 execution root is absent"));
+    }
+    let candidate_result = read_json_path(&attempt_004_root().join("candidate-result.json"))?;
+    if candidate_result.get("attempt") != Some(&json!(4))
+        || candidate_result.get("state") != Some(&json!("INCONCLUSIVE"))
+        || candidate_result.get("inference_requests") != Some(&json!(0))
+        || candidate_result.get("listener_check_attempts") != Some(&json!(0))
+        || candidate_result.get("case_set_complete") != Some(&Value::Bool(false))
+    {
+        return Err(invalid("attempt-004 candidate result accounting mismatch"));
+    }
+    let execution_record = read_json_path(&attempt_004_root().join("execution-record.json"))?;
+    if execution_record.get("attempt") != Some(&json!(4))
+        || execution_record.get("classification") != Some(&json!("INVALID / AMBIGUOUS"))
+        || execution_record.get("requests_dispatched") != Some(&json!(0))
+        || execution_record.get("automatic_retries") != Some(&json!(0))
+        || execution_record.get("request_artifacts_present") != Some(&Value::Bool(false))
+        || execution_record.get("response_artifacts_present") != Some(&Value::Bool(false))
+    {
+        return Err(invalid("attempt-004 execution record accounting mismatch"));
+    }
+    Ok(())
+}
+
 fn attempt_003_evidence_hashes() -> [(&'static str, &'static str); 4] {
     [
         (
@@ -3178,7 +3205,11 @@ mod tests {
             canonical_hash(&identity).unwrap(),
             "7e59288ccc2847298482dfe6aa4dfe0e2d3e4197fdfbe72031f9551e51c675c9"
         );
-        validate_attempt_004_evidence_state().unwrap();
+        if attempt_004_root().exists() {
+            validate_attempt_004_execution_record().unwrap();
+        } else {
+            validate_attempt_004_evidence_state().unwrap();
+        }
         assert_eq!(
             identity["attempt_004_evidence_root"],
             format!("{CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT}/")
