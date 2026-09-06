@@ -14,7 +14,7 @@ The deterministic binding record is
 [`PHASE_1C_WORKFLOW_IDENTITY_CERTIFICATION_V1.json`](PHASE_1C_WORKFLOW_IDENTITY_CERTIFICATION_V1.json),
 fingerprinted by its adjacent `.sha256` sidecar.
 The final canonical manifest SHA-256 is
-`aa64a9e1fbb2a1eff185b6188e918febf64af6f51cd406d0e5daa38fff3e4151`.
+`824b65a0f93e18a12e917fd49662790bdb2dce945c6e4f8f0c8b72a9c41524a4`.
 
 ## Attempt-006 forensics
 
@@ -72,11 +72,11 @@ Raw path spelling is retained as evidence but is not the sole identity.
 
 The real-process result reported:
 
-- supervisor PID `21728`, child PID `22476`, child parent PID `21728`;
+- supervisor PID `22464`, child PID `22340`, child parent PID `22464`;
 - supervisor executable SHA-256
-  `2bf09d18e9d4df439a8a1e021e5bbee81461c09210f586c1cc23336347062939`;
+  `3ca8d1590900148d637c22d82135af0d00f339045ddde79dc3e3286893eadfc5`;
 - child executable SHA-256
-  `166a314447713a562a75cf84e94b96d308d50aa8e3108423b44a1923e6e783e0`;
+  `71ecb41f97d15bda9a39842436c19aa00eecfa40692fdf4f5418025b1f5fbca8`;
 - one supervisor launch, child exit code `0`, and zero child retries;
 - zero llama startups, zero port-8080 model contacts, zero TCP readiness
   contacts, zero HTTP requests, and zero inference requests;

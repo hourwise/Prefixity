@@ -2868,13 +2868,13 @@ file ID. The strongest-supported root cause is
 The dedicated non-live identity is attempt-style `900`, not Attempt 007.
 The actual checked-in supervisor launched the actual calibration child in
 `workflow-identity-certification` mode and returned
-`WORKFLOW_IDENTITY_CERTIFIED`. The result had supervisor PID `21728`, child
-PID `22476`, child parent PID `21728`, zero llama records, zero llama startups,
+`WORKFLOW_IDENTITY_CERTIFIED`. The result had supervisor PID `22464`, child
+PID `22340`, child parent PID `22464`, zero llama records, zero llama startups,
 zero port/model contacts, zero TCP readiness contacts, zero HTTP requests, and
 zero inference requests. The deterministic record is
 `docs/phase-1/PHASE_1C_WORKFLOW_IDENTITY_CERTIFICATION_V1.json` with canonical
 SHA-256
-`aa64a9e1fbb2a1eff185b6188e918febf64af6f51cd406d0e5daa38fff3e4151`.
+`824b65a0f93e18a12e917fd49662790bdb2dce945c6e4f8f0c8b72a9c41524a4`.
 
 Local validation completed on the final source state:
 

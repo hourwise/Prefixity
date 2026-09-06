@@ -30,13 +30,13 @@
     "supervisor_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_live_supervisor.rs",
     "supervisor_source_sha256": "abf40762f351251814194cbf8a1fd8ccb3abd9599a8ba26898a12889bfcd6870",
     "child_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
-    "child_source_sha256": "f932e680c04fc876de78d3a503c82b29c814d70d39cf42f50e829fea84a35a30",
+    "child_source_sha256": "94c709675e7eb8d89906e5135177f3628e6b264ad886f00a998512ec923abdbf",
     "stable_identity_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_executable_identity.rs",
     "stable_identity_source_sha256": "c6f41b12d607283553428e932829255501e85c2dc6e204c843e4aad154299588",
     "native_inspector_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs",
     "native_inspector_source_sha256": "9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29",
-    "supervisor_binary_sha256": "2bf09d18e9d4df439a8a1e021e5bbee81461c09210f586c1cc23336347062939",
-    "child_binary_sha256": "166a314447713a562a75cf84e94b96d308d50aa8e3108423b44a1923e6e783e0"
+    "supervisor_binary_sha256": "3ca8d1590900148d637c22d82135af0d00f339045ddde79dc3e3286893eadfc5",
+    "child_binary_sha256": "71ecb41f97d15bda9a39842436c19aa00eecfa40692fdf4f5418025b1f5fbca8"
   },
   "certification_mode": {
     "supervisor_binary": "prefixity-phase1c-live-supervisor",

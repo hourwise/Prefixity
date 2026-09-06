@@ -2,5 +2,5 @@
   "artifact_path": "docs/phase-1/PHASE_1C_WORKFLOW_IDENTITY_CERTIFICATION_V1.json",
   "algorithm": "SHA-256",
   "canonicalization": "sorted JSON object keys; arrays preserve order",
-  "canonical_sha256": "aa64a9e1fbb2a1eff185b6188e918febf64af6f51cd406d0e5daa38fff3e4151"
+  "canonical_sha256": "824b65a0f93e18a12e917fd49662790bdb2dce945c6e4f8f0c8b72a9c41524a4"
 }

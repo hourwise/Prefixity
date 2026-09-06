@@ -1582,9 +1582,9 @@ pub fn certify_workflow_identity(
         ));
     }
 
-    let expected_workflow = expected_workflow_identity_from_supervisor_env()?;
     #[cfg(windows)]
-    let process_records = {
+    {
+        let expected_workflow = expected_workflow_identity_from_supervisor_env()?;
         let processes = windows_exclusivity::process_table()
             .map_err(|failure| invalid(&format!("process inspection failed: {failure}")))?;
         windows_exclusivity::validate_expected_workflow_identity(&processes, &expected_workflow)
@@ -1598,50 +1598,53 @@ pub fn certify_workflow_identity(
                 "workflow certification found an unexpected competing workflow",
             ));
         }
-        processes
-    };
-    #[cfg(not(windows))]
-    let process_records = return Err(invalid(
-        "workflow certification requires the Windows native process identity inspector",
-    ));
 
-    let child_pid = std::process::id();
-    let result = json!({
-        "schema_id": WORKFLOW_CERTIFICATION_RESULT_SCHEMA_ID,
-        "schema_version": 1,
-        "state": "WORKFLOW_IDENTITY_CERTIFIED",
-        "launch_identity": metadata.launch_identity,
-        "registered_identity": {
-            "path": metadata.attempt_identity_path,
-            "sha256": metadata.attempt_identity_sha256,
-            "attempt": metadata.attempt,
-            "candidate_budget": metadata.candidate_budget,
-            "candidate_identity": metadata.candidate_identity,
-            "evidence_root": metadata.evidence_root
-        },
-        "supervisor": {
-            "pid": metadata.supervisor_pid,
-            "path": metadata.supervisor_path,
-            "executable_identity": metadata.supervisor_executable_identity
-        },
-        "child": {
-            "pid": child_pid,
-            "path": metadata.child_executable_path,
-            "executable_identity": metadata.child_executable_identity,
-            "parent_pid": metadata.supervisor_pid
-        },
-        "parent_child_validation": "validated by native process table; child parent PID equals supervisor PID",
-        "process_table_records": process_records,
-        "network_accounting": {
-            "llama_startups": 0,
-            "port_8080_model_contacts": 0,
-            "tcp_readiness_contacts": 0,
-            "http_requests": 0,
-            "inference_requests": 0
-        }
-    });
-    write_json(result_path, &result)?;
-    Ok(result)
+        let child_pid = std::process::id();
+        let result = json!({
+            "schema_id": WORKFLOW_CERTIFICATION_RESULT_SCHEMA_ID,
+            "schema_version": 1,
+            "state": "WORKFLOW_IDENTITY_CERTIFIED",
+            "launch_identity": metadata.launch_identity,
+            "registered_identity": {
+                "path": metadata.attempt_identity_path,
+                "sha256": metadata.attempt_identity_sha256,
+                "attempt": metadata.attempt,
+                "candidate_budget": metadata.candidate_budget,
+                "candidate_identity": metadata.candidate_identity,
+                "evidence_root": metadata.evidence_root
+            },
+            "supervisor": {
+                "pid": metadata.supervisor_pid,
+                "path": metadata.supervisor_path,
+                "executable_identity": metadata.supervisor_executable_identity
+            },
+            "child": {
+                "pid": child_pid,
+                "path": metadata.child_executable_path,
+                "executable_identity": metadata.child_executable_identity,
+                "parent_pid": metadata.supervisor_pid
+            },
+            "parent_child_validation": "validated by native process table; child parent PID equals supervisor PID",
+            "process_table_records": processes,
+            "network_accounting": {
+                "llama_startups": 0,
+                "port_8080_model_contacts": 0,
+                "tcp_readiness_contacts": 0,
+                "http_requests": 0,
+                "inference_requests": 0
+            }
+        });
+        write_json(result_path, &result)?;
+        Ok(result)
+    }
+
+    #[cfg(not(windows))]
+    {
+        let _ = result_path;
+        Err(invalid(
+            "workflow certification requires the Windows native process identity inspector",
+        ))
+    }
 }
 
 fn windows_native_prestart_value(attempt: u32, operator_attested: bool) -> Value {
