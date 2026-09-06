@@ -482,7 +482,7 @@ mod tests {
             std::path::PathBuf::from("sh"),
             vec![
                 "-c".to_string(),
-                "test -n '$PREFIXITY_PHASE1C_WORKFLOW_HANDOFF'".to_string(),
+                "test -n \"$PREFIXITY_PHASE1C_WORKFLOW_HANDOFF\"".to_string(),
             ],
         )
     }

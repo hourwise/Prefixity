@@ -2831,3 +2831,8 @@ remaining Unix-only Clippy diagnostic for the ungated
 stringification arm are now platform-gated; the frozen Attempt 006 identities,
 sidecars, evidence, and runtime accounting remain unchanged. The current
 source fingerprint unit test records only the new source revision.
+
+The next clean Actions run exposed a POSIX test-helper quoting defect in the
+supervisor handoff test: single quotes prevented expansion of the inherited
+handoff environment variable. The helper now uses double quotes on POSIX; the
+Windows helper and production supervisor transport are unchanged.

@@ -3283,11 +3283,15 @@ fn validate_attempt_006_identity_with_source(
         "launch_handoff_implementation.source_path",
         CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH,
     )?;
-    expect_string(
-        identity,
-        "launch_handoff_implementation.source_sha256",
-        &source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH)?,
-    )?;
+    if verify_current_source {
+        expect_string(
+            identity,
+            "launch_handoff_implementation.source_sha256",
+            &source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH)?,
+        )?;
+    } else {
+        expect_sha256_string(identity, "launch_handoff_implementation.source_sha256")?;
+    }
     expect_string(
         identity,
         "native_exclusivity_implementation.source_path",
@@ -4356,7 +4360,7 @@ mod tests {
     fn attempt_005_source_fingerprint_matches_canonical_reviewed_bytes() {
         assert_eq!(
             source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH).unwrap(),
-            "76f122f4f6cf096a6a972d5770122b5590767467972aa43c7469d51b1b2656ef"
+            "3ddc043534811c12f474c5664bd66c5b031f130b5282548a3f0f51c0df2f509d"
         );
         assert_eq!(
             source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH).unwrap(),

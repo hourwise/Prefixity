@@ -70,6 +70,12 @@ changing the frozen identities. The current-source fingerprint unit test was
 updated only for the resulting source change; it is not an experimental
 evidence hash or a historical identity sidecar.
 
+That same run then exposed a POSIX-only test-helper quoting defect in the
+supervisor handoff test: single quotes prevented expansion of the inherited
+handoff environment variable. The helper now uses double quotes for POSIX
+shell expansion. This changes only test portability and does not affect the
+supervisor transport or any runtime/evidence path.
+
 ## Validation record
 
 Local validation on the remediation branch:
