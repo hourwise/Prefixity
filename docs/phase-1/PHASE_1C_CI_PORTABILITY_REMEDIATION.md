@@ -90,6 +90,9 @@ Local validation on the remediation branch:
   calls and zero additional inference requests;
 - `git diff --check`: passed.
 
-The clean-checkout worktree and GitHub Actions results are recorded below as
-they are completed. No Qwen process or localhost endpoint was contacted by
-this remediation.
+The clean-checkout equivalent validation passed, and final code commit
+`653fb5f66219e41191d0ba5f6398a8da0549af2b` passed Actions run `34040641843`
+(run #118): Windows job `101506640835`, macOS job `101506640961`, Ubuntu job
+`101506641025`, and MSRV job `101506641017` all passed. The checkout action
+Node.js deprecation annotations were non-blocking. No Qwen process or
+localhost endpoint was contacted by this remediation.

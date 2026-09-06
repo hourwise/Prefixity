@@ -2822,8 +2822,12 @@ unchanged. Strict current-source identity checks therefore remain a deliberate
 offline workflow-identity certification boundary after CI remediation.
 
 Local fmt, full workspace tests, strict Clippy, and preserved-evidence
-certification pass. Clean-checkout and GitHub Actions verification remain
-required before this task can be closed or Attempt 007 can be considered.
+certification pass. The final clean-checkout Actions matrix for commit
+`653fb5f66219e41191d0ba5f6398a8da0549af2b` is green in run #118 / database
+`34040641843`: Windows job `101506640835`, macOS job `101506640961`, Ubuntu
+job `101506641025`, and MSRV job `101506641017` all passed. Only the
+non-blocking checkout Node.js deprecation annotation remains. No Attempt 007
+has been prepared.
 
 The first post-remediation Actions run passed Windows and MSRV but exposed one
 remaining Unix-only Clippy diagnostic for the ungated
