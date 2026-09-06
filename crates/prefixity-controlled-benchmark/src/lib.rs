@@ -202,16 +202,16 @@ pub use phase1c_live_supervisor::{
 pub use phase1c_reasoning_budget_calibration::{
     attempt_002_exclusivity_preflight, attempt_002_runtime_ownership, attempt_003_poststart,
     attempt_003_runtime_ownership, attempt_003_runtime_ownership_with_expected_workflow,
-    attempt_005_poststart, attempt_006_poststart, dry_run_attempt_002, dry_run_attempt_003,
-    dry_run_attempt_004, dry_run_attempt_005, dry_run_attempt_006, dry_run_calibration,
-    execute_attempt_002, execute_attempt_003, execute_calibration,
-    expected_workflow_identity_from_supervisor_env, fingerprint_attempt_002,
-    fingerprint_attempt_003, fingerprint_attempt_004, fingerprint_attempt_005,
-    fingerprint_attempt_006, fingerprint_calibration, next_candidate_budget,
-    parse_calibration_cli_args, preflight_attempt_002, preflight_attempt_003,
-    preflight_attempt_004, preflight_attempt_005, preflight_attempt_006, preflight_calibration,
-    summarize_attempt_002_budget, summarize_calibration_budget, CalibrationCliCommand,
-    ReasoningBudgetCalibrationError, CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT,
+    attempt_005_poststart, attempt_006_poststart, certify_preserved_calibration_evidence,
+    dry_run_attempt_002, dry_run_attempt_003, dry_run_attempt_004, dry_run_attempt_004_portable,
+    dry_run_attempt_005, dry_run_attempt_006, dry_run_calibration, execute_attempt_002,
+    execute_attempt_003, execute_calibration, expected_workflow_identity_from_supervisor_env,
+    fingerprint_attempt_002, fingerprint_attempt_003, fingerprint_attempt_004,
+    fingerprint_attempt_005, fingerprint_attempt_006, fingerprint_calibration,
+    next_candidate_budget, parse_calibration_cli_args, preflight_attempt_002,
+    preflight_attempt_003, preflight_attempt_004, preflight_attempt_005, preflight_attempt_006,
+    preflight_calibration, summarize_attempt_002_budget, summarize_calibration_budget,
+    CalibrationCliCommand, ReasoningBudgetCalibrationError, CALIBRATION_ATTEMPT_002_EVIDENCE_ROOT,
     CALIBRATION_ATTEMPT_002_IDENTITY_FINGERPRINT_PATH, CALIBRATION_ATTEMPT_002_IDENTITY_PATH,
     CALIBRATION_ATTEMPT_003_EVIDENCE_ROOT, CALIBRATION_ATTEMPT_003_IDENTITY_FINGERPRINT_PATH,
     CALIBRATION_ATTEMPT_003_IDENTITY_PATH, CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT,
@@ -247,7 +247,9 @@ pub use phase1c_stage1_reasoning_off_postrun::{
     validate_stage1_reasoning_off_evidence, ReasoningOffPostrunError,
 };
 pub use phase1c_stage1_reasoning_off_preflight::{
-    preflight_stage1_reasoning_off_smoke, RemediationPreflight, RemediationPreflightError,
+    certify_stage1_reasoning_off_preserved_evidence, preflight_stage1_reasoning_off_smoke,
+    validate_stage1_reasoning_off_contract_and_fixture, RemediationPreflight,
+    RemediationPreflightError,
 };
 pub use planner::{project_planner_evidence, run_frozen_planner};
 pub use world::{ExecutionStatus, ScriptedWorld, WorldExecution};

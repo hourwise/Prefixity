@@ -6,7 +6,7 @@
 //! request, advances to another arm, or uses evaluator-only data in a model
 //! request.
 
-use crate::hashing::{canonical_hash, canonical_json, sha256_hex};
+use crate::hashing::{canonical_hash, canonical_json, canonicalize_source_bytes, sha256_hex};
 use reqwest::blocking::Client;
 use reqwest::redirect::Policy;
 use serde_json::{json, Value};
@@ -689,7 +689,12 @@ fn validate_artifacts(artifacts: &H001Artifacts) -> Result<(), H001Error> {
         .pointer("/source_revision/source_file_sha256")
         .and_then(Value::as_str)
         .ok_or_else(|| missing("source_manifest.source_revision.source_file_sha256"))?;
-    if sha256_hex(&source_code) != expected_source_file_sha {
+    let canonical_source_code = canonicalize_source_bytes(&source_code).map_err(|message| {
+        H001Error::Validation(format!(
+            "h001 source revision canonicalization failed: {message}"
+        ))
+    })?;
+    if sha256_hex(&canonical_source_code) != expected_source_file_sha {
         return Err(H001Error::Validation(
             "h001 source revision file hash mismatch".to_string(),
         ));
@@ -1267,6 +1272,21 @@ mod tests {
         assert_eq!(result["network_calls"], 0);
         assert_eq!(result["inference_requests"], 0);
         assert_eq!(result["arm_projection_sha256"].as_array().unwrap().len(), 3);
+    }
+
+    #[test]
+    fn h001_source_revision_hash_is_stable_under_checkout_line_endings() {
+        let source_manifest = read_repo_json(H001_SOURCE_MANIFEST_PATH).unwrap();
+        let expected = source_manifest
+            .pointer("/source_revision/source_file_sha256")
+            .and_then(Value::as_str)
+            .unwrap();
+        let source = fs::read(workspace_path(
+            "crates/prefixity-controlled-benchmark/src/phase1b9.rs",
+        ))
+        .unwrap();
+        let canonical = canonicalize_source_bytes(&source).unwrap();
+        assert_eq!(sha256_hex(&canonical), expected);
     }
 
     #[test]

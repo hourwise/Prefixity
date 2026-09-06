@@ -7,7 +7,7 @@
 //! credential. The existing V1 live adapter remains untouched.
 
 use serde::Serialize;
-use serde_json::Value;
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -87,6 +87,39 @@ pub fn validate_stage1_reasoning_off_contract_and_fixture(
     preflight_stage1_reasoning_off_smoke_with_evidence_guard(false)
 }
 
+/// Certify the preserved Smoke 01 evidence that anchors the Smoke 02 lineage.
+///
+/// This is intentionally separate from the portable contract/fixture
+/// validation above. It reads only preserved local evidence and fails closed
+/// when either artifact is absent or has changed; it never writes evidence or
+/// contacts the runtime.
+pub fn certify_stage1_reasoning_off_preserved_evidence() -> Result<Value, RemediationPreflightError>
+{
+    let forensic_bytes = fs::read(workspace_path(FORENSIC_REVIEW_PATH))?;
+    let original_response = fs::read(workspace_path(ORIGINAL_RESPONSE_PATH))?;
+    let forensic_review_sha256 = sha256_hex(&forensic_bytes);
+    let original_response_sha256 = sha256_hex(&original_response);
+    if forensic_review_sha256 != FORENSIC_REVIEW_SHA256 {
+        return Err(RemediationPreflightError::Validation(
+            "accepted forensic review hash changed".to_string(),
+        ));
+    }
+    if original_response_sha256 != ORIGINAL_RESPONSE_SHA256 {
+        return Err(RemediationPreflightError::Validation(
+            "Smoke 01 response hash changed".to_string(),
+        ));
+    }
+    Ok(json!({
+        "state": "PRESERVED_EVIDENCE_VALIDATED",
+        "forensic_review_path": FORENSIC_REVIEW_PATH,
+        "forensic_review_sha256": forensic_review_sha256,
+        "original_response_path": ORIGINAL_RESPONSE_PATH,
+        "original_response_sha256": original_response_sha256,
+        "network_calls": 0,
+        "inference_requests": 0
+    }))
+}
+
 fn preflight_stage1_reasoning_off_smoke_with_evidence_guard(
     require_fresh_evidence_location: bool,
 ) -> Result<RemediationPreflight, RemediationPreflightError> {
@@ -98,8 +131,16 @@ fn preflight_stage1_reasoning_off_smoke_with_evidence_guard(
     let request_schema =
         read_json("docs/phase-1/schemas/phase1c-stage1-local-qwen-request-v1.schema.json")?;
     let output_schema = read_json("docs/phase-1/schemas/phase1c-stage1-smoke-v1.schema.json")?;
-    let forensic_bytes = fs::read(workspace_path(FORENSIC_REVIEW_PATH))?;
-    let original_response = fs::read(workspace_path(ORIGINAL_RESPONSE_PATH))?;
+    let (forensic_review_sha256, original_response_sha256) = if require_fresh_evidence_location {
+        let forensic_bytes = fs::read(workspace_path(FORENSIC_REVIEW_PATH))?;
+        let original_response = fs::read(workspace_path(ORIGINAL_RESPONSE_PATH))?;
+        (sha256_hex(&forensic_bytes), sha256_hex(&original_response))
+    } else {
+        (
+            FORENSIC_REVIEW_SHA256.to_string(),
+            ORIGINAL_RESPONSE_SHA256.to_string(),
+        )
+    };
 
     validate_v2_schema(&v2_schema)?;
     validate_contract_delta(&v1_contract, &v2_contract)?;
@@ -113,17 +154,17 @@ fn preflight_stage1_reasoning_off_smoke_with_evidence_guard(
         ));
     }
 
-    let original_response_sha256 = sha256_hex(&original_response);
-    if original_response_sha256 != ORIGINAL_RESPONSE_SHA256 {
-        return Err(RemediationPreflightError::Validation(
-            "Smoke 01 response hash changed".to_string(),
-        ));
-    }
-    let forensic_review_sha256 = sha256_hex(&forensic_bytes);
-    if forensic_review_sha256 != FORENSIC_REVIEW_SHA256 {
-        return Err(RemediationPreflightError::Validation(
-            "accepted forensic review hash changed".to_string(),
-        ));
+    if require_fresh_evidence_location {
+        if original_response_sha256 != ORIGINAL_RESPONSE_SHA256 {
+            return Err(RemediationPreflightError::Validation(
+                "Smoke 01 response hash changed".to_string(),
+            ));
+        }
+        if forensic_review_sha256 != FORENSIC_REVIEW_SHA256 {
+            return Err(RemediationPreflightError::Validation(
+                "accepted forensic review hash changed".to_string(),
+            ));
+        }
     }
     if require_fresh_evidence_location && workspace_path(V2_EVIDENCE_DIR).exists() {
         return Err(RemediationPreflightError::Validation(format!(

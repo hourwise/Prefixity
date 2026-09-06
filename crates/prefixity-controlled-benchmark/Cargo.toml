@@ -23,6 +23,10 @@ name = "prefixity-phase1c-stage1-reasoning-off-postrun"
 path = "src/bin/phase1c_stage1_reasoning_off_postrun.rs"
 
 [[bin]]
+name = "prefixity-phase1c-local-evidence-certification"
+path = "src/bin/phase1c_local_evidence_certification.rs"
+
+[[bin]]
 name = "prefixity-phase1c-scored-design"
 path = "src/bin/phase1c_scored_design.rs"
 

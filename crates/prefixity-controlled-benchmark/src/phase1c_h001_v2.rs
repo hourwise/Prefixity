@@ -703,7 +703,10 @@ mod tests {
         let result = dry_run_v2().unwrap();
         assert_eq!(result["network_calls"], 0);
         assert_eq!(result["inference_requests"], 0);
-        assert!(workspace_path(V2_H001_EVIDENCE_ROOT).exists());
+        assert_eq!(
+            result["preflight"]["v2_evidence_root"],
+            V2_H001_EVIDENCE_ROOT
+        );
     }
 
     #[test]

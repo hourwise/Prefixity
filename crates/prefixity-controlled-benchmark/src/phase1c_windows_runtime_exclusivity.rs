@@ -46,6 +46,7 @@ pub struct ListenerRecord {
 pub enum ProbeFailureKind {
     ProcessInspection,
     PortInspection,
+    #[cfg(windows)]
     ExecutablePath,
 }
 
@@ -54,6 +55,7 @@ impl ProbeFailureKind {
         match self {
             Self::ProcessInspection => "PROCESS_INSPECTION_FAILED",
             Self::PortInspection => "PORT_INSPECTION_FAILED",
+            #[cfg(windows)]
             Self::ExecutablePath => "EXECUTABLE_PATH_FAILED",
         }
     }
@@ -365,6 +367,7 @@ fn failure_outcome(failure: &ProbeFailure) -> ExclusivityOutcome {
     match failure.kind {
         ProbeFailureKind::ProcessInspection => ExclusivityOutcome::ProcessInspectionFailed,
         ProbeFailureKind::PortInspection => ExclusivityOutcome::PortInspectionFailed,
+        #[cfg(windows)]
         ProbeFailureKind::ExecutablePath => ExclusivityOutcome::ExecutablePathFailed,
     }
 }
@@ -728,6 +731,7 @@ mod tests {
         );
     }
 
+    #[cfg(windows)]
     #[test]
     fn executable_path_failure_is_distinct() {
         let processes: ProbeResult<Vec<ProcessRecord>> = Err(ProbeFailure::new(

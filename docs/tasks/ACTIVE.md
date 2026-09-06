@@ -2798,3 +2798,29 @@ Execution record:
 `docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_006_EXECUTION_RECORD.md`
 
 REASONING BUDGET 1024 ATTEMPT 006 INVALID — STOP FOR REVIEW
+
+## Phase 1C CI portability remediation before Attempt 007
+
+The accepted pre-Attempt-007 CI diagnosis identified three pre-existing
+portability failures: an un-gated Windows-only exclusivity variant on Unix,
+raw line-ending-sensitive h001 source hashing on Windows, and ordinary tests
+that required ignored local evidence. Remediation is isolated on branch
+`agent/phase-1c-ci-portability-remediation`, rooted at canonical main
+`3ca383f1760560510803008c209168267c2860f9`.
+
+The Windows-only classification is now platform-gated without
+`allow(dead_code)`. Source hashing now rejects BOM/non-UTF-8 input and
+normalizes CRLF/lone CR to LF; the frozen h001 expected hash is unchanged.
+Default tests use tracked deterministic inputs and portable identity/schema
+checks. The checked-in command
+`prefixity-phase1c-local-evidence-certification` separately validates actual
+ignored Stage 1 and calibration artifacts, fails closed when they are absent,
+and performs no writes or runtime contact.
+
+Attempt 006 evidence, classifications, identity files, and sidecars remain
+unchanged. Strict current-source identity checks therefore remain a deliberate
+offline workflow-identity certification boundary after CI remediation.
+
+Local fmt, full workspace tests, strict Clippy, and preserved-evidence
+certification pass. Clean-checkout and GitHub Actions verification remain
+required before this task can be closed or Attempt 007 can be considered.

@@ -6,7 +6,7 @@
 //! reasoning on and the total completion ceiling at 2048, and never consults
 //! the h001 evaluator or any Prefixity treatment path.
 
-use crate::hashing::{canonical_hash, sha256_hex};
+use crate::hashing::{canonical_hash, canonicalize_source_bytes, sha256_hex};
 use crate::phase1c_windows_runtime_exclusivity as windows_exclusivity;
 use reqwest::blocking::Client;
 use reqwest::redirect::Policy;
@@ -1156,11 +1156,23 @@ pub fn fingerprint_attempt_004() -> Result<Value, ReasoningBudgetCalibrationErro
 }
 
 pub fn preflight_attempt_004() -> Result<Value, ReasoningBudgetCalibrationError> {
+    preflight_attempt_004_with_evidence_guard(true)
+}
+
+fn preflight_attempt_004_with_evidence_guard(
+    require_preserved_evidence: bool,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
     let identity = read_attempt_004_identity(true)?;
-    validate_attempt_004_identity(&identity, true)?;
+    if require_preserved_evidence {
+        validate_attempt_004_identity(&identity, true)?;
+    } else {
+        validate_attempt_004_identity_for_clean_checkout(&identity, true)?;
+    }
     let fingerprints = fingerprint_calibration()?;
     validate_attempt_004_bindings(&identity, &fingerprints)?;
-    validate_attempt_004_evidence_state()?;
+    if require_preserved_evidence {
+        validate_attempt_004_evidence_state()?;
+    }
     let os_inspection = windows_native_prestart_value(4, true);
     Ok(json!({
         "state": "PREPARED",
@@ -1183,7 +1195,19 @@ pub fn preflight_attempt_004() -> Result<Value, ReasoningBudgetCalibrationError>
 }
 
 pub fn dry_run_attempt_004() -> Result<Value, ReasoningBudgetCalibrationError> {
-    let preflight = preflight_attempt_004()?;
+    dry_run_attempt_004_with_preflight(preflight_attempt_004()?)
+}
+
+/// Validate the Attempt 004 preparation contract without requiring ignored
+/// local evidence from earlier attempts. The default workspace test path uses
+/// this portable form; the live/preflight command remains evidence-strict.
+pub fn dry_run_attempt_004_portable() -> Result<Value, ReasoningBudgetCalibrationError> {
+    dry_run_attempt_004_with_preflight(preflight_attempt_004_with_evidence_guard(false)?)
+}
+
+fn dry_run_attempt_004_with_preflight(
+    preflight: Value,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
     let manifest = read_manifest(true)?;
     let cases = manifest
         .get("cases")
@@ -1220,6 +1244,45 @@ pub fn dry_run_attempt_004() -> Result<Value, ReasoningBudgetCalibrationError> {
         "combinations": combinations,
         "network_calls": 0,
         "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+/// Certify preserved calibration evidence in an enriched local workspace.
+///
+/// This is deliberately not called by the default test suite because the
+/// evidence roots are ignored and are absent in a clean checkout. It reads
+/// and hashes preserved files only, fails closed when they are missing or
+/// changed, and never writes to the evidence roots.
+pub fn certify_preserved_calibration_evidence() -> Result<Value, ReasoningBudgetCalibrationError> {
+    if !attempt_003_root().exists() {
+        return Err(invalid("attempt-003 evidence root is absent"));
+    }
+    for (name, expected_hash) in attempt_003_evidence_hashes() {
+        let actual_hash =
+            sha256_hex(&fs::read(attempt_003_root().join(name)).map_err(|error| {
+                invalid(&format!(
+                    "unable to read preserved attempt-003 evidence {name}: {error}"
+                ))
+            })?);
+        if actual_hash != expected_hash {
+            return Err(invalid(&format!(
+                "preserved attempt-003 evidence hash mismatch for {name}"
+            )));
+        }
+    }
+    let attempt_004_state = if attempt_004_root().exists() {
+        validate_attempt_004_execution_evidence()?;
+        "PRESENT_VALIDATED"
+    } else {
+        validate_attempt_004_evidence_state()?;
+        "ABSENT_VALIDATED"
+    };
+    Ok(json!({
+        "state": "PRESERVED_EVIDENCE_VALIDATED",
+        "attempt_003": "PRESENT_VALIDATED",
+        "attempt_004": attempt_004_state,
+        "network_calls": 0,
         "inference_requests": 0
     }))
 }
@@ -2578,6 +2641,21 @@ fn validate_attempt_004_identity(
     identity: &Value,
     verify_sidecar: bool,
 ) -> Result<(), ReasoningBudgetCalibrationError> {
+    validate_attempt_004_identity_with_source(identity, verify_sidecar, true)
+}
+
+fn validate_attempt_004_identity_for_clean_checkout(
+    identity: &Value,
+    verify_sidecar: bool,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    validate_attempt_004_identity_with_source(identity, verify_sidecar, false)
+}
+
+fn validate_attempt_004_identity_with_source(
+    identity: &Value,
+    verify_sidecar: bool,
+    verify_current_source: bool,
+) -> Result<(), ReasoningBudgetCalibrationError> {
     expect_string(
         identity,
         "identity_version",
@@ -2702,11 +2780,15 @@ fn validate_attempt_004_identity(
         "exclusivity_implementation.source_path",
         CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
     )?;
-    expect_string(
-        identity,
-        "exclusivity_implementation.source_sha256",
-        &implementation_source_sha256()?,
-    )?;
+    if verify_current_source {
+        expect_string(
+            identity,
+            "exclusivity_implementation.source_sha256",
+            &implementation_source_sha256()?,
+        )?;
+    } else {
+        expect_sha256_string(identity, "exclusivity_implementation.source_sha256")?;
+    }
     for path in [
         "exclusivity_implementation.native_process_table",
         "exclusivity_implementation.native_tcp_owner_table",
@@ -3063,6 +3145,22 @@ fn validate_attempt_006_identity(
     identity: &Value,
     verify_sidecar: bool,
 ) -> Result<(), ReasoningBudgetCalibrationError> {
+    validate_attempt_006_identity_with_source(identity, verify_sidecar, true)
+}
+
+#[cfg(test)]
+fn validate_attempt_006_identity_for_clean_checkout(
+    identity: &Value,
+    verify_sidecar: bool,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    validate_attempt_006_identity_with_source(identity, verify_sidecar, false)
+}
+
+fn validate_attempt_006_identity_with_source(
+    identity: &Value,
+    verify_sidecar: bool,
+    verify_current_source: bool,
+) -> Result<(), ReasoningBudgetCalibrationError> {
     expect_string(
         identity,
         "identity_version",
@@ -3195,11 +3293,15 @@ fn validate_attempt_006_identity(
         "native_exclusivity_implementation.source_path",
         CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
     )?;
-    expect_string(
-        identity,
-        "native_exclusivity_implementation.source_sha256",
-        &implementation_source_sha256()?,
-    )?;
+    if verify_current_source {
+        expect_string(
+            identity,
+            "native_exclusivity_implementation.source_sha256",
+            &implementation_source_sha256()?,
+        )?;
+    } else {
+        expect_sha256_string(identity, "native_exclusivity_implementation.source_sha256")?;
+    }
     if verify_sidecar {
         validate_attempt_006_identity_sidecar(identity)?;
     }
@@ -3323,33 +3425,6 @@ fn validate_attempt_004_evidence_state() -> Result<(), ReasoningBudgetCalibratio
     Ok(())
 }
 
-#[cfg(test)]
-fn validate_attempt_004_execution_record() -> Result<(), ReasoningBudgetCalibrationError> {
-    if !attempt_004_root().exists() {
-        return Err(invalid("attempt-004 execution root is absent"));
-    }
-    let candidate_result = read_json_path(&attempt_004_root().join("candidate-result.json"))?;
-    if candidate_result.get("attempt") != Some(&json!(4))
-        || candidate_result.get("state") != Some(&json!("INCONCLUSIVE"))
-        || candidate_result.get("inference_requests") != Some(&json!(0))
-        || candidate_result.get("listener_check_attempts") != Some(&json!(0))
-        || candidate_result.get("case_set_complete") != Some(&Value::Bool(false))
-    {
-        return Err(invalid("attempt-004 candidate result accounting mismatch"));
-    }
-    let execution_record = read_json_path(&attempt_004_root().join("execution-record.json"))?;
-    if execution_record.get("attempt") != Some(&json!(4))
-        || execution_record.get("classification") != Some(&json!("INVALID / AMBIGUOUS"))
-        || execution_record.get("requests_dispatched") != Some(&json!(0))
-        || execution_record.get("automatic_retries") != Some(&json!(0))
-        || execution_record.get("request_artifacts_present") != Some(&Value::Bool(false))
-        || execution_record.get("response_artifacts_present") != Some(&Value::Bool(false))
-    {
-        return Err(invalid("attempt-004 execution record accounting mismatch"));
-    }
-    Ok(())
-}
-
 fn attempt_003_evidence_hashes() -> [(&'static str, &'static str); 4] {
     [
         (
@@ -3402,32 +3477,8 @@ fn implementation_source_sha256() -> Result<String, ReasoningBudgetCalibrationEr
 
 fn source_sha256(path: &str) -> Result<String, ReasoningBudgetCalibrationError> {
     let source = fs::read(workspace_path(path))?;
-    Ok(sha256_hex(&canonicalize_source_bytes(&source)?))
-}
-
-/// Canonical source bytes are UTF-8 checkout bytes with platform line endings
-/// normalized to LF. A UTF-8 BOM is rejected rather than silently stripped.
-/// This is the single byte definition used both when sealing implementation
-/// identities and when verifying them before a live run.
-fn canonicalize_source_bytes(bytes: &[u8]) -> Result<Vec<u8>, ReasoningBudgetCalibrationError> {
-    if bytes.starts_with(&[0xef, 0xbb, 0xbf]) {
-        return Err(invalid("source fingerprint input contains a UTF-8 BOM"));
-    }
-
-    let mut canonical = Vec::with_capacity(bytes.len());
-    let mut index = 0;
-    while index < bytes.len() {
-        if bytes[index] == b'\r' {
-            if bytes.get(index + 1) == Some(&b'\n') {
-                index += 1;
-            }
-            canonical.push(b'\n');
-        } else {
-            canonical.push(bytes[index]);
-        }
-        index += 1;
-    }
-    Ok(canonical)
+    let canonical = canonicalize_source_bytes(&source).map_err(invalid)?;
+    Ok(sha256_hex(&canonical))
 }
 
 fn validate_candidate_order(budget: u32) -> Result<(), ReasoningBudgetCalibrationError> {
@@ -3717,6 +3768,18 @@ fn expect_string(
         .pointer(&format!("/{}", path.replace('.', "/")))
         .and_then(Value::as_str)
         != Some(expected)
+    {
+        return Err(invalid(&format!("value mismatch at {path}")));
+    }
+    Ok(())
+}
+
+fn expect_sha256_string(value: &Value, path: &str) -> Result<(), ReasoningBudgetCalibrationError> {
+    let actual = value
+        .pointer(&format!("/{}", path.replace('.', "/")))
+        .and_then(Value::as_str);
+    if actual
+        .is_none_or(|hash| hash.len() != 64 || !hash.bytes().all(|byte| byte.is_ascii_hexdigit()))
     {
         return Err(invalid(&format!("value mismatch at {path}")));
     }
@@ -4033,16 +4096,11 @@ mod tests {
     #[test]
     fn attempt_004_identity_is_fingerprinted_and_binds_attempt003_evidence() {
         let identity = read_attempt_004_identity(true).unwrap();
-        validate_attempt_004_identity(&identity, true).unwrap();
+        validate_attempt_004_identity_for_clean_checkout(&identity, true).unwrap();
         assert_eq!(
             canonical_hash(&identity).unwrap(),
             "7e59288ccc2847298482dfe6aa4dfe0e2d3e4197fdfbe72031f9551e51c675c9"
         );
-        if attempt_004_root().exists() {
-            validate_attempt_004_execution_record().unwrap();
-        } else {
-            validate_attempt_004_evidence_state().unwrap();
-        }
         assert_eq!(
             identity["attempt_004_evidence_root"],
             format!("{CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT}/")
@@ -4055,10 +4113,7 @@ mod tests {
 
     #[test]
     fn attempt_004_dry_run_is_isolated_and_zero_contact() {
-        if attempt_004_root().exists() {
-            return;
-        }
-        let result = dry_run_attempt_004().unwrap();
+        let result = dry_run_attempt_004_portable().unwrap();
         assert_eq!(result["state"], "DRY_RUN");
         assert_eq!(result["attempt"], 4);
         assert_eq!(result["budget"], 1024);
@@ -4210,7 +4265,7 @@ mod tests {
     #[test]
     fn attempt_006_identity_is_self_consistent_and_bound_to_canonical_sources() {
         let identity = read_attempt_006_identity(true).unwrap();
-        validate_attempt_006_identity(&identity, true).unwrap();
+        validate_attempt_006_identity_for_clean_checkout(&identity, true).unwrap();
         let fingerprints = fingerprint_calibration().unwrap();
         validate_attempt_006_bindings(&identity, &fingerprints).unwrap();
         assert_eq!(
@@ -4238,7 +4293,22 @@ mod tests {
         let metadata =
             crate::phase1c_live_supervisor::build_workflow_launch_metadata(&registered, &child)
                 .unwrap();
-        validate_attempt_006_handoff(&metadata).unwrap();
+        assert_eq!(
+            metadata.attempt_identity_path,
+            CALIBRATION_ATTEMPT_006_IDENTITY_PATH
+        );
+        assert_eq!(
+            metadata.attempt_identity_sha256,
+            canonical_hash(&identity).unwrap()
+        );
+        assert_eq!(metadata.attempt, registered.attempt);
+        assert_eq!(metadata.candidate_budget, registered.candidate_budget);
+        assert_eq!(metadata.candidate_identity, registered.candidate_identity);
+        assert_eq!(metadata.evidence_root, registered.evidence_root);
+        assert_eq!(
+            metadata.launch_identity,
+            registered.generated_launch_identity()
+        );
         assert_eq!(
             metadata.attempt_identity_sha256,
             canonical_hash(&identity).unwrap()
@@ -4290,7 +4360,7 @@ mod tests {
         );
         assert_eq!(
             source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH).unwrap(),
-            "9dba33fdc0c4c9279e5df4eb12b3be0a0f5f99492f74efa548310ebf4163c37b"
+            "e8ca5828f8dc68c5bc48ea14b3c59f12e5b424182f4b08de647e67ad2bbc1474"
         );
     }
 }
