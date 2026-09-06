@@ -3072,3 +3072,67 @@ PHASE_1C_FROZEN_EXECUTABLE_BINDING_REMEDIATION_ACCEPTED,
 ATTEMPT_007_CALIBRATION_INADMISSIBLE,
 ATTEMPT_007_PERMANENTLY_CONSUMED,
 ATTEMPT_008_NOT_PREPARED.
+
+## Phase 1C Attempt 008 preparation
+
+The accepted Attempt-007 remediation baseline was reverified at
+417673c06b141e07d54ad0bc101e1105e1a734de with `HEAD`, `main`, and
+`origin/main` equal and a clean worktree. Attempt 006 evidence remains
+unchanged at `c8feaf01a4083d609dd5fdf5ccaf96b40db56c1cbb3ef0b7bb88f52b67724b07`.
+Attempt 007 remains canonically frozen at
+`fd536cb507aab2b76511e1731d3860bbbc0074b940e4e21067ec7c6b1f4bbbe8`, with
+`EXECUTED=true`, `INTEGRITY_ACCEPTED=false`,
+`CALIBRATION_ADMISSIBLE=false`, `REUSABLE=false`, and permanently consumed.
+
+The frozen protocol permits a replacement attempt after an integrity-invalid
+consumed attempt. The last admissible candidate before Attempt 007 was 1024;
+the raw Attempt-007 `next_budget=512` remains preserved but excluded from
+accepted calibration-state progression. The deterministic provenance fixture
+is `fixtures/phase1c/attempt-008-budget-provenance.json`.
+
+Attempt 008 is eligible and was prepared with candidate budget 1024:
+
+    ATTEMPT_008_ELIGIBLE
+    ATTEMPT_008_PREPARED
+    ATTEMPT_008_NOT_EXECUTED
+    FROZEN_EXECUTABLE_IDENTITY_BOUND
+
+The preparation identity is
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_008_IDENTITY_V1.json` with
+canonical SHA-256
+`917fde56d11e79a3b700de82f13e5f072bda483fa6b7abe6e2da9ff37ee2dfb5` and sidecar
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_008_IDENTITY_V1.sha256`.
+It binds the accepted baseline, unchanged manifest and request hashes, the
+complete 1024 runtime contract, accepted 900-v2 workflow certification
+`acf2d18d93b2baf08b4fa4bc5bb0846e8f3f8bedab83927cf9547240abb2d194`, and the
+fresh Attempt-008 frozen supervisor/child objects.
+
+The final build source commit before freezing was
+`ddc05be5951e3cc3da36a659f15303f9760d952a`. The frozen supervisor is
+`f07a9302786f3abe5a01eb9fa9eda85f50de9fe9f3d34feba14ba0b2e09c2088`, size
+1259008, file ID `volume=ba2f80f4;index=0007000000387abb`. The frozen child is
+`0b859faae14dbcf5dad65612b646967fd79977173d67e5b2dabb570b861e5230`, size
+8657920, file ID `volume=ba2f80f4;index=000c00000038d6f2`. Both are in the
+bounded non-overwriting `target/phase1c-attempt-008-frozen/` stage; mutable
+`target/debug` objects are not authorized execution objects.
+
+Offline fingerprint, virgin preflight, dry run, preparation validation, exact
+frozen-chain certification, and substitution tests passed. Correct frozen
+objects were certified with native parent/child validation. Wrong supervisor,
+wrong child, and mutable-path same-content substitution were rejected before
+spawn as `FROZEN_EXECUTABLE_IDENTITY_MISMATCH`.
+
+No Attempt-008 execution root, request ledger, retry record, lock, or live
+result exists. The future model-server and frozen-supervisor commands are
+recorded as `NOT_EXECUTED` in the preparation record
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_008_PREPARATION.md`.
+
+Preparation accounting remains:
+
+    model_server_startups=0
+    port_8080_contacts=0
+    tcp_readiness_contacts=0
+    http_model_requests=0
+    inference_requests=0
+    attempt_007_executions_added=0
+    attempt_008_executions=0
