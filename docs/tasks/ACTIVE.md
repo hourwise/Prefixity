@@ -2950,3 +2950,48 @@ PHASE_1C_ATTEMPT_007_PREPARATION_ACCEPTED
 ATTEMPT_007_PREPARED
 ATTEMPT_007_NOT_EXECUTED
 ```
+
+## Phase 1C Attempt 007 live execution closeout
+
+The separately authorized live boundary was crossed exactly once from the
+accepted baseline `c3059a1f2933ce0a4c9107ae03ec634b55c3fd69`. The prestart gate
+was virgin and exclusive, with `EXCLUSIVE_PRESTART`; the exact frozen server
+was started once, readiness passed once, and the exact certified supervisor
+completed one child launch. The frozen cases were dispatched in order:
+`rbcal-001`, `rbcal-002`, `rbcal-003`. There were three inference requests,
+zero retries, zero fallbacks, zero adaptive replicates, and no fourth request.
+
+The raw Attempt 007 evidence is preserved at
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-007/`
+and is inventoried in
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_007_EXECUTION_RECORD.md`.
+The candidate result is protocol state `FAIL`: `rbcal-001` passed, while
+`rbcal-002` and `rbcal-003` returned HTTP 200 with `finish_reason: length` and
+failed structural validation. The protocol points to `next_budget: 512`, but
+512 and 256 were not run and remain unauthorized.
+
+The supervisor and child passed the repository's runtime handoff,
+parent/child, and poststart ownership checks. However, the executable objects
+recorded at runtime did not match the supervisor and child hashes/file IDs
+bound into the accepted preparation identity. The existing validator records
+the live objects but does not compare those cached preparation-time target
+binary fields. This is a material execution-integrity deviation, not a source
+or frozen-identity change; no attempt was made to repair or rerun it.
+
+The exact terminal classification is:
+
+```text
+PHASE_1C_ATTEMPT_007_EXECUTION_INVALID - STOP FOR REVIEW
+REASON: FROZEN_EXECUTABLE_IDENTITY_MISMATCH
+ATTEMPT_007_EXECUTED_ONCE
+```
+
+The launched server was shut down. Post-run checks found no llama/Qwen
+process, supervisor, child, port-8080 listener, stale handoff, or Attempt 007
+execution lock. Attempt 006 remains unchanged at preserved SHA
+`c8feaf01a4083d609dd5fdf5ccaf96b40db56c1cbb3ef0b7bb88f52b67724b07`.
+
+Evidence, cleanup, validation, and the bounded publication are recorded in
+the execution record. No wider Phase 1C conclusion or admissible calibration
+disposition is supported by this invalid execution. No live rerun is
+authorized.
