@@ -3136,3 +3136,69 @@ Preparation accounting remains:
     inference_requests=0
     attempt_007_executions_added=0
     attempt_008_executions=0
+
+## Phase 1C Attempt 008 live execution closeout
+
+The separately authorized Attempt 008 live boundary was crossed exactly once
+from the published preparation baseline
+`b7f756d2d9ba538736bf5ef9765a5a2112fb3d31`. The identity, virgin, native
+prestart, server-configuration, frozen-object, and v2 certification gates
+passed. The exact accepted llama command was verified on PID `4608`, and the
+native process/TCP ownership checks found one expected server and no competing
+Prefixity workflow.
+
+The exact frozen supervisor and child executed once. Supervisor PID `120`
+launched child PID `6312`; the recorded child parent PID was `120`, both
+runtime executable objects matched the preparation SHA/size/file IDs, the
+child exited `0`, and the supervisor completed. Readiness used one permitted
+TCP listener connect. The ordered request ledger was exactly
+`rbcal-001`, `rbcal-002`, `rbcal-003`, with three HTTP 200 inference requests,
+zero retries, zero fallbacks, zero adaptive replicates, and no fourth request.
+
+The raw candidate result is `FAIL`: `rbcal-001` passed, while `rbcal-002` and
+`rbcal-003` reached `finish_reason=length` and failed structural validation.
+The independently verified execution-integrity gate passed:
+
+```text
+ATTEMPT_008_INTEGRITY_ACCEPTED
+ATTEMPT_008_CALIBRATION_ADMISSIBLE
+```
+
+The frozen protocol disposition is `next_budget=512`. That value is recorded
+only as the result of Attempt 008; no 512 execution was authorized or started.
+
+Raw evidence remains in the ignored root
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-008/`.
+Its 23-file inventory was frozen before interpretation and matched the
+deterministic evidence manifest and sidecar. The manifest SHA-256 is
+`f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e4779`.
+The tracked execution record is
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_008_EXECUTION_RECORD.md`.
+
+After evidence freeze, the exact server PID `4608` was terminated. Post-run
+checks found no server, no port-8080 listener, no supervisor, no child, no
+stale handoff, and no execution lock. Attempt 006 and Attempt 007 historical
+evidence remain unchanged. No later budget or live attempt was started.
+
+Execution accounting:
+
+```text
+model_server_startups=1
+readiness_contacts=1
+http_model_requests=3
+inference_requests=3
+automatic_retries=0
+fallback_requests=0
+adaptive_replicates=0
+attempt_008_executions=1
+```
+
+Final classification:
+
+```text
+PHASE_1C_ATTEMPT_008_EXECUTION_ACCEPTED
+ATTEMPT_008_EXECUTED_ONCE
+ATTEMPT_008_INTEGRITY_ACCEPTED
+ATTEMPT_008_CALIBRATION_ADMISSIBLE
+CALIBRATION_DISPOSITION_NEXT_BUDGET_512_NOT_EXECUTED
+```
