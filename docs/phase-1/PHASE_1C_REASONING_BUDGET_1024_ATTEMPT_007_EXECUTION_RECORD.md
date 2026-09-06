@@ -182,7 +182,7 @@ The raw evidence root is:
 experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-007/
 ```
 
-The root was frozen before interpretation. It contains 29 files: the
+The root was frozen before interpretation. It contains 23 files: the
 candidate result, preflight, readiness, runtime confirmation, supervisor
 record, and the complete three-case request/response evidence. The core
 artifacts are:
