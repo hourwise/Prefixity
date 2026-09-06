@@ -479,7 +479,7 @@ mod tests {
     #[cfg(not(windows))]
     fn handoff_child() -> (std::path::PathBuf, Vec<String>) {
         (
-            std::path::PathBuf::from("sh"),
+            std::path::PathBuf::from("/bin/sh"),
             vec![
                 "-c".to_string(),
                 "test -n \"$PREFIXITY_PHASE1C_WORKFLOW_HANDOFF\"".to_string(),

@@ -2832,7 +2832,8 @@ stringification arm are now platform-gated; the frozen Attempt 006 identities,
 sidecars, evidence, and runtime accounting remain unchanged. The current
 source fingerprint unit test records only the new source revision.
 
-The next clean Actions run exposed a POSIX test-helper quoting defect in the
-supervisor handoff test: single quotes prevented expansion of the inherited
-handoff environment variable. The helper now uses double quotes on POSIX; the
+The final clean Actions run exposed a POSIX test-helper path defect in the
+supervisor handoff test: the supervisor canonicalizes the child executable
+path, so the relative `sh` path was not resolvable on a clean Unix runner. The
+helper now uses `/bin/sh` and double quotes for environment expansion; the
 Windows helper and production supervisor transport are unchanged.

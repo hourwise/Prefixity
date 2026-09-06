@@ -4360,7 +4360,7 @@ mod tests {
     fn attempt_005_source_fingerprint_matches_canonical_reviewed_bytes() {
         assert_eq!(
             source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH).unwrap(),
-            "3ddc043534811c12f474c5664bd66c5b031f130b5282548a3f0f51c0df2f509d"
+            "d8ccaa3879776212b77d3032224cb83e2d67e0c3b2bfd223971019f182bde786"
         );
         assert_eq!(
             source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH).unwrap(),
