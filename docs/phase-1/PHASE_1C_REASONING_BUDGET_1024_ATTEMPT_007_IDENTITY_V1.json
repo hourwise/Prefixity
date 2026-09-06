@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "identity_version": "phase1c-reasoning-budget-1024-attempt-007-v1",
+  "status": "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+  "experiment_id": "phase1c-reasoning-budget-calibration",
+  "attempt": 7,
+  "accepted_baseline": {
+    "main_sha": "f311b237f6f3bbde3e4f002177d5a80ed9572afe",
+    "workflow_identity_certification_state": "PHASE_1C_WORKFLOW_IDENTITY_CERTIFICATION_ACCEPTED"
+  },
+  "candidate": {
+    "reasoning_budget": 1024,
+    "calibration_candidate_identity": "phase1c-reasoning-budget-1024",
+    "case_order": [
+      "rbcal-001",
+      "rbcal-002",
+      "rbcal-003"
+    ],
+    "maximum_requests": 3,
+    "automatic_retries": 0,
+    "fresh_server_required": true,
+    "runtime_exclusivity_required": true
+  },
+  "manifest": {
+    "path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_CALIBRATION_MANIFEST_V1.json",
+    "sha256": "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b"
+  },
+  "frozen_request_hashes": {
+    "rbcal-001": "f32863dfb1da27c00a61d54986d4984569c87e9636cf5c6263c69906cb336461",
+    "rbcal-002": "e9cb29143ed1be27ce5c5b27bda4daa546ff63825189b170b37083624534c1b3",
+    "rbcal-003": "2c9839a9482080b3d03fa89d908c63d442d35ec64e142d5c573d276e801aec7e"
+  },
+  "lineage": {
+    "attempt_001_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/",
+    "attempt_001_immutable": true,
+    "attempt_002_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-002/",
+    "attempt_002_root_absent": true,
+    "attempt_003_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-003/",
+    "attempt_003_immutable": true,
+    "attempt_004_immutable": true,
+    "attempt_005_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-005/",
+    "attempt_005_root_absent": true,
+    "attempt_006_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-006/",
+    "attempt_006_classification": "REASONING BUDGET 1024 ATTEMPT 006 INVALID — STOP FOR REVIEW",
+    "attempt_006_immediate_cause": "EXPECTED_CHILD_PATH_MISMATCH",
+    "attempt_006_evidence_sha256": "c8feaf01a4083d609dd5fdf5ccaf96b40db56c1cbb3ef0b7bb88f52b67724b07",
+    "attempt_006_inference_requests": 0,
+    "attempt_006_retries": 0,
+    "attempt_006_immutable": true
+  },
+  "attempt_007_evidence_root": "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-007/",
+  "workflow_identity_certification": {
+    "identity_path": "docs/phase-1/PHASE_1C_WORKFLOW_IDENTITY_CERTIFICATION_V1.json",
+    "canonical_sha256": "824b65a0f93e18a12e917fd49662790bdb2dce945c6e4f8f0c8b72a9c41524a4",
+    "state": "WORKFLOW_IDENTITY_CERTIFIED",
+    "path_classification": "PATH_REPRESENTATION_MISMATCH",
+    "certification_identity": 900,
+    "attempt_007_identity_distinct": true
+  },
+  "runtime": {
+    "engine": "llama.cpp",
+    "server_executable_family": [
+      "llama",
+      "llama-server"
+    ],
+    "server_executable": {
+      "raw_path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "final_path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "file_size": 15277056,
+      "sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+      "windows_file_id": "0x000000000000000000060000001ea970",
+      "version": "b10217-ddd4ec142"
+    },
+    "model_reference": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+    "model_file_path": null,
+    "model_file_sha256": null,
+    "model_file_hash_status": "not_frozen; the accepted launch template uses -hf model reference",
+    "quantization": "Q4_0",
+    "context_size": 8192,
+    "parallel_slots": 1,
+    "metrics": "enabled",
+    "reasoning": "on",
+    "reasoning_budget": 1024,
+    "reasoning_budget_message": "unset",
+    "host": "127.0.0.1",
+    "port": 8080,
+    "endpoint": "http://127.0.0.1:8080/v1/chat/completions"
+  },
+  "generation": {
+    "max_tokens": 2048,
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 1,
+    "stream": false
+  },
+  "timeouts": {
+    "connect_timeout_ms": 1000,
+    "complete_request_timeout_ms": 1200000,
+    "supervisor_timeout_ms": 1320000
+  },
+  "retry_policy": {
+    "automatic_retries": 0,
+    "fallback_requests": 0,
+    "adaptive_replicates": 0
+  },
+  "freshness_policy": {
+    "fresh_server_per_candidate": true,
+    "warmup": false,
+    "case_order": [
+      "rbcal-001",
+      "rbcal-002",
+      "rbcal-003"
+    ],
+    "maximum_listener_checks_per_candidate": 1,
+    "maximum_inference_requests": 3
+  },
+  "source_fingerprint": {
+    "algorithm": "SHA-256",
+    "byte_definition": "UTF-8 checkout source bytes; CRLF and lone CR normalized to LF; UTF-8 BOM rejected",
+    "same_for_sealing_and_verification": true
+  },
+  "implementation_fingerprints": {
+    "algorithm": "SHA-256",
+    "source_byte_definition": "UTF-8 checkout source bytes; CRLF and lone CR normalized to LF; UTF-8 BOM rejected",
+    "supervisor_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_live_supervisor.rs",
+    "supervisor_source_sha256": "7416b793be4ed8eeb2d33a409771d672f7c90dce0b8154f449151e65d3fd2ab7",
+    "child_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
+    "child_source_sha256": "44e8fc2ca8422970e93cb5479039b2ae6f8cfe003d2e763b1b76eb037a117044",
+    "native_exclusivity_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs",
+    "native_exclusivity_source_sha256": "9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29",
+    "supervisor_binary": {
+      "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-live-supervisor.exe",
+      "final_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-live-supervisor.exe",
+      "file_size": 1197056,
+      "sha256": "8427e2ca64fce890e24d8d0474ee9e964e367b7d805caf0dbdbfb3abecc592db",
+      "windows_file_id": "0x0000000000000000000100000039821c"
+    },
+    "child_binary": {
+      "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-reasoning-budget-calibration.exe",
+      "final_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-reasoning-budget-calibration.exe",
+      "file_size": 8448000,
+      "sha256": "844e02c7aab8d6223c93c4f9e1c94b74877c1ec766066037bf999d9f05745a39",
+      "windows_file_id": "0x00000000000000000006000000393382"
+    }
+  },
+  "launch_handoff_implementation": {
+    "source_path": "crates/prefixity-controlled-benchmark/src/phase1c_live_supervisor.rs",
+    "source_sha256": "7416b793be4ed8eeb2d33a409771d672f7c90dce0b8154f449151e65d3fd2ab7",
+    "supervisor_binary_wired": true,
+    "single_metadata_transport": true,
+    "launch_identity_generated_by_supervisor": true,
+    "registered_identity_required": true,
+    "attempt_specific_evidence_root_binding": true
+  },
+  "native_exclusivity_implementation": {
+    "source_path": "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs",
+    "source_sha256": "9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29",
+    "native_process_table": true,
+    "native_tcp_owner_table": true,
+    "native_parent_process_table": true,
+    "launch_specific_expected_identity": true,
+    "no_shell_commands": true,
+    "no_admin_required": true,
+    "read_only": true,
+    "localhost_contact": false
+  },
+  "handoff_contract": {
+    "schema_id": "prefixity.phase1c.workflow-launch-metadata",
+    "transport": "single inherited environment JSON",
+    "environment_variable": "PREFIXITY_PHASE1C_WORKFLOW_HANDOFF",
+    "child_binding": "parent_pid",
+    "launch_identity_formula": "phase1c-attempt-{attempt}-budget-{candidate_budget}-{attempt_identity_sha256}",
+    "supervisor_generates_launch_identity": true,
+    "child_must_not_invent_identity": true,
+    "fail_closed_on_mismatch": true,
+    "expected_process_policy": "only the registered supervisor and calibration child may be excluded from competing-workflow classification"
+  },
+  "launch_plan": {
+    "server_command_status": "NOT_EXECUTED",
+    "server_command": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe serve -hf ggml-org/Qwen3.5-0.8B-GGUF:Q4_0 -c 8192 -np 1 --metrics --reasoning on --reasoning-budget 1024 --host 127.0.0.1 --port 8080",
+    "supervisor_command_status": "NOT_EXECUTED",
+    "supervisor_command": ".\\target\\debug\\prefixity-phase1c-live-supervisor.exe --attempt-identity docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_007_IDENTITY_V1.json --evidence experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-007/supervisor.json -- .\\target\\debug\\prefixity-phase1c-reasoning-budget-calibration.exe run-attempt-007",
+    "supervisor_child": "prefixity-phase1c-reasoning-budget-calibration",
+    "attempt_id": 7,
+    "candidate_budget": 1024,
+    "request_ceiling": 3,
+    "automatic_retries": 0
+  },
+  "operating_environment": {
+    "platform": "windows-x86_64",
+    "os_description": "Microsoft Windows 10.0.26100",
+    "localhost_contact_during_preparation": false,
+    "model_startup_during_preparation": false
+  },
+  "preparation_result": {
+    "state": "ATTEMPT_007_PREPARED",
+    "execution_state": "ATTEMPT_007_NOT_EXECUTED",
+    "evidence_root_must_begin_absent": true,
+    "no_result_artifact_created": true
+  }
+}

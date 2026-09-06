@@ -2897,3 +2897,56 @@ The narrow cfg-portability fix was committed as replacement candidate
 `ef3a56728222b28f430606f1ba1db60f2d42469d`. GitHub Actions run
 `34048230074` / `#122` passed Ubuntu, Windows, macOS, and MSRV for that exact
 SHA. Promotion to `main` remains the final publication gate for this task.
+
+## Phase 1C Attempt 007 preparation gate — current task
+
+The accepted preparation baseline was rechecked before making bounded changes:
+`main` and `origin/main` both resolved to
+`f311b237f6f3bbde3e4f002177d5a80ed9572afe`, with the expected remote and a
+clean worktree. The accepted workflow certification and preserved Attempt 006
+artifact were treated as immutable inputs.
+
+Attempt 007 here means the independent
+`phase1c-reasoning-budget-calibration` namespace. It is not the historical
+P0-L6 fresh-arm Attempt 007 record, which remains closed in its own lineage.
+The prepared evidence root is
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-007/`.
+
+The frozen preparation identity is
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_007_IDENTITY_V1.json`
+with canonical SHA-256
+`fd536cb507aab2b76511e1731d3860bbbc0074b940e4e21067ec7c6b1f4bbbe8` and
+sidecar
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_007_IDENTITY_V1.sha256`.
+The accompanying preparation record is
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_007_PREPARATION.md`.
+
+The identity binds the accepted baseline, calibration manifest
+`4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b`, frozen
+request hashes, candidate budget `1024`, fixed case order, maximum three
+requests, zero retries, fresh-runtime requirement, the preserved Attempt 006
+supervisor hash `c8feaf01a4083d609dd5fdf5ccaf96b40db56c1cbb3ef0b7bb88f52b67724b07`,
+and the accepted certification manifest hash
+`824b65a0f93e18a12e917fd49662790bdb2dce945c6e4f8f0c8b72a9c41524a4`. The
+certification identity remains `900`, distinct from Attempt 007.
+
+The current executable and source fingerprints, exact future server command,
+and exact future supervisor command are recorded in the identity and
+preparation record. The future commands are `NOT_EXECUTED`. Offline
+`attempt-007-fingerprint`, non-contact `attempt-007-preflight`, and
+`attempt-007-dry-run` checks passed. The focused Phase 1C suite passed with
+`82 passed; 0 failed; 33 filtered out`, and the offline locked build passed.
+Strict Clippy, the full offline workspace test suite, formatting check, and
+`git diff --check` also passed.
+Preflight found no llama process, no port-8080 listener, and no competing
+workflow process; it performed no TCP connection or readiness probe.
+
+The preparation contact count is zero for model/server startups, port-8080
+contacts, TCP readiness, HTTP, inference, Attempt 007 execution, and retries.
+The Attempt 007 root and result artifacts remain absent. Final classification:
+
+```text
+PHASE_1C_ATTEMPT_007_PREPARATION_ACCEPTED
+ATTEMPT_007_PREPARED
+ATTEMPT_007_NOT_EXECUTED
+```

@@ -199,13 +199,13 @@ pub fn registered_workflow_identity_from_file(
         evidence_root,
     };
     binding.validate()?;
-    if (!matches!(binding.attempt, 5 | 6) && !certification_identity)
+    if (!matches!(binding.attempt, 5..=7) && !certification_identity)
         || binding.candidate_budget != 1024
         || identity.pointer("/candidate/maximum_requests") != Some(&json!(3))
         || identity.pointer("/candidate/automatic_retries") != Some(&json!(0))
     {
         return Err(H001Error::Validation(
-            "registered workflow identity is not an Attempt-005/006 1024 candidate".to_string(),
+            "registered workflow identity is not an Attempt-005/006/007 1024 candidate".to_string(),
         ));
     }
     Ok(binding)
