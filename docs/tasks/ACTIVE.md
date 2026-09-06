@@ -2727,3 +2727,43 @@ agent/phase-1c-reasoning-budget-calibration-1024-attempt-005 as preparation
 only. Do not execute Attempt 005 under this authorization.
 
 REASONING BUDGET 1024 ATTEMPT 005 READY FOR SEPARATE LIVE AUTHORIZATION
+
+## Phase 1C Attempt 005 hash forensics and Attempt 006 preparation
+
+Attempt 005 is permanently frozen as `1024 / ATTEMPT 005 — NOT STARTED`.
+Its pre-live repository gate failed before Qwen startup because the sealed
+supervisor source identity was `df74a196b79e0407c0d4d83f4a8aede974904a505a6462a72a9e868eda8e8744`,
+while the Windows checkout hash was `d18e56fb68c0be8e58a10c94cc8333186614c7ef2f928bc3c252d143207d273f`.
+No startup, localhost contact, readiness, request, inference, or retry
+occurred, and Attempt 005 identity/evidence were not rewritten.
+
+Offline history established that `df74…` is the LF-preserving source hash at
+`bab45ca7cf8bb859de8923e6f6097443915425e9` and `d18…` is a CRLF checkout
+representation. The shared fingerprint path now normalizes CRLF and lone CR
+to LF and rejects a UTF-8 BOM, with focused regression coverage. Attempt 006
+also adds only the attempt-specific evidence-root lookup needed to bind its
+new identity; no model-facing or runtime-contract semantics changed.
+
+Attempt 006 identity:
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_006_IDENTITY_V1.json`
+
+Attempt 006 canonical identity SHA-256:
+`1d326578deb5a5280eafbed5d844a754d1468429c4990b25a0ee207652ca28a1`
+
+Attempt 006 authoritative supervisor source SHA-256:
+`76f122f4f6cf096a6a972d5770122b5590767467972aa43c7469d51b1b2656ef`
+
+Native exclusivity source remains:
+`9dba33fdc0c4c9279e5df4eb12b3be0a0f5f99492f74efa548310ebf4163c37b`.
+
+Attempt 006 evidence root
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-006/`
+remains absent. Its offline fingerprint, preflight, and dry-run passed with
+the unchanged manifest/request hashes, `EXCLUSIVE_PRESTART`, and zero network,
+listener, or inference activity. Focused identity, source-fingerprint, and
+handoff tests passed. No Qwen startup or localhost contact occurred.
+
+Attempt 006 requires separate live authorization and is not to be executed by
+this preparation record.
+
+REASONING BUDGET 1024 ATTEMPT 006 READY FOR SEPARATE LIVE AUTHORIZATION

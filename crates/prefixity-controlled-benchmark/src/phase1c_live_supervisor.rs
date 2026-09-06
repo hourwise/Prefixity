@@ -148,8 +148,9 @@ pub fn registered_workflow_identity_from_file(
             H001Error::Validation("registered candidate identity is missing".to_string())
         })?
         .to_string();
+    let evidence_root_key = format!("attempt_{attempt:03}_evidence_root");
     let evidence_root = identity
-        .get("attempt_005_evidence_root")
+        .get(&evidence_root_key)
         .and_then(Value::as_str)
         .ok_or_else(|| H001Error::Validation("registered evidence root is missing".to_string()))?
         .to_string();
@@ -162,13 +163,13 @@ pub fn registered_workflow_identity_from_file(
         evidence_root,
     };
     binding.validate()?;
-    if binding.attempt != 5
+    if !matches!(binding.attempt, 5 | 6)
         || binding.candidate_budget != 1024
         || identity.pointer("/candidate/maximum_requests") != Some(&json!(3))
         || identity.pointer("/candidate/automatic_retries") != Some(&json!(0))
     {
         return Err(H001Error::Validation(
-            "registered workflow identity is not the Attempt-005 1024 candidate".to_string(),
+            "registered workflow identity is not an Attempt-005/006 1024 candidate".to_string(),
         ));
     }
     Ok(binding)
