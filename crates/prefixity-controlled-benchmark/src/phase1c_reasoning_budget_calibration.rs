@@ -4360,7 +4360,7 @@ mod tests {
         );
         assert_eq!(
             source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH).unwrap(),
-            "e8ca5828f8dc68c5bc48ea14b3c59f12e5b424182f4b08de647e67ad2bbc1474"
+            "821610913e2f6081c6bbe1913ad86da497c50382a8997aaf9592145f21ff6711"
         );
     }
 }

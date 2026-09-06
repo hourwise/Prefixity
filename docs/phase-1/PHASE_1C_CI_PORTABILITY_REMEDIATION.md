@@ -21,9 +21,10 @@ alter any model request, runtime setting, inference count, or preserved result.
 
 ## Remediation boundary
 
-`ProbeFailureKind::ExecutablePath`, its classification match arm, and its
-test are now `cfg(windows)`-gated. No dead-code allowance is used. The
-Windows implementation and its fail-closed outcomes are unchanged.
+`ProbeFailureKind::ExecutablePath`, its classification match arm, its test,
+and the associated `ExclusivityOutcome::ExecutablePathFailed` variant and
+stringification arm are now `cfg(windows)`-gated. No dead-code allowance is
+used. The Windows implementation and its fail-closed outcomes are unchanged.
 
 Source identity hashing is centralized in `hashing::canonicalize_source_bytes`:
 
@@ -61,6 +62,13 @@ implementation, strict live/preflight identity checks continue to fail closed
 until the separately authorized offline workflow-identity certification
 reconciles the current source identity. This is deliberate and does not
 rewrite prior classifications or evidence.
+
+The first post-remediation Actions run (`34038819063`) confirmed the Windows
+and MSRV jobs, then exposed the corresponding ungated outcome variant on
+Ubuntu and macOS. That variant and its stringification arm were gated without
+changing the frozen identities. The current-source fingerprint unit test was
+updated only for the resulting source change; it is not an experimental
+evidence hash or a historical identity sidecar.
 
 ## Validation record
 

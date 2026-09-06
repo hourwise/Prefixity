@@ -2824,3 +2824,10 @@ offline workflow-identity certification boundary after CI remediation.
 Local fmt, full workspace tests, strict Clippy, and preserved-evidence
 certification pass. Clean-checkout and GitHub Actions verification remain
 required before this task can be closed or Attempt 007 can be considered.
+
+The first post-remediation Actions run passed Windows and MSRV but exposed one
+remaining Unix-only Clippy diagnostic for the ungated
+`ExclusivityOutcome::ExecutablePathFailed` variant. That variant and its
+stringification arm are now platform-gated; the frozen Attempt 006 identities,
+sidecars, evidence, and runtime accounting remain unchanged. The current
+source fingerprint unit test records only the new source revision.

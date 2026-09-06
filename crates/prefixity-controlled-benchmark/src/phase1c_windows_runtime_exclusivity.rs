@@ -104,6 +104,7 @@ pub enum ExclusivityOutcome {
     OperatorAttestationMissing,
     ProcessInspectionFailed,
     PortInspectionFailed,
+    #[cfg(windows)]
     ExecutablePathFailed,
 }
 
@@ -128,6 +129,7 @@ impl ExclusivityOutcome {
             Self::OperatorAttestationMissing => "OPERATOR_ATTESTATION_MISSING",
             Self::ProcessInspectionFailed => "PROCESS_INSPECTION_FAILED",
             Self::PortInspectionFailed => "PORT_INSPECTION_FAILED",
+            #[cfg(windows)]
             Self::ExecutablePathFailed => "EXECUTABLE_PATH_FAILED",
         }
     }
