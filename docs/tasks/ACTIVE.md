@@ -2683,3 +2683,47 @@ The next permitted action is runtime investigation of the missing supervisor
 handoff. No further localhost/model contact is authorized by this record.
 
 REASONING BUDGET 1024 ATTEMPT 004 INVALID — STOP FOR RUNTIME INVESTIGATION
+
+## Phase 1C Attempt 004 handoff remediation and Attempt 005 preparation
+
+The accepted Attempt 004 history was fast-forward-promoted to main and
+verified on origin/main at
+5b16161babe015a66f0a2651610963ac7b7ec735. Attempt 004 remains
+INVALID BEFORE READINESS / INFERENCE with immediate cause
+SUPERVISOR_LAUNCH_IDENTITY_HANDOFF_MISSING. Accounting remains Qwen startup 1,
+readiness 0, inference 0, and retries 0. Its preserved evidence remains
+unchanged.
+
+The exact defect was traced to the real
+prefixity-phase1c-live-supervisor binary calling the generic run_supervised
+path with no handoff. The remediation replaces the three unused environment
+variables with one canonical serialized WorkflowLaunchMetadata handoff,
+PREFIXITY_PHASE1C_WORKFLOW_HANDOFF. The supervisor generates the launch
+identity from the registered Attempt 005 identity and passes its own PID/path,
+candidate identity, evidence-root identity, and exact child binding. The child
+validates that metadata against the registered identity; native exclusivity
+then verifies the parent process, exact executable paths, llama PID, and port
+owner. All mismatches fail closed.
+
+Attempt 005 identity:
+docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_005_IDENTITY_V1.json
+
+Attempt 005 identity SHA-256:
+5d247fe0c5b29d99b1652254743c5ee3d38833244d30c2ef4e64795f7159a8c6
+
+Attempt 005 evidence root:
+experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-005/
+
+The root remains absent. Manifest and all three frozen request hashes are
+unchanged. Offline fingerprint, preflight, and dry-run passed with network
+calls 0, listener checks 0, inference requests 0, and three cases. Focused
+calibration 22/22, supervisor 6/6, native exclusivity 12/12, full workspace
+tests, strict Clippy, rustfmt, and git diff --check passed. No Qwen startup,
+localhost contact, readiness, or inference was performed.
+
+The remediation branch is to be committed and pushed, then fast-forward
+promoted to main. After promotion, create
+agent/phase-1c-reasoning-budget-calibration-1024-attempt-005 as preparation
+only. Do not execute Attempt 005 under this authorization.
+
+REASONING BUDGET 1024 ATTEMPT 005 READY FOR SEPARATE LIVE AUTHORIZATION

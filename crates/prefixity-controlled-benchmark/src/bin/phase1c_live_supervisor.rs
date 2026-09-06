@@ -1,5 +1,6 @@
 use prefixity_controlled_benchmark::{
-    persist_supervisor_result, run_supervised, H001Error, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
+    persist_supervisor_result, registered_workflow_identity_from_file, run_supervised,
+    run_supervised_with_registered_workflow_identity, H001Error, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
 };
 use std::env;
 use std::path::PathBuf;
@@ -7,8 +8,28 @@ use std::time::Duration;
 
 fn main() {
     let mut args = env::args().skip(1);
-    let evidence_path = match (args.next().as_deref(), args.next()) {
-        (Some("--evidence"), Some(path)) => PathBuf::from(path),
+    let (attempt_identity_path, evidence_path) = match args.next().as_deref() {
+        Some("--attempt-identity") => {
+            let identity_path = match args.next() {
+                Some(path) => PathBuf::from(path),
+                None => fail(usage()),
+            };
+            if args.next().as_deref() != Some("--evidence") {
+                fail(usage());
+            }
+            let evidence_path = match args.next() {
+                Some(path) => PathBuf::from(path),
+                None => fail(usage()),
+            };
+            (Some(identity_path), evidence_path)
+        }
+        Some("--evidence") => {
+            let evidence_path = match args.next() {
+                Some(path) => PathBuf::from(path),
+                None => fail(usage()),
+            };
+            (None, evidence_path)
+        }
         _ => fail(usage()),
     };
     if args.next().as_deref() != Some("--") {
@@ -19,11 +40,26 @@ fn main() {
         None => fail(usage()),
     };
     let child_args = args.collect::<Vec<_>>();
-    let result = match run_supervised(
-        &program,
-        &child_args,
-        Duration::from_millis(PRODUCTION_SUPERVISOR_TIMEOUT_MS),
-    ) {
+    let result = match attempt_identity_path {
+        Some(identity_path) => {
+            let registered = match registered_workflow_identity_from_file(&identity_path) {
+                Ok(identity) => identity,
+                Err(error) => fail(error),
+            };
+            run_supervised_with_registered_workflow_identity(
+                &program,
+                &child_args,
+                Duration::from_millis(PRODUCTION_SUPERVISOR_TIMEOUT_MS),
+                &registered,
+            )
+        }
+        None => run_supervised(
+            &program,
+            &child_args,
+            Duration::from_millis(PRODUCTION_SUPERVISOR_TIMEOUT_MS),
+        ),
+    };
+    let result = match result {
         Ok(result) => result,
         Err(error) => fail(error),
     };
@@ -41,7 +77,7 @@ fn main() {
 
 fn usage() -> H001Error {
     H001Error::Validation(format!(
-        "usage: prefixity-phase1c-live-supervisor --evidence PATH -- PROGRAM [ARGS...] (deadline fixed at {PRODUCTION_SUPERVISOR_TIMEOUT_MS}ms)"
+        "usage: prefixity-phase1c-live-supervisor [--attempt-identity IDENTITY_PATH] --evidence PATH -- PROGRAM [ARGS...] (deadline fixed at {PRODUCTION_SUPERVISOR_TIMEOUT_MS}ms)"
     ))
 }
 

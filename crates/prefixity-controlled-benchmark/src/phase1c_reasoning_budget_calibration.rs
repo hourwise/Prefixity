@@ -42,8 +42,16 @@ pub const CALIBRATION_ATTEMPT_004_IDENTITY_FINGERPRINT_PATH: &str =
     "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_004_IDENTITY_V1.sha256";
 pub const CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT: &str =
     "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-004";
+pub const CALIBRATION_ATTEMPT_005_IDENTITY_PATH: &str =
+    "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_005_IDENTITY_V1.json";
+pub const CALIBRATION_ATTEMPT_005_IDENTITY_FINGERPRINT_PATH: &str =
+    "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_005_IDENTITY_V1.sha256";
+pub const CALIBRATION_ATTEMPT_005_EVIDENCE_ROOT: &str =
+    "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-005";
 pub const CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH: &str =
     "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs";
+pub const CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH: &str =
+    "crates/prefixity-controlled-benchmark/src/phase1c_live_supervisor.rs";
 const ATTEMPT_003_SEALED_IMPLEMENTATION_SHA256: &str =
     "019ed0c7b066773b570f29adb6130b4447b1e9610e13724933b79a9e40374e93";
 pub const CALIBRATION_CASE_IDS: [&str; 3] = ["rbcal-001", "rbcal-002", "rbcal-003"];
@@ -96,6 +104,10 @@ pub enum CalibrationCliCommand {
     Attempt004Fingerprint,
     Attempt004Preflight,
     Attempt004DryRun,
+    Attempt005Fingerprint,
+    Attempt005Preflight,
+    Attempt005DryRun,
+    Attempt005Poststart,
 }
 
 pub fn parse_calibration_cli_args<I>(
@@ -185,8 +197,20 @@ where
         [command] if command == "attempt-004-dry-run" => {
             Ok(CalibrationCliCommand::Attempt004DryRun)
         }
+        [command] if command == "attempt-005-fingerprint" => {
+            Ok(CalibrationCliCommand::Attempt005Fingerprint)
+        }
+        [command] if command == "attempt-005-preflight" => {
+            Ok(CalibrationCliCommand::Attempt005Preflight)
+        }
+        [command] if command == "attempt-005-dry-run" => {
+            Ok(CalibrationCliCommand::Attempt005DryRun)
+        }
+        [command] if command == "attempt-005-poststart" => {
+            Ok(CalibrationCliCommand::Attempt005Poststart)
+        }
         _ => Err(ReasoningBudgetCalibrationError::Validation(
-            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003|attempt-004-fingerprint|attempt-004-preflight|attempt-004-dry-run]".to_string(),
+            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003|attempt-004-fingerprint|attempt-004-preflight|attempt-004-dry-run|attempt-005-fingerprint|attempt-005-preflight|attempt-005-dry-run|attempt-005-poststart]".to_string(),
         )),
     }
 }
@@ -628,34 +652,38 @@ pub fn attempt_003_poststart() -> Result<Value, ReasoningBudgetCalibrationError>
 
 pub fn expected_workflow_identity_from_supervisor_env(
 ) -> Result<windows_exclusivity::ExpectedWorkflowIdentity, ReasoningBudgetCalibrationError> {
-    let launch_identity = env::var(crate::phase1c_live_supervisor::WORKFLOW_LAUNCH_IDENTITY_ENV)
-        .map_err(|_| {
-            invalid("expected workflow launch identity was not handed off by supervisor")
-        })?;
-    let supervisor_pid = env::var(crate::phase1c_live_supervisor::WORKFLOW_SUPERVISOR_PID_ENV)
-        .map_err(|_| invalid("expected supervisor PID was not handed off by supervisor"))?
-        .parse::<u32>()
-        .map_err(|_| invalid("expected supervisor PID handoff was not numeric"))?;
-    let supervisor_path = env::var(crate::phase1c_live_supervisor::WORKFLOW_SUPERVISOR_PATH_ENV)
-        .map_err(|_| invalid("expected supervisor path was not handed off by supervisor"))?;
+    let metadata = crate::phase1c_live_supervisor::workflow_launch_metadata_from_env()
+        .map_err(|error| invalid(&error.to_string()))?;
     let child_path = env::current_exe()?.to_string_lossy().into_owned();
     let child_pid = std::process::id();
-    if supervisor_pid == 0 || child_pid == 0 || supervisor_pid == child_pid {
+    if child_pid == 0 {
+        return Err(invalid("expected workflow child PID is invalid"));
+    }
+    let expected_child_path = std::fs::canonicalize(&child_path)
+        .map_err(|error| invalid(&format!("expected workflow child path is invalid: {error}")))?
+        .to_string_lossy()
+        .into_owned();
+    if !expected_child_path.eq_ignore_ascii_case(&metadata.child_executable_path) {
+        return Err(invalid(
+            "expected workflow child path does not match supervisor handoff",
+        ));
+    }
+    if metadata.supervisor_pid == child_pid {
         return Err(invalid(
             "expected workflow supervisor and child identities are invalid",
         ));
     }
     Ok(windows_exclusivity::ExpectedWorkflowIdentity {
-        launch_identity,
+        launch_identity: metadata.launch_identity,
         supervisor: windows_exclusivity::ExpectedProcessIdentity {
-            pid: supervisor_pid,
-            executable_path: supervisor_path,
+            pid: metadata.supervisor_pid,
+            executable_path: metadata.supervisor_path,
             parent_pid: None,
         },
         calibration_child: windows_exclusivity::ExpectedProcessIdentity {
             pid: child_pid,
-            executable_path: child_path,
-            parent_pid: Some(supervisor_pid),
+            executable_path: expected_child_path,
+            parent_pid: Some(metadata.supervisor_pid),
         },
         inspector: None,
     })
@@ -1172,6 +1200,120 @@ pub fn dry_run_attempt_004() -> Result<Value, ReasoningBudgetCalibrationError> {
         "listener_checks": 0,
         "inference_requests": 0
     }))
+}
+
+pub fn fingerprint_attempt_005() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_attempt_005_identity(false)?;
+    validate_attempt_005_identity(&identity, false)?;
+    let fingerprints = fingerprint_calibration()?;
+    validate_attempt_005_bindings(&identity, &fingerprints)?;
+    Ok(json!({
+        "identity_sha256": canonical_hash(&identity)?,
+        "launch_handoff_implementation_sha256": source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH)?,
+        "native_exclusivity_implementation_sha256": implementation_source_sha256()?,
+        "manifest_sha256": fingerprints["manifest_sha256"],
+        "candidate_budget": 1024,
+        "case_order": CALIBRATION_CASE_IDS,
+        "cases": fingerprints["cases"],
+        "attempt": 5,
+        "evidence_root": CALIBRATION_ATTEMPT_005_EVIDENCE_ROOT,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+pub fn preflight_attempt_005() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_attempt_005_identity(true)?;
+    validate_attempt_005_identity(&identity, true)?;
+    let fingerprints = fingerprint_calibration()?;
+    validate_attempt_005_bindings(&identity, &fingerprints)?;
+    validate_attempt_005_evidence_state()?;
+    let os_inspection = windows_native_prestart_value(5, true);
+    Ok(json!({
+        "state": "PREPARED",
+        "attempt": 5,
+        "experiment_id": EXPERIMENT_ID,
+        "candidate_budget": 1024,
+        "case_order": CALIBRATION_CASE_IDS,
+        "manifest_sha256": fingerprints["manifest_sha256"],
+        "request_hashes": fingerprints["cases"],
+        "evidence_root": CALIBRATION_ATTEMPT_005_EVIDENCE_ROOT,
+        "evidence_root_absent": true,
+        "attempt_001_immutable": true,
+        "attempt_002_root_absent": true,
+        "attempt_003_immutable": true,
+        "attempt_004_immutable": true,
+        "windows_native_exclusivity": os_inspection,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+pub fn dry_run_attempt_005() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let preflight = preflight_attempt_005()?;
+    let manifest = read_manifest(true)?;
+    let cases = manifest
+        .get("cases")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("cases"))?;
+    let combinations = CALIBRATION_CASE_IDS
+        .iter()
+        .map(|case_id| {
+            let case = cases
+                .iter()
+                .find(|case| case.get("case_id").and_then(Value::as_str) == Some(case_id))
+                .ok_or_else(|| missing(case_id))?;
+            Ok(json!({
+                "attempt": 5,
+                "budget": 1024,
+                "case_id": case_id,
+                "evidence_root": format!("{CALIBRATION_ATTEMPT_005_EVIDENCE_ROOT}/{case_id}"),
+                "server_reasoning_budget": 1024,
+                "request_has_reasoning_budget_field": false,
+                "request_sha256": case["request_sha256"],
+                "wire_request_sha256": case["wire_request_sha256"],
+                "request_bytes": case["request_bytes"],
+                "network_calls": 0,
+                "listener_checks": 0,
+                "inference_requests": 0
+            }))
+        })
+        .collect::<Result<Vec<_>, ReasoningBudgetCalibrationError>>()?;
+    Ok(json!({
+        "state": "DRY_RUN",
+        "attempt": 5,
+        "budget": 1024,
+        "preflight": preflight,
+        "combinations": combinations,
+        "network_calls": 0,
+        "listener_checks": 0,
+        "inference_requests": 0
+    }))
+}
+
+pub fn attempt_005_poststart() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let metadata = crate::phase1c_live_supervisor::workflow_launch_metadata_from_env()
+        .map_err(|error| invalid(&error.to_string()))?;
+    validate_attempt_005_handoff(&metadata)?;
+    let processes = windows_exclusivity::process_table()
+        .map_err(|failure| invalid(&format!("post-start process inspection failed: {failure}")))?;
+    let llama_processes = windows_exclusivity::llama_processes(&processes);
+    if llama_processes.len() != 1 {
+        return Err(invalid(&format!(
+            "post-start expected exactly one llama.exe process, found {}",
+            llama_processes.len()
+        )));
+    }
+    let expected_workflow = expected_workflow_identity_from_supervisor_env()?;
+    let mut result = attempt_003_runtime_ownership_with_expected_workflow(
+        llama_processes[0].pid,
+        &expected_workflow,
+    )?;
+    result["attempt"] = json!(5);
+    result["server_start_identity"] = json!("fresh candidate-1024 llama.cpp process");
+    Ok(result)
 }
 
 fn windows_native_prestart_value(attempt: u32, operator_attested: bool) -> Value {
@@ -2520,6 +2662,257 @@ fn validate_attempt_004_bindings(
     Ok(())
 }
 
+fn read_attempt_005_identity(
+    verify_sidecar: bool,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_json(CALIBRATION_ATTEMPT_005_IDENTITY_PATH)?;
+    if verify_sidecar {
+        validate_attempt_005_identity_sidecar(&identity)?;
+    }
+    Ok(identity)
+}
+
+fn validate_attempt_005_identity(
+    identity: &Value,
+    verify_sidecar: bool,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    expect_string(
+        identity,
+        "identity_version",
+        "phase1c-reasoning-budget-1024-attempt-005-v1",
+    )?;
+    expect_string(
+        identity,
+        "status",
+        "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+    )?;
+    expect_string(identity, "experiment_id", EXPERIMENT_ID)?;
+    expect_u64(identity, "attempt", 5)?;
+    expect_u64(identity, "candidate.reasoning_budget", 1024)?;
+    if identity.pointer("/candidate/case_order") != Some(&json!(CALIBRATION_CASE_IDS))
+        || identity.pointer("/candidate/maximum_requests") != Some(&json!(3))
+        || identity.pointer("/candidate/automatic_retries") != Some(&json!(0))
+        || identity.pointer("/candidate/fresh_server_required") != Some(&Value::Bool(true))
+        || identity.pointer("/candidate/runtime_exclusivity_required") != Some(&Value::Bool(true))
+    {
+        return Err(invalid("attempt-005 candidate identity changed"));
+    }
+    expect_string(
+        identity,
+        "candidate.calibration_candidate_identity",
+        "phase1c-reasoning-budget-1024",
+    )?;
+    expect_string(identity, "manifest.path", CALIBRATION_MANIFEST_PATH)?;
+    expect_string(
+        identity,
+        "manifest.sha256",
+        "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b",
+    )?;
+    validate_frozen_request_hashes(identity, "attempt-005")?;
+    expect_string(
+        identity,
+        "attempt_005_evidence_root",
+        &format!("{CALIBRATION_ATTEMPT_005_EVIDENCE_ROOT}/"),
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_004_classification",
+        "INVALID BEFORE READINESS / INFERENCE",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_004_immediate_cause",
+        "SUPERVISOR_LAUNCH_IDENTITY_HANDOFF_MISSING",
+    )?;
+    expect_string(
+        identity,
+        "lineage.attempt_004_terminal_sha",
+        "5b16161babe015a66f0a2651610963ac7b7ec735",
+    )?;
+    expect_u64(identity, "lineage.attempt_004_qwen_startup", 1)?;
+    expect_u64(identity, "lineage.attempt_004_readiness", 0)?;
+    expect_u64(identity, "lineage.attempt_004_inference", 0)?;
+    expect_u64(identity, "lineage.attempt_004_retries", 0)?;
+    for (path, expected) in [
+        (
+            "lineage.attempt_004_evidence_sha256.preflight",
+            "ddd3bc415f9565fd461449988618630cd95cc8bacd5c89306163aafaea164d6f",
+        ),
+        (
+            "lineage.attempt_004_evidence_sha256.runtime_startup",
+            "5710b1bb021b727cee6907314d5757635255bd06f0ad2862163ee25faa914c7b",
+        ),
+        (
+            "lineage.attempt_004_evidence_sha256.runtime_ownership",
+            "7206588dbadc82d31fa99739914a4be3c226318dbad34290e8cce858d619be54",
+        ),
+        (
+            "lineage.attempt_004_evidence_sha256.candidate_result",
+            "eebdff4272ee9b0215397a8de1f4cd5979388533eb971e3fb69b3d66064a9ea5",
+        ),
+        (
+            "lineage.attempt_004_evidence_sha256.execution_record",
+            "e002c05a3b6da64d4a5fa03ba8aa080c39182eee673cfeafac8d629e7c12c8e3",
+        ),
+    ] {
+        expect_string(identity, path, expected)?;
+    }
+    expect_string(
+        identity,
+        "handoff_contract.schema_id",
+        crate::phase1c_live_supervisor::WORKFLOW_HANDOFF_SCHEMA_ID,
+    )?;
+    expect_string(
+        identity,
+        "handoff_contract.transport",
+        "single inherited environment JSON",
+    )?;
+    expect_string(identity, "handoff_contract.child_binding", "parent_pid")?;
+    expect_string(
+        identity,
+        "handoff_contract.launch_identity_formula",
+        "phase1c-attempt-{attempt}-budget-{candidate_budget}-{attempt_identity_sha256}",
+    )?;
+    expect_bool(
+        identity,
+        "handoff_contract.supervisor_generates_launch_identity",
+        true,
+    )?;
+    expect_bool(
+        identity,
+        "handoff_contract.child_must_not_invent_identity",
+        true,
+    )?;
+    expect_bool(identity, "handoff_contract.fail_closed_on_mismatch", true)?;
+    expect_string(
+        identity,
+        "launch_handoff_implementation.source_path",
+        CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH,
+    )?;
+    expect_string(
+        identity,
+        "launch_handoff_implementation.source_sha256",
+        &source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH)?,
+    )?;
+    expect_string(
+        identity,
+        "native_exclusivity_implementation.source_path",
+        CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
+    )?;
+    expect_string(
+        identity,
+        "native_exclusivity_implementation.source_sha256",
+        &implementation_source_sha256()?,
+    )?;
+    if verify_sidecar {
+        validate_attempt_005_identity_sidecar(identity)?;
+    }
+    Ok(())
+}
+
+fn validate_attempt_005_identity_sidecar(
+    identity: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    let sidecar = read_json(CALIBRATION_ATTEMPT_005_IDENTITY_FINGERPRINT_PATH)?;
+    if sidecar.get("artifact_path").and_then(Value::as_str)
+        != Some(CALIBRATION_ATTEMPT_005_IDENTITY_PATH)
+        || sidecar.get("algorithm").and_then(Value::as_str) != Some("SHA-256")
+        || sidecar.get("canonicalization").and_then(Value::as_str)
+            != Some("sorted JSON object keys; arrays preserve order")
+        || sidecar.get("canonical_sha256").and_then(Value::as_str)
+            != Some(canonical_hash(identity)?.as_str())
+    {
+        return Err(invalid("attempt-005 identity fingerprint sidecar mismatch"));
+    }
+    Ok(())
+}
+
+fn validate_attempt_005_bindings(
+    identity: &Value,
+    fingerprints: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    if identity.pointer("/manifest/sha256") != fingerprints.get("manifest_sha256") {
+        return Err(invalid("attempt-005 manifest binding mismatch"));
+    }
+    let expected_cases = identity
+        .get("frozen_request_hashes")
+        .and_then(Value::as_object)
+        .ok_or_else(|| missing("frozen_request_hashes"))?;
+    let actual_cases = fingerprints
+        .get("cases")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("cases"))?;
+    for case_id in CALIBRATION_CASE_IDS {
+        let expected = expected_cases
+            .get(case_id)
+            .and_then(Value::as_str)
+            .ok_or_else(|| missing(case_id))?;
+        let actual = actual_cases
+            .iter()
+            .find(|case| case.get("case_id").and_then(Value::as_str) == Some(case_id))
+            .and_then(|case| case.get("request_sha256"))
+            .and_then(Value::as_str);
+        if actual != Some(expected) {
+            return Err(invalid("attempt-005 request binding mismatch"));
+        }
+    }
+    Ok(())
+}
+
+fn validate_attempt_005_evidence_state() -> Result<(), ReasoningBudgetCalibrationError> {
+    validate_attempt_004_execution_evidence()?;
+    if attempt_005_root().exists() {
+        return Err(invalid("attempt-005 evidence root must remain absent"));
+    }
+    Ok(())
+}
+
+fn validate_attempt_004_execution_evidence() -> Result<(), ReasoningBudgetCalibrationError> {
+    if !attempt_004_root().exists() {
+        return Err(invalid("attempt-004 evidence root is absent"));
+    }
+    for (name, expected_hash) in attempt_004_evidence_hashes() {
+        let path = attempt_004_root().join(name);
+        let actual_hash = sha256_hex(&fs::read(&path).map_err(|error| {
+            invalid(&format!(
+                "unable to read preserved attempt-004 evidence {name}: {error}"
+            ))
+        })?);
+        if actual_hash != expected_hash {
+            return Err(invalid(&format!(
+                "preserved attempt-004 evidence hash mismatch for {name}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn validate_attempt_005_handoff(
+    metadata: &crate::phase1c_live_supervisor::WorkflowLaunchMetadata,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    let identity = read_attempt_005_identity(true)?;
+    validate_attempt_005_identity(&identity, true)?;
+    if metadata.attempt_identity_path != CALIBRATION_ATTEMPT_005_IDENTITY_PATH {
+        return Err(invalid("attempt-005 handoff identity path mismatch"));
+    }
+    let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
+        Path::new(CALIBRATION_ATTEMPT_005_IDENTITY_PATH),
+    )
+    .map_err(|error| invalid(&error.to_string()))?;
+    if metadata.attempt_identity_sha256 != canonical_hash(&identity)?
+        || metadata.attempt != registered.attempt
+        || metadata.candidate_budget != registered.candidate_budget
+        || metadata.candidate_identity != registered.candidate_identity
+        || metadata.evidence_root != registered.evidence_root
+        || metadata.launch_identity != registered.generated_launch_identity()
+    {
+        return Err(invalid(
+            "attempt-005 supervisor launch metadata does not match registered identity",
+        ));
+    }
+    Ok(())
+}
+
 fn validate_attempt_004_evidence_state() -> Result<(), ReasoningBudgetCalibrationError> {
     let attempt_001_root =
         workspace_path("experiments/runs/phase1c-reasoning-budget-calibration/budget-1024");
@@ -2599,10 +2992,37 @@ fn attempt_003_evidence_hashes() -> [(&'static str, &'static str); 4] {
     ]
 }
 
+fn attempt_004_evidence_hashes() -> [(&'static str, &'static str); 5] {
+    [
+        (
+            "preflight.json",
+            "ddd3bc415f9565fd461449988618630cd95cc8bacd5c89306163aafaea164d6f",
+        ),
+        (
+            "runtime-startup.json",
+            "5710b1bb021b727cee6907314d5757635255bd06f0ad2862163ee25faa914c7b",
+        ),
+        (
+            "runtime-ownership.json",
+            "7206588dbadc82d31fa99739914a4be3c226318dbad34290e8cce858d619be54",
+        ),
+        (
+            "candidate-result.json",
+            "eebdff4272ee9b0215397a8de1f4cd5979388533eb971e3fb69b3d66064a9ea5",
+        ),
+        (
+            "execution-record.json",
+            "e002c05a3b6da64d4a5fa03ba8aa080c39182eee673cfeafac8d629e7c12c8e3",
+        ),
+    ]
+}
+
 fn implementation_source_sha256() -> Result<String, ReasoningBudgetCalibrationError> {
-    Ok(sha256_hex(&fs::read(workspace_path(
-        CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
-    ))?))
+    source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH)
+}
+
+fn source_sha256(path: &str) -> Result<String, ReasoningBudgetCalibrationError> {
+    Ok(sha256_hex(&fs::read(workspace_path(path))?))
 }
 
 fn validate_candidate_order(budget: u32) -> Result<(), ReasoningBudgetCalibrationError> {
@@ -2860,6 +3280,10 @@ fn attempt_003_root() -> PathBuf {
 
 fn attempt_004_root() -> PathBuf {
     workspace_path(CALIBRATION_ATTEMPT_004_EVIDENCE_ROOT)
+}
+
+fn attempt_005_root() -> PathBuf {
+    workspace_path(CALIBRATION_ATTEMPT_005_EVIDENCE_ROOT)
 }
 
 fn workspace_path(path: &str) -> PathBuf {
@@ -3262,6 +3686,115 @@ mod tests {
         assert_eq!(
             parse_calibration_cli_args(vec!["attempt-004-dry-run".to_string()]).unwrap(),
             CalibrationCliCommand::Attempt004DryRun
+        );
+    }
+
+    #[test]
+    fn attempt_005_handoff_contract_accepts_supervisor_generated_metadata() {
+        let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
+            Path::new(CALIBRATION_ATTEMPT_005_IDENTITY_PATH),
+        )
+        .unwrap();
+        let child = std::env::current_exe().unwrap();
+        let metadata =
+            crate::phase1c_live_supervisor::build_workflow_launch_metadata(&registered, &child)
+                .unwrap();
+        validate_attempt_005_handoff(&metadata).unwrap();
+    }
+
+    #[test]
+    fn attempt_005_wrong_launch_identity_fails_closed() {
+        let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
+            Path::new(CALIBRATION_ATTEMPT_005_IDENTITY_PATH),
+        )
+        .unwrap();
+        let child = std::env::current_exe().unwrap();
+        let mut metadata =
+            crate::phase1c_live_supervisor::build_workflow_launch_metadata(&registered, &child)
+                .unwrap();
+        metadata.launch_identity = "stale-or-wrong-launch".to_string();
+        assert!(validate_attempt_005_handoff(&metadata).is_err());
+    }
+
+    #[test]
+    fn attempt_005_stale_identity_fails_closed() {
+        let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
+            Path::new(CALIBRATION_ATTEMPT_005_IDENTITY_PATH),
+        )
+        .unwrap();
+        let child = std::env::current_exe().unwrap();
+        let mut metadata =
+            crate::phase1c_live_supervisor::build_workflow_launch_metadata(&registered, &child)
+                .unwrap();
+        metadata.attempt_identity_sha256 = "c".repeat(64);
+        assert!(validate_attempt_005_handoff(&metadata).is_err());
+    }
+
+    #[test]
+    fn attempt004_missing_launch_identity_regression_fails_closed() {
+        let processes = Ok(vec![
+            windows_exclusivity::ProcessRecord {
+                image_name: "prefixity-phase1c-live-supervisor.exe".to_string(),
+                pid: 10,
+                parent_pid: 1,
+                executable_path: Some(
+                    r"D:Prefixityprefixity-phase1c-live-supervisor.exe".to_string(),
+                ),
+            },
+            windows_exclusivity::ProcessRecord {
+                image_name: "prefixity-phase1c-calibration.exe".to_string(),
+                pid: 11,
+                parent_pid: 10,
+                executable_path: Some(r"D:Prefixityprefixity-phase1c-calibration.exe".to_string()),
+            },
+            windows_exclusivity::ProcessRecord {
+                image_name: "llama.exe".to_string(),
+                pid: 20,
+                parent_pid: 1,
+                executable_path: Some(r"D:llamallama.exe".to_string()),
+            },
+        ]);
+        let listeners = Ok(vec![windows_exclusivity::ListenerRecord {
+            local_address: "127.0.0.1".to_string(),
+            local_port: 8080,
+            pid: 20,
+            state: "LISTENING".to_string(),
+        }]);
+        let identity = windows_exclusivity::ExpectedWorkflowIdentity {
+            launch_identity: String::new(),
+            supervisor: windows_exclusivity::ExpectedProcessIdentity {
+                pid: 10,
+                executable_path: r"D:Prefixityprefixity-phase1c-live-supervisor.exe".to_string(),
+                parent_pid: None,
+            },
+            calibration_child: windows_exclusivity::ExpectedProcessIdentity {
+                pid: 11,
+                executable_path: r"D:Prefixityprefixity-phase1c-calibration.exe".to_string(),
+                parent_pid: Some(10),
+            },
+            inspector: None,
+        };
+        assert_eq!(
+            windows_exclusivity::classify_poststart_with_expected_workflow(
+                20, &processes, &listeners, &identity
+            ),
+            windows_exclusivity::ExclusivityOutcome::ExpectedWorkflowIdentityInvalid
+        );
+    }
+
+    #[test]
+    fn attempt_005_cli_commands_are_offline_only() {
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-005-fingerprint".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt005Fingerprint
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-005-preflight".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt005Preflight
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-005-dry-run".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt005DryRun
         );
     }
 }
