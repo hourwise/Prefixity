@@ -1,0 +1,19 @@
+{
+  "schema_id": "prefixity.phase1c.attempt-008-budget-provenance",
+  "schema_version": 1,
+  "attempt": 8,
+  "selected_budget": 1024,
+  "selected_budget_source": "last_admissible_calibration_state_before_attempt_007",
+  "last_admissible_candidate": "phase1c-reasoning-budget-1024",
+  "attempt_007_state": {
+    "executed": true,
+    "integrity_accepted": false,
+    "calibration_admissible": false,
+    "reusable": false,
+    "permanently_consumed": true
+  },
+  "attempt_007_raw_candidate_state": "FAIL",
+  "excluded_attempt_007_next_budget": 512,
+  "inadmissible_attempt_007_influenced_selection": false,
+  "selection_rule": "A consumed integrity-invalid attempt does not advance accepted calibration state; the next fresh replacement inherits the last admissible candidate."
+}
