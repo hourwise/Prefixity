@@ -2890,6 +2890,10 @@ No Attempt-007 identity or evidence root was created. No Qwen startup,
 readiness, localhost contact, inference, 512/256 calibration, NO_OP,
 INTERVENTION, or V3 execution occurred.
 
-Commit/push, GitHub Actions inspection, promotion to `main`, and any
-conditional Attempt-007 preparation remain outstanding. The current worktree
-contains the bounded candidate and no CI result is claimed yet.
+The first published candidate commit `e0df48c9265d54d7bd94a4fcf6b5a220990c5078`
+was not promotion-eligible: GitHub Actions run `34047686452` / `#121` failed
+Ubuntu and macOS Clippy on the non-Windows fail-closed certification branch.
+The narrow cfg-portability fix was committed as replacement candidate
+`ef3a56728222b28f430606f1ba1db60f2d42469d`. GitHub Actions run
+`34048230074` / `#122` passed Ubuntu, Windows, macOS, and MSRV for that exact
+SHA. Promotion to `main` remains the final publication gate for this task.
