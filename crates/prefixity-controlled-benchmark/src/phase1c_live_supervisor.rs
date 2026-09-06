@@ -4,7 +4,10 @@
 //! llama.cpp, opens a socket, sends HTTP, retries, or selects another arm.
 
 use crate::hashing::canonical_hash;
-use crate::phase1c_executable_identity::{inspect as inspect_executable, ExecutableIdentity};
+use crate::phase1c_executable_identity::{
+    inspect as inspect_executable, validate_frozen_executable_binding, ExecutableIdentity,
+    FrozenExecutableBinding,
+};
 use crate::phase1c_h001::H001Error;
 #[cfg(test)]
 use crate::phase1c_h001_v2::{parse_v2_cli_args, v2_live_child_args, V2CliCommand};
@@ -28,6 +31,9 @@ pub struct RegisteredWorkflowIdentity {
     pub candidate_budget: u32,
     pub candidate_identity: String,
     pub evidence_root: String,
+    /// Complete preparation-time binding. Historical identities may omit it,
+    /// but the live registered-workflow path rejects that omission.
+    pub frozen_executable_binding: Option<FrozenExecutableBinding>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -46,6 +52,8 @@ pub struct WorkflowLaunchMetadata {
     pub candidate_budget: u32,
     pub candidate_identity: String,
     pub evidence_root: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub frozen_executable_binding: Option<FrozenExecutableBinding>,
 }
 
 impl RegisteredWorkflowIdentity {
@@ -89,6 +97,14 @@ pub fn build_workflow_launch_metadata(
         inspect_executable(&supervisor_path).map_err(H001Error::Validation)?;
     let child_executable_identity =
         inspect_executable(&child_path).map_err(H001Error::Validation)?;
+    if let Some(expected) = &registered.frozen_executable_binding {
+        validate_frozen_executable_binding(
+            expected,
+            &supervisor_executable_identity,
+            &child_executable_identity,
+        )
+        .map_err(H001Error::Validation)?;
+    }
     Ok(WorkflowLaunchMetadata {
         schema_id: WORKFLOW_HANDOFF_SCHEMA_ID.to_string(),
         attempt_identity_path: registered.attempt_identity_path.clone(),
@@ -104,6 +120,7 @@ pub fn build_workflow_launch_metadata(
         candidate_budget: registered.candidate_budget,
         candidate_identity: registered.candidate_identity.clone(),
         evidence_root: registered.evidence_root.clone(),
+        frozen_executable_binding: registered.frozen_executable_binding.clone(),
     })
 }
 
@@ -145,6 +162,17 @@ pub fn workflow_launch_metadata_from_env() -> Result<WorkflowLaunchMetadata, H00
             "expected workflow launch metadata is invalid".to_string(),
         ));
     }
+    if let Some(binding) = &metadata.frozen_executable_binding {
+        if binding.supervisor.raw_path.trim().is_empty()
+            || binding.supervisor.final_path.trim().is_empty()
+            || binding.child.raw_path.trim().is_empty()
+            || binding.child.final_path.trim().is_empty()
+        {
+            return Err(H001Error::Validation(
+                "frozen executable binding in workflow launch metadata is invalid".to_string(),
+            ));
+        }
+    }
     Ok(metadata)
 }
 
@@ -178,8 +206,10 @@ pub fn registered_workflow_identity_from_file(
         })?
         .to_string();
     let evidence_root_key = format!("attempt_{attempt:03}_evidence_root");
-    let certification_identity = identity.get("identity_version").and_then(Value::as_str)
-        == Some("phase1c-workflow-identity-certification-v1");
+    let certification_identity = identity
+        .get("identity_version")
+        .and_then(Value::as_str)
+        .is_some_and(|version| version.starts_with("phase1c-workflow-identity-certification-"));
     let evidence_root_key = if certification_identity {
         "certification_evidence_root".to_string()
     } else {
@@ -190,6 +220,25 @@ pub fn registered_workflow_identity_from_file(
         .and_then(Value::as_str)
         .ok_or_else(|| H001Error::Validation("registered evidence root is missing".to_string()))?
         .to_string();
+    let frozen_executable_binding =
+        FrozenExecutableBinding::from_implementation_fingerprints(&identity)
+            .map_err(H001Error::Validation)?;
+    if let Some(binding) = &frozen_executable_binding {
+        if [
+            &binding.supervisor.raw_path,
+            &binding.supervisor.final_path,
+            &binding.child.raw_path,
+            &binding.child.final_path,
+        ]
+        .into_iter()
+        .any(|path| mutable_target_debug_path(path))
+        {
+            return Err(H001Error::Validation(
+                "frozen executable identity points at mutable target/debug; stage executables before registration"
+                    .to_string(),
+            ));
+        }
+    }
     let binding = RegisteredWorkflowIdentity {
         attempt_identity_path: path.to_string_lossy().into_owned(),
         attempt_identity_sha256: canonical_hash(&identity)?,
@@ -197,6 +246,7 @@ pub fn registered_workflow_identity_from_file(
         candidate_budget,
         candidate_identity,
         evidence_root,
+        frozen_executable_binding,
     };
     binding.validate()?;
     if (!matches!(binding.attempt, 5..=7) && !certification_identity)
@@ -209,6 +259,12 @@ pub fn registered_workflow_identity_from_file(
         ));
     }
     Ok(binding)
+}
+
+fn mutable_target_debug_path(path: &str) -> bool {
+    path.to_ascii_lowercase()
+        .replace('/', "\\")
+        .contains("target\\debug\\")
 }
 
 pub fn run_supervised(
@@ -232,6 +288,11 @@ pub fn run_supervised_with_registered_workflow_identity(
     deadline: Duration,
     registered: &RegisteredWorkflowIdentity,
 ) -> Result<Value, H001Error> {
+    if registered.frozen_executable_binding.is_none() {
+        return Err(H001Error::Validation(
+            "registered workflow identity is missing frozen executable identity".to_string(),
+        ));
+    }
     let handoff = build_workflow_launch_metadata(registered, program)?;
     run_supervised_internal(program, args, deadline, Some(handoff))
 }
@@ -378,6 +439,8 @@ mod tests {
     #[test]
     fn expected_workflow_handoff_serializes_supervisor_generated_identity() {
         let (program, args) = handoff_child();
+        let expected_supervisor = inspect_executable(&std::env::current_exe().unwrap()).unwrap();
+        let expected_child = inspect_executable(&program).unwrap();
         let registered = RegisteredWorkflowIdentity {
             attempt_identity_path: "docs/phase-1/attempt-005.json".to_string(),
             attempt_identity_sha256: "a".repeat(64),
@@ -387,6 +450,10 @@ mod tests {
             evidence_root:
                 "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-005/"
                     .to_string(),
+            frozen_executable_binding: Some(FrozenExecutableBinding {
+                supervisor: expected_supervisor,
+                child: expected_child,
+            }),
         };
         let result = run_supervised_with_registered_workflow_identity(
             &program,
@@ -432,11 +499,36 @@ mod tests {
             candidate_budget: 1024,
             candidate_identity: "phase1c-reasoning-budget-1024".to_string(),
             evidence_root: "attempt-005/".to_string(),
+            frozen_executable_binding: None,
         };
         assert_eq!(
             registered.generated_launch_identity(),
             format!("phase1c-attempt-5-budget-1024-{}", "b".repeat(64))
         );
+    }
+
+    #[test]
+    fn registered_workflow_without_frozen_identity_is_rejected_before_spawn() {
+        let (program, args) = successful_child();
+        let registered = RegisteredWorkflowIdentity {
+            attempt_identity_path: "attempt-005.json".to_string(),
+            attempt_identity_sha256: "c".repeat(64),
+            attempt: 5,
+            candidate_budget: 1024,
+            candidate_identity: "phase1c-reasoning-budget-1024".to_string(),
+            evidence_root: "attempt-005/".to_string(),
+            frozen_executable_binding: None,
+        };
+        let error = run_supervised_with_registered_workflow_identity(
+            &program,
+            &args,
+            Duration::from_millis(500),
+            &registered,
+        )
+        .unwrap_err();
+        assert!(error
+            .to_string()
+            .contains("missing frozen executable identity"));
     }
 
     #[test]

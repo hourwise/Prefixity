@@ -8,7 +8,8 @@ use prefixity_controlled_benchmark::{
     fingerprint_attempt_007, fingerprint_calibration, parse_calibration_cli_args,
     preflight_attempt_002, preflight_attempt_003, preflight_attempt_004, preflight_attempt_005,
     preflight_attempt_006, preflight_attempt_007, preflight_calibration,
-    summarize_attempt_002_budget, summarize_calibration_budget, CalibrationCliCommand,
+    summarize_attempt_002_budget, summarize_calibration_budget,
+    validate_attempt_007_execution_evidence, CalibrationCliCommand,
 };
 use std::env;
 
@@ -51,6 +52,9 @@ fn main() {
         Ok(CalibrationCliCommand::Attempt007Preflight) => preflight_attempt_007(),
         Ok(CalibrationCliCommand::Attempt007DryRun) => dry_run_attempt_007(),
         Ok(CalibrationCliCommand::Attempt007Poststart) => attempt_007_poststart(),
+        Ok(CalibrationCliCommand::Attempt007ValidateEvidence) => {
+            validate_attempt_007_execution_evidence()
+        }
         Ok(CalibrationCliCommand::RunAttempt007) => execute_attempt_007(),
         Ok(CalibrationCliCommand::WorkflowIdentityCertification { result_path }) => {
             certify_workflow_identity(&result_path)

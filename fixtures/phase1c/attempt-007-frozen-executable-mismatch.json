@@ -1,0 +1,41 @@
+{
+  "expected_classification": "FROZEN_EXECUTABLE_IDENTITY_MISMATCH",
+  "preparation_identity": {
+    "implementation_fingerprints": {
+      "supervisor_binary": {
+        "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-live-supervisor.exe",
+        "final_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-live-supervisor.exe",
+        "file_size": 1197056,
+        "sha256": "8427e2ca64fce890e24d8d0474ee9e964e367b7d805caf0dbdbfb3abecc592db",
+        "windows_file_id": "0x0000000000000000000100000039821c"
+      },
+      "child_binary": {
+        "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-reasoning-budget-calibration.exe",
+        "final_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-reasoning-budget-calibration.exe",
+        "file_size": 8448000,
+        "sha256": "844e02c7aab8d6223c93c4f9e1c94b74877c1ec766066037bf999d9f05745a39",
+        "windows_file_id": "0x00000000000000000006000000393382"
+      }
+    }
+  },
+  "supervisor_evidence": {
+    "expected_workflow_handoff": {
+      "metadata": {
+        "supervisor_executable_identity": {
+          "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-live-supervisor.exe",
+          "final_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-live-supervisor.exe",
+          "file_size": 1187840,
+          "sha256": "f5c7e7eed98be6dcb8976f33b2bff6759c05e350d507e5b0914515fa64faadba",
+          "file_id": "volume=ba2f80f4;index=001700000036a34d"
+        },
+        "child_executable_identity": {
+          "raw_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-reasoning-budget-calibration.exe",
+          "final_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\debug\\prefixity-phase1c-reasoning-budget-calibration.exe",
+          "file_size": 8445440,
+          "sha256": "efedfa712758d5be9a0a0f24bce401f69de2153774f86ce33a685990cb2ffad0",
+          "file_id": "volume=ba2f80f4;index=000600000039337f"
+        }
+      }
+    }
+  }
+}

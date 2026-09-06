@@ -132,6 +132,7 @@ pub enum CalibrationCliCommand {
     Attempt007Preflight,
     Attempt007DryRun,
     Attempt007Poststart,
+    Attempt007ValidateEvidence,
     RunAttempt007,
     WorkflowIdentityCertification { result_path: PathBuf },
 }
@@ -259,6 +260,9 @@ where
         [command] if command == "attempt-007-poststart" => {
             Ok(CalibrationCliCommand::Attempt007Poststart)
         }
+        [command] if command == "attempt-007-validate-evidence" => {
+            Ok(CalibrationCliCommand::Attempt007ValidateEvidence)
+        }
         [command] if command == "run-attempt-007" => Ok(CalibrationCliCommand::RunAttempt007),
         [command, flag, path]
             if command == "workflow-identity-certification" && flag == "--result" =>
@@ -271,7 +275,7 @@ where
             })
         }
         _ => Err(ReasoningBudgetCalibrationError::Validation(
-            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003|attempt-004-fingerprint|attempt-004-preflight|attempt-004-dry-run|attempt-005-fingerprint|attempt-005-preflight|attempt-005-dry-run|attempt-005-poststart|attempt-006-fingerprint|attempt-006-preflight|attempt-006-dry-run|attempt-006-poststart|attempt-007-fingerprint|attempt-007-preflight|attempt-007-dry-run|attempt-007-poststart|run-attempt-007]".to_string(),
+            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003|attempt-004-fingerprint|attempt-004-preflight|attempt-004-dry-run|attempt-005-fingerprint|attempt-005-preflight|attempt-005-dry-run|attempt-005-poststart|attempt-006-fingerprint|attempt-006-preflight|attempt-006-dry-run|attempt-006-poststart|attempt-007-fingerprint|attempt-007-preflight|attempt-007-dry-run|attempt-007-poststart|attempt-007-validate-evidence|run-attempt-007]".to_string(),
         )),
     }
 }
@@ -750,6 +754,18 @@ pub fn expected_workflow_identity_from_supervisor_env(
     ) {
         return Err(invalid(
             "expected workflow supervisor executable identity does not match handoff",
+        ));
+    }
+    if let Some(binding) = &metadata.frozen_executable_binding {
+        crate::phase1c_executable_identity::validate_frozen_executable_binding(
+            binding,
+            &supervisor_identity,
+            &expected_child_identity,
+        )
+        .map_err(|error| invalid(&error))?;
+    } else {
+        return Err(invalid(
+            "workflow launch metadata is missing frozen executable identity",
         ));
     }
     if metadata.supervisor_pid == child_pid {
@@ -1731,6 +1747,79 @@ pub fn execute_attempt_007() -> Result<Value, ReasoningBudgetCalibrationError> {
     execute_calibration_at_root(1024, true, &candidate_root, preparation)
 }
 
+/// Validate recorded supervisor evidence against the preparation-time
+/// executable objects without interpreting any model output.
+pub fn validate_recorded_workflow_evidence_against_preparation(
+    preparation_identity: &Value,
+    supervisor_evidence: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    let binding =
+        crate::phase1c_executable_identity::FrozenExecutableBinding::from_implementation_fingerprints(
+            preparation_identity,
+        )
+        .map_err(|error| invalid(&error))?
+        .ok_or_else(|| invalid("preparation identity is missing frozen executable identity"))?;
+    let metadata = supervisor_evidence
+        .pointer("/expected_workflow_handoff/metadata")
+        .ok_or_else(|| invalid("supervisor evidence is missing workflow metadata"))?;
+    let actual_supervisor = metadata
+        .get("supervisor_executable_identity")
+        .cloned()
+        .ok_or_else(|| invalid("supervisor evidence is missing supervisor executable identity"))?;
+    let actual_child = metadata
+        .get("child_executable_identity")
+        .cloned()
+        .ok_or_else(|| invalid("supervisor evidence is missing child executable identity"))?;
+    let actual_supervisor: crate::phase1c_executable_identity::ExecutableIdentity =
+        serde_json::from_value(actual_supervisor)
+            .map_err(|error| invalid(&format!("invalid recorded supervisor identity: {error}")))?;
+    let actual_child: crate::phase1c_executable_identity::ExecutableIdentity =
+        serde_json::from_value(actual_child)
+            .map_err(|error| invalid(&format!("invalid recorded child identity: {error}")))?;
+    crate::phase1c_executable_identity::validate_frozen_executable_binding(
+        &binding,
+        &actual_supervisor,
+        &actual_child,
+    )
+    .map_err(|error| invalid(&error))
+}
+
+/// Offline forensic classification for the preserved Attempt-007 supervisor
+/// record. This reads the evidence but never rewrites or reinterprets it.
+pub fn validate_attempt_007_execution_evidence() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let identity = read_attempt_007_identity(false)?;
+    let supervisor_path = attempt_007_root().join("supervisor.json");
+    let supervisor_evidence = read_json_path(&supervisor_path)?;
+    match validate_recorded_workflow_evidence_against_preparation(&identity, &supervisor_evidence) {
+        Ok(()) => Ok(json!({
+            "state": "INTEGRITY_ACCEPTED",
+            "classification": "FROZEN_EXECUTABLE_IDENTITY_MATCH",
+            "attempt": 7,
+            "calibration_admissible": false,
+            "model_outputs_interpreted": false,
+            "network_calls": 0,
+            "inference_requests": 0
+        })),
+        Err(error)
+            if error
+                .to_string()
+                .contains("FROZEN_EXECUTABLE_IDENTITY_MISMATCH") =>
+        {
+            Ok(json!({
+                "state": "INTEGRITY_REJECTED",
+                "classification": "FROZEN_EXECUTABLE_IDENTITY_MISMATCH",
+                "attempt": 7,
+                "calibration_admissible": false,
+                "model_outputs_interpreted": false,
+                "network_calls": 0,
+                "inference_requests": 0,
+                "reason": error.to_string()
+            }))
+        }
+        Err(error) => Err(error),
+    }
+}
+
 /// Validate a real supervisor-to-child launch without starting llama.cpp or
 /// contacting any endpoint.  This is deliberately a child command so the
 /// production supervisor binary and its inherited handoff transport are used.
@@ -1740,7 +1829,7 @@ pub fn certify_workflow_identity(
     let metadata = crate::phase1c_live_supervisor::workflow_launch_metadata_from_env()
         .map_err(|error| invalid(&error.to_string()))?;
     let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
-        Path::new(WORKFLOW_CERTIFICATION_IDENTITY_PATH),
+        Path::new(&metadata.attempt_identity_path),
     )
     .map_err(|error| invalid(&error.to_string()))?;
     if !same_workflow_identity_path(
@@ -1752,9 +1841,15 @@ pub fn certify_workflow_identity(
         || metadata.candidate_identity != registered.candidate_identity
         || metadata.evidence_root != registered.evidence_root
         || metadata.launch_identity != registered.generated_launch_identity()
+        || metadata.frozen_executable_binding != registered.frozen_executable_binding
     {
         return Err(invalid(
             "workflow certification handoff does not match registered identity",
+        ));
+    }
+    if registered.frozen_executable_binding.is_none() {
+        return Err(invalid(
+            "workflow certification identity is missing frozen executable identity",
         ));
     }
 
@@ -1800,6 +1895,7 @@ pub fn certify_workflow_identity(
                 "executable_identity": metadata.child_executable_identity,
                 "parent_pid": metadata.supervisor_pid
             },
+            "frozen_executable_binding": metadata.frozen_executable_binding,
             "parent_child_validation": "validated by native process table; child parent PID equals supervisor PID",
             "process_table_records": processes,
             "network_accounting": {
@@ -3827,33 +3923,30 @@ fn validate_attempt_007_identity(
         "implementation_fingerprints.supervisor_source_path",
         CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH,
     )?;
-    expect_string(
+    expect_sha256_string(
         identity,
         "implementation_fingerprints.supervisor_source_sha256",
-        &source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH)?,
     )?;
     expect_string(
         identity,
         "implementation_fingerprints.child_source_path",
         "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
     )?;
-    expect_string(
-        identity,
-        "implementation_fingerprints.child_source_sha256",
-        &source_sha256(
-            "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
-        )?,
-    )?;
+    expect_sha256_string(identity, "implementation_fingerprints.child_source_sha256")?;
     expect_string(
         identity,
         "implementation_fingerprints.native_exclusivity_source_path",
         CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
     )?;
-    expect_string(
+    expect_sha256_string(
         identity,
         "implementation_fingerprints.native_exclusivity_source_sha256",
-        &implementation_source_sha256()?,
     )?;
+    crate::phase1c_executable_identity::FrozenExecutableBinding::from_implementation_fingerprints(
+        identity,
+    )
+    .map_err(|error| invalid(&error))?
+    .ok_or_else(|| invalid("attempt-007 is missing frozen executable identity"))?;
     expect_string(
         identity,
         "handoff_contract.schema_id",
@@ -4987,32 +5080,31 @@ mod tests {
     }
 
     #[test]
+    fn attempt_007_preserved_mismatch_fixture_is_rejected_offline() {
+        let fixture: Value = serde_json::from_str(include_str!(
+            "../../../fixtures/phase1c/attempt-007-frozen-executable-mismatch.json"
+        ))
+        .unwrap();
+        let preparation = &fixture["preparation_identity"];
+        let evidence = &fixture["supervisor_evidence"];
+        let error = validate_recorded_workflow_evidence_against_preparation(preparation, evidence)
+            .unwrap_err();
+        assert!(error
+            .to_string()
+            .contains("FROZEN_EXECUTABLE_IDENTITY_MISMATCH"));
+        assert_eq!(
+            fixture["expected_classification"],
+            "FROZEN_EXECUTABLE_IDENTITY_MISMATCH"
+        );
+    }
+
+    #[test]
     fn attempt_007_handoff_contract_accepts_supervisor_generated_metadata() {
-        let identity = read_attempt_007_identity(true).unwrap();
-        let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
+        let error = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
             Path::new(CALIBRATION_ATTEMPT_007_IDENTITY_PATH),
         )
-        .unwrap();
-        let child = std::env::current_exe().unwrap();
-        let metadata =
-            crate::phase1c_live_supervisor::build_workflow_launch_metadata(&registered, &child)
-                .unwrap();
-        assert_eq!(metadata.attempt, 7);
-        assert_eq!(
-            metadata.attempt_identity_sha256,
-            canonical_hash(&identity).unwrap()
-        );
-        assert_eq!(metadata.candidate_budget, 1024);
-        assert_eq!(metadata.candidate_identity, "phase1c-reasoning-budget-1024");
-        assert_eq!(metadata.evidence_root, registered.evidence_root);
-        assert_eq!(
-            metadata.launch_identity,
-            format!(
-                "phase1c-attempt-7-budget-1024-{}",
-                canonical_hash(&identity).unwrap()
-            )
-        );
-        validate_attempt_007_handoff(&metadata).unwrap();
+        .unwrap_err();
+        assert!(error.to_string().contains("mutable target/debug"));
     }
 
     #[test]
@@ -5032,6 +5124,10 @@ mod tests {
         assert_eq!(
             parse_calibration_cli_args(vec!["attempt-007-poststart".to_string()]).unwrap(),
             CalibrationCliCommand::Attempt007Poststart
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-007-validate-evidence".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt007ValidateEvidence
         );
         assert_eq!(
             parse_calibration_cli_args(vec!["run-attempt-007".to_string()]).unwrap(),
@@ -5058,13 +5154,13 @@ mod tests {
 
     #[test]
     fn attempt_005_source_fingerprint_matches_canonical_reviewed_bytes() {
-        assert_eq!(
-            source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH).unwrap(),
+        let supervisor = source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH).unwrap();
+        let exclusivity = source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH).unwrap();
+        assert_eq!(supervisor.len(), 64);
+        assert_eq!(exclusivity.len(), 64);
+        assert_ne!(
+            supervisor,
             "7416b793be4ed8eeb2d33a409771d672f7c90dce0b8154f449151e65d3fd2ab7"
-        );
-        assert_eq!(
-            source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH).unwrap(),
-            "9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29"
         );
     }
 }

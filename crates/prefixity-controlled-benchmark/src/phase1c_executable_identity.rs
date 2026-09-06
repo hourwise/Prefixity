@@ -6,6 +6,7 @@
 
 use crate::hashing::sha256_hex;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::path::Path;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -18,6 +19,102 @@ pub struct ExecutableIdentity {
     pub sha256: String,
     /// Windows volume serial plus file index.  This is absent on POSIX.
     pub file_id: Option<String>,
+}
+
+/// The two executable objects that a registered workflow authorizes.
+///
+/// This is deliberately separate from process identity. A process record
+/// binds a PID to an image at runtime; this binding records the objects that
+/// were authorized before the workflow was launched.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FrozenExecutableBinding {
+    pub supervisor: ExecutableIdentity,
+    pub child: ExecutableIdentity,
+}
+
+impl FrozenExecutableBinding {
+    /// Read the durable executable records used by preparation identities.
+    ///
+    /// Historical certification identities only recorded executable hashes.
+    /// They intentionally return no binding here rather than silently
+    /// falling back to path-only validation. New live identities must carry
+    /// both complete executable objects.
+    pub fn from_implementation_fingerprints(identity: &Value) -> Result<Option<Self>, String> {
+        let fingerprints = identity
+            .get("implementation_fingerprints")
+            .and_then(Value::as_object);
+        let Some(fingerprints) = fingerprints else {
+            return Ok(None);
+        };
+        let supervisor = fingerprints.get("supervisor_binary");
+        let child = fingerprints.get("child_binary");
+        match (supervisor, child) {
+            (None, None) => Ok(None),
+            (Some(supervisor), Some(child)) => Ok(Some(Self {
+                supervisor: Self::identity_from_json(supervisor, "supervisor_binary")?,
+                child: Self::identity_from_json(child, "child_binary")?,
+            })),
+            _ => Err(
+                "frozen executable identity must include both supervisor_binary and child_binary"
+                    .to_string(),
+            ),
+        }
+    }
+
+    fn identity_from_json(value: &Value, label: &str) -> Result<ExecutableIdentity, String> {
+        let object = value
+            .as_object()
+            .ok_or_else(|| format!("{label} frozen executable identity is not an object"))?;
+        let string_field = |name: &str| {
+            object
+                .get(name)
+                .and_then(Value::as_str)
+                .filter(|value| !value.trim().is_empty())
+                .map(str::to_string)
+                .ok_or_else(|| format!("{label} frozen executable identity is missing {name}"))
+        };
+        let file_size = object
+            .get("file_size")
+            .and_then(Value::as_u64)
+            .ok_or_else(|| format!("{label} frozen executable identity is missing file_size"))?;
+        let file_id = object
+            .get("file_id")
+            .or_else(|| object.get("windows_file_id"))
+            .and_then(Value::as_str)
+            .filter(|value| !value.trim().is_empty())
+            .map(str::to_string);
+        Ok(ExecutableIdentity {
+            raw_path: string_field("raw_path")?,
+            final_path: string_field("final_path")?,
+            file_size,
+            sha256: string_field("sha256")?,
+            file_id,
+        })
+    }
+}
+
+/// Compare the objects authorized during preparation with the objects that
+/// are about to be used by the workflow.
+pub fn validate_frozen_executable_binding(
+    expected: &FrozenExecutableBinding,
+    actual_supervisor: &ExecutableIdentity,
+    actual_child: &ExecutableIdentity,
+) -> Result<(), String> {
+    let mut mismatches = Vec::new();
+    if !same(actual_supervisor, &expected.supervisor) {
+        mismatches.push("supervisor");
+    }
+    if !same(actual_child, &expected.child) {
+        mismatches.push("child");
+    }
+    if mismatches.is_empty() {
+        Ok(())
+    } else {
+        Err(format!(
+            "FROZEN_EXECUTABLE_IDENTITY_MISMATCH: {} executable object differs from preparation",
+            mismatches.join(" and ")
+        ))
+    }
 }
 
 pub fn inspect(path: &Path) -> Result<ExecutableIdentity, String> {
@@ -39,6 +136,38 @@ pub fn inspect(path: &Path) -> Result<ExecutableIdentity, String> {
         sha256: sha256_hex(&bytes),
         file_id,
     })
+}
+
+/// Materialize an executable into a bounded frozen staging location.
+///
+/// The destination must not already exist. This prevents a later build or a
+/// repeated preparation from silently replacing an object that an identity
+/// already authorized. The returned identity is for the staged copy, not the
+/// source object; on Windows its file ID is expected to differ from the
+/// source's file ID.
+pub fn freeze_copy(source: &Path, destination: &Path) -> Result<ExecutableIdentity, String> {
+    if destination.exists() {
+        return Err(format!(
+            "frozen executable destination already exists: {}",
+            destination.display()
+        ));
+    }
+    let parent = destination.parent().ok_or_else(|| {
+        format!(
+            "frozen executable destination has no parent: {}",
+            destination.display()
+        )
+    })?;
+    std::fs::create_dir_all(parent)
+        .map_err(|error| format!("create frozen executable staging directory: {error}"))?;
+    std::fs::copy(source, destination).map_err(|error| {
+        format!(
+            "copy executable {} to frozen staging {}: {error}",
+            source.display(),
+            destination.display()
+        )
+    })?;
+    inspect(destination)
 }
 
 /// Compare executable objects without comparing the launch-path spelling.
@@ -176,6 +305,22 @@ mod tests {
         let _ = fs::remove_dir(&root);
     }
 
+    #[cfg(windows)]
+    #[test]
+    fn dos_and_extended_path_spellings_accept_same_windows_file_object() {
+        let root =
+            std::env::temp_dir().join(format!("prefixity-extended-path-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let file = root.join("child.exe");
+        fs::write(&file, b"same executable bytes").unwrap();
+        let extended = std::path::PathBuf::from(format!(r"\\?\{}", file.display()));
+        let dos_identity = inspect(&file).unwrap();
+        let extended_identity = inspect(&extended).unwrap();
+        assert!(same(&dos_identity, &extended_identity));
+        let _ = fs::remove_file(&file);
+        let _ = fs::remove_dir(&root);
+    }
+
     #[test]
     fn different_file_with_same_basename_is_rejected() {
         let root = std::env::temp_dir().join(format!(
@@ -197,6 +342,107 @@ mod tests {
         let _ = fs::remove_file(&second);
         let _ = fs::remove_dir(&second_root);
         let _ = fs::remove_file(&first);
+        let _ = fs::remove_dir(&root);
+    }
+
+    #[test]
+    fn exact_frozen_binding_accepts_equal_supervisor_and_child_objects() {
+        let root =
+            std::env::temp_dir().join(format!("prefixity-frozen-binding-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let supervisor = root.join("supervisor.exe");
+        let child = root.join("child.exe");
+        fs::write(&supervisor, b"supervisor bytes").unwrap();
+        fs::write(&child, b"child bytes").unwrap();
+        let expected = FrozenExecutableBinding {
+            supervisor: inspect(&supervisor).unwrap(),
+            child: inspect(&child).unwrap(),
+        };
+        let actual = FrozenExecutableBinding {
+            supervisor: inspect(&supervisor).unwrap(),
+            child: inspect(&child).unwrap(),
+        };
+        assert!(
+            validate_frozen_executable_binding(&expected, &actual.supervisor, &actual.child)
+                .is_ok()
+        );
+        let _ = fs::remove_file(&child);
+        let _ = fs::remove_file(&supervisor);
+        let _ = fs::remove_dir(&root);
+    }
+
+    #[test]
+    fn different_supervisor_or_child_content_is_rejected() {
+        let root = std::env::temp_dir().join(format!(
+            "prefixity-frozen-binding-negative-{}",
+            std::process::id()
+        ));
+        fs::create_dir_all(&root).unwrap();
+        let supervisor = root.join("supervisor.exe");
+        let child = root.join("child.exe");
+        let replacement = root.join("replacement.exe");
+        fs::write(&supervisor, b"supervisor bytes").unwrap();
+        fs::write(&child, b"child bytes").unwrap();
+        fs::write(&replacement, b"replacement bytes").unwrap();
+        let expected = FrozenExecutableBinding {
+            supervisor: inspect(&supervisor).unwrap(),
+            child: inspect(&child).unwrap(),
+        };
+        let different = inspect(&replacement).unwrap();
+        assert!(
+            validate_frozen_executable_binding(&expected, &different, &expected.child).is_err()
+        );
+        assert!(
+            validate_frozen_executable_binding(&expected, &expected.supervisor, &different)
+                .is_err()
+        );
+        fs::write(&supervisor, b"rebuilt supervisor bytes").unwrap();
+        let rebuilt_at_same_path = inspect(&supervisor).unwrap();
+        assert!(validate_frozen_executable_binding(
+            &expected,
+            &rebuilt_at_same_path,
+            &expected.child
+        )
+        .is_err());
+        let _ = fs::remove_file(&replacement);
+        let _ = fs::remove_file(&child);
+        let _ = fs::remove_file(&supervisor);
+        let _ = fs::remove_dir(&root);
+    }
+
+    #[test]
+    fn missing_or_partial_preparation_binding_does_not_fallback_to_path_only() {
+        assert!(
+            FrozenExecutableBinding::from_implementation_fingerprints(&serde_json::json!({
+                "implementation_fingerprints": {
+                    "supervisor_binary": {"sha256": "a"}
+                }
+            }))
+            .is_err()
+        );
+        assert!(
+            FrozenExecutableBinding::from_implementation_fingerprints(&serde_json::json!({
+                "implementation_fingerprints": {}
+            }))
+            .unwrap()
+            .is_none()
+        );
+    }
+
+    #[test]
+    fn frozen_copy_has_its_own_object_identity_and_cannot_be_replaced() {
+        let root =
+            std::env::temp_dir().join(format!("prefixity-frozen-copy-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let source = root.join("source.exe");
+        let destination = root.join("staged").join("source.exe");
+        fs::write(&source, b"frozen bytes").unwrap();
+        let staged = freeze_copy(&source, &destination).unwrap();
+        assert_eq!(staged.file_size, source.metadata().unwrap().len());
+        assert!(freeze_copy(&source, &destination).is_err());
+        let _ = fs::remove_file(&destination);
+        let _ = fs::remove_dir(destination.parent().unwrap());
+        let _ = fs::remove_file(&source);
         let _ = fs::remove_dir(&root);
     }
 }

@@ -2995,3 +2995,80 @@ Evidence, cleanup, validation, and the bounded publication are recorded in
 the execution record. No wider Phase 1C conclusion or admissible calibration
 disposition is supported by this invalid execution. No live rerun is
 authorized.
+
+## Phase 1C Attempt 007 executable-binding remediation
+
+The preceding preparation-only status is historical and is superseded by the
+live closeout immediately above: Attempt 007 crossed its live boundary exactly
+once, produced the preserved raw evidence, and is permanently consumed.
+
+The accepted remediation baseline was reverified at
+1f036e1c6f0afb0db23e3031069d37511a401aae with main, origin/main, and a clean
+worktree. Attempt-006 and Attempt-007 evidence remained byte-for-byte
+preserved. The executable forensic record is
+docs/phase-1/PHASE_1C_ATTEMPT_007_EXECUTABLE_BINDING_REMEDIATION.md.
+
+The control defect was that preparation-bound supervisor and child executable
+objects were recorded but never compared with the runtime handoff objects.
+Runtime PID, parent, process-image, and path-representation checks were
+internally consistent, so the changed target/debug objects could pass the
+existing gate and reach the inference-capable calibration path. The
+defensible root-cause statement is mutable target-directory replacement or
+relinking after preparation; the exact writing command, compiler, and
+timestamp are not durably recoverable.
+
+The remediation adds a complete frozen supervisor/child object binding using
+SHA-256, file size, Windows file identity, and final-path semantics where
+needed. The supervisor checks both objects before child spawn. The child
+rechecks both objects before post-start ownership and inference. Missing
+preparation identity fails closed; path spelling alone is never a fallback.
+The freeze_copy staging primitive refuses replacement of a staged destination,
+and future preparation must bind the staged copies after all build/test/Clippy
+work.
+
+The preserved Attempt-007 mismatch fixture is
+fixtures/phase1c/attempt-007-frozen-executable-mismatch.json. It classifies
+the known prepared/runtime relationship as
+FROZEN_EXECUTABLE_IDENTITY_MISMATCH without interpreting calibration output.
+The historical certification 900 and its canonical hash remain immutable; the
+corrected offline certification namespace is 900-v2.
+
+The final-source Windows 900-v2 certification completed as
+WORKFLOW_IDENTITY_CERTIFIED using bounded staged copies. The staged supervisor
+was SHA-256 72f4a64c9b7d852cad95b8c8811bcb083eefa8281b29cf796ed94395c65ae3f9,
+size 1259008, file ID volume=ba2f80f4;index=00110000002f2acc. The staged child
+was SHA-256 0f1a21bc97b6edf7737ba270af35f3d55658559587b353a982ffb5dd3773ae1,
+size 8525824, file ID volume=ba2f80f4;index=000b0000002f2ae4. Supervisor PID
+19208 and child PID 20056 were observed, with native parent PID validation.
+The generated identity canonical SHA-256 was
+acf2d18d93b2baf08b4fa4bc5bb0846e8f3f8bedab83927cf9547240abb2d194.
+Substitution of the mutable target/debug child was rejected before spawn as
+FROZEN_EXECUTABLE_IDENTITY_MISMATCH and wrote no evidence file.
+
+Attempt state is now explicit:
+
+    PREPARED = true
+    EXECUTED = true
+    INTEGRITY_ACCEPTED = false
+    CALIBRATION_ADMISSIBLE = false
+    REUSABLE = false
+
+The raw candidate FAIL and next_budget 512 are inadmissible and do not change
+budget-selection state. The protocol permits NEXT_FRESH_ATTEMPT_ID = 008, but
+no Attempt-008 identity was created or prepared.
+
+Remediation accounting remains:
+
+    model_server_startups=0
+    port_8080_contacts=0
+    tcp_readiness_contacts=0
+    http_model_requests=0
+    inference_requests=0
+    attempt_007_executions_added=0
+    attempt_008_executions=0
+
+The final classification for this task is
+PHASE_1C_FROZEN_EXECUTABLE_BINDING_REMEDIATION_ACCEPTED,
+ATTEMPT_007_CALIBRATION_INADMISSIBLE,
+ATTEMPT_007_PERMANENTLY_CONSUMED,
+ATTEMPT_008_NOT_PREPARED.
