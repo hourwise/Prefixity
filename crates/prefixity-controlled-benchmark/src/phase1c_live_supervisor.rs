@@ -4,6 +4,7 @@
 //! llama.cpp, opens a socket, sends HTTP, retries, or selects another arm.
 
 use crate::hashing::canonical_hash;
+use crate::phase1c_executable_identity::{inspect as inspect_executable, ExecutableIdentity};
 use crate::phase1c_h001::H001Error;
 #[cfg(test)]
 use crate::phase1c_h001_v2::{parse_v2_cli_args, v2_live_child_args, V2CliCommand};
@@ -38,8 +39,10 @@ pub struct WorkflowLaunchMetadata {
     pub launch_identity: String,
     pub supervisor_pid: u32,
     pub supervisor_path: String,
+    pub supervisor_executable_identity: ExecutableIdentity,
     pub child_binding: String,
     pub child_executable_path: String,
+    pub child_executable_identity: ExecutableIdentity,
     pub candidate_budget: u32,
     pub candidate_identity: String,
     pub evidence_root: String,
@@ -82,6 +85,10 @@ pub fn build_workflow_launch_metadata(
     }
     let supervisor_path = std::env::current_exe()?;
     let child_path = std::fs::canonicalize(child_program)?;
+    let supervisor_executable_identity =
+        inspect_executable(&supervisor_path).map_err(H001Error::Validation)?;
+    let child_executable_identity =
+        inspect_executable(&child_path).map_err(H001Error::Validation)?;
     Ok(WorkflowLaunchMetadata {
         schema_id: WORKFLOW_HANDOFF_SCHEMA_ID.to_string(),
         attempt_identity_path: registered.attempt_identity_path.clone(),
@@ -90,8 +97,10 @@ pub fn build_workflow_launch_metadata(
         launch_identity: registered.generated_launch_identity(),
         supervisor_pid,
         supervisor_path: supervisor_path.to_string_lossy().into_owned(),
+        supervisor_executable_identity,
         child_binding: "parent_pid".to_string(),
         child_executable_path: child_path.to_string_lossy().into_owned(),
+        child_executable_identity,
         candidate_budget: registered.candidate_budget,
         candidate_identity: registered.candidate_identity.clone(),
         evidence_root: registered.evidence_root.clone(),
@@ -107,8 +116,28 @@ pub fn workflow_launch_metadata_from_env() -> Result<WorkflowLaunchMetadata, H00
         || metadata.launch_identity.trim().is_empty()
         || metadata.supervisor_pid == 0
         || metadata.supervisor_path.trim().is_empty()
+        || metadata
+            .supervisor_executable_identity
+            .raw_path
+            .trim()
+            .is_empty()
+        || metadata
+            .supervisor_executable_identity
+            .final_path
+            .trim()
+            .is_empty()
         || metadata.child_binding != "parent_pid"
         || metadata.child_executable_path.trim().is_empty()
+        || metadata
+            .child_executable_identity
+            .raw_path
+            .trim()
+            .is_empty()
+        || metadata
+            .child_executable_identity
+            .final_path
+            .trim()
+            .is_empty()
         || metadata.attempt == 0
         || metadata.candidate_budget == 0
     {
@@ -149,6 +178,13 @@ pub fn registered_workflow_identity_from_file(
         })?
         .to_string();
     let evidence_root_key = format!("attempt_{attempt:03}_evidence_root");
+    let certification_identity = identity.get("identity_version").and_then(Value::as_str)
+        == Some("phase1c-workflow-identity-certification-v1");
+    let evidence_root_key = if certification_identity {
+        "certification_evidence_root".to_string()
+    } else {
+        evidence_root_key
+    };
     let evidence_root = identity
         .get(&evidence_root_key)
         .and_then(Value::as_str)
@@ -163,7 +199,7 @@ pub fn registered_workflow_identity_from_file(
         evidence_root,
     };
     binding.validate()?;
-    if !matches!(binding.attempt, 5 | 6)
+    if (!matches!(binding.attempt, 5 | 6) && !certification_identity)
         || binding.candidate_budget != 1024
         || identity.pointer("/candidate/maximum_requests") != Some(&json!(3))
         || identity.pointer("/candidate/automatic_retries") != Some(&json!(0))

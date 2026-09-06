@@ -54,6 +54,10 @@ pub const CALIBRATION_ATTEMPT_006_IDENTITY_FINGERPRINT_PATH: &str =
     "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_006_IDENTITY_V1.sha256";
 pub const CALIBRATION_ATTEMPT_006_EVIDENCE_ROOT: &str =
     "experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-006";
+pub const WORKFLOW_CERTIFICATION_IDENTITY_PATH: &str =
+    "docs/phase-1/PHASE_1C_WORKFLOW_IDENTITY_CERTIFICATION_V1.json";
+pub const WORKFLOW_CERTIFICATION_RESULT_SCHEMA_ID: &str =
+    "prefixity.phase1c.workflow-identity-certification-result";
 pub const CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH: &str =
     "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs";
 pub const CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH: &str =
@@ -89,7 +93,7 @@ pub enum ReasoningBudgetCalibrationError {
     Transport(String),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CalibrationCliCommand {
     Preflight,
     Fingerprint,
@@ -118,6 +122,7 @@ pub enum CalibrationCliCommand {
     Attempt006Preflight,
     Attempt006DryRun,
     Attempt006Poststart,
+    WorkflowIdentityCertification { result_path: PathBuf },
 }
 
 pub fn parse_calibration_cli_args<I>(
@@ -230,6 +235,16 @@ where
         }
         [command] if command == "attempt-006-poststart" => {
             Ok(CalibrationCliCommand::Attempt006Poststart)
+        }
+        [command, flag, path]
+            if command == "workflow-identity-certification" && flag == "--result" =>
+        {
+            if path.trim().is_empty() {
+                return Err(invalid("workflow certification result path is empty"));
+            }
+            Ok(CalibrationCliCommand::WorkflowIdentityCertification {
+                result_path: PathBuf::from(path),
+            })
         }
         _ => Err(ReasoningBudgetCalibrationError::Validation(
             "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003|attempt-004-fingerprint|attempt-004-preflight|attempt-004-dry-run|attempt-005-fingerprint|attempt-005-preflight|attempt-005-dry-run|attempt-005-poststart|attempt-006-fingerprint|attempt-006-preflight|attempt-006-dry-run|attempt-006-poststart]".to_string(),
@@ -676,18 +691,41 @@ pub fn expected_workflow_identity_from_supervisor_env(
 ) -> Result<windows_exclusivity::ExpectedWorkflowIdentity, ReasoningBudgetCalibrationError> {
     let metadata = crate::phase1c_live_supervisor::workflow_launch_metadata_from_env()
         .map_err(|error| invalid(&error.to_string()))?;
-    let child_path = env::current_exe()?.to_string_lossy().into_owned();
+    let child_path = env::current_exe()?;
     let child_pid = std::process::id();
     if child_pid == 0 {
         return Err(invalid("expected workflow child PID is invalid"));
     }
     let expected_child_path = std::fs::canonicalize(&child_path)
-        .map_err(|error| invalid(&format!("expected workflow child path is invalid: {error}")))?
-        .to_string_lossy()
-        .into_owned();
-    if !expected_child_path.eq_ignore_ascii_case(&metadata.child_executable_path) {
+        .map_err(|error| invalid(&format!("expected workflow child path is invalid: {error}")))?;
+    let expected_child_identity = crate::phase1c_executable_identity::inspect(&expected_child_path)
+        .map_err(|error| {
+            invalid(&format!(
+                "expected workflow child identity is invalid: {error}"
+            ))
+        })?;
+    if !crate::phase1c_executable_identity::same(
+        &expected_child_identity,
+        &metadata.child_executable_identity,
+    ) {
         return Err(invalid(
-            "expected workflow child path does not match supervisor handoff",
+            "expected workflow child executable identity does not match supervisor handoff",
+        ));
+    }
+    let supervisor_identity = crate::phase1c_executable_identity::inspect(Path::new(
+        &metadata.supervisor_path,
+    ))
+    .map_err(|error| {
+        invalid(&format!(
+            "expected workflow supervisor identity is invalid: {error}"
+        ))
+    })?;
+    if !crate::phase1c_executable_identity::same(
+        &supervisor_identity,
+        &metadata.supervisor_executable_identity,
+    ) {
+        return Err(invalid(
+            "expected workflow supervisor executable identity does not match handoff",
         ));
     }
     if metadata.supervisor_pid == child_pid {
@@ -700,11 +738,13 @@ pub fn expected_workflow_identity_from_supervisor_env(
         supervisor: windows_exclusivity::ExpectedProcessIdentity {
             pid: metadata.supervisor_pid,
             executable_path: metadata.supervisor_path,
+            executable_identity: metadata.supervisor_executable_identity,
             parent_pid: None,
         },
         calibration_child: windows_exclusivity::ExpectedProcessIdentity {
             pid: child_pid,
-            executable_path: expected_child_path,
+            executable_path: expected_child_path.to_string_lossy().into_owned(),
+            executable_identity: expected_child_identity,
             parent_pid: Some(metadata.supervisor_pid),
         },
         inspector: None,
@@ -1512,6 +1552,95 @@ pub fn attempt_006_poststart() -> Result<Value, ReasoningBudgetCalibrationError>
     )?;
     result["attempt"] = json!(6);
     result["server_start_identity"] = json!("fresh candidate-1024 llama.cpp process");
+    Ok(result)
+}
+
+/// Validate a real supervisor-to-child launch without starting llama.cpp or
+/// contacting any endpoint.  This is deliberately a child command so the
+/// production supervisor binary and its inherited handoff transport are used.
+pub fn certify_workflow_identity(
+    result_path: &Path,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    let metadata = crate::phase1c_live_supervisor::workflow_launch_metadata_from_env()
+        .map_err(|error| invalid(&error.to_string()))?;
+    let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
+        Path::new(WORKFLOW_CERTIFICATION_IDENTITY_PATH),
+    )
+    .map_err(|error| invalid(&error.to_string()))?;
+    if !same_workflow_identity_path(
+        &metadata.attempt_identity_path,
+        &registered.attempt_identity_path,
+    ) || metadata.attempt_identity_sha256 != registered.attempt_identity_sha256
+        || metadata.attempt != registered.attempt
+        || metadata.candidate_budget != registered.candidate_budget
+        || metadata.candidate_identity != registered.candidate_identity
+        || metadata.evidence_root != registered.evidence_root
+        || metadata.launch_identity != registered.generated_launch_identity()
+    {
+        return Err(invalid(
+            "workflow certification handoff does not match registered identity",
+        ));
+    }
+
+    let expected_workflow = expected_workflow_identity_from_supervisor_env()?;
+    #[cfg(windows)]
+    let process_records = {
+        let processes = windows_exclusivity::process_table()
+            .map_err(|failure| invalid(&format!("process inspection failed: {failure}")))?;
+        windows_exclusivity::validate_expected_workflow_identity(&processes, &expected_workflow)
+            .map_err(|outcome| invalid(outcome.as_str()))?;
+        let competing = windows_exclusivity::competing_processes_for_expected_workflow(
+            &processes,
+            &expected_workflow,
+        );
+        if !competing.is_empty() {
+            return Err(invalid(
+                "workflow certification found an unexpected competing workflow",
+            ));
+        }
+        processes
+    };
+    #[cfg(not(windows))]
+    let process_records = return Err(invalid(
+        "workflow certification requires the Windows native process identity inspector",
+    ));
+
+    let child_pid = std::process::id();
+    let result = json!({
+        "schema_id": WORKFLOW_CERTIFICATION_RESULT_SCHEMA_ID,
+        "schema_version": 1,
+        "state": "WORKFLOW_IDENTITY_CERTIFIED",
+        "launch_identity": metadata.launch_identity,
+        "registered_identity": {
+            "path": metadata.attempt_identity_path,
+            "sha256": metadata.attempt_identity_sha256,
+            "attempt": metadata.attempt,
+            "candidate_budget": metadata.candidate_budget,
+            "candidate_identity": metadata.candidate_identity,
+            "evidence_root": metadata.evidence_root
+        },
+        "supervisor": {
+            "pid": metadata.supervisor_pid,
+            "path": metadata.supervisor_path,
+            "executable_identity": metadata.supervisor_executable_identity
+        },
+        "child": {
+            "pid": child_pid,
+            "path": metadata.child_executable_path,
+            "executable_identity": metadata.child_executable_identity,
+            "parent_pid": metadata.supervisor_pid
+        },
+        "parent_child_validation": "validated by native process table; child parent PID equals supervisor PID",
+        "process_table_records": process_records,
+        "network_accounting": {
+            "llama_startups": 0,
+            "port_8080_model_contacts": 0,
+            "tcp_readiness_contacts": 0,
+            "http_requests": 0,
+            "inference_requests": 0
+        }
+    });
+    write_json(result_path, &result)?;
     Ok(result)
 }
 
@@ -3110,13 +3239,16 @@ fn validate_attempt_005_handoff(
 ) -> Result<(), ReasoningBudgetCalibrationError> {
     let identity = read_attempt_005_identity(true)?;
     validate_attempt_005_identity(&identity, true)?;
-    if metadata.attempt_identity_path != CALIBRATION_ATTEMPT_005_IDENTITY_PATH {
-        return Err(invalid("attempt-005 handoff identity path mismatch"));
-    }
     let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
         Path::new(CALIBRATION_ATTEMPT_005_IDENTITY_PATH),
     )
     .map_err(|error| invalid(&error.to_string()))?;
+    if !same_workflow_identity_path(
+        &metadata.attempt_identity_path,
+        &registered.attempt_identity_path,
+    ) {
+        return Err(invalid("attempt-005 handoff identity path mismatch"));
+    }
     if metadata.attempt_identity_sha256 != canonical_hash(&identity)?
         || metadata.attempt != registered.attempt
         || metadata.candidate_budget != registered.candidate_budget
@@ -3377,13 +3509,16 @@ fn validate_attempt_006_handoff(
 ) -> Result<(), ReasoningBudgetCalibrationError> {
     let identity = read_attempt_006_identity(true)?;
     validate_attempt_006_identity(&identity, true)?;
-    if metadata.attempt_identity_path != CALIBRATION_ATTEMPT_006_IDENTITY_PATH {
-        return Err(invalid("attempt-006 handoff identity path mismatch"));
-    }
     let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
         Path::new(CALIBRATION_ATTEMPT_006_IDENTITY_PATH),
     )
     .map_err(|error| invalid(&error.to_string()))?;
+    if !same_workflow_identity_path(
+        &metadata.attempt_identity_path,
+        &registered.attempt_identity_path,
+    ) {
+        return Err(invalid("attempt-006 handoff identity path mismatch"));
+    }
     if metadata.attempt_identity_sha256 != canonical_hash(&identity)?
         || metadata.attempt != registered.attempt
         || metadata.candidate_budget != registered.candidate_budget
@@ -3824,6 +3959,19 @@ fn missing(path: &str) -> ReasoningBudgetCalibrationError {
     invalid(&format!("missing {path}"))
 }
 
+fn same_workflow_identity_path(actual: &str, expected: &str) -> bool {
+    #[cfg(windows)]
+    {
+        actual
+            .replace('\\', "/")
+            .eq_ignore_ascii_case(&expected.replace('\\', "/"))
+    }
+    #[cfg(not(windows))]
+    {
+        actual == expected
+    }
+}
+
 fn invalid(message: &str) -> ReasoningBudgetCalibrationError {
     ReasoningBudgetCalibrationError::Validation(message.to_string())
 }
@@ -4208,18 +4356,21 @@ mod tests {
                 executable_path: Some(
                     r"D:Prefixityprefixity-phase1c-live-supervisor.exe".to_string(),
                 ),
+                executable_identity: None,
             },
             windows_exclusivity::ProcessRecord {
                 image_name: "prefixity-phase1c-calibration.exe".to_string(),
                 pid: 11,
                 parent_pid: 10,
                 executable_path: Some(r"D:Prefixityprefixity-phase1c-calibration.exe".to_string()),
+                executable_identity: None,
             },
             windows_exclusivity::ProcessRecord {
                 image_name: "llama.exe".to_string(),
                 pid: 20,
                 parent_pid: 1,
                 executable_path: Some(r"D:llamallama.exe".to_string()),
+                executable_identity: None,
             },
         ]);
         let listeners = Ok(vec![windows_exclusivity::ListenerRecord {
@@ -4233,11 +4384,25 @@ mod tests {
             supervisor: windows_exclusivity::ExpectedProcessIdentity {
                 pid: 10,
                 executable_path: r"D:Prefixityprefixity-phase1c-live-supervisor.exe".to_string(),
+                executable_identity: windows_exclusivity::ExecutableIdentity {
+                    raw_path: r"D:Prefixityprefixity-phase1c-live-supervisor.exe".to_string(),
+                    final_path: r"D:Prefixityprefixity-phase1c-live-supervisor.exe".to_string(),
+                    file_size: 0,
+                    sha256: String::new(),
+                    file_id: None,
+                },
                 parent_pid: None,
             },
             calibration_child: windows_exclusivity::ExpectedProcessIdentity {
                 pid: 11,
                 executable_path: r"D:Prefixityprefixity-phase1c-calibration.exe".to_string(),
+                executable_identity: windows_exclusivity::ExecutableIdentity {
+                    raw_path: r"D:Prefixityprefixity-phase1c-calibration.exe".to_string(),
+                    final_path: r"D:Prefixityprefixity-phase1c-calibration.exe".to_string(),
+                    file_size: 0,
+                    sha256: String::new(),
+                    file_id: None,
+                },
                 parent_pid: Some(10),
             },
             inspector: None,
@@ -4360,11 +4525,11 @@ mod tests {
     fn attempt_005_source_fingerprint_matches_canonical_reviewed_bytes() {
         assert_eq!(
             source_sha256(CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH).unwrap(),
-            "d8ccaa3879776212b77d3032224cb83e2d67e0c3b2bfd223971019f182bde786"
+            "abf40762f351251814194cbf8a1fd8ccb3abd9599a8ba26898a12889bfcd6870"
         );
         assert_eq!(
             source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH).unwrap(),
-            "821610913e2f6081c6bbe1913ad86da497c50382a8997aaf9592145f21ff6711"
+            "9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29"
         );
     }
 }

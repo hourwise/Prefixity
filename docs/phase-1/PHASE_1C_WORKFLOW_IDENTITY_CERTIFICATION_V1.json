@@ -1,0 +1,59 @@
+{
+  "identity_version": "phase1c-workflow-identity-certification-v1",
+  "status": "OFFLINE_CERTIFICATION_ONLY",
+  "experiment_id": "phase1c-workflow-identity-certification",
+  "attempt": 900,
+  "candidate": {
+    "reasoning_budget": 1024,
+    "calibration_candidate_identity": "phase1c-workflow-identity-certification",
+    "maximum_requests": 3,
+    "automatic_retries": 0,
+    "fresh_server_required": false,
+    "runtime_exclusivity_required": true
+  },
+  "certification_evidence_root": "docs/phase-1/workflow-identity-certification/",
+  "network_policy": {
+    "llama_startups": 0,
+    "port_8080_model_contacts": 0,
+    "tcp_readiness_contacts": 0,
+    "http_requests": 0,
+    "inference_requests": 0
+  },
+  "lineage": {
+    "canonical_main_sha": "73f27d3aeee98994afdcdf4c77124fa67f36fd6d",
+    "attempt_006_failure": "EXPECTED_CHILD_PATH_MISMATCH",
+    "attempt_006_evidence_sha256": "c8feaf01a4083d609dd5fdf5ccaf96b40db56c1cbb3ef0b7bb88f52b67724b07",
+    "attempt_007_preparation": "forbidden until workflow identity certification passes"
+  },
+  "implementation_fingerprints": {
+    "algorithm": "SHA-256",
+    "supervisor_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_live_supervisor.rs",
+    "supervisor_source_sha256": "abf40762f351251814194cbf8a1fd8ccb3abd9599a8ba26898a12889bfcd6870",
+    "child_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
+    "child_source_sha256": "f932e680c04fc876de78d3a503c82b29c814d70d39cf42f50e829fea84a35a30",
+    "stable_identity_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_executable_identity.rs",
+    "stable_identity_source_sha256": "c6f41b12d607283553428e932829255501e85c2dc6e204c843e4aad154299588",
+    "native_inspector_source_path": "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs",
+    "native_inspector_source_sha256": "9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29",
+    "supervisor_binary_sha256": "2bf09d18e9d4df439a8a1e021e5bbee81461c09210f586c1cc23336347062939",
+    "child_binary_sha256": "166a314447713a562a75cf84e94b96d308d50aa8e3108423b44a1923e6e783e0"
+  },
+  "certification_mode": {
+    "supervisor_binary": "prefixity-phase1c-live-supervisor",
+    "child_binary": "prefixity-phase1c-reasoning-budget-calibration",
+    "child_command": "workflow-identity-certification",
+    "executable_identity_method": "raw path + final path + file size + SHA-256 + Windows file identity",
+    "parent_child_validation": "native process table",
+    "unexpected_workflow_policy": "fail closed",
+    "model_contact": "forbidden"
+  },
+  "handoff_contract": {
+    "schema_id": "prefixity.phase1c.workflow-launch-metadata",
+    "transport": "single inherited environment JSON",
+    "child_binding": "parent_pid",
+    "supervisor_generates_launch_identity": true,
+    "stable_executable_identity_required": true,
+    "fail_closed_on_mismatch": true
+  },
+  "certification_result": "WORKFLOW_IDENTITY_CERTIFIED"
+}

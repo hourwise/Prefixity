@@ -1,13 +1,13 @@
 use prefixity_controlled_benchmark::{
     attempt_002_exclusivity_preflight, attempt_003_poststart, attempt_005_poststart,
-    attempt_006_poststart, dry_run_attempt_002, dry_run_attempt_003, dry_run_attempt_004,
-    dry_run_attempt_005, dry_run_attempt_006, dry_run_calibration, execute_attempt_002,
-    execute_attempt_003, execute_calibration, fingerprint_attempt_002, fingerprint_attempt_003,
-    fingerprint_attempt_004, fingerprint_attempt_005, fingerprint_attempt_006,
-    fingerprint_calibration, parse_calibration_cli_args, preflight_attempt_002,
-    preflight_attempt_003, preflight_attempt_004, preflight_attempt_005, preflight_attempt_006,
-    preflight_calibration, summarize_attempt_002_budget, summarize_calibration_budget,
-    CalibrationCliCommand,
+    attempt_006_poststart, certify_workflow_identity, dry_run_attempt_002, dry_run_attempt_003,
+    dry_run_attempt_004, dry_run_attempt_005, dry_run_attempt_006, dry_run_calibration,
+    execute_attempt_002, execute_attempt_003, execute_calibration, fingerprint_attempt_002,
+    fingerprint_attempt_003, fingerprint_attempt_004, fingerprint_attempt_005,
+    fingerprint_attempt_006, fingerprint_calibration, parse_calibration_cli_args,
+    preflight_attempt_002, preflight_attempt_003, preflight_attempt_004, preflight_attempt_005,
+    preflight_attempt_006, preflight_calibration, summarize_attempt_002_budget,
+    summarize_calibration_budget, CalibrationCliCommand,
 };
 use std::env;
 
@@ -46,6 +46,9 @@ fn main() {
         Ok(CalibrationCliCommand::Attempt006Preflight) => preflight_attempt_006(),
         Ok(CalibrationCliCommand::Attempt006DryRun) => dry_run_attempt_006(),
         Ok(CalibrationCliCommand::Attempt006Poststart) => attempt_006_poststart(),
+        Ok(CalibrationCliCommand::WorkflowIdentityCertification { result_path }) => {
+            certify_workflow_identity(&result_path)
+        }
         Err(error) => Err(error),
     };
     match result {
