@@ -2767,3 +2767,34 @@ Attempt 006 requires separate live authorization and is not to be executed by
 this preparation record.
 
 REASONING BUDGET 1024 ATTEMPT 006 READY FOR SEPARATE LIVE AUTHORIZATION
+
+## Phase 1C Attempt 006 live closeout
+
+Attempt 006 was authorized for exactly three ordered budget-1024 cases with
+zero retries. The repository and canonical fingerprint gates passed, the
+native prestart gate returned `EXCLUSIVE_PRESTART`, and the fresh Qwen server
+loaded and announced `127.0.0.1:8080` with the frozen runtime settings.
+
+The registered supervisor generated and transmitted the canonical
+`PREFIXITY_PHASE1C_WORKFLOW_HANDOFF` metadata for Attempt 006. The child/native
+poststart gate then failed closed with `EXPECTED_CHILD_PATH_MISMATCH`. This is
+an infrastructure-invalid stop before readiness and inference. No readiness
+check, calibration request, request artifact, response artifact, or candidate
+result was produced. The server was stopped and native verification confirmed
+zero llama processes and no port-8080 listener.
+
+Attempt 006 accounting is Qwen startup `1`, supervisor launch `1`, poststart
+check `1`, readiness `0`, inference `0`, requests `0`, and retries `0`. The
+only persisted artifact is
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024-attempt-006/supervisor.json`
+with SHA-256
+`c8feaf01a4083d609dd5fdf5ccaf96b40db56c1cbb3ef0b7bb88f52b67724b07`.
+
+The precise child-path representation mismatch requires offline forensic
+review. Do not rerun the poststart gate, repair Attempt 006 in place, create
+Attempt 007, or execute 512/256 under this authorization.
+
+Execution record:
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_006_EXECUTION_RECORD.md`
+
+REASONING BUDGET 1024 ATTEMPT 006 INVALID — STOP FOR REVIEW
