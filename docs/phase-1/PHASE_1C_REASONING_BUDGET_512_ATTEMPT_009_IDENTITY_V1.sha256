@@ -1,0 +1,6 @@
+{
+  "artifact_path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_009_IDENTITY_V1.json",
+  "algorithm": "SHA-256",
+  "canonicalization": "sorted JSON object keys; arrays preserve order",
+  "canonical_sha256": "0929aae1d371415d3efd92e4e7310490ad06fb69fd0398aa76aa9d857818f812"
+}

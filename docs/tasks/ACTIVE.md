@@ -3202,3 +3202,81 @@ ATTEMPT_008_INTEGRITY_ACCEPTED
 ATTEMPT_008_CALIBRATION_ADMISSIBLE
 CALIBRATION_DISPOSITION_NEXT_BUDGET_512_NOT_EXECUTED
 ```
+
+## Phase 1C Attempt 009 preparation gate
+
+Attempt 009 was eligible only through the independently revalidated,
+integrity-accepted and calibration-admissible Attempt-008 result:
+
+```text
+SOURCE_ATTEMPT_008
+SOURCE_BUDGET_1024
+SOURCE_STATE_FAIL
+NEXT_BUDGET_512
+ATTEMPT_007_EXCLUDED_FROM_SELECTION
+ATTEMPT_009_ELIGIBLE
+```
+
+Attempt-008 identity SHA-256 is
+`917fde56d11e79a3b700de82f13e5f072bda483fa6b7abe6e2da9ff37ee2dfb5`; its
+evidence-manifest SHA-256 is
+`f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e4779`. The
+offline predecessor audit verified the recorded FAIL, complete three-case
+set, exactly three requests, zero retries/fallback/adaptive replicates, the
+Attempt-008 supervisor handoff, and all 23 raw evidence file hashes.
+
+The Attempt-009 preparation identity is
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_009_IDENTITY_V1.json`,
+canonical SHA-256
+`0929aae1d371415d3efd92e4e7310490ad06fb69fd0398aa76aa9d857818f812`, with
+sidecar
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_009_IDENTITY_V1.sha256`.
+It binds the unchanged manifest and request hashes, candidate budget 512,
+the Attempt-008 provenance fixture, accepted v2 workflow certification
+`acf2d18d93b2baf08b4fa4bc5bb0846e8f3f8bedab83927cf9547240abb2d194`, and the
+complete frozen executable objects.
+
+The final source build commit before freezing was
+`5918141941132fc444ce34a039574974bd363753`. The bounded stage is
+`target/phase1c-attempt-009-frozen/`:
+
+```text
+supervisor SHA: aaba6a8202ccc88c4ea6c277b5c20058588cabdd98c5e5d101756e40e33aa2fb
+supervisor size: 1259008
+supervisor file ID: volume=ba2f80f4;index=000500000038291e
+child SHA: c5c4913d1b4719b333d972ecfff11530fadbf24aaac99fde71f5a5bb8f4e1beb
+child size: 8813056
+child file ID: volume=ba2f80f4;index=000a000000382aae
+```
+
+Both frozen objects passed exact object binding; mutable `target/debug`
+objects are forbidden. Offline fingerprint, preflight, dry-run, preparation
+validation, Attempt-008 raw-evidence revalidation, v2 certification, and the
+existing pre-spawn substitution rejection tests passed. No Attempt-009
+evidence root or result artifact was created.
+
+The future 512 model-server command and frozen supervisor invocation are
+recorded as `NOT_EXECUTED` in
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_009_PREPARATION.md`.
+
+Preparation accounting remains:
+
+```text
+model_server_startups=0
+port_8080_contacts=0
+tcp_readiness_contacts=0
+http_model_requests=0
+inference_requests=0
+attempt_008_executions_added=0
+attempt_009_executions=0
+```
+
+Final preparation classification:
+
+```text
+PHASE_1C_ATTEMPT_009_PREPARATION_ACCEPTED
+ATTEMPT_009_PREPARED
+ATTEMPT_009_NOT_EXECUTED
+CANDIDATE_BUDGET_512
+FROZEN_EXECUTABLE_IDENTITY_BOUND
+```
