@@ -1,0 +1,16 @@
+{
+  "schema_id": "prefixity.phase1c.attempt-009-budget-provenance",
+  "schema_version": 1,
+  "attempt": 9,
+  "selected_budget": 512,
+  "selected_budget_source": "attempt_008_admissible_fail_next_budget",
+  "source_attempt": 8,
+  "source_candidate_budget": 1024,
+  "source_result": "FAIL",
+  "source_integrity": "ACCEPTED",
+  "source_calibration_admissible": true,
+  "selected_next_budget": 512,
+  "attempt_007_excluded_from_selection": true,
+  "attempt_007_raw_next_budget_excluded": true,
+  "selection_rule": "Only an integrity-accepted, calibration-admissible FAIL advances the accepted calibration state; Attempt-007 is permanently consumed and its raw next_budget is historical forensic evidence only."
+}

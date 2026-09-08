@@ -249,13 +249,22 @@ pub fn registered_workflow_identity_from_file(
         frozen_executable_binding,
     };
     binding.validate()?;
-    if (!matches!(binding.attempt, 5..=8) && !certification_identity)
-        || binding.candidate_budget != 1024
+    let expected_budget = if certification_identity {
+        1024
+    } else {
+        match binding.attempt {
+            5..=8 => 1024,
+            9 => 512,
+            _ => 0,
+        }
+    };
+    if (!matches!(binding.attempt, 5..=9) && !certification_identity)
+        || binding.candidate_budget != expected_budget
         || identity.pointer("/candidate/maximum_requests") != Some(&json!(3))
         || identity.pointer("/candidate/automatic_retries") != Some(&json!(0))
     {
         return Err(H001Error::Validation(
-            "registered workflow identity is not an Attempt-005/006/007/008 1024 candidate"
+            "registered workflow identity is not an Attempt-005/006/007/008 1024 or Attempt-009 512 candidate"
                 .to_string(),
         ));
     }
