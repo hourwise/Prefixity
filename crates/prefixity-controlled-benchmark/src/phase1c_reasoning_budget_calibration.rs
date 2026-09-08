@@ -1992,6 +1992,20 @@ pub fn preflight_attempt_009() -> Result<Value, ReasoningBudgetCalibrationError>
     validate_attempt_009_identity(&identity, true)?;
     let fingerprints = fingerprint_calibration()?;
     validate_attempt_009_bindings(&identity, &fingerprints)?;
+    let registered = crate::phase1c_live_supervisor::registered_workflow_identity_from_file(
+        Path::new(CALIBRATION_ATTEMPT_009_IDENTITY_PATH),
+    )
+    .map_err(|error| invalid(&error.to_string()))?;
+    if registered.attempt != 9
+        || registered.candidate_budget != 512
+        || registered.candidate_identity != "phase1c-reasoning-budget-512"
+        || registered.evidence_root != format!("{CALIBRATION_ATTEMPT_009_EVIDENCE_ROOT}/")
+        || registered.frozen_executable_binding.is_none()
+    {
+        return Err(invalid(
+            "Attempt-009 registered workflow identity binding is invalid",
+        ));
+    }
     let frozen = validate_attempt_009_frozen_executables(&identity)?;
     let predecessor = validate_attempt_008_admissible_predecessor()?;
     let provenance = validate_attempt_009_budget_provenance(&predecessor)?;
@@ -2013,6 +2027,13 @@ pub fn preflight_attempt_009() -> Result<Value, ReasoningBudgetCalibrationError>
         "manifest_sha256": fingerprints["manifest_sha256"],
         "request_hashes": fingerprints["cases"],
         "evidence_root": CALIBRATION_ATTEMPT_009_EVIDENCE_ROOT,
+        "registered_workflow": {
+            "attempt": registered.attempt,
+            "candidate_budget": registered.candidate_budget,
+            "candidate_identity": registered.candidate_identity,
+            "evidence_root": registered.evidence_root,
+            "generated_launch_identity": registered.generated_launch_identity()
+        },
         "frozen_executable_binding": frozen,
         "attempt_008_admissible_predecessor": predecessor,
         "budget_512_provenance": provenance,
@@ -4566,6 +4587,11 @@ fn validate_attempt_008_identity(
         identity,
         "launch_plan.supervisor_command_status",
         "NOT_EXECUTED",
+    )?;
+    expect_string(
+        identity,
+        "launch_plan.supervisor_command",
+        ".\\target\\phase1c-attempt-009-frozen\\prefixity-phase1c-live-supervisor.exe --attempt-identity docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_009_IDENTITY_V1.json --evidence experiments/runs/phase1c-reasoning-budget-calibration/budget-512-attempt-009/supervisor.json -- .\\target\\phase1c-attempt-009-frozen\\prefixity-phase1c-reasoning-budget-calibration.exe run-attempt-009",
     )?;
     expect_u64(identity, "launch_plan.attempt_id", 8)?;
     expect_u64(identity, "launch_plan.candidate_budget", 1024)?;
