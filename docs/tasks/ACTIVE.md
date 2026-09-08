@@ -3280,3 +3280,56 @@ ATTEMPT_009_NOT_EXECUTED
 CANDIDATE_BUDGET_512
 FROZEN_EXECUTABLE_IDENTITY_BOUND
 ```
+
+## Phase 1C Attempt 009 live execution closeout
+
+The separately authorized Attempt-009 live boundary was crossed exactly once
+from the promoted preparation baseline
+`d3895008932327ed625701ac86c3efb9fbfd34f0`. The virgin and exclusive
+prestart gates passed. The exact operator-started llama server matched the
+512 contract, and the exact frozen supervisor launched the exact frozen child
+once with matching executable identities.
+
+The child failed before readiness and inference with
+`candidate order is not satisfied: prior candidate result is absent`. The
+failure indicates a harness validation defect: the Attempt-009 candidate-order
+precondition does not resolve the accepted Attempt-008 result in its default
+path. No readiness contact, HTTP request, inference, request ledger, response,
+or calibration result was produced. The run is consumed and must not be
+rerun; source remediation is a separate task.
+
+The bounded raw record is
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_009_EXECUTION_RECORD.md`.
+The raw supervisor evidence remains at
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-512-attempt-009/`.
+Its supervisor record SHA-256 is
+`83d4fee4203672881f9ca8e26d7440c3fccae19f67315eb0352e1fc74bf8e077`; the
+deterministic one-file evidence manifest SHA-256 is
+`3f38b73f46800c1682f8e5dcc2f23ccc6788016fa48e00af86c6982810d3cc27`, with a
+valid sidecar.
+
+Runtime accounting for this task is:
+
+```text
+model_server_startups=1
+port_8080_contacts=0
+tcp_readiness_contacts=0
+http_model_requests=0
+inference_requests=0
+attempt_008_executions_added=0
+attempt_009_executions=1
+automatic_retries=0
+fallback_requests=0
+adaptive_replicates=0
+```
+
+Cleanup completed: the exact server exited, port 8080 is clear, and no
+supervisor, child, stale handoff, or execution lock remains. Final
+classification:
+
+```text
+ATTEMPT_009_EXECUTED_ONCE
+ATTEMPT_009_INTEGRITY_REJECTED
+ATTEMPT_009_CALIBRATION_INADMISSIBLE
+REASON: CHILD_FAILED_BEFORE_READINESS
+```
