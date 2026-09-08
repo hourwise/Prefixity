@@ -12,7 +12,7 @@ use prefixity_controlled_benchmark::{
     preflight_attempt_006, preflight_attempt_007, preflight_attempt_008, preflight_attempt_009,
     preflight_calibration, summarize_attempt_002_budget, summarize_calibration_budget,
     validate_attempt_007_execution_evidence, validate_attempt_008_preparation,
-    validate_attempt_009_preparation, CalibrationCliCommand,
+    validate_attempt_009_candidate_order, validate_attempt_009_preparation, CalibrationCliCommand,
 };
 use std::env;
 
@@ -73,6 +73,9 @@ fn main() {
         Ok(CalibrationCliCommand::Attempt009Freeze) => freeze_attempt_009(),
         Ok(CalibrationCliCommand::Attempt009ValidatePreparation) => {
             validate_attempt_009_preparation()
+        }
+        Ok(CalibrationCliCommand::Attempt009CandidateOrder) => {
+            validate_attempt_009_candidate_order()
         }
         Ok(CalibrationCliCommand::RunAttempt009) => execute_attempt_009(),
         Ok(CalibrationCliCommand::WorkflowIdentityCertification { result_path }) => {

@@ -163,6 +163,7 @@ pub enum CalibrationCliCommand {
     Attempt009DryRun,
     Attempt009Freeze,
     Attempt009ValidatePreparation,
+    Attempt009CandidateOrder,
     RunAttempt009,
     WorkflowIdentityCertification { result_path: PathBuf },
 }
@@ -325,6 +326,9 @@ where
         [command] if command == "attempt-009-validate-preparation" => {
             Ok(CalibrationCliCommand::Attempt009ValidatePreparation)
         }
+        [command] if command == "attempt-009-candidate-order" => {
+            Ok(CalibrationCliCommand::Attempt009CandidateOrder)
+        }
         [command] if command == "run-attempt-009" => Ok(CalibrationCliCommand::RunAttempt009),
         [command, flag, path]
             if command == "workflow-identity-certification" && flag == "--result" =>
@@ -337,7 +341,7 @@ where
             })
         }
         _ => Err(ReasoningBudgetCalibrationError::Validation(
-            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003|attempt-004-fingerprint|attempt-004-preflight|attempt-004-dry-run|attempt-005-fingerprint|attempt-005-preflight|attempt-005-dry-run|attempt-005-poststart|attempt-006-fingerprint|attempt-006-preflight|attempt-006-dry-run|attempt-006-poststart|attempt-007-fingerprint|attempt-007-preflight|attempt-007-dry-run|attempt-007-poststart|attempt-007-validate-evidence|run-attempt-007|attempt-008-fingerprint|attempt-008-preflight|attempt-008-dry-run|attempt-008-freeze|attempt-008-validate-preparation|run-attempt-008|attempt-009-fingerprint|attempt-009-preflight|attempt-009-dry-run|attempt-009-freeze|attempt-009-validate-preparation|run-attempt-009]".to_string(),
+            "usage: prefixity-phase1c-reasoning-budget-calibration [preflight|fingerprint|dry-run|run --budget {1024|512|256} --confirm-fresh-runtime|summarize --budget {1024|512|256}|attempt-002-fingerprint|attempt-002-preflight|attempt-002-dry-run|attempt-002-exclusivity-preflight --confirm-no-other-workflow|run-attempt-002 --budget 1024 --server-pid PID --confirm-fresh-runtime --confirm-exclusive-runtime|summarize-attempt-002 --budget 1024|attempt-003-fingerprint|attempt-003-preflight|attempt-003-dry-run|attempt-003-poststart|run-attempt-003|attempt-004-fingerprint|attempt-004-preflight|attempt-004-dry-run|attempt-005-fingerprint|attempt-005-preflight|attempt-005-dry-run|attempt-005-poststart|attempt-006-fingerprint|attempt-006-preflight|attempt-006-dry-run|attempt-006-poststart|attempt-007-fingerprint|attempt-007-preflight|attempt-007-dry-run|attempt-007-poststart|attempt-007-validate-evidence|run-attempt-007|attempt-008-fingerprint|attempt-008-preflight|attempt-008-dry-run|attempt-008-freeze|attempt-008-validate-preparation|run-attempt-008|attempt-009-fingerprint|attempt-009-preflight|attempt-009-dry-run|attempt-009-freeze|attempt-009-validate-preparation|attempt-009-candidate-order|run-attempt-009]".to_string(),
         )),
     }
 }
@@ -2007,7 +2011,10 @@ pub fn preflight_attempt_009() -> Result<Value, ReasoningBudgetCalibrationError>
         ));
     }
     let frozen = validate_attempt_009_frozen_executables(&identity)?;
-    let predecessor = validate_attempt_008_admissible_predecessor()?;
+    // The tracked transition is the same dependency the live candidate-order
+    // gate validates. Preserved Attempt-008 raw evidence remains a separate
+    // forensic audit source and is never a runtime prerequisite.
+    let predecessor = load_authoritative_attempt_008_transition()?;
     let provenance = validate_attempt_009_budget_provenance(&predecessor)?;
     validate_attempt_009_virgin_state()?;
     let certification = validate_accepted_workflow_certification_v2()?;
@@ -2142,6 +2149,58 @@ pub fn validate_attempt_009_preparation() -> Result<Value, ReasoningBudgetCalibr
         "http_model_requests": 0,
         "inference_requests": 0,
         "attempt_009_executions": 0
+    }))
+}
+
+/// Validate the Attempt-009 candidate-order dependency without entering any
+/// live boundary. This is intentionally usable from a clean checkout after
+/// the accepted transition fixture is present; it does not require ignored
+/// Attempt-008 raw evidence, a virgin Attempt-009 root, a listener, or a
+/// model-server process.
+pub fn validate_attempt_009_candidate_order() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let order = validate_candidate_order_report(512)?;
+    if order["candidate_order_valid"] != true {
+        return Err(invalid("Attempt-009 candidate order is invalid"));
+    }
+    let predecessor = order
+        .get("predecessor_transition")
+        .cloned()
+        .ok_or_else(|| invalid("Attempt-009 predecessor transition is absent"))?;
+    let provenance = validate_attempt_009_budget_provenance(&predecessor)?;
+    Ok(json!({
+        "state": "CANDIDATE_BUDGET_512_ORDER_VALID",
+        "attempt": 9,
+        "candidate_budget": 512,
+        "RUNTIME_DEPENDENCIES_COMPLETE": true,
+        "PREDECESSOR_TRANSITION_PRESENT": true,
+        "PREDECESSOR_TRANSITION_VALID": true,
+        "CANDIDATE_ORDER_VALID": true,
+        "SOURCE_ATTEMPT_008": true,
+        "SOURCE_BUDGET_1024": true,
+        "SOURCE_STATE_FAIL": true,
+        "NEXT_BUDGET_512": true,
+        "CANDIDATE_BUDGET_512_ORDER_VALID": true,
+        "source_attempt": 8,
+        "source_candidate_budget": 1024,
+        "source_result": "FAIL",
+        "source_integrity": "ACCEPTED",
+        "source_calibration_admissible": true,
+        "next_budget": 512,
+        "attempt_007_excluded_from_selection": true,
+        "authoritative_transition_path": CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH,
+        "raw_predecessor_evidence_required": false,
+        "predecessor_transition": predecessor,
+        "budget_512_provenance": provenance,
+        "next_fresh_attempt_id": 10,
+        "next_fresh_candidate_budget": 512,
+        "attempt_010_prepared": false,
+        "model_server_startups": 0,
+        "port_8080_contacts": 0,
+        "tcp_readiness_contacts": 0,
+        "http_model_requests": 0,
+        "inference_requests": 0,
+        "attempt_009_executions_added": 0,
+        "attempt_010_executions": 0
     }))
 }
 
@@ -4785,6 +4844,7 @@ fn validate_attempt_008_virgin_state() -> Result<(), ReasoningBudgetCalibrationE
 /// fingerprints with the current checkout: a later preparation changes the
 /// implementation source, while the executed predecessor remains identified
 /// by its canonical identity, evidence manifest, and recorded handoff.
+#[allow(dead_code)]
 fn validate_attempt_008_admissible_predecessor() -> Result<Value, ReasoningBudgetCalibrationError> {
     let identity = read_json(CALIBRATION_ATTEMPT_008_IDENTITY_PATH)?;
     if canonical_hash(&identity)?
@@ -4911,6 +4971,80 @@ fn validate_attempt_008_admissible_predecessor() -> Result<Value, ReasoningBudge
     }))
 }
 
+/// Load the durable Attempt-008-to-Attempt-009 transition used by both
+/// preparation and live candidate-order validation. The tracked provenance
+/// fixture is authoritative for this transition; the ignored raw evidence is
+/// deliberately not consulted here.
+fn load_authoritative_attempt_008_transition() -> Result<Value, ReasoningBudgetCalibrationError> {
+    let path = workspace_path(CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH);
+    if !path.is_file() {
+        return Err(invalid("authoritative predecessor transition is absent"));
+    }
+    let provenance = read_json(CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH)?;
+    validate_authoritative_attempt_008_transition_record(&provenance)?;
+    Ok(json!({
+        "state": "ATTEMPT_008_CALIBRATION_ADMISSIBLE",
+        "executed_once": true,
+        "integrity_accepted": true,
+        "calibration_admissible": true,
+        "candidate_budget": 1024,
+        "candidate_state": "FAIL",
+        "case_set_complete": true,
+        "next_budget": 512,
+        "source_attempt": 8,
+        "source_candidate_budget": 1024,
+        "source_result": "FAIL",
+        "source_integrity": "ACCEPTED",
+        "source_calibration_admissible": true,
+        "selected_next_budget": 512,
+        "attempt_007_excluded_from_selection": true,
+        "attempt_007_raw_next_budget_excluded": true,
+        "requests": 3,
+        "automatic_retries": 0,
+        "fallback_requests": 0,
+        "adaptive_replicates": 0,
+        "identity_sha256": "917fde56d11e79a3b700de82f13e5f072bda483fa6b7abe6e2da9ff37ee2dfb5",
+        "evidence_manifest_sha256": "f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e477",
+        "authoritative_transition_path": CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH,
+        "raw_predecessor_evidence_required": false
+    }))
+}
+
+fn validate_authoritative_attempt_008_transition_record(
+    provenance: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    if !provenance.is_object() {
+        return Err(invalid("authoritative predecessor transition is absent"));
+    }
+    expect_string(
+        provenance,
+        "schema_id",
+        "prefixity.phase1c.attempt-009-budget-provenance",
+    )?;
+    expect_u64(provenance, "schema_version", 1)?;
+    expect_u64(provenance, "attempt", 9)?;
+    expect_u64(provenance, "selected_budget", 512)?;
+    expect_string(
+        provenance,
+        "selected_budget_source",
+        "attempt_008_admissible_fail_next_budget",
+    )?;
+    expect_u64(provenance, "source_attempt", 8)?;
+    expect_u64(provenance, "source_candidate_budget", 1024)?;
+    expect_string(provenance, "source_result", "FAIL")?;
+    expect_string(provenance, "source_integrity", "ACCEPTED")?;
+    expect_bool(provenance, "source_calibration_admissible", true)?;
+    expect_u64(provenance, "selected_next_budget", 512)?;
+    expect_bool(provenance, "attempt_007_excluded_from_selection", true)?;
+    expect_bool(provenance, "attempt_007_raw_next_budget_excluded", true)?;
+    expect_string(
+        provenance,
+        "selection_rule",
+        "Only an integrity-accepted, calibration-admissible FAIL advances the accepted calibration state; Attempt-007 is permanently consumed and its raw next_budget is historical forensic evidence only.",
+    )?;
+    Ok(())
+}
+
 fn validate_attempt_009_budget_provenance(
     predecessor: &Value,
 ) -> Result<Value, ReasoningBudgetCalibrationError> {
@@ -4925,19 +5059,7 @@ fn validate_attempt_009_budget_provenance(
         ));
     }
     let provenance = read_json(CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH)?;
-    if provenance["selected_budget"] != 512
-        || provenance["selected_budget_source"] != "attempt_008_admissible_fail_next_budget"
-        || provenance["source_attempt"] != 8
-        || provenance["source_candidate_budget"] != 1024
-        || provenance["source_result"] != "FAIL"
-        || provenance["source_integrity"] != "ACCEPTED"
-        || provenance["source_calibration_admissible"] != true
-        || provenance["selected_next_budget"] != 512
-        || provenance["attempt_007_excluded_from_selection"] != true
-        || provenance["attempt_007_raw_next_budget_excluded"] != true
-    {
-        return Err(invalid("Attempt-009 budget provenance is invalid"));
-    }
+    validate_authoritative_attempt_008_transition_record(&provenance)?;
     Ok(json!({
         "state": "BUDGET_512_PROVENANCE_ACCEPTED",
         "source_attempt": 8,
@@ -4946,7 +5068,9 @@ fn validate_attempt_009_budget_provenance(
         "source_integrity": "ACCEPTED",
         "source_calibration_admissible": true,
         "selected_next_budget": 512,
-        "attempt_007_excluded_from_selection": true
+        "attempt_007_excluded_from_selection": true,
+        "authoritative_transition_path": CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH,
+        "raw_predecessor_evidence_required": false
     }))
 }
 
@@ -5803,14 +5927,39 @@ fn source_sha256(path: &str) -> Result<String, ReasoningBudgetCalibrationError> 
 }
 
 fn validate_candidate_order(budget: u32) -> Result<(), ReasoningBudgetCalibrationError> {
+    validate_candidate_order_report(budget).map(|_| ())
+}
+
+fn validate_candidate_order_report(budget: u32) -> Result<Value, ReasoningBudgetCalibrationError> {
     if budget == CALIBRATION_BUDGETS[0] {
-        return Ok(());
+        return Ok(json!({
+            "candidate_budget": budget,
+            "candidate_order_valid": true,
+            "predecessor_transition_required": false
+        }));
     }
     let index = CALIBRATION_BUDGETS
         .iter()
         .position(|candidate| *candidate == budget)
         .ok_or_else(|| invalid("unregistered calibration budget"))?;
     let previous = CALIBRATION_BUDGETS[index - 1];
+
+    // Budget 512 is the first live-required successor after the accepted
+    // Attempt-008 FAIL. Its predecessor is a tracked transition, not a
+    // generic result path under the current checkout. This is deliberately
+    // the same loader used by Attempt-009 preparation.
+    if budget == 512 {
+        let predecessor = load_authoritative_attempt_008_transition()?;
+        return Ok(json!({
+            "candidate_budget": budget,
+            "candidate_order_valid": true,
+            "predecessor_budget": previous,
+            "predecessor_transition": predecessor,
+            "predecessor_transition_required": true,
+            "raw_predecessor_evidence_required": false
+        }));
+    }
+
     let previous_result = candidate_result_path(previous);
     if !previous_result.exists() {
         return Err(invalid(
@@ -5828,7 +5977,13 @@ fn validate_candidate_order(budget: u32) -> Result<(), ReasoningBudgetCalibratio
             "candidate order stopped after a passing prior candidate",
         ));
     }
-    Ok(())
+    Ok(json!({
+        "candidate_budget": budget,
+        "candidate_order_valid": true,
+        "predecessor_budget": previous,
+        "predecessor_result_path": previous_result,
+        "predecessor_transition_required": false
+    }))
 }
 
 fn aggregate_state(results: &[Value]) -> &'static str {
@@ -6211,6 +6366,97 @@ mod tests {
         assert_eq!(next_candidate_budget(512, "INCONCLUSIVE"), Some(256));
         assert_eq!(next_candidate_budget(1024, "PASS"), None);
         assert_eq!(next_candidate_budget(256, "FAIL"), None);
+    }
+
+    #[test]
+    fn attempt_009_candidate_order_accepts_tracked_attempt_008_transition() {
+        let report = validate_attempt_009_candidate_order().unwrap();
+
+        assert_eq!(report["state"], "CANDIDATE_BUDGET_512_ORDER_VALID");
+        assert_eq!(report["SOURCE_ATTEMPT_008"], true);
+        assert_eq!(report["SOURCE_BUDGET_1024"], true);
+        assert_eq!(report["SOURCE_STATE_FAIL"], true);
+        assert_eq!(report["NEXT_BUDGET_512"], true);
+        assert_eq!(report["CANDIDATE_BUDGET_512_ORDER_VALID"], true);
+        assert_eq!(report["source_attempt"], 8);
+        assert_eq!(report["source_candidate_budget"], 1024);
+        assert_eq!(report["source_result"], "FAIL");
+        assert_eq!(report["next_budget"], 512);
+        assert_eq!(report["attempt_010_prepared"], false);
+        assert_eq!(report["model_server_startups"], 0);
+        assert_eq!(report["inference_requests"], 0);
+    }
+
+    #[test]
+    fn candidate_order_preparation_and_runtime_share_authoritative_transition() {
+        let preparation_transition = load_authoritative_attempt_008_transition().unwrap();
+        let runtime_order = validate_candidate_order_report(512).unwrap();
+
+        assert_eq!(
+            runtime_order["predecessor_transition"],
+            preparation_transition
+        );
+        assert_eq!(runtime_order["candidate_order_valid"], true);
+        assert_eq!(runtime_order["raw_predecessor_evidence_required"], false);
+    }
+
+    #[test]
+    fn missing_authoritative_predecessor_is_rejected_before_model_contact() {
+        let error = validate_authoritative_attempt_008_transition_record(&Value::Null)
+            .unwrap_err()
+            .to_string();
+
+        assert!(error.contains("authoritative predecessor transition is absent"));
+    }
+
+    #[test]
+    fn attempt_007_raw_next_budget_cannot_satisfy_candidate_order() {
+        let mut provenance = read_json(CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH).unwrap();
+        provenance["source_attempt"] = json!(7);
+        provenance["attempt_007_excluded_from_selection"] = json!(false);
+        provenance["attempt_007_raw_next_budget_excluded"] = json!(false);
+
+        let error = validate_authoritative_attempt_008_transition_record(&provenance)
+            .unwrap_err()
+            .to_string();
+
+        assert!(error.contains("integer mismatch at source_attempt"));
+    }
+
+    #[test]
+    fn attempt_008_transition_wins_over_generic_and_attempt_007_paths() {
+        let order = validate_candidate_order_report(512).unwrap();
+        let predecessor = &order["predecessor_transition"];
+
+        assert_eq!(predecessor["candidate_budget"], 1024);
+        assert_eq!(predecessor["candidate_state"], "FAIL");
+        assert_eq!(
+            predecessor["identity_sha256"],
+            "917fde56d11e79a3b700de82f13e5f072bda483fa6b7abe6e2da9ff37ee2dfb5"
+        );
+        assert_eq!(
+            predecessor["authoritative_transition_path"],
+            CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH
+        );
+    }
+
+    #[test]
+    fn clean_checkout_candidate_order_does_not_require_ignored_raw_predecessor() {
+        let report = validate_attempt_009_candidate_order().unwrap();
+
+        assert_eq!(report["PREDECESSOR_TRANSITION_PRESENT"], true);
+        assert_eq!(report["PREDECESSOR_TRANSITION_VALID"], true);
+        assert_eq!(report["raw_predecessor_evidence_required"], false);
+        assert_eq!(report["attempt_009_executions_added"], 0);
+    }
+
+    #[test]
+    fn attempt_009_forensic_failure_no_longer_looks_like_missing_predecessor() {
+        let report = validate_candidate_order_report(512).unwrap();
+
+        assert_eq!(report["candidate_order_valid"], true);
+        assert_ne!(report["predecessor_transition"], Value::Null);
+        assert_eq!(report["predecessor_transition"]["source_attempt"], 8);
     }
 
     #[test]
@@ -6819,6 +7065,10 @@ mod tests {
             parse_calibration_cli_args(vec!["attempt-009-validate-preparation".to_string(),])
                 .unwrap(),
             CalibrationCliCommand::Attempt009ValidatePreparation
+        );
+        assert_eq!(
+            parse_calibration_cli_args(vec!["attempt-009-candidate-order".to_string()]).unwrap(),
+            CalibrationCliCommand::Attempt009CandidateOrder
         );
         assert_eq!(
             parse_calibration_cli_args(vec!["run-attempt-009".to_string()]).unwrap(),

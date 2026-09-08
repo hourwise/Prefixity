@@ -3332,4 +3332,42 @@ ATTEMPT_009_EXECUTED_ONCE
 ATTEMPT_009_INTEGRITY_REJECTED
 ATTEMPT_009_CALIBRATION_INADMISSIBLE
 REASON: CHILD_FAILED_BEFORE_READINESS
+
+## Phase 1C Attempt 009 candidate-order gate remediation
+
+The consumed Attempt009 failure was forensically classified as a
+preparation/runtime semantic disagreement. Preparation accepted the tracked
+Attempt008-admissible transition, while the runtime candidate-order validator
+looked for the unrelated generic path
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-512/candidate-result.json`.
+The accepted Attempt008 result is represented by the tracked transition in
+`fixtures/phase1c/attempt-009-budget-provenance.json`; ignored raw evidence is
+not a clean-checkout dependency.
+
+The remediation uses one validated loader for both Attempt009 preparation and
+the runtime candidate-order gate. The new offline
+`attempt-009-candidate-order` command proves the runtime dependency,
+predecessor transition, and 512 candidate order without requiring a listener,
+model server, virgin Attempt009 state, or ignored raw evidence. Focused tests
+cover the valid transition, missing predecessor, Attempt007 exclusion,
+Attempt008 precedence, preparation/runtime parity, clean-checkout behavior,
+and the consumed Attempt009 regression.
+
+State is preserved: Attempt008 remains the accepted `FAIL` at budget 1024 with
+`next_budget=512`; Attempt009 remains consumed, integrity-rejected,
+calibration-inadmissible, and non-reusable. **Attempt 009 is not evidence about
+reasoning budget 512. Budget 512 remains untested.** The next fresh protocol
+state is Attempt010 at budget 512, but Attempt010 is not prepared.
+
+Remediation accounting remains:
+
+```text
+model_server_startups=0
+port_8080_contacts=0
+tcp_readiness_contacts=0
+http_model_requests=0
+inference_requests=0
+attempt_009_executions_added=0
+attempt_010_executions=0
+```
 ```
