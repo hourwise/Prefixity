@@ -3704,3 +3704,42 @@ server started with the recorded command, and the recorded frozen supervisor
 command. Post-start ownership was not exercised offline. `V3_FEASIBILITY_PASSED`
 is not claimed; no pilot preparation, ceiling change, or reasoning budget is
 authorized.
+
+## Phase 1C V3 feasibility-gate execution — terminal result
+
+```text
+PHASE_1C_V3_FEASIBILITY_RESULT_ACCEPTED
+V3_FEASIBILITY_EXECUTED_ONCE
+V3_FEASIBILITY_INTEGRITY_ACCEPTED
+V3_FEASIBILITY_FAILED
+CURRENT_QWEN_SCORED_PATH_CLOSED
+DIFFERENT_CAPABLE_MODEL_DESIGN_REVIEW_ONLY
+```
+
+Result publication only; record:
+`docs/phase-1/PHASE_1C_V3_FEASIBILITY_GATE_EXECUTION_RECORD.md`. The gate ran
+exactly once at repository `21b80a8` (source provenance `b255606`, identity
+`65958c75…242a`) on an operator-started server (PID 6508) running
+Qwen3.5-0.8B Q4_0 with reasoning on, no reasoning-budget flag,
+`max_tokens = 4096`, and context 8192.
+
+Evidence (measured): authoritative token counts 332, 335, and 339 (all within
+`input_tokens + 4096 <= 8192`, and equal to the server's later prompt-token
+counts); three inference requests, each HTTP 200 with `finish_reason =
+length` and 4096 completion tokens, evaluated `FAIL`. Accounting: 1 server
+startup, 1 readiness contact, 3 token-count contacts, 3 inference requests,
+no retry, fallback, replicate, or warmup; one gate execution and one
+supervisor launch. Integrity was accepted before outcomes were read; the
+gate-result seal is `0f232e73…8635` and the evidence manifest is
+`cf003307…2cfbc`. The server was terminated after sealing.
+
+Interpretation: under the pre-registered rule this closes the current
+Qwen3.5-0.8B scored path. The result is bounded to this model, quantization,
+runtime, reasoning-on configuration, frozen cases, and V3 protocol; it does
+not show the model is generally incapable and is not a Prefixity capability
+or performance result.
+
+Not authorized: a second ceiling, an 8192-token experiment, a new reasoning
+budget, a reasoning-off fallback, another 0.8B quantization, a gate rerun, a
+V3 scored pilot, or any inference. Next permitted substantive work:
+`DIFFERENT_CAPABLE_MODEL_DESIGN_REVIEW`.

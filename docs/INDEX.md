@@ -62,6 +62,7 @@
 | [`phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_EXECUTION_RECORD.md`](phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_EXECUTION_RECORD.md) | Single consumed Attempt 011 live execution at budget 256: server verification, request ledger, integrity acceptance, evidence manifest, admissible FAIL, and the terminal calibration classification `REASONING-ON / 2048-TOKEN SCORED CONFIGURATION NOT FEASIBLE`. | Reviewing the terminal Phase 1C calibration result; no budget was selected, no further candidate exists, and Attempt 011 must not be rerun. |
 | [`phase-1/PHASE_1C_SCORED_RUNTIME_V3_DESIGN_DECISION.md`](phase-1/PHASE_1C_SCORED_RUNTIME_V3_DESIGN_DECISION.md) | V3 design decision after the terminal calibration: a final bounded feasibility/falsification gate for the existing Qwen instrument (reasoning on, budget flag absent, 4096-token ceiling, context 8192), its input-feasibility proof, and the pre-registered `CURRENT_QWEN_SCORED_PATH_CLOSED` stop. | Reviewing whether and how Phase 1C scored work may continue; it authorizes only offline preparation, no inference. |
 | [`phase-1/PHASE_1C_V3_FEASIBILITY_GATE_PREPARATION.md`](phase-1/PHASE_1C_V3_FEASIBILITY_GATE_PREPARATION.md) and [`PHASE_1C_V3_FEASIBILITY_GATE_IDENTITY_V1.json`](phase-1/PHASE_1C_V3_FEASIBILITY_GATE_IDENTITY_V1.json) | V3 feasibility-gate preparation: source-provenance commit, derived 7501000 ms supervisor deadline, corrected llama.exe identity, frozen supervisor/child, gate identity, frozen dry run/preflight/live-prerequisite traversal, substitution rejection, and future commands. | Reviewing the prepared, not executed, V3 gate before any separately authorized live run. |
+| [`phase-1/PHASE_1C_V3_FEASIBILITY_GATE_EXECUTION_RECORD.md`](phase-1/PHASE_1C_V3_FEASIBILITY_GATE_EXECUTION_RECORD.md) | Single V3 feasibility-gate execution: server verification, authoritative token counts (332/335/339, all within the context bound), request ledger, integrity acceptance, evidence manifest and gate-result seal, three `length` FAILs at the 4096-token ceiling, and the terminal `CURRENT_QWEN_SCORED_PATH_CLOSED` classification. | Reviewing the terminal V3 result; only a different-capable-model design review is permitted and the gate must not be rerun. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
@@ -114,9 +115,12 @@ Stage 1 proceeded through a separately authorized local-Qwen schema-smoke
 path: Smoke 01 failed and Smoke 02 (reasoning off, non-scored) passed. The
 scored h001 BASELINE was inconclusive under runtime V1 (request deadline) and
 V2 (2048-token ceiling), and the reasoning-budget calibration is terminal
-(`REASONING-ON / 2048-TOKEN SCORED CONFIGURATION NOT FEASIBLE`). The V3 design
-decision defines a final bounded feasibility gate for the Qwen instrument; no
-scored comparison has completed and no inference is currently authorized. The
+(`REASONING-ON / 2048-TOKEN SCORED CONFIGURATION NOT FEASIBLE`). The V3
+feasibility gate (reasoning on, no budget flag, 4096-token ceiling) executed
+once with integrity accepted and failed on all three cases
+(`CURRENT_QWEN_SCORED_PATH_CLOSED`); the only permitted next work is a
+different-capable-model design review. No scored comparison has completed and
+no inference is currently authorized. The
 Phase 1A
 corpus/import evidence and the later Phase 1B/1C results are documented in the
 linked closeouts and gates above.
