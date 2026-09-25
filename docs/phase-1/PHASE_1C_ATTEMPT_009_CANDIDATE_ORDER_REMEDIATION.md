@@ -40,10 +40,11 @@ fixtures/phase1c/attempt-009-budget-provenance.json
 
 The preparation path also performed a local audit of ignored Attempt008 raw
 evidence. The live child did not use either of those semantics. In
-`validate_candidate_order(512)`, the runtime constructed the generic path:
+`validate_candidate_order(512)`, the runtime derived the prior registered
+budget (1024) and constructed the generic prior-candidate path:
 
 ```text
-experiments/runs/phase1c-reasoning-budget-calibration/budget-512/candidate-result.json
+experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/candidate-result.json
 ```
 
 The accepted Attempt008 candidate result, when present locally, is instead
@@ -69,7 +70,7 @@ Provenance classification:
 
 | Finding | Classification |
 | --- | --- |
-| Runtime looked for the generic `budget-512/candidate-result.json` path | PROVEN — established by the source path construction and the recorded child error |
+| Runtime looked for the generic prior-candidate `budget-1024/candidate-result.json` path | PROVEN — established by the source path construction and the recorded child error |
 | The accepted Attempt008 result is represented by the tracked transition and an ignored raw evidence audit | PROVEN — recorded fixture and prior accepted evidence agree |
 | Runtime candidate order did not consume the tracked transition validated by preparation | PROVEN — preparation and runtime called different validators |
 | The original intended meaning of the generic candidate path | UNKNOWN — not inferred from the consumed run |
@@ -132,6 +133,17 @@ Attempt007 exclusion, Attempt008 precedence, preparation/runtime parity,
 clean-checkout operation, consumed Attempt009 regression, and CLI parsing.
 The required repository checks are run before publication and recorded with
 their exact results in the task closeout.
+
+Review correction (follow-up to `644acc6`): the transition emitted by the
+shared loader carried a truncated Attempt008 evidence-manifest hash (63 hex
+characters). It now carries the canonical
+`f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e4779`, and a
+regression binds both emitted hashes to the tracked Attempt009 identity
+lineage. Further regressions reject a budget not selected by the admissible
+predecessor (256, unregistered 768) and reject a corrupt or missing
+transition field rather than reconstructing it. The forensic path above was
+also corrected from `budget-512` to the prior-candidate `budget-1024` path
+actually constructed by the original validator.
 
 No Attempt009 raw evidence file, Attempt009 execution record, Attempt008 raw
 evidence file, or historical calibration result was edited by this remediation.

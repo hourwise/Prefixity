@@ -3332,14 +3332,15 @@ ATTEMPT_009_EXECUTED_ONCE
 ATTEMPT_009_INTEGRITY_REJECTED
 ATTEMPT_009_CALIBRATION_INADMISSIBLE
 REASON: CHILD_FAILED_BEFORE_READINESS
+```
 
 ## Phase 1C Attempt 009 candidate-order gate remediation
 
 The consumed Attempt009 failure was forensically classified as a
 preparation/runtime semantic disagreement. Preparation accepted the tracked
 Attempt008-admissible transition, while the runtime candidate-order validator
-looked for the unrelated generic path
-`experiments/runs/phase1c-reasoning-budget-calibration/budget-512/candidate-result.json`.
+looked for the unrelated generic prior-candidate path
+`experiments/runs/phase1c-reasoning-budget-calibration/budget-1024/candidate-result.json`.
 The accepted Attempt008 result is represented by the tracked transition in
 `fixtures/phase1c/attempt-009-budget-provenance.json`; ignored raw evidence is
 not a clean-checkout dependency.
@@ -3370,4 +3371,14 @@ inference_requests=0
 attempt_009_executions_added=0
 attempt_010_executions=0
 ```
-```
+
+Review follow-up: the shared loader's emitted Attempt008 evidence-manifest
+hash was truncated (63 hex characters) and is corrected to the canonical
+value; regressions now bind emitted hashes to the tracked Attempt009 identity
+lineage, reject non-selected budgets, and reject corrupt or missing transition
+fields. Documentation now records the original runtime lookup as the
+prior-candidate `budget-1024` path and closes the preceding Attempt009 code
+fence. Local offline validation before publication: `cargo fmt --check`,
+`cargo clippy -D warnings`, `cargo test --workspace` (controlled-benchmark
+library: 134 passed, 0 failed), `cargo build --bins`, and `git diff --check`
+all passed on Rust 1.97.1.

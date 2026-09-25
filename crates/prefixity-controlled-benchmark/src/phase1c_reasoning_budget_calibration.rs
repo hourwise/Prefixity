@@ -5004,7 +5004,7 @@ fn load_authoritative_attempt_008_transition() -> Result<Value, ReasoningBudgetC
         "fallback_requests": 0,
         "adaptive_replicates": 0,
         "identity_sha256": "917fde56d11e79a3b700de82f13e5f072bda483fa6b7abe6e2da9ff37ee2dfb5",
-        "evidence_manifest_sha256": "f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e477",
+        "evidence_manifest_sha256": "f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e4779",
         "authoritative_transition_path": CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH,
         "raw_predecessor_evidence_required": false
     }))
@@ -6448,6 +6448,56 @@ mod tests {
         assert_eq!(report["PREDECESSOR_TRANSITION_VALID"], true);
         assert_eq!(report["raw_predecessor_evidence_required"], false);
         assert_eq!(report["attempt_009_executions_added"], 0);
+    }
+
+    #[test]
+    fn authoritative_transition_hashes_match_tracked_attempt_009_lineage() {
+        let transition = load_authoritative_attempt_008_transition().unwrap();
+        let identity = read_json(CALIBRATION_ATTEMPT_009_IDENTITY_PATH).unwrap();
+
+        for (field, lineage_field) in [
+            ("identity_sha256", "attempt_008_identity_sha256"),
+            (
+                "evidence_manifest_sha256",
+                "attempt_008_evidence_manifest_sha256",
+            ),
+        ] {
+            let hash = transition[field].as_str().unwrap();
+            assert_eq!(hash.len(), 64, "{field} is not a full SHA-256");
+            assert!(hash.bytes().all(|byte| byte.is_ascii_hexdigit()));
+            assert_eq!(transition[field], identity["lineage"][lineage_field]);
+        }
+    }
+
+    #[test]
+    fn candidate_not_selected_by_admissible_predecessor_is_rejected() {
+        // Budget 256 would require an accepted 512 result, which does not
+        // exist; an unregistered budget is never ordered.
+        assert!(validate_candidate_order_report(256).is_err());
+        assert!(validate_candidate_order_report(768).is_err());
+    }
+
+    #[test]
+    fn corrupt_authoritative_transition_is_rejected_not_reconstructed() {
+        let original = read_json(CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH).unwrap();
+        for (field, value) in [
+            ("source_result", json!("PASS")),
+            ("source_integrity", json!("REJECTED")),
+            ("source_calibration_admissible", json!(false)),
+            ("source_candidate_budget", json!(512)),
+            ("selected_next_budget", json!(256)),
+            ("selected_budget", json!(256)),
+        ] {
+            let mut provenance = original.clone();
+            provenance[field] = value;
+            assert!(
+                validate_authoritative_attempt_008_transition_record(&provenance).is_err(),
+                "{field} corruption was accepted"
+            );
+            let mut missing = original.clone();
+            missing.as_object_mut().unwrap().remove(field);
+            assert!(validate_authoritative_attempt_008_transition_record(&missing).is_err());
+        }
     }
 
     #[test]
