@@ -3382,3 +3382,49 @@ fence. Local offline validation before publication: `cargo fmt --check`,
 `cargo clippy -D warnings`, `cargo test --workspace` (controlled-benchmark
 library: 134 passed, 0 failed), `cargo build --bins`, and `git diff --check`
 all passed on Rust 1.97.1.
+
+## Phase 1C Attempt 010 budget-512 preparation
+
+Attempt 010 was prepared at budget 512 from accepted baseline
+`a0019bcd96ca8759801a879619f119032067a3f9`. The code commit
+`cd7145319555d6f00c979e6e333fc66c921fa335` adds the Attempt-010 path. Its
+live entry point and the offline `attempt-010-live-prerequisites` command
+share one prerequisite function, which includes the pre-listener checks
+extracted unchanged from the calibration runtime. After fmt, clippy, the
+full workspace tests (controlled-benchmark library 140 passed, 0 failed), and
+the bins build passed on Rust 1.97.1, the supervisor
+(`3e43fddd…288e`, 1259008 bytes, `volume=ba2f80f4;index=00080000003b6e6d`)
+and child (`e65a626e…61c9`, 9010176 bytes,
+`volume=ba2f80f4;index=0008000000454e40`) were frozen into
+`target/phase1c-attempt-010-frozen/` without overwrite.
+
+The identity canonical SHA-256 is
+`9292e9ecdd2e89f695dfb34bc782ade41b70412c427807c6c3a5653b50ec16f7`, computed
+independently by the generator and by the frozen child. Fingerprint,
+repository contract, preflight (`EXCLUSIVE_PRESTART`), dry run, and
+preparation validation passed with the frozen child. The real frozen
+supervisor launched the frozen child once for the prerequisite traversal,
+which reached `READY_FOR_MODEL_READINESS_BOUNDARY` with
+`RUNTIME_DEPENDENCIES_COMPLETE`, `PREDECESSOR_TRANSITION_VALID`, and
+`CANDIDATE_ORDER_VALID`, and stopped before post-start ownership inspection,
+TCP readiness, HTTP, and inference. Mutable child, mutable supervisor, and
+same-content different-object substitutions were rejected before spawn as
+`FROZEN_EXECUTABLE_IDENTITY_MISMATCH`. A clean-checkout integration test runs
+the repository contract in CI.
+
+State is preserved: Attempt 008 remains the last admissible result (1024,
+`FAIL`, next 512); Attempt 009 remains consumed and inadmissible with zero
+inference. **Budget 512 remains untested. Attempt 010 is prepared, not
+executed.** The budget-256 generic predecessor lookup and a misplaced
+Attempt-009 check inside the historical Attempt-008 identity validator are
+recorded as deferred, non-blocking issues in the preparation record.
+
+```text
+model_server_startups=0
+port_8080_contacts=0
+tcp_readiness_contacts=0
+http_model_requests=0
+inference_requests=0
+attempt_009_executions_added=0
+attempt_010_executions=0
+```
