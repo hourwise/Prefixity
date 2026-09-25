@@ -3428,3 +3428,44 @@ inference_requests=0
 attempt_009_executions_added=0
 attempt_010_executions=0
 ```
+
+## Phase 1C Attempt 010 budget-512 execution
+
+Attempt 010 was executed exactly once from promoted preparation `87cbacd`
+against an operator-started server (PID 18048) whose command line,
+executable identity, exclusivity, and sole port-8080 ownership were verified
+read-only beforehand. The frozen supervisor (PID 11740) launched the frozen
+child (PID 21240) once; the child passed the shared live prerequisites,
+recorded `EXCLUSIVE_POSTSTART`, made one passed readiness check, and issued
+exactly three requests with the frozen hashes.
+
+```text
+ATTEMPT_010_EXECUTED_ONCE
+ATTEMPT_010_INTEGRITY_ACCEPTED
+ATTEMPT_010_CALIBRATION_ADMISSIBLE
+```
+
+Admissible raw outcome at budget 512: rbcal-001 FAIL (`length`, 2048
+tokens), rbcal-002 PASS (`stop`, 547), rbcal-003 FAIL (`stop`, 554, structural
+schema). Candidate state `FAIL`, case set complete, selected budget null,
+protocol `next_budget=256`. Evidence manifest
+`5673e55b381d1f5171c38bc9f1721b3105adf829ece4ec029cbcca4db150c4b9` verifies all
+23 raw files. The verified server PID was terminated after evidence freeze;
+no server, listener, workflow process, handoff, or lock remains.
+
+Budget 256 is not prepared or authorized. The deferred budget-256
+candidate-order defect must be remediated and validated before any 256
+attempt is prepared. Full record:
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_010_EXECUTION_RECORD.md`.
+
+```text
+model_server_startups_by_agent=0
+readiness_contacts=1
+http_model_requests=3
+inference_requests=3
+automatic_retries=0
+fallback_requests=0
+adaptive_replicates=0
+attempt_009_executions_added=0
+attempt_010_executions=1
+```
