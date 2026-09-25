@@ -3469,3 +3469,46 @@ adaptive_replicates=0
 attempt_009_executions_added=0
 attempt_010_executions=1
 ```
+
+## Phase 1C authoritative candidate-transition generalization
+
+The recorded budget-256 candidate-order defect is remediated. Candidate
+order for every non-initial budget now resolves through one tracked registry,
+`fixtures/phase1c/calibration-candidate-transitions.json`, via
+`resolve_authoritative_candidate_transition`; the 512 special case and the
+generic ignored `budget-512/candidate-result.json` lookup are removed.
+
+```text
+ATTEMPT_008_TO_512_VALID      (1024 FAIL -> 512)
+ATTEMPT_010_TO_256_VALID      (512 FAIL -> 256)
+ATTEMPT_007_EXCLUDED
+ATTEMPT_009_EXCLUDED
+CANDIDATE_512_ORDER_VALID
+CANDIDATE_256_ORDER_VALID
+```
+
+Each transition binds the source identity hash, evidence-manifest hash, and
+execution-record hash and is cross-checked against those tracked files.
+Missing, corrupt, inadmissible, wrong-source, wrong-budget, wrong-state,
+wrong-successor, mismatched-hash, raw-path, duplicate, and ambiguous
+transitions are rejected without reconstruction. Preparation and live
+candidate order share the resolver through `calibration_prestart_checks`.
+Clean-checkout integration tests establish 512 and 256 order from tracked
+evidence only.
+
+The consumed Attempt-010 identity now fails closed on its source binding, as
+intended after the source change; its document check remains. The historical
+Attempt-008 validator defect is not on the resolver path and stays deferred.
+No evidence was modified. Attempt 011 at budget 256 is eligible but not
+prepared. Record:
+`docs/phase-1/PHASE_1C_AUTHORITATIVE_CANDIDATE_TRANSITIONS.md`.
+
+```text
+model_server_startups=0
+port_8080_contacts=0
+tcp_readiness_contacts=0
+http_model_requests=0
+inference_requests=0
+attempt_010_executions_added=0
+attempt_011_executions=0
+```

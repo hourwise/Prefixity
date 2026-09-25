@@ -1,9 +1,10 @@
-//! Clean-checkout proof for the prepared Attempt-010 contract.
+//! Checks of the consumed Attempt-010 identity document.
 //!
 //! These tests read only tracked repository evidence. They do not require
 //! ignored prior-run evidence, frozen executables, a supervisor, a listener,
-//! or a model server, so a fresh CI clone exercises the same repository
-//! contract that the live Attempt-010 child validates before model contact.
+//! or a model server. Attempt 010 has executed; its repository contract now
+//! fails closed on the source binding, while the recorded identity document
+//! itself remains checkable.
 
 use prefixity_controlled_benchmark::{
     validate_attempt_010_identity_document, validate_attempt_010_repository_contract,
@@ -26,42 +27,15 @@ fn rejected(mutate: impl FnOnce(&mut Value)) -> bool {
 }
 
 #[test]
-fn clean_checkout_attempt_010_repository_contract_is_valid() {
-    let contract = validate_attempt_010_repository_contract().unwrap();
+fn consumed_attempt_010_contract_fails_closed_after_source_changes() {
+    // Attempt 010 is consumed. Its identity binds the implementation sources
+    // of its frozen executables, so once those sources change no preparation
+    // or live path may accept the identity again.
+    let error = validate_attempt_010_repository_contract()
+        .unwrap_err()
+        .to_string();
 
-    assert_eq!(contract["state"], "ATTEMPT_010_REPOSITORY_CONTRACT_VALID");
-    for flag in [
-        "ATTEMPT_ID_VALID",
-        "ATTEMPT_IDENTITY_VALID",
-        "PREDECESSOR_TRANSITION_PRESENT",
-        "PREDECESSOR_TRANSITION_VALID",
-        "SOURCE_ATTEMPT_008",
-        "SOURCE_BUDGET_1024",
-        "SOURCE_STATE_FAIL",
-        "SOURCE_INTEGRITY_ACCEPTED",
-        "SOURCE_CALIBRATION_ADMISSIBLE",
-        "NEXT_BUDGET_512",
-        "CANDIDATE_ORDER_VALID",
-        "CANDIDATE_BUDGET_512_ORDER_VALID",
-        "ATTEMPT_007_EXCLUDED_FROM_SELECTION",
-        "ATTEMPT_009_EXCLUDED_FROM_SELECTION",
-        "CASE_SET_VALID",
-        "REQUEST_CEILING_VALID",
-        "RETRY_POLICY_VALID",
-        "FALLBACK_POLICY_VALID",
-    ] {
-        assert_eq!(contract[flag], true, "{flag}");
-    }
-    assert_eq!(contract["raw_predecessor_evidence_required"], false);
-    assert_eq!(
-        contract["candidate_order"]["predecessor_transition"]["source_attempt"],
-        8
-    );
-    assert!(contract["candidate_order"]
-        .get("predecessor_result_path")
-        .is_none());
-    assert_eq!(contract["network_calls"], 0);
-    assert_eq!(contract["inference_requests"], 0);
+    assert!(error.contains("does not match current source"), "{error}");
 }
 
 #[test]

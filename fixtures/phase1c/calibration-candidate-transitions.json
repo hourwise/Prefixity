@@ -1,0 +1,55 @@
+{
+  "schema_id": "prefixity.phase1c.calibration-candidate-transitions",
+  "schema_version": 1,
+  "experiment_id": "phase1c-reasoning-budget-calibration",
+  "candidate_order": [1024, 512, 256],
+  "selection_rule": "Only an integrity-accepted, calibration-admissible, case-set-complete FAIL advances the accepted calibration state, and only to the protocol successor of its budget. Each non-initial candidate has exactly one authoritative predecessor transition.",
+  "excluded_attempts": [
+    {
+      "attempt": 7,
+      "reason": "executed; integrity rejected; calibration inadmissible; permanently consumed; raw next_budget is historical forensic evidence only"
+    },
+    {
+      "attempt": 9,
+      "reason": "executed once; integrity rejected before readiness; calibration inadmissible; permanently consumed; zero inference"
+    }
+  ],
+  "transitions": [
+    {
+      "source_attempt": 8,
+      "source_budget": 1024,
+      "source_state": "FAIL",
+      "integrity_accepted": true,
+      "calibration_admissible": true,
+      "case_set_complete": true,
+      "requests": 3,
+      "automatic_retries": 0,
+      "fallback_requests": 0,
+      "adaptive_replicates": 0,
+      "selected_next_budget": 512,
+      "source_identity_path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_008_IDENTITY_V1.json",
+      "source_identity_sha256": "917fde56d11e79a3b700de82f13e5f072bda483fa6b7abe6e2da9ff37ee2dfb5",
+      "evidence_manifest_sha256": "f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e4779",
+      "execution_record_path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_1024_ATTEMPT_008_EXECUTION_RECORD.md",
+      "execution_record_sha256": "cc12d12a4a760fce91a9627240b7c7ad8869c999b4f686670093a49531cffc26"
+    },
+    {
+      "source_attempt": 10,
+      "source_budget": 512,
+      "source_state": "FAIL",
+      "integrity_accepted": true,
+      "calibration_admissible": true,
+      "case_set_complete": true,
+      "requests": 3,
+      "automatic_retries": 0,
+      "fallback_requests": 0,
+      "adaptive_replicates": 0,
+      "selected_next_budget": 256,
+      "source_identity_path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_010_IDENTITY_V1.json",
+      "source_identity_sha256": "9292e9ecdd2e89f695dfb34bc782ade41b70412c427807c6c3a5653b50ec16f7",
+      "evidence_manifest_sha256": "5673e55b381d1f5171c38bc9f1721b3105adf829ece4ec029cbcca4db150c4b9",
+      "execution_record_path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_010_EXECUTION_RECORD.md",
+      "execution_record_sha256": "c85dd5f3169e29cd96be3d71d4a49bc12c90d7474fe621ace5fbede943160edc"
+    }
+  ]
+}

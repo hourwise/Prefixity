@@ -78,6 +78,11 @@ pub const CALIBRATION_ATTEMPT_009_EVIDENCE_ROOT: &str =
 pub const CALIBRATION_ATTEMPT_009_FROZEN_STAGE_ROOT: &str = "target/phase1c-attempt-009-frozen";
 pub const CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH: &str =
     "fixtures/phase1c/attempt-009-budget-provenance.json";
+pub const CALIBRATION_CANDIDATE_TRANSITIONS_PATH: &str =
+    "fixtures/phase1c/calibration-candidate-transitions.json";
+/// Attempts that were executed but are permanently excluded from calibration
+/// selection. No authoritative transition may name them as a source.
+const CALIBRATION_INADMISSIBLE_ATTEMPTS: [u64; 2] = [7, 9];
 pub const CALIBRATION_ATTEMPT_009_EXECUTION_RECORD_PATH: &str =
     "docs/phase-1/PHASE_1C_REASONING_BUDGET_512_ATTEMPT_009_EXECUTION_RECORD.md";
 pub const CALIBRATION_ATTEMPT_010_IDENTITY_PATH: &str =
@@ -2051,7 +2056,7 @@ pub fn preflight_attempt_009() -> Result<Value, ReasoningBudgetCalibrationError>
     // The tracked transition is the same dependency the live candidate-order
     // gate validates. Preserved Attempt-008 raw evidence remains a separate
     // forensic audit source and is never a runtime prerequisite.
-    let predecessor = load_authoritative_attempt_008_transition()?;
+    let predecessor = resolve_authoritative_candidate_transition(512)?;
     let provenance = validate_attempt_009_budget_provenance(&predecessor)?;
     validate_attempt_009_virgin_state()?;
     let certification = validate_accepted_workflow_certification_v2()?;
@@ -5461,43 +5466,271 @@ fn validate_attempt_008_admissible_predecessor() -> Result<Value, ReasoningBudge
     }))
 }
 
-/// Load the durable Attempt-008-to-Attempt-009 transition used by both
-/// preparation and live candidate-order validation. The tracked provenance
-/// fixture is authoritative for this transition; the ignored raw evidence is
-/// deliberately not consulted here.
-fn load_authoritative_attempt_008_transition() -> Result<Value, ReasoningBudgetCalibrationError> {
-    let path = workspace_path(CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH);
+/// Resolve the single authoritative admissible transition that selects
+/// `candidate_budget`. Preparation and live candidate-order validation both
+/// reach this through `validate_candidate_order_report`. It reads only the
+/// tracked transition registry and the tracked identity and execution record
+/// each transition binds; ignored run evidence is never consulted.
+pub fn resolve_authoritative_candidate_transition(
+    candidate_budget: u32,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    let path = workspace_path(CALIBRATION_CANDIDATE_TRANSITIONS_PATH);
     if !path.is_file() {
         return Err(invalid("authoritative predecessor transition is absent"));
     }
-    let provenance = read_json(CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH)?;
-    validate_authoritative_attempt_008_transition_record(&provenance)?;
-    Ok(json!({
-        "state": "ATTEMPT_008_CALIBRATION_ADMISSIBLE",
-        "executed_once": true,
-        "integrity_accepted": true,
-        "calibration_admissible": true,
-        "candidate_budget": 1024,
-        "candidate_state": "FAIL",
-        "case_set_complete": true,
-        "next_budget": 512,
-        "source_attempt": 8,
-        "source_candidate_budget": 1024,
+    let registry = read_json(CALIBRATION_CANDIDATE_TRANSITIONS_PATH)?;
+    let transition = select_candidate_transition(&registry, candidate_budget)?;
+    validate_transition_tracked_evidence(&transition)?;
+    Ok(normalized_candidate_transition(
+        &transition,
+        candidate_budget,
+    ))
+}
+
+/// Structural selection over a registry value. A candidate resolves only when
+/// exactly one complete, admissible FAIL transition selects it and that
+/// transition's source is the protocol predecessor budget.
+fn select_candidate_transition(
+    registry: &Value,
+    candidate_budget: u32,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    if !registry.is_object() {
+        return Err(invalid("authoritative predecessor transition is absent"));
+    }
+    expect_string(
+        registry,
+        "schema_id",
+        "prefixity.phase1c.calibration-candidate-transitions",
+    )?;
+    expect_u64(registry, "schema_version", 1)?;
+    expect_string(registry, "experiment_id", EXPERIMENT_ID)?;
+    if registry.get("candidate_order") != Some(&json!(CALIBRATION_BUDGETS)) {
+        return Err(invalid("authoritative transition candidate order changed"));
+    }
+    let excluded = registry
+        .get("excluded_attempts")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("excluded_attempts"))?
+        .iter()
+        .map(|entry| {
+            entry
+                .get("attempt")
+                .and_then(Value::as_u64)
+                .ok_or_else(|| invalid("excluded attempt entry is incomplete"))
+        })
+        .collect::<Result<Vec<_>, ReasoningBudgetCalibrationError>>()?;
+    if CALIBRATION_INADMISSIBLE_ATTEMPTS
+        .iter()
+        .any(|attempt| !excluded.contains(attempt))
+    {
+        return Err(invalid(
+            "an inadmissible attempt is not excluded from selection",
+        ));
+    }
+    let index = CALIBRATION_BUDGETS
+        .iter()
+        .position(|candidate| *candidate == candidate_budget)
+        .ok_or_else(|| invalid("unregistered calibration budget"))?;
+    if index == 0 {
+        return Err(invalid(
+            "the initial calibration candidate has no predecessor transition",
+        ));
+    }
+    let predecessor_budget = CALIBRATION_BUDGETS[index - 1];
+    let transitions = registry
+        .get("transitions")
+        .and_then(Value::as_array)
+        .ok_or_else(|| missing("transitions"))?;
+    for transition in transitions {
+        validate_candidate_transition_record(transition, &excluded)?;
+    }
+    for field in ["source_attempt", "source_budget", "selected_next_budget"] {
+        let mut values = transitions
+            .iter()
+            .map(|transition| transition[field].clone())
+            .collect::<Vec<_>>();
+        let count = values.len();
+        values.sort_by_key(Value::to_string);
+        values.dedup();
+        if values.len() != count {
+            return Err(invalid("authoritative predecessor transition is ambiguous"));
+        }
+    }
+    let selected = transitions
+        .iter()
+        .filter(|transition| transition["selected_next_budget"] == candidate_budget)
+        .collect::<Vec<_>>();
+    match selected.as_slice() {
+        [] => Err(invalid("authoritative predecessor transition is absent")),
+        [transition] if transition["source_budget"] == predecessor_budget => {
+            Ok((*transition).clone())
+        }
+        [_] => Err(invalid(
+            "authoritative predecessor transition has the wrong source budget",
+        )),
+        _ => Err(invalid("authoritative predecessor transition is ambiguous")),
+    }
+}
+
+fn validate_candidate_transition_record(
+    transition: &Value,
+    excluded: &[u64],
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    if !transition.is_object() {
+        return Err(invalid(
+            "authoritative predecessor transition is incomplete",
+        ));
+    }
+    let source_attempt = transition
+        .get("source_attempt")
+        .and_then(Value::as_u64)
+        .ok_or_else(|| missing("source_attempt"))?;
+    if source_attempt == 0 || excluded.contains(&source_attempt) {
+        return Err(invalid(
+            "authoritative transition names an excluded or invalid source attempt",
+        ));
+    }
+    let source_budget = transition
+        .get("source_budget")
+        .and_then(Value::as_u64)
+        .and_then(|budget| u32::try_from(budget).ok())
+        .ok_or_else(|| missing("source_budget"))?;
+    ensure_budget(source_budget)?;
+    expect_string(transition, "source_state", "FAIL")?;
+    expect_bool(transition, "integrity_accepted", true)?;
+    expect_bool(transition, "calibration_admissible", true)?;
+    expect_bool(transition, "case_set_complete", true)?;
+    expect_u64(transition, "requests", CALIBRATION_CASE_IDS.len() as u64)?;
+    expect_u64(transition, "automatic_retries", 0)?;
+    expect_u64(transition, "fallback_requests", 0)?;
+    expect_u64(transition, "adaptive_replicates", 0)?;
+    let selected_next_budget = transition
+        .get("selected_next_budget")
+        .and_then(Value::as_u64)
+        .ok_or_else(|| missing("selected_next_budget"))?;
+    if next_candidate_budget(source_budget, "FAIL").map(u64::from) != Some(selected_next_budget) {
+        return Err(invalid(
+            "authoritative transition does not select the protocol successor budget",
+        ));
+    }
+    for field in [
+        "source_identity_sha256",
+        "evidence_manifest_sha256",
+        "execution_record_sha256",
+    ] {
+        let complete = transition
+            .get(field)
+            .and_then(Value::as_str)
+            .is_some_and(|hash| {
+                hash.len() == 64
+                    && hash
+                        .bytes()
+                        .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+            });
+        if !complete {
+            return Err(invalid(&format!(
+                "authoritative transition {field} is not a complete SHA-256"
+            )));
+        }
+    }
+    for field in ["source_identity_path", "execution_record_path"] {
+        let tracked = transition
+            .get(field)
+            .and_then(Value::as_str)
+            .is_some_and(|path| path.starts_with("docs/") && !path.contains(".."));
+        if !tracked {
+            return Err(invalid(&format!(
+                "authoritative transition {field} is not tracked documentation"
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Bind a structurally valid transition to the tracked identity, identity
+/// sidecar, and execution record it names.
+fn validate_transition_tracked_evidence(
+    transition: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    let source_attempt = transition["source_attempt"]
+        .as_u64()
+        .ok_or_else(|| missing("source_attempt"))?;
+    let identity_path = transition["source_identity_path"]
+        .as_str()
+        .ok_or_else(|| missing("source_identity_path"))?;
+    let identity = read_json(identity_path)?;
+    let identity_sha256 = canonical_hash(&identity)?;
+    let sidecar = read_json(&identity_path.replace(".json", ".sha256"))?;
+    if transition["source_identity_sha256"] != identity_sha256.as_str()
+        || sidecar.get("canonical_sha256").and_then(Value::as_str) != Some(identity_sha256.as_str())
+        || identity.get("attempt").and_then(Value::as_u64) != Some(source_attempt)
+        || identity.pointer("/candidate/reasoning_budget") != transition.get("source_budget")
+    {
+        return Err(invalid(
+            "authoritative transition source identity does not match tracked evidence",
+        ));
+    }
+    let record_path = transition["execution_record_path"]
+        .as_str()
+        .ok_or_else(|| missing("execution_record_path"))?;
+    if transition["execution_record_sha256"] != source_sha256(record_path)?.as_str() {
+        return Err(invalid(
+            "authoritative transition execution record does not match tracked evidence",
+        ));
+    }
+    let record = fs::read_to_string(workspace_path(record_path))?;
+    let manifest_sha256 = transition["evidence_manifest_sha256"]
+        .as_str()
+        .ok_or_else(|| missing("evidence_manifest_sha256"))?;
+    for marker in [
+        format!("ATTEMPT_{source_attempt:03}_INTEGRITY_ACCEPTED"),
+        format!("ATTEMPT_{source_attempt:03}_CALIBRATION_ADMISSIBLE"),
+        manifest_sha256.to_string(),
+    ] {
+        if !record.contains(&marker) {
+            return Err(invalid(
+                "authoritative transition is not supported by its execution record",
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn normalized_candidate_transition(transition: &Value, candidate_budget: u32) -> Value {
+    let source_attempt = transition["source_attempt"].as_u64().unwrap_or_default();
+    json!({
+        "state": format!("ATTEMPT_{source_attempt:03}_CALIBRATION_ADMISSIBLE"),
+        "source_attempt": source_attempt,
+        "source_budget": transition["source_budget"],
+        "source_candidate_budget": transition["source_budget"],
+        "source_state": "FAIL",
         "source_result": "FAIL",
         "source_integrity": "ACCEPTED",
         "source_calibration_admissible": true,
-        "selected_next_budget": 512,
-        "attempt_007_excluded_from_selection": true,
-        "attempt_007_raw_next_budget_excluded": true,
-        "requests": 3,
+        "integrity_accepted": true,
+        "calibration_admissible": true,
+        "candidate_budget": transition["source_budget"],
+        "candidate_state": "FAIL",
+        "case_set_complete": true,
+        "next_budget": transition["selected_next_budget"],
+        "selected_next_budget": transition["selected_next_budget"],
+        "selected_candidate_budget": candidate_budget,
+        "requests": transition["requests"],
         "automatic_retries": 0,
         "fallback_requests": 0,
         "adaptive_replicates": 0,
-        "identity_sha256": "917fde56d11e79a3b700de82f13e5f072bda483fa6b7abe6e2da9ff37ee2dfb5",
-        "evidence_manifest_sha256": "f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e4779",
-        "authoritative_transition_path": CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH,
+        "identity_sha256": transition["source_identity_sha256"],
+        "source_identity_path": transition["source_identity_path"],
+        "evidence_manifest_sha256": transition["evidence_manifest_sha256"],
+        "execution_record_path": transition["execution_record_path"],
+        "execution_record_sha256": transition["execution_record_sha256"],
+        "excluded_attempts": CALIBRATION_INADMISSIBLE_ATTEMPTS,
+        "attempt_007_excluded_from_selection": true,
+        "attempt_007_raw_next_budget_excluded": true,
+        "attempt_009_excluded_from_selection": true,
+        "authoritative_transition_path": CALIBRATION_CANDIDATE_TRANSITIONS_PATH,
         "raw_predecessor_evidence_required": false
-    }))
+    })
 }
 
 fn validate_authoritative_attempt_008_transition_record(
@@ -6021,16 +6254,62 @@ const ATTEMPT_009_EXECUTION_RECORD_SHA256: &str =
     "2eb51b44600850cd2514c40a2e347670af323afead7e90d1afad9525261cfaaa";
 
 /// Validate the Attempt-010 identity document without reading the sidecar,
-/// frozen executables, or any ignored evidence.
+/// frozen executables, current implementation sources, or any ignored
+/// evidence. Attempt 010 is consumed, so later source changes do not
+/// invalidate its recorded document; live and preparation paths still
+/// require the source binding through `validate_attempt_010_identity`.
 pub fn validate_attempt_010_identity_document(
     identity: &Value,
 ) -> Result<(), ReasoningBudgetCalibrationError> {
-    validate_attempt_010_identity(identity, false)
+    validate_attempt_010_identity_fields(identity)
 }
 
 fn validate_attempt_010_identity(
     identity: &Value,
     verify_sidecar: bool,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    validate_attempt_010_identity_fields(identity)?;
+    validate_attempt_010_source_binding(identity)?;
+    if verify_sidecar {
+        validate_attempt_010_identity_sidecar(identity)?;
+    }
+    Ok(())
+}
+
+/// The prepared implementation sources must equal the current checkout for
+/// any preparation or live use of the Attempt-010 identity.
+fn validate_attempt_010_source_binding(
+    identity: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
+    for (field, path) in [
+        (
+            "implementation_fingerprints.supervisor_source_sha256",
+            CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH,
+        ),
+        (
+            "implementation_fingerprints.child_source_sha256",
+            "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
+        ),
+        (
+            "implementation_fingerprints.native_exclusivity_source_sha256",
+            CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
+        ),
+    ] {
+        let pointer = format!("/{}", field.replace('.', "/"));
+        let expected = identity
+            .pointer(&pointer)
+            .and_then(Value::as_str)
+            .ok_or_else(|| missing(field))?;
+        let actual = source_sha256(path)?;
+        if expected != actual {
+            return Err(invalid(&format!("{field} does not match current source")));
+        }
+    }
+    Ok(())
+}
+
+fn validate_attempt_010_identity_fields(
+    identity: &Value,
 ) -> Result<(), ReasoningBudgetCalibrationError> {
     expect_string(
         identity,
@@ -6285,30 +6564,6 @@ fn validate_attempt_010_identity(
         "implementation_fingerprints.native_exclusivity_source_path",
         CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
     )?;
-    for (field, path) in [
-        (
-            "implementation_fingerprints.supervisor_source_sha256",
-            CALIBRATION_SUPERVISOR_HANDOFF_SOURCE_PATH,
-        ),
-        (
-            "implementation_fingerprints.child_source_sha256",
-            "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
-        ),
-        (
-            "implementation_fingerprints.native_exclusivity_source_sha256",
-            CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH,
-        ),
-    ] {
-        let pointer = format!("/{}", field.replace('.', "/"));
-        let expected = identity
-            .pointer(&pointer)
-            .and_then(Value::as_str)
-            .ok_or_else(|| missing(field))?;
-        let actual = source_sha256(path)?;
-        if expected != actual {
-            return Err(invalid(&format!("{field} does not match current source")));
-        }
-    }
     let binding =
         crate::phase1c_executable_identity::FrozenExecutableBinding::from_implementation_fingerprints(
             identity,
@@ -6454,9 +6709,6 @@ fn validate_attempt_010_identity(
         "network_policy.attempt_010_executions",
     ] {
         expect_u64(identity, field, 0)?;
-    }
-    if verify_sidecar {
-        validate_attempt_010_identity_sidecar(identity)?;
     }
     Ok(())
 }
@@ -7004,59 +7256,32 @@ fn source_sha256(path: &str) -> Result<String, ReasoningBudgetCalibrationError> 
     Ok(sha256_hex(&canonical))
 }
 
-fn validate_candidate_order_report(budget: u32) -> Result<Value, ReasoningBudgetCalibrationError> {
-    if budget == CALIBRATION_BUDGETS[0] {
+/// Candidate-order validation shared by preparation and live execution. The
+/// initial candidate needs no predecessor; every other candidate resolves
+/// through the single authoritative transition registry. The generic
+/// `candidate-result.json` path is never consulted.
+pub fn validate_candidate_order_report(
+    budget: u32,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
+    let index = CALIBRATION_BUDGETS
+        .iter()
+        .position(|candidate| *candidate == budget)
+        .ok_or_else(|| invalid("unregistered calibration budget"))?;
+    if index == 0 {
         return Ok(json!({
             "candidate_budget": budget,
             "candidate_order_valid": true,
             "predecessor_transition_required": false
         }));
     }
-    let index = CALIBRATION_BUDGETS
-        .iter()
-        .position(|candidate| *candidate == budget)
-        .ok_or_else(|| invalid("unregistered calibration budget"))?;
-    let previous = CALIBRATION_BUDGETS[index - 1];
-
-    // Budget 512 is the first live-required successor after the accepted
-    // Attempt-008 FAIL. Its predecessor is a tracked transition, not a
-    // generic result path under the current checkout. This is deliberately
-    // the same loader used by Attempt-009 preparation.
-    if budget == 512 {
-        let predecessor = load_authoritative_attempt_008_transition()?;
-        return Ok(json!({
-            "candidate_budget": budget,
-            "candidate_order_valid": true,
-            "predecessor_budget": previous,
-            "predecessor_transition": predecessor,
-            "predecessor_transition_required": true,
-            "raw_predecessor_evidence_required": false
-        }));
-    }
-
-    let previous_result = candidate_result_path(previous);
-    if !previous_result.exists() {
-        return Err(invalid(
-            "candidate order is not satisfied: prior candidate result is absent",
-        ));
-    }
-    let previous_value = read_json_path(&previous_result)?;
-    if previous_value.get("case_set_complete") != Some(&Value::Bool(true)) {
-        return Err(invalid(
-            "candidate order is not satisfied: prior case set is incomplete",
-        ));
-    }
-    if previous_value.get("state").and_then(Value::as_str) == Some("PASS") {
-        return Err(invalid(
-            "candidate order stopped after a passing prior candidate",
-        ));
-    }
+    let predecessor = resolve_authoritative_candidate_transition(budget)?;
     Ok(json!({
         "candidate_budget": budget,
         "candidate_order_valid": true,
-        "predecessor_budget": previous,
-        "predecessor_result_path": previous_result,
-        "predecessor_transition_required": false
+        "predecessor_budget": CALIBRATION_BUDGETS[index - 1],
+        "predecessor_transition": predecessor,
+        "predecessor_transition_required": true,
+        "raw_predecessor_evidence_required": false
     }))
 }
 
@@ -7467,7 +7692,7 @@ mod tests {
 
     #[test]
     fn candidate_order_preparation_and_runtime_share_authoritative_transition() {
-        let preparation_transition = load_authoritative_attempt_008_transition().unwrap();
+        let preparation_transition = resolve_authoritative_candidate_transition(512).unwrap();
         let runtime_order = validate_candidate_order_report(512).unwrap();
 
         assert_eq!(
@@ -7514,8 +7739,10 @@ mod tests {
         );
         assert_eq!(
             predecessor["authoritative_transition_path"],
-            CALIBRATION_ATTEMPT_009_BUDGET_PROVENANCE_PATH
+            CALIBRATION_CANDIDATE_TRANSITIONS_PATH
         );
+        assert_eq!(predecessor["source_attempt"], 8);
+        assert!(order.get("predecessor_result_path").is_none());
     }
 
     #[test]
@@ -7530,7 +7757,7 @@ mod tests {
 
     #[test]
     fn authoritative_transition_hashes_match_tracked_attempt_009_lineage() {
-        let transition = load_authoritative_attempt_008_transition().unwrap();
+        let transition = resolve_authoritative_candidate_transition(512).unwrap();
         let identity = read_json(CALIBRATION_ATTEMPT_009_IDENTITY_PATH).unwrap();
 
         for (field, lineage_field) in [
@@ -7549,10 +7776,278 @@ mod tests {
 
     #[test]
     fn candidate_not_selected_by_admissible_predecessor_is_rejected() {
-        // Budget 256 would require an accepted 512 result, which does not
-        // exist; an unregistered budget is never ordered.
-        assert!(validate_candidate_order_report(256).is_err());
+        // An unregistered budget is never ordered, and the initial candidate
+        // is never the target of a predecessor transition.
         assert!(validate_candidate_order_report(768).is_err());
+        assert!(resolve_authoritative_candidate_transition(768).is_err());
+        assert!(resolve_authoritative_candidate_transition(1024).is_err());
+        // A registry whose only transition selects 512 does not order 256.
+        let mut registry = transition_registry();
+        registry["transitions"] = json!([registry["transitions"][0].clone()]);
+        assert!(select_candidate_transition(&registry, 256)
+            .unwrap_err()
+            .to_string()
+            .contains("authoritative predecessor transition is absent"));
+    }
+
+    /// A labelled fail-closed case: candidate budget and registry mutation.
+    type TransitionCase = (&'static str, u32, Box<dyn FnOnce(&mut Value)>);
+
+    fn transition_registry() -> Value {
+        read_json(CALIBRATION_CANDIDATE_TRANSITIONS_PATH).unwrap()
+    }
+
+    fn transition_rejected(candidate: u32, mutate: impl FnOnce(&mut Value)) -> String {
+        let mut registry = transition_registry();
+        mutate(&mut registry);
+        match select_candidate_transition(&registry, candidate) {
+            Ok(transition) => validate_transition_tracked_evidence(&transition)
+                .unwrap_err()
+                .to_string(),
+            Err(error) => error.to_string(),
+        }
+    }
+
+    #[test]
+    fn attempt_008_to_512_and_attempt_010_to_256_resolve_canonically() {
+        let to_512 = resolve_authoritative_candidate_transition(512).unwrap();
+        assert_eq!(to_512["source_attempt"], 8);
+        assert_eq!(to_512["source_budget"], 1024);
+        assert_eq!(to_512["source_state"], "FAIL");
+        assert_eq!(to_512["selected_next_budget"], 512);
+        assert_eq!(
+            to_512["evidence_manifest_sha256"],
+            "f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e4779"
+        );
+
+        let to_256 = resolve_authoritative_candidate_transition(256).unwrap();
+        assert_eq!(to_256["source_attempt"], 10);
+        assert_eq!(to_256["source_budget"], 512);
+        assert_eq!(to_256["source_state"], "FAIL");
+        assert_eq!(to_256["integrity_accepted"], true);
+        assert_eq!(to_256["calibration_admissible"], true);
+        assert_eq!(to_256["selected_next_budget"], 256);
+        assert_eq!(
+            to_256["identity_sha256"],
+            "9292e9ecdd2e89f695dfb34bc782ade41b70412c427807c6c3a5653b50ec16f7"
+        );
+        assert_eq!(
+            to_256["evidence_manifest_sha256"],
+            "5673e55b381d1f5171c38bc9f1721b3105adf829ece4ec029cbcca4db150c4b9"
+        );
+        assert_eq!(to_256["raw_predecessor_evidence_required"], false);
+
+        for (budget, source) in [(512, 8), (256, 10)] {
+            let order = validate_candidate_order_report(budget).unwrap();
+            assert_eq!(order["candidate_order_valid"], true);
+            assert_eq!(order["predecessor_transition"]["source_attempt"], source);
+            assert!(order.get("predecessor_result_path").is_none());
+        }
+    }
+
+    #[test]
+    fn candidate_256_preparation_and_runtime_share_the_canonical_transition() {
+        let absent_root = std::env::temp_dir().join(format!(
+            "prefixity-candidate-256-prestart-absent-{}",
+            std::process::id()
+        ));
+        let resolved = resolve_authoritative_candidate_transition(256).unwrap();
+        let order = validate_candidate_order_report(256).unwrap();
+        let (_manifest, runtime_order) =
+            calibration_prestart_checks(256, true, &absent_root).unwrap();
+
+        assert_eq!(order["predecessor_transition"], resolved);
+        assert_eq!(runtime_order, order);
+    }
+
+    #[test]
+    fn authoritative_transitions_exclude_attempts_007_and_009() {
+        for attempt in [7, 9] {
+            let error = transition_rejected(256, |registry| {
+                registry["transitions"][1]["source_attempt"] = json!(attempt);
+            });
+            assert!(
+                error.contains("excluded or invalid source attempt"),
+                "{error}"
+            );
+        }
+        let error = transition_rejected(512, |registry| {
+            registry["excluded_attempts"]
+                .as_array_mut()
+                .unwrap()
+                .retain(|entry| entry["attempt"] != 9);
+        });
+        assert!(error.contains("inadmissible attempt is not excluded"));
+    }
+
+    #[test]
+    fn attempt_010_is_never_a_source_for_512() {
+        let error = transition_rejected(512, |registry| {
+            registry["transitions"] = json!([registry["transitions"][1].clone()]);
+        });
+        assert!(error.contains("authoritative predecessor transition is absent"));
+    }
+
+    #[test]
+    fn authoritative_transitions_fail_closed() {
+        let cases: Vec<TransitionCase> = vec![
+            (
+                "missing registry",
+                256,
+                Box::new(|registry: &mut Value| *registry = Value::Null),
+            ),
+            (
+                "missing transitions",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry.as_object_mut().unwrap().remove("transitions");
+                }),
+            ),
+            (
+                "corrupt transition",
+                256,
+                Box::new(|registry: &mut Value| registry["transitions"][1] = json!("corrupt")),
+            ),
+            (
+                "incomplete transition",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]
+                        .as_object_mut()
+                        .unwrap()
+                        .remove("evidence_manifest_sha256");
+                }),
+            ),
+            (
+                "integrity rejected",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["integrity_accepted"] = json!(false)
+                }),
+            ),
+            (
+                "inadmissible",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["calibration_admissible"] = json!(false)
+                }),
+            ),
+            (
+                "incomplete case set",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["case_set_complete"] = json!(false)
+                }),
+            ),
+            (
+                "wrong source attempt",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["source_attempt"] = json!(11)
+                }),
+            ),
+            (
+                "wrong source budget",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["source_budget"] = json!(1024)
+                }),
+            ),
+            (
+                "wrong source state",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["source_state"] = json!("PASS")
+                }),
+            ),
+            (
+                "wrong next budget",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["selected_next_budget"] = json!(1024)
+                }),
+            ),
+            (
+                "mismatched manifest hash",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["evidence_manifest_sha256"] =
+                        json!("f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e4779")
+                }),
+            ),
+            (
+                "truncated manifest hash",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["evidence_manifest_sha256"] =
+                        json!("5673e55b381d1f5171c38bc9f1721b3105adf829ece4ec029cbcca4db150c4b")
+                }),
+            ),
+            (
+                "mismatched identity hash",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["source_identity_sha256"] =
+                        json!("917fde56d11e79a3b700de82f13e5f072bda483fa6b7abe6e2da9ff37ee2dfb5")
+                }),
+            ),
+            (
+                "changed execution record",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["execution_record_sha256"] =
+                        json!("cc12d12a4a760fce91a9627240b7c7ad8869c999b4f686670093a49531cffc26")
+                }),
+            ),
+            (
+                "ignored raw evidence path",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["transitions"][1]["execution_record_path"] = json!(
+                        "experiments/runs/phase1c-reasoning-budget-calibration/budget-512/candidate-result.json"
+                    )
+                }),
+            ),
+            (
+                "duplicate transition",
+                256,
+                Box::new(|registry: &mut Value| {
+                    let duplicate = registry["transitions"][1].clone();
+                    registry["transitions"]
+                        .as_array_mut()
+                        .unwrap()
+                        .push(duplicate);
+                }),
+            ),
+            (
+                "ambiguous source budget",
+                512,
+                Box::new(|registry: &mut Value| {
+                    let mut ambiguous = registry["transitions"][0].clone();
+                    ambiguous["source_attempt"] = json!(12);
+                    registry["transitions"]
+                        .as_array_mut()
+                        .unwrap()
+                        .push(ambiguous);
+                }),
+            ),
+            (
+                "changed candidate order",
+                256,
+                Box::new(|registry: &mut Value| {
+                    registry["candidate_order"] = json!([1024, 256, 512])
+                }),
+            ),
+        ];
+        for (label, candidate, mutate) in cases {
+            let mut registry = transition_registry();
+            mutate(&mut registry);
+            let rejected = match select_candidate_transition(&registry, candidate) {
+                Ok(transition) => validate_transition_tracked_evidence(&transition).is_err(),
+                Err(_) => true,
+            };
+            assert!(rejected, "{label} was accepted");
+        }
     }
 
     #[test]
@@ -8310,7 +8805,6 @@ mod tests {
             .unwrap_err()
             .to_string()
             .contains("fresh-runtime confirmation"));
-        assert!(calibration_prestart_checks(256, true, &absent_root).is_err());
         assert!(calibration_prestart_checks(768, true, &absent_root).is_err());
     }
 
