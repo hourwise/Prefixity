@@ -1,13 +1,14 @@
-//! Clean-checkout proof for the prepared Attempt-011 contract.
+//! Checks of the consumed Attempt-011 identity document.
 //!
 //! These tests read only tracked repository evidence. They do not require
 //! ignored prior-run evidence, frozen executables, a supervisor, a listener,
-//! or a model server, so a fresh CI clone exercises the same repository
-//! contract that the live Attempt-011 child validates before model contact.
+//! or a model server. Attempt 011 has executed; its repository contract now
+//! fails closed on the source binding, while the recorded identity document
+//! itself remains checkable.
 
 use prefixity_controlled_benchmark::{
     validate_attempt_011_identity_document, validate_attempt_011_repository_contract,
-    CALIBRATION_ATTEMPT_011_IDENTITY_PATH, CALIBRATION_CANDIDATE_TRANSITIONS_PATH,
+    CALIBRATION_ATTEMPT_011_IDENTITY_PATH,
 };
 use serde_json::{json, Value};
 use std::path::Path;
@@ -26,51 +27,15 @@ fn rejected(mutate: impl FnOnce(&mut Value)) -> bool {
 }
 
 #[test]
-fn clean_checkout_attempt_011_repository_contract_is_valid() {
-    let contract = validate_attempt_011_repository_contract().unwrap();
+fn consumed_attempt_011_contract_fails_closed_after_source_changes() {
+    // Attempt 011 is consumed. Its identity binds the implementation sources
+    // of its frozen executables, so once those sources change no preparation
+    // or live path may accept the identity again.
+    let error = validate_attempt_011_repository_contract()
+        .unwrap_err()
+        .to_string();
 
-    assert_eq!(contract["state"], "ATTEMPT_011_REPOSITORY_CONTRACT_VALID");
-    for flag in [
-        "ATTEMPT_ID_VALID",
-        "ATTEMPT_IDENTITY_VALID",
-        "PREDECESSOR_TRANSITION_PRESENT",
-        "PREDECESSOR_TRANSITION_VALID",
-        "SOURCE_ATTEMPT_010",
-        "SOURCE_BUDGET_512",
-        "SOURCE_STATE_FAIL",
-        "SOURCE_INTEGRITY_ACCEPTED",
-        "SOURCE_CALIBRATION_ADMISSIBLE",
-        "NEXT_BUDGET_256",
-        "CANDIDATE_ORDER_VALID",
-        "CANDIDATE_BUDGET_256_ORDER_VALID",
-        "ATTEMPT_007_EXCLUDED_FROM_SELECTION",
-        "ATTEMPT_009_EXCLUDED_FROM_SELECTION",
-        "ATTEMPT_008_NOT_SOURCE_FOR_256",
-        "CASE_SET_VALID",
-        "REQUEST_CEILING_VALID",
-        "RETRY_POLICY_VALID",
-        "FALLBACK_POLICY_VALID",
-    ] {
-        assert_eq!(contract[flag], true, "{flag}");
-    }
-    let predecessor = &contract["candidate_order"]["predecessor_transition"];
-    assert_eq!(predecessor["source_attempt"], 10);
-    assert_eq!(predecessor["source_budget"], 512);
-    assert_eq!(predecessor["selected_next_budget"], 256);
-    assert_eq!(
-        predecessor["evidence_manifest_sha256"],
-        "5673e55b381d1f5171c38bc9f1721b3105adf829ece4ec029cbcca4db150c4b9"
-    );
-    assert_eq!(
-        predecessor["authoritative_transition_path"],
-        CALIBRATION_CANDIDATE_TRANSITIONS_PATH
-    );
-    assert!(contract["candidate_order"]
-        .get("predecessor_result_path")
-        .is_none());
-    assert_eq!(contract["raw_predecessor_evidence_required"], false);
-    assert_eq!(contract["network_calls"], 0);
-    assert_eq!(contract["inference_requests"], 0);
+    assert!(error.contains("does not match current source"), "{error}");
 }
 
 #[test]

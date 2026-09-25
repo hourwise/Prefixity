@@ -1,0 +1,134 @@
+{
+  "contract_version": "phase1c-scored-runtime-local-qwen-v3",
+  "experiment_id": "phase-1c-scored-capability-v3",
+  "status": "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+  "parent_contract": {
+    "path": "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V2.json",
+    "contract_version": "phase1c-scored-runtime-local-qwen-v2",
+    "status": "FROZEN_TERMINALLY_INFEASIBLE",
+    "reason": "h001 V2 BASELINE exhausted the 2048-token ceiling and the reasoning-budget calibration is terminal: REASONING-ON / 2048-TOKEN SCORED CONFIGURATION NOT FEASIBLE"
+  },
+  "design_record": "docs/phase-1/PHASE_1C_SCORED_RUNTIME_V3_DESIGN_DECISION.md",
+  "runtime": {
+    "engine": "llama.cpp",
+    "executable": {
+      "path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "version": "b10217-ddd4ec142",
+      "source_commit": "ddd4ec1428a6201e18975ea52b07c71e0f9aef26",
+      "sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+      "file_size": 15277056,
+      "windows_file_id": "volume=c4c93b54;index=00060000001ea970",
+      "windows_file_id_source": "repository executable-identity inspect() of the opened C: file handle; c4c93b54 is the C: volume serial. Attempts 009-011 recorded volume=ba2f80f4 (the D: serial) for this file; those historical records are not rewritten"
+    },
+    "model": {
+      "reference": "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0",
+      "architecture": "qwen35",
+      "quantization": "Q4_0",
+      "loading": "direct frozen file via -m; -hf is forbidden",
+      "path": "D:\\Prefixity-Lab\\models\\models--ggml-org--Qwen3.5-0.8B-GGUF\\snapshots\\8fea620810c4afa23dd6443f999a48574c1611a3\\Qwen3.5-0.8B-Q4_0.gguf",
+      "snapshot": "8fea620810c4afa23dd6443f999a48574c1611a3",
+      "sha256": "57d1997790d1744fba5b40a7317df71ea5e2acee28c47e78f0cce39c0703f8cf",
+      "file_size": 563036064,
+      "windows_file_id": "volume=ba2f80f4;index=00030000002035c4"
+    },
+    "context_size": 8192,
+    "parallel_slots": 1,
+    "metrics": "enabled",
+    "reasoning": "on",
+    "reasoning_budget_flag": "ABSENT",
+    "reasoning_budget_flag_semantics": "no --reasoning-budget argument and no LLAMA_ARG_* environment variable; the frozen b10217 server default applies",
+    "network_offline_flag": "--offline",
+    "host": "127.0.0.1",
+    "port": 8080,
+    "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+    "launch_arguments": [
+      "serve",
+      "-m",
+      "D:\\Prefixity-Lab\\models\\models--ggml-org--Qwen3.5-0.8B-GGUF\\snapshots\\8fea620810c4afa23dd6443f999a48574c1611a3\\Qwen3.5-0.8B-Q4_0.gguf",
+      "-c",
+      "8192",
+      "-np",
+      "1",
+      "--metrics",
+      "--reasoning",
+      "on",
+      "--offline",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8080"
+    ],
+    "forbidden_launch_arguments": [
+      "--reasoning-budget",
+      "--reasoning-budget-message",
+      "-hf",
+      "--hf-repo",
+      "-hff",
+      "--hf-file",
+      "--mmproj",
+      "-mm"
+    ],
+    "forbidden_environment_prefix": "LLAMA_ARG_"
+  },
+  "generation": {
+    "max_tokens": 4096,
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 1,
+    "stream": false,
+    "additional_sampling_parameters": {}
+  },
+  "context_budget": {
+    "context_tokens": 8192,
+    "output_ceiling_tokens": 4096,
+    "bound": "input_tokens + 4096 <= 8192",
+    "authoritative_token_counter": "frozen llama.cpp b10217 + frozen GGUF + POST /v1/chat/completions/input_tokens",
+    "token_counter_is_inference": false,
+    "token_counter_request_body": "the exact chat-completion request body that would be submitted for inference; no projection",
+    "on_bound_failure": "INCONCLUSIVE_CONTEXT_BOUND without dispatch; no truncation, summarization, history drop, max_tokens reduction, context increase, or retry"
+  },
+  "timeout_policy": {
+    "connect_timeout_ms": 1000,
+    "readiness_timeout_ms": 1000,
+    "token_count_request_timeout_ms": 60000,
+    "inference_request_timeout_ms": 2400000,
+    "non_request_margin_ms": 120000,
+    "supervisor_deadline_ms": 7501000,
+    "supervisor_deadline_derivation": "readiness_contacts * readiness_timeout_ms + token_count_contacts * token_count_request_timeout_ms + inference_requests * inference_request_timeout_ms + non_request_margin_ms = 1 * 1000 + 3 * 60000 + 3 * 2400000 + 120000",
+    "supervisor_deadline_is_derived": "the recorded supervisor_deadline_ms must equal the derivation from the gate limits and these components; an independent value is rejected",
+    "per_contact_bounds": "each readiness, token-count, and inference contact has its own complete bound; token-count contacts do not inherit the inference bound",
+    "connect_timeout_scope": "TCP connect bound inside each HTTP contact's complete bound; must not exceed any contact bound",
+    "non_request_margin_scope": "child process start, prerequisite validation and hashing, post-start ownership inspection, evidence writes, and child exit; no network contact is made inside the margin"
+  },
+  "retry_policy": {
+    "automatic_retries": 0,
+    "fallback_requests": 0,
+    "adaptive_replicates": 0,
+    "warmup_requests": 0
+  },
+  "accounting_classes": [
+    "operator_server_startups",
+    "readiness_contacts",
+    "token_count_contacts",
+    "inference_requests"
+  ],
+  "reasoning_isolation": {
+    "reasoning_content_status": "diagnostic_only_separate_field",
+    "reasoning_content_substitution_for_final_content": "forbidden",
+    "reasoning_score": "none"
+  },
+  "unchanged_from_v2": [
+    "model and quantization",
+    "context 8192, one slot, metrics",
+    "reasoning on",
+    "temperature, top_p, seed, stream",
+    "prompts, tasks, tool contract, evaluator, thresholds, arms, turns",
+    "retry, fallback, replicate, and freshness policy"
+  ],
+  "changed_from_v2": {
+    "max_tokens": [2048, 4096],
+    "complete_request_timeout_ms_to_inference_request_timeout_ms": [1200000, 2400000],
+    "supervisor_timeout_ms_to_derived_supervisor_deadline_ms": [1320000, 7501000],
+    "model_loading": ["-hf ggml-org/Qwen3.5-0.8B-GGUF:Q4_0", "-m <frozen GGUF path> with --offline"]
+  }
+}

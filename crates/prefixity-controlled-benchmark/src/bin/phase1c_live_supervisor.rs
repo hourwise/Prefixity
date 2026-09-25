@@ -1,5 +1,6 @@
 use prefixity_controlled_benchmark::{
-    persist_supervisor_result, registered_workflow_identity_from_file, run_supervised,
+    persist_supervisor_result, registered_supervisor_deadline_ms,
+    registered_workflow_identity_from_file, run_supervised,
     run_supervised_with_registered_workflow_identity, H001Error, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
 };
 use std::env;
@@ -78,10 +79,14 @@ fn main() {
                 Ok(identity) => identity,
                 Err(error) => fail(error),
             };
+            let deadline_ms = match registered_supervisor_deadline_ms(&identity_path) {
+                Ok(deadline_ms) => deadline_ms,
+                Err(error) => fail(error),
+            };
             run_supervised_with_registered_workflow_identity(
                 &program,
                 &child_args,
-                Duration::from_millis(PRODUCTION_SUPERVISOR_TIMEOUT_MS),
+                Duration::from_millis(deadline_ms),
                 &registered,
             )
         }
@@ -109,7 +114,7 @@ fn main() {
 
 fn usage() -> H001Error {
     H001Error::Validation(format!(
-        "usage: prefixity-phase1c-live-supervisor [--attempt-identity IDENTITY_PATH|--certification-identity IDENTITY_PATH --certification-result PATH] --evidence PATH -- PROGRAM [ARGS...] (deadline fixed at {PRODUCTION_SUPERVISOR_TIMEOUT_MS}ms)"
+        "usage: prefixity-phase1c-live-supervisor [--attempt-identity IDENTITY_PATH|--certification-identity IDENTITY_PATH --certification-result PATH] --evidence PATH -- PROGRAM [ARGS...] (deadline fixed at {PRODUCTION_SUPERVISOR_TIMEOUT_MS}ms; V3 feasibility-gate identities use the child-lifecycle deadline derived from their bound spec)"
     ))
 }
 

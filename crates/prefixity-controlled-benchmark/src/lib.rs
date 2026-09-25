@@ -36,6 +36,7 @@ mod phase1c_stage1_local_qwen;
 mod phase1c_stage1_reasoning_off_live;
 mod phase1c_stage1_reasoning_off_postrun;
 mod phase1c_stage1_reasoning_off_preflight;
+mod phase1c_v3_feasibility;
 mod phase1c_windows_runtime_exclusivity;
 mod planner;
 mod world;
@@ -204,6 +205,9 @@ pub use phase1c_live_supervisor::{
     RegisteredWorkflowIdentity, WorkflowLaunchMetadata, PRODUCTION_SUPERVISOR_TIMEOUT_MS,
     WORKFLOW_HANDOFF_ENV, WORKFLOW_HANDOFF_SCHEMA_ID,
 };
+pub use phase1c_live_supervisor::{
+    registered_supervisor_deadline_ms, V3_FEASIBILITY_GATE_IDENTITY_PREFIX,
+};
 pub use phase1c_reasoning_budget_calibration::{
     attempt_002_exclusivity_preflight, attempt_002_runtime_ownership, attempt_003_poststart,
     attempt_003_runtime_ownership, attempt_003_runtime_ownership_with_expected_workflow,
@@ -283,6 +287,16 @@ pub use phase1c_stage1_reasoning_off_preflight::{
     certify_stage1_reasoning_off_preserved_evidence, preflight_stage1_reasoning_off_smoke,
     validate_stage1_reasoning_off_contract_and_fixture, RemediationPreflight,
     RemediationPreflightError,
+};
+pub use phase1c_v3_feasibility::{
+    classify_gate, context_guard, derive_gate_spec, dry_run_v3_feasibility_gate,
+    execute_v3_feasibility_gate, freeze_v3_feasibility_gate, gate_permission,
+    preflight_v3_feasibility_gate, validate_gate_identity_document, validate_gate_spec,
+    validate_v3_contract, validate_v3_live_prerequisites, ContextDecision, V3GateSpec,
+    CURRENT_QWEN_SCORED_PATH_CLOSED, INCONCLUSIVE_CONTEXT_BOUND, V3_CONTRACT_PATH,
+    V3_FEASIBILITY_PASSED, V3_GATE_EVIDENCE_ROOT, V3_GATE_FROZEN_STAGE_ROOT,
+    V3_GATE_IDENTITY_FINGERPRINT_PATH, V3_GATE_IDENTITY_PATH, V3_GATE_TRAVERSAL_ROOT,
+    V3_MAX_TOKENS,
 };
 pub use planner::{project_planner_evidence, run_frozen_planner};
 pub use world::{ExecutionStatus, ScriptedWorld, WorldExecution};

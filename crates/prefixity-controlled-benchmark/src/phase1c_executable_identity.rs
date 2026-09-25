@@ -275,10 +275,129 @@ fn platform_file_identity(
     result
 }
 
+/// Serial number of the volume that contains `path`, resolved through the
+/// volume mount point rather than a handle to the file. Tests use it as an
+/// independent reference for the volume component of a Windows file ID.
+#[cfg(all(windows, test))]
+pub(crate) fn containing_volume_serial(path: &Path) -> Result<u32, String> {
+    use std::iter::once;
+    use std::os::windows::ffi::OsStrExt;
+    use std::ptr::null_mut;
+    use windows_sys::Win32::Foundation::GetLastError;
+    use windows_sys::Win32::Storage::FileSystem::{GetVolumeInformationW, GetVolumePathNameW};
+
+    let wide_path = path
+        .as_os_str()
+        .encode_wide()
+        .chain(once(0))
+        .collect::<Vec<_>>();
+    let mut volume_root = [0u16; 32_768];
+    if unsafe {
+        GetVolumePathNameW(
+            wide_path.as_ptr(),
+            volume_root.as_mut_ptr(),
+            volume_root.len() as u32,
+        )
+    } == 0
+    {
+        return Err(format!(
+            "GetVolumePathNameW failed with Windows error {}",
+            unsafe { GetLastError() }
+        ));
+    }
+    let mut serial = 0u32;
+    if unsafe {
+        GetVolumeInformationW(
+            volume_root.as_ptr(),
+            null_mut(),
+            0,
+            &mut serial,
+            null_mut(),
+            null_mut(),
+            null_mut(),
+            0,
+        )
+    } == 0
+    {
+        return Err(format!(
+            "GetVolumeInformationW failed with Windows error {}",
+            unsafe { GetLastError() }
+        ));
+    }
+    Ok(serial)
+}
+
+/// The volume component of a `volume=XXXXXXXX;index=YYYYYYYYYYYYYYYY` file ID.
+#[cfg(test)]
+pub(crate) fn file_id_volume(file_id: &str) -> Option<u32> {
+    let (volume, index) = file_id.strip_prefix("volume=")?.split_once(";index=")?;
+    let hex = |text: &str, width: usize| {
+        text.len() == width
+            && text
+                .chars()
+                .all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
+    };
+    if !hex(volume, 8) || !hex(index, 16) {
+        return None;
+    }
+    u32::from_str_radix(volume, 16).ok()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::fs;
+
+    /// Regression for the Attempt 009-011 llama.exe record, whose volume
+    /// component was another volume's serial: the helper's volume must be the
+    /// volume that contains the inspected file. The temporary directory and
+    /// the test executable are on different volumes on the preparation host
+    /// (C: and D:), so this also covers the cross-volume case there.
+    #[cfg(windows)]
+    #[test]
+    fn windows_file_id_volume_is_the_containing_volume() {
+        let root =
+            std::env::temp_dir().join(format!("prefixity-volume-identity-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let temporary = root.join("object.bin");
+        fs::write(&temporary, b"volume identity").unwrap();
+        let executable = std::env::current_exe().unwrap();
+
+        let mut serials = Vec::new();
+        for path in [temporary.as_path(), executable.as_path()] {
+            let identity = inspect(path).unwrap();
+            let recorded = identity
+                .file_id
+                .as_deref()
+                .and_then(file_id_volume)
+                .unwrap_or_else(|| panic!("{} has no well-formed file ID", path.display()));
+            let containing = containing_volume_serial(path).unwrap();
+            assert_eq!(recorded, containing, "{}", path.display());
+            serials.push(containing);
+        }
+        let _ = fs::remove_file(&temporary);
+        let _ = fs::remove_dir(&root);
+        eprintln!(
+            "volume identity: temp={:08x} executable={:08x} cross_volume={}",
+            serials[0],
+            serials[1],
+            serials[0] != serials[1]
+        );
+    }
+
+    #[test]
+    fn file_id_volume_parses_only_the_helper_format() {
+        assert_eq!(
+            file_id_volume("volume=c4c93b54;index=00060000001ea970"),
+            Some(0xc4c9_3b54)
+        );
+        assert_eq!(file_id_volume("0x000000000000000000060000001ea970"), None);
+        assert_eq!(
+            file_id_volume("volume=C4C93B54;index=00060000001ea970"),
+            None
+        );
+        assert_eq!(file_id_volume("volume=c4c93b54;index=1ea970"), None);
+    }
 
     #[test]
     fn alternate_path_representation_accepts_same_file() {

@@ -75,7 +75,7 @@ V3 changes exactly these fields relative to scored runtime V2:
 | --- | ---: | ---: |
 | `max_tokens` (output ceiling) | 2048 | 4096 |
 | `complete_request_timeout_ms` | 1200000 | 2400000 |
-| `supervisor_timeout_ms` | 1320000 | 2520000 |
+| `supervisor_timeout_ms` | 1320000 | 2520000 (superseded; see section 14) |
 
 Derivation:
 
@@ -321,3 +321,207 @@ Files expected in that later preparation task:
 - `docs/phase-1/PHASE_1C_SCORED_PILOT_MANIFEST_V3.json` and `.sha256`;
 - a V3 feasibility-gate spec with its identity and sidecar;
 - the spec-driven gate runner and its tests.
+
+## 13. Amendment 1 — model loading and authoritative token counting
+
+Accepted after the offline preparation blocker
+`EXACT_OFFLINE_TOKENIZER_UNAVAILABLE`: the installed b10217 build has no
+standalone tokenizer (its commands are `serve`, `cli`, `completion`, `bench`,
+and similar), and its binary contains no `/apply-template` or `/tokenize`
+route. Exact counts would otherwise require recreating llama.cpp's chat
+template and tokenizer logic.
+
+**Model loading.** `-hf` is replaced by direct loading of the frozen file with
+`-m`:
+
+```text
+D:\Prefixity-Lab\models\models--ggml-org--Qwen3.5-0.8B-GGUF\snapshots\8fea620810c4afa23dd6443f999a48574c1611a3\Qwen3.5-0.8B-Q4_0.gguf
+SHA-256 57d1997790d1744fba5b40a7317df71ea5e2acee28c47e78f0cce39c0703f8cf, 563036064 bytes
+```
+
+`-hf` re-resolved the Hugging Face reference at every launch (the cache
+`refs/main` was rewritten when Attempt 011's server started) and may fetch a
+multimodal projector. The frozen b10217 `--offline` flag ("forces use of
+cache, prevents network access") is added as a recorded network-safety
+property. No `LLAMA_ARG_*` environment variable may be present at launch.
+The GGUF hash, size, and file identity must match before any token-count or
+inference request.
+
+**Authoritative token counter.**
+
+```text
+AUTHORITATIVE_V3_TOKEN_COUNTER =
+frozen llama.cpp b10217 + frozen GGUF + POST /v1/chat/completions/input_tokens
+```
+
+In the frozen source (`ddd4ec1428a6201e18975ea52b07c71e0f9aef26`,
+`tools/server/server-context.cpp`), `handle_count_tokens` parses the body with
+`oaicompat_chat_params_parse(body, meta->chat_params, files)` and counts with
+`tokenize_mixed(vocab, prompt, true, true)`, returning
+`{"input_tokens": N, "object": "response.input_tokens"}` without generation.
+`post_chat_completions` uses the same parse and the same text tokenization.
+With `-m` and no multimodal projector the runtime is text-only, so the counter
+receives the **exact inference request body with no projection**. This
+replaces section 5's standalone offline tokenizer requirement; no approximate
+tokenizer is used. Token counting is a model-loaded, non-inference operation.
+
+**Accounting.** Recorded separately, and token-count contacts are never
+counted as inference:
+
+```text
+operator_server_startups = 1
+readiness_contacts       = 1
+token_count_contacts     = 3
+inference_requests      <= 3
+retry_requests = fallback_requests = adaptive_replicates = warmup_requests = 0
+```
+
+**Static gate proof at the pre-inference boundary.** No separate model instance
+is started for preparation. At the live gate, after runtime identity and
+exclusivity checks and before any inference, the three frozen gate request
+bodies are counted and each must satisfy `input_tokens + 4096 <= 8192`. Any
+failure records `INCONCLUSIVE_CONTEXT_BOUND` and
+`CURRENT_QWEN_SCORED_PATH_CLOSED` with `inference_requests = 0`. The static
+fit analysis for pilot and full-cohort requests moves to V3 pilot
+preparation; later pilot turns use the same endpoint immediately before
+dispatch (section 5).
+
+**Pre-inference failures.** A readiness failure, or a token-count request that
+fails at the transport or HTTP level, is a genuine pre-inference failure
+(`GATE_PRE_INFERENCE_FAILURE`, zero inference). It consumes the gate identity
+and may receive the single replacement identity of section 7. A counted
+request that exceeds the bound is not a pre-inference failure; it closes the
+path.
+
+**Supervisor deadline.** Resolved by Amendment 2 (section 14).
+
+## 14. Amendment 2 — derived child-lifecycle supervisor deadline
+
+The `2520000` ms supervisor deadline is rejected. It was V2's single-request
+rule (request bound + 120 s), while the V3 child may make three sequential
+inference requests plus readiness and token-count contacts. This amendment is
+a preparation/spec correction only; it does not change the model, cases,
+ceiling, reasoning semantics, or pass/fail rule.
+
+**Inherited timeouts before this amendment (inspected in code).** Readiness is
+one TCP listener connect (`TcpStream::connect_timeout`), not an HTTP request;
+it inherited `connect_timeout_ms = 1000`. The three
+`/v1/chat/completions/input_tokens` requests used the same HTTP client as
+inference and therefore silently inherited the `2400000` ms generation bound.
+
+**Explicit per-contact bounds.** `V3GateSpec.deadlines` and the contract's
+`timeout_policy` now carry:
+
+| Component | Value (ms) | Enforced by |
+| --- | ---: | --- |
+| `connect_timeout_ms` | 1000 | TCP connect inside each HTTP contact bound |
+| `readiness_timeout_ms` | 1000 | the single listener connect |
+| `token_count_request_timeout_ms` | 60000 | per-request override on each token-count POST |
+| `inference_request_timeout_ms` | 2400000 | client default, used only by inference |
+| `non_request_margin_ms` | 120000 | explicit; no network contact inside it |
+
+Each HTTP bound is reqwest's complete-request bound (connect through end of
+body). The connect bound must not exceed any contact bound. Token counting is a
+non-generating tokenization of the exact request body, so 60000 ms is a
+deliberately generous bound, not a measurement.
+
+**Derivation.** The supervisor deadline is not an independent value:
+
+```text
+supervisor_deadline_ms =
+    readiness_contacts   * readiness_timeout_ms              1 * 1000
+  + token_count_contacts * token_count_request_timeout_ms    3 * 60000
+  + inference_requests   * inference_request_timeout_ms      3 * 2400000
+  + non_request_margin_ms                                    120000
+  = 1000 + 180000 + 7200000 + 120000
+  = 7501000 ms (about 125 min)
+```
+
+The derivation uses checked arithmetic and rejects zero components. A recorded
+`supervisor_deadline_ms` that differs from it in either direction is rejected
+by contract validation, by gate-spec validation, by gate-identity registration,
+and by the supervisor's deadline reader. The superseded
+`supervisor_timeout_ms` and `complete_request_timeout_ms` fields are rejected
+in the V3 contract and, through `deny_unknown_fields`, in the V3 spec. The
+supervisor re-derives the deadline from the bound identity's `spec.limits` and
+`spec.deadlines`; the value is not compiled into the frozen executables.
+Historical identity kinds (h001 V2, calibration attempts, workflow
+certification) keep the fixed `1320000` ms production deadline even if they
+carry V3-shaped fields.
+
+**What the margin covers.** The supervisor's clock starts before it spawns the
+child. Everything the child does outside the three contact classes falls in
+`non_request_margin_ms`: process start, handoff parsing, prerequisite
+validation (source hashes, frozen supervisor/child hashes, workflow
+certification V2 hashes, llama.exe and GGUF identity), post-start ownership
+inspection, evidence writes, and exit. None of these makes a network contact
+and none has its own timer; they are bounded by file size.
+
+Evidence recorded while preparing this amendment (2026-09-25, same host,
+unoptimized `dev` profile as the frozen executables, offline, no server):
+
+| Measured object | Bytes | `inspect` wall time (3 runs) |
+| --- | ---: | --- |
+| GGUF model | 563036064 | 47545, 46318, 46016 ms |
+| llama.exe | 15277056 | 1297, 1305, 1219 ms |
+
+Estimate, not measured: the child hashes about 617 MB in total outside
+requests (GGUF 563 MB, llama.exe 15.3 MB, the frozen supervisor/child about
+9.7 MB three times, and the certification V2 executables about 9.8 MB). At the
+measured rate of about 11.8 MB/s that is about 52 s, leaving about 68 s of the
+120000 ms margin for process start, process-table inspection, and evidence
+writes. The margin is therefore sufficient on the observed host but not by a
+large factor; a materially slower disk or memory pressure during the live run
+could consume it. If the margin is exhausted, the supervisor kills the child
+once and records `SUPERVISOR_TIMEOUT`; it never retries.
+
+## 15. Amendment 3 — llama.exe Windows file identity
+
+Classification: `HISTORICAL_LLAMA_FILE_ID_RECORDING_DEFECT`.
+
+**Observation.** The V3 contract carried the llama.exe file ID
+`volume=ba2f80f4;index=00060000001ea970` from the Attempt 009-011 identities.
+`ba2f80f4` is the D: volume serial; llama.exe is on C: (`c4c93b54`). SHA-256
+and size matched; `v3-dry-run` failed closed on the file ID.
+
+**Helper check.** The repository `inspect()` opens the target with
+`CreateFileW` and takes both the volume serial and the file index from
+`GetFileInformationByHandle` on that handle; no cwd, drive letter, or other
+object is consulted. A harness calling only the exported
+`inspect_executable_identity` gave, on 2026-09-25:
+
+| cwd | object | `file_id` |
+| --- | --- | --- |
+| `D:\Users\fleur\Prefixity` | C: llama.exe | `volume=c4c93b54;index=00060000001ea970` |
+| `C:\Users\USER` | C: llama.exe | `volume=c4c93b54;index=00060000001ea970` |
+| `D:\Users\fleur\Prefixity` and `C:\Users\USER` | D: `Cargo.toml` | `volume=ba2f80f4;index=00160000000f03dc` |
+| `C:\Users\USER` | D: GGUF | `volume=ba2f80f4;index=00030000002035c4` |
+
+`vol` reports C: `C4C9-3B54` and D: `BA2F-80F4`. The helper is correct and
+cwd-independent.
+
+**Root cause.** Attempts 007 and 008 recorded the llama.exe file ID in
+`fsutil` form, `0x000000000000000000060000001ea970`, which has no volume
+component. The Attempt 009 identity (commit `d389500`, documents only)
+rewrote it by hand into the helper's `volume=...;index=...` form, keeping the
+index and filling the volume with `ba2f80f4`, the serial shared by every
+other recorded object (frozen executables and the GGUF, all on D:). Attempts
+010 and 011 copied the value; their `reverification` notes re-read only
+"sha256, file_size and NTFS file index". No code reads
+`server_executable.windows_file_id`, so nothing detected it.
+
+**Historical records.** The Attempt 009, 010, and 011 identities, sidecars,
+preparation records, and execution evidence are unchanged. Their llama.exe
+`windows_file_id` has the wrong volume component (`ba2f80f4` instead of
+`c4c93b54`); the index, SHA-256, size, and path are correct. Their accepted
+execution evidence remains historical and consumed; this amendment does not
+reinterpret any result.
+
+**V3 correction.** The V3 contract records
+`volume=c4c93b54;index=00060000001ea970` for
+`C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe`
+(SHA-256 `cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617`,
+15277056 bytes), and contract validation pins that value and rejects the
+historical one. Regression tests bind each recorded volume to the volume that
+contains the object, resolved independently through `GetVolumePathNameW` and
+`GetVolumeInformationW`.

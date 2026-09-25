@@ -118,9 +118,9 @@ pub const CALIBRATION_BUDGETS: [u32; 3] = [1024, 512, 256];
 
 const EXPERIMENT_ID: &str = "phase1c-reasoning-budget-calibration";
 const MODEL_ID: &str = "ggml-org/Qwen3.5-0.8B-GGUF:Q4_0";
-const ENDPOINT: &str = "http://127.0.0.1:8080/v1/chat/completions";
-const HOST: &str = "127.0.0.1";
-const PORT: u16 = 8080;
+pub(crate) const ENDPOINT: &str = "http://127.0.0.1:8080/v1/chat/completions";
+pub(crate) const HOST: &str = "127.0.0.1";
+pub(crate) const PORT: u16 = 8080;
 const MAX_TURNS: u32 = 1;
 const MAX_RESPONSE_BYTES: usize = 4 * 1024 * 1024;
 const REQUEST_SCHEMA_ID: &str = "prefixity.phase1c.reasoning-budget-calibration-request";
@@ -1086,7 +1086,7 @@ pub fn execute_attempt_003() -> Result<Value, ReasoningBudgetCalibrationError> {
             .ok_or_else(|| missing(case_id))?;
         let case_dir = candidate_root.join(case_id);
         fs::create_dir_all(&case_dir)?;
-        let result = execute_case(&manifest, case, budget, &case_dir, &client)?;
+        let result = execute_case(&manifest, case, Some(budget), &case_dir, &client)?;
         let infrastructure_ambiguous =
             result.get("state").and_then(Value::as_str) == Some("INCONCLUSIVE");
         results.push(result);
@@ -1244,7 +1244,13 @@ pub fn execute_attempt_002(
             .ok_or_else(|| missing(case_id))?;
         let case_dir = candidate_root.join(case_id);
         fs::create_dir_all(&case_dir)?;
-        results.push(execute_case(&manifest, case, budget, &case_dir, &client)?);
+        results.push(execute_case(
+            &manifest,
+            case,
+            Some(budget),
+            &case_dir,
+            &client,
+        )?);
     }
     let state = aggregate_state(&results);
     let result = candidate_result(budget, results, 3, state, true, None)?;
@@ -3518,7 +3524,7 @@ pub fn certify_workflow_identity(
     }
 }
 
-fn windows_native_prestart_value(attempt: u32, operator_attested: bool) -> Value {
+pub(crate) fn windows_native_prestart_value(attempt: u32, operator_attested: bool) -> Value {
     let current_pid = std::process::id();
     let processes = windows_exclusivity::process_table();
     let listeners = windows_exclusivity::tcp_listener_table(PORT);
@@ -3708,7 +3714,13 @@ fn execute_calibration_at_root(
             .ok_or_else(|| missing(case_id))?;
         let case_dir = candidate_root.join(case_id);
         fs::create_dir_all(&case_dir)?;
-        results.push(execute_case(&manifest, case, budget, &case_dir, &client)?);
+        results.push(execute_case(
+            &manifest,
+            case,
+            Some(budget),
+            &case_dir,
+            &client,
+        )?);
     }
     let state = aggregate_state(&results);
     let result = candidate_result(budget, results, 3, state, true, None)?;
@@ -3716,10 +3728,10 @@ fn execute_calibration_at_root(
     Ok(result)
 }
 
-fn execute_case(
+pub(crate) fn execute_case(
     manifest: &Value,
     case: &Value,
-    budget: u32,
+    budget: Option<u32>,
     evidence_dir: &Path,
     client: &Client,
 ) -> Result<Value, ReasoningBudgetCalibrationError> {
@@ -3728,6 +3740,10 @@ fn execute_case(
         .and_then(Value::as_str)
         .ok_or_else(|| missing("case_id"))?;
     let request = build_request(manifest, case)?;
+    let max_tokens = request
+        .get("max_tokens")
+        .and_then(Value::as_u64)
+        .ok_or_else(|| missing("max_tokens"))?;
     let request_bytes = serde_json::to_vec(&request)?;
     let request_sha256 = canonical_hash(&request)?;
     let wire_request_sha256 = sha256_hex(&request_bytes);
@@ -3742,7 +3758,7 @@ fn execute_case(
         "request_sha256": request_sha256,
         "wire_request_sha256": wire_request_sha256,
         "request_bytes": request_bytes.len(),
-        "max_tokens": 2048,
+        "max_tokens": max_tokens,
         "temperature": 0,
         "top_p": 1,
         "seed": 1,
@@ -3939,7 +3955,9 @@ fn execute_case(
     } else if parsed.is_none() {
         json!("response body was not valid JSON")
     } else if finish_reason_text == Some("length") {
-        json!("total 2048-token ceiling exhausted before terminal completion")
+        json!(format!(
+            "total {max_tokens}-token ceiling exhausted before terminal completion"
+        ))
     } else if final_content.is_none() {
         json!("terminal assistant content was absent or not a string")
     } else if tool_call_present {
@@ -4019,7 +4037,7 @@ fn execute_case(
     Ok(result)
 }
 
-fn validate_manifest(
+pub(crate) fn validate_manifest(
     manifest: &Value,
     verify_recorded_hashes: bool,
 ) -> Result<(), ReasoningBudgetCalibrationError> {
@@ -4202,7 +4220,10 @@ fn validate_case(
     Ok(())
 }
 
-fn build_request(manifest: &Value, case: &Value) -> Result<Value, ReasoningBudgetCalibrationError> {
+pub(crate) fn build_request(
+    manifest: &Value,
+    case: &Value,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
     Ok(json!({
         "model": manifest.pointer("/runtime/model").cloned().ok_or_else(|| missing("runtime.model"))?,
         "messages": case.get("messages").cloned().ok_or_else(|| missing("messages"))?,
@@ -7891,7 +7912,8 @@ fn validate_attempt_011_virgin_state() -> Result<(), ReasoningBudgetCalibrationE
     Ok(())
 }
 
-fn validate_accepted_workflow_certification_v2() -> Result<Value, ReasoningBudgetCalibrationError> {
+pub(crate) fn validate_accepted_workflow_certification_v2(
+) -> Result<Value, ReasoningBudgetCalibrationError> {
     let root = workspace_path("target/phase1c-workflow-identity-certification-v2-final");
     let identity = read_json_path(&root.join("identity.json"))?;
     if canonical_hash(&identity)?
@@ -8290,7 +8312,7 @@ fn implementation_source_sha256() -> Result<String, ReasoningBudgetCalibrationEr
     source_sha256(CALIBRATION_WINDOWS_EXCLUSIVITY_SOURCE_PATH)
 }
 
-fn source_sha256(path: &str) -> Result<String, ReasoningBudgetCalibrationError> {
+pub(crate) fn source_sha256(path: &str) -> Result<String, ReasoningBudgetCalibrationError> {
     let source = fs::read(workspace_path(path))?;
     let canonical = canonicalize_source_bytes(&source).map_err(invalid)?;
     Ok(sha256_hex(&canonical))
@@ -8325,7 +8347,7 @@ pub fn validate_candidate_order_report(
     }))
 }
 
-fn aggregate_state(results: &[Value]) -> &'static str {
+pub(crate) fn aggregate_state(results: &[Value]) -> &'static str {
     if results
         .iter()
         .all(|result| result.get("state").and_then(Value::as_str) == Some("PASS"))
@@ -8493,7 +8515,9 @@ fn parse_server_pid(value: &str) -> Result<u32, ReasoningBudgetCalibrationError>
     Ok(pid)
 }
 
-fn read_manifest(verify_sidecar: bool) -> Result<Value, ReasoningBudgetCalibrationError> {
+pub(crate) fn read_manifest(
+    verify_sidecar: bool,
+) -> Result<Value, ReasoningBudgetCalibrationError> {
     let manifest = read_json(CALIBRATION_MANIFEST_PATH)?;
     if verify_sidecar {
         validate_sidecar(&manifest)?;
@@ -8501,7 +8525,7 @@ fn read_manifest(verify_sidecar: bool) -> Result<Value, ReasoningBudgetCalibrati
     Ok(manifest)
 }
 
-fn read_json(path: &str) -> Result<Value, ReasoningBudgetCalibrationError> {
+pub(crate) fn read_json(path: &str) -> Result<Value, ReasoningBudgetCalibrationError> {
     Ok(serde_json::from_slice(&fs::read(workspace_path(path))?)?)
 }
 
@@ -8509,11 +8533,17 @@ fn read_json_path(path: &Path) -> Result<Value, ReasoningBudgetCalibrationError>
     Ok(serde_json::from_slice(&fs::read(path)?)?)
 }
 
-fn write_json(path: &Path, value: &Value) -> Result<(), ReasoningBudgetCalibrationError> {
+pub(crate) fn write_json(
+    path: &Path,
+    value: &Value,
+) -> Result<(), ReasoningBudgetCalibrationError> {
     write_bytes(path, &serde_json::to_vec_pretty(value)?)
 }
 
-fn write_bytes(path: &Path, bytes: &[u8]) -> Result<(), ReasoningBudgetCalibrationError> {
+pub(crate) fn write_bytes(
+    path: &Path,
+    bytes: &[u8],
+) -> Result<(), ReasoningBudgetCalibrationError> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
     }
@@ -8577,13 +8607,13 @@ fn attempt_011_root() -> PathBuf {
     workspace_path(CALIBRATION_ATTEMPT_011_EVIDENCE_ROOT)
 }
 
-fn workspace_path(path: &str) -> PathBuf {
+pub(crate) fn workspace_path(path: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
         .join(path)
 }
 
-fn now_unix_ms() -> Result<u64, ReasoningBudgetCalibrationError> {
+pub(crate) fn now_unix_ms() -> Result<u64, ReasoningBudgetCalibrationError> {
     Ok(SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|error| invalid(&format!("system clock before UNIX epoch: {error}")))?
@@ -8651,7 +8681,7 @@ fn missing(path: &str) -> ReasoningBudgetCalibrationError {
     invalid(&format!("missing {path}"))
 }
 
-fn same_workflow_identity_path(actual: &str, expected: &str) -> bool {
+pub(crate) fn same_workflow_identity_path(actual: &str, expected: &str) -> bool {
     #[cfg(windows)]
     {
         actual
