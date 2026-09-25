@@ -72,36 +72,54 @@ fn attempt_010_identity_document_is_accepted_unchanged() {
 #[test]
 fn attempt_010_identity_rejects_contract_changes() {
     assert!(rejected(|id| id["attempt"] = json!(9)));
-    assert!(rejected(|id| id["candidate"]["reasoning_budget"] = json!(256)));
-    assert!(rejected(|id| id["runtime"]["reasoning_budget"] = json!(1024)));
+    assert!(rejected(
+        |id| id["candidate"]["reasoning_budget"] = json!(256)
+    ));
+    assert!(rejected(
+        |id| id["runtime"]["reasoning_budget"] = json!(1024)
+    ));
     assert!(rejected(|id| id["candidate"]["maximum_requests"] = json!(4)));
-    assert!(rejected(|id| id["retry_policy"]["automatic_retries"] = json!(1)));
-    assert!(rejected(|id| id["retry_policy"]["fallback_requests"] = json!(1)));
+    assert!(rejected(
+        |id| id["retry_policy"]["automatic_retries"] = json!(1)
+    ));
+    assert!(rejected(
+        |id| id["retry_policy"]["fallback_requests"] = json!(1)
+    ));
     assert!(rejected(|id| id["generation"]["temperature"] = json!(1)));
-    assert!(rejected(|id| id["candidate"]["case_order"] =
-        json!(["rbcal-003", "rbcal-002", "rbcal-001"])));
-    assert!(rejected(|id| id["launch_plan"]["server_command"] = json!(id["launch_plan"]
-        ["server_command"]
-        .as_str()
-        .unwrap()
-        .replace("--reasoning-budget 512", "--reasoning-budget 1024"))));
+    assert!(rejected(
+        |id| id["candidate"]["case_order"] = json!(["rbcal-003", "rbcal-002", "rbcal-001"])
+    ));
+    assert!(rejected(|id| id["launch_plan"]["server_command"] =
+        json!(id["launch_plan"]["server_command"]
+            .as_str()
+            .unwrap()
+            .replace(
+                "--reasoning-budget 512",
+                "--reasoning-budget 1024"
+            ))));
 }
 
 #[test]
 fn attempt_010_identity_rejects_inadmissible_predecessors() {
-    assert!(rejected(|id| id["budget_provenance"]["source_attempt"] = json!(7)));
-    assert!(rejected(|id| id["budget_provenance"]["source_attempt"] = json!(9)));
     assert!(rejected(
-        |id| id["lineage"]["attempt_007_excluded_from_selection"] = json!(false)
+        |id| id["budget_provenance"]["source_attempt"] = json!(7)
     ));
     assert!(rejected(
-        |id| id["lineage"]["attempt_009_excluded_from_selection"] = json!(false)
+        |id| id["budget_provenance"]["source_attempt"] = json!(9)
     ));
-    assert!(rejected(
-        |id| id["lineage"]["attempt_009_calibration_admissible"] = json!(true)
-    ));
-    assert!(rejected(|id| id["lineage"]["attempt_008_evidence_manifest_sha256"] =
-        json!("f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e477")));
+    assert!(rejected(|id| id["lineage"]
+        ["attempt_007_excluded_from_selection"] =
+        json!(false)));
+    assert!(rejected(|id| id["lineage"]
+        ["attempt_009_excluded_from_selection"] =
+        json!(false)));
+    assert!(rejected(|id| id["lineage"]
+        ["attempt_009_calibration_admissible"] =
+        json!(true)));
+    assert!(rejected(|id| id["lineage"]
+        ["attempt_008_evidence_manifest_sha256"] = json!(
+        "f20c4ce0149070e3ca1bc167f4400d71b88fe0bd7adac41851169ba8540e477"
+    )));
 }
 
 #[test]
@@ -144,9 +162,9 @@ fn attempt_010_identity_rejects_missing_partial_or_mutable_executables() {
             "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\phase1c-attempt-009-frozen\\prefixity-phase1c-live-supervisor.exe"
         )
     }));
-    assert!(rejected(|id| id["launch_plan"]["supervisor_command"] = json!(id["launch_plan"]
-        ["supervisor_command"]
-        .as_str()
-        .unwrap()
-        .replace("phase1c-attempt-010-frozen", "debug"))));
+    assert!(rejected(|id| id["launch_plan"]["supervisor_command"] =
+        json!(id["launch_plan"]["supervisor_command"]
+            .as_str()
+            .unwrap()
+            .replace("phase1c-attempt-010-frozen", "debug"))));
 }
