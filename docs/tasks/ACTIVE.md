@@ -3654,3 +3654,53 @@ V2 remains frozen and valid, V3 is a new lineage starting every arm fresh
 from BASELINE, and no V1/V2/calibration observation enters the V3 comparison.
 The stale `docs/INDEX.md` Stage 1 status was corrected. The next task is
 offline V3 preparation; no inference is authorized.
+
+## Phase 1C V3 feasibility-gate preparation
+
+```text
+PHASE_1C_V3_FEASIBILITY_PREPARATION_ACCEPTED
+V3_FEASIBILITY_GATE_PREPARED
+V3_FEASIBILITY_GATE_NOT_EXECUTED
+CURRENT_QWEN_SCORED_PATH_OPEN_PENDING_GATE
+NO_SCORED_INFERENCE_AUTHORIZED
+```
+
+Offline preparation only; record:
+`docs/phase-1/PHASE_1C_V3_FEASIBILITY_GATE_PREPARATION.md`. No model server
+was started, port 8080 was not contacted, and no readiness, token-count, or
+inference request was made.
+
+Work completed:
+
+- Source provenance `b255606528388dda6bc098f7cb07a5e22d033b2b`: compact
+  `V3GateSpec` runner; direct `-m` GGUF loading with `--offline` and no
+  `LLAMA_ARG_*`; `/v1/chat/completions/input_tokens` as authoritative counter;
+  reasoning on, budget flag absent, `max_tokens` 4096, context 8192.
+- Design Amendment 2: supervisor deadline derived from the spec,
+  `1*1000 + 3*60000 + 3*2400000 + 120000 = 7501000` ms; token counting no
+  longer inherits the generation bound; an independent supervisor timeout is
+  rejected; historical identities keep 1320000 ms.
+- Design Amendment 3: `HISTORICAL_LLAMA_FILE_ID_RECORDING_DEFECT`. The helper
+  is correct and cwd-independent; the V3 llama.exe identity is
+  `volume=c4c93b54;index=00060000001ea970`. Attempts 009-011 unchanged.
+- `V3_BOUND_SOURCES` has seven sources including
+  `phase1c_executable_identity.rs`. The consumed Attempt-011 repository
+  contract now fails closed on its source binding.
+- Frozen supervisor `2cdac8ec...` and child `1b0342b2...` in
+  `target/phase1c-v3-feasibility-frozen/`; gate identity V1 canonical SHA-256
+  `65958c75ca0b4cd8c7223b1e5382222fa182e37df73bc3a349fc219c514d242a`.
+
+Validation performed: fmt, clippy (`-D warnings`), workspace tests, bin build
+and MSRV check pass at the provenance commit (one timing flake of the
+pre-existing 500 ms handoff test on the first run; two further full runs
+607/607). Frozen `v3-dry-run`, `v3-preflight`, and frozen supervisor -> child
+`v3-live-prerequisites` (`READY_FOR_MODEL_READINESS_BOUNDARY`, applied
+deadline 7501000 ms) all stopped before readiness with zero contacts. Mutable,
+same-content-copied, and historical supervisor/child substitutions and
+tampered llama.exe/GGUF identities were rejected before inference.
+
+Remaining: the live gate needs separate operator authorization, a fresh
+server started with the recorded command, and the recorded frozen supervisor
+command. Post-start ownership was not exercised offline. `V3_FEASIBILITY_PASSED`
+is not claimed; no pilot preparation, ceiling change, or reasoning budget is
+authorized.

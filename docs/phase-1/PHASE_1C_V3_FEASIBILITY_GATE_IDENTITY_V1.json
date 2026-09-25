@@ -1,0 +1,241 @@
+{
+  "build_provenance": {
+    "build_command": "cargo build -p prefixity-controlled-benchmark --bins --locked --offline",
+    "build_dependent_validation_completed_before_freeze": true,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "child_build_output": {
+      "file_id": "volume=ba2f80f4;index=000c000000454fb6",
+      "file_size": 8274944,
+      "sha256": "1b0342b265ee0ff10276766bc5c823fc0af327b38df90c6341fbb083ba7697f0"
+    },
+    "freeze_command": "prefixity-phase1c-v3-feasibility v3-freeze",
+    "frozen_stage": "target/phase1c-v3-feasibility-frozen/",
+    "lockfile_path": "Cargo.lock",
+    "lockfile_sha256": "79f4fb5ea5e2b698c9785ac609294ed44e793dd8674f49cd53001792a2491cf8",
+    "profile": "dev",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "source_commit": "b255606528388dda6bc098f7cb07a5e22d033b2b",
+    "supervisor_build_output": {
+      "file_id": "volume=ba2f80f4;index=001800000037c9d7",
+      "file_size": 1410048,
+      "sha256": "2cdac8ec4e40e5926bf24d27b61e9152c4c80b19d9fe55a42852cd98666edc1c"
+    },
+    "target": "x86_64-pc-windows-msvc"
+  },
+  "calibration_manifest": {
+    "canonical_sha256": "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b",
+    "path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_CALIBRATION_MANIFEST_V1.json"
+  },
+  "deadlines": {
+    "connect_timeout_ms": 1000,
+    "derivation": "1*1000 + 3*60000 + 3*2400000 + 120000 = 7501000",
+    "inference_request_timeout_ms": 2400000,
+    "non_request_margin_ms": 120000,
+    "readiness_timeout_ms": 1000,
+    "supervisor_deadline_ms": 7501000,
+    "token_count_request_timeout_ms": 60000
+  },
+  "design_record": "docs/phase-1/PHASE_1C_SCORED_RUNTIME_V3_DESIGN_DECISION.md",
+  "experiment_id": "phase-1c-scored-capability-v3",
+  "gate_identity_number": 1,
+  "identity_version": "phase1c-v3-feasibility-gate-v1",
+  "implementation_fingerprints": {
+    "algorithm": "SHA-256",
+    "child_binary": {
+      "file_size": 8274944,
+      "final_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\phase1c-v3-feasibility-frozen\\prefixity-phase1c-v3-feasibility.exe",
+      "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\phase1c-v3-feasibility-frozen\\prefixity-phase1c-v3-feasibility.exe",
+      "sha256": "1b0342b265ee0ff10276766bc5c823fc0af327b38df90c6341fbb083ba7697f0",
+      "windows_file_id": "volume=ba2f80f4;index=000900000036a253"
+    },
+    "source_byte_definition": "UTF-8 checkout source bytes; CRLF and lone CR normalized to LF; UTF-8 BOM rejected",
+    "supervisor_binary": {
+      "file_size": 1410048,
+      "final_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\phase1c-v3-feasibility-frozen\\prefixity-phase1c-live-supervisor.exe",
+      "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\phase1c-v3-feasibility-frozen\\prefixity-phase1c-live-supervisor.exe",
+      "sha256": "2cdac8ec4e40e5926bf24d27b61e9152c4c80b19d9fe55a42852cd98666edc1c",
+      "windows_file_id": "volume=ba2f80f4;index=000b000000369612"
+    }
+  },
+  "implementation_sources": [
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_v3_feasibility.rs",
+      "sha256": "8f6cdafdbaf333163caf6ea73f747c5b7903fbb8460869fba29abe3a172d00cf"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/bin/phase1c_v3_feasibility.rs",
+      "sha256": "b0b548e50cb59a9938642388612d33e37e2a611069d109526535c0fe60f20066"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
+      "sha256": "d2d5c1074333af761ed07e056f14ffd913b4478ae96d391f8447fd431665d3d2"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_live_supervisor.rs",
+      "sha256": "0ad44ea345e0df24fae60787aefe1bc4b4990bcb11f99a40fb8d36fd41078caa"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/bin/phase1c_live_supervisor.rs",
+      "sha256": "5b3cc976f41801504a15e0c7efaf196fe7b129b1199ba2164c6b9eb19f86a282"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs",
+      "sha256": "9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_executable_identity.rs",
+      "sha256": "cffbff046bb7d42208d6fb85c7331a0244270e6d3b95534e860e50d6f82334dc"
+    }
+  ],
+  "launch_plan": {
+    "execution_authorized": false,
+    "operator_starts_server": true,
+    "server_command": [
+      "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "serve",
+      "-m",
+      "D:\\Prefixity-Lab\\models\\models--ggml-org--Qwen3.5-0.8B-GGUF\\snapshots\\8fea620810c4afa23dd6443f999a48574c1611a3\\Qwen3.5-0.8B-Q4_0.gguf",
+      "-c",
+      "8192",
+      "-np",
+      "1",
+      "--metrics",
+      "--reasoning",
+      "on",
+      "--offline",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8080"
+    ],
+    "server_environment": "no LLAMA_ARG_* variable may be present",
+    "supervisor_gate_command": [
+      "D:\\Users\\fleur\\Prefixity\\target\\phase1c-v3-feasibility-frozen\\prefixity-phase1c-live-supervisor.exe",
+      "--attempt-identity",
+      "docs/phase-1/PHASE_1C_V3_FEASIBILITY_GATE_IDENTITY_V1.json",
+      "--evidence",
+      "experiments/runs/phase1c-scored-capability-v3/feasibility-gate-supervisor-result.json",
+      "--",
+      "D:\\Users\\fleur\\Prefixity\\target\\phase1c-v3-feasibility-frozen\\prefixity-phase1c-v3-feasibility.exe",
+      "run-v3-feasibility-gate"
+    ],
+    "supervisor_result_path": "experiments/runs/phase1c-scored-capability-v3/feasibility-gate-supervisor-result.json",
+    "working_directory": "D:\\Users\\fleur\\Prefixity"
+  },
+  "network_policy": {
+    "gate_executions": 0,
+    "inference_requests": 0,
+    "model_server_startups": 0,
+    "port_8080_contacts": 0,
+    "readiness_contacts": 0,
+    "token_count_contacts": 0
+  },
+  "runtime_contract": {
+    "canonical_sha256": "f73250f33235f6dfd5396c6ed68a3e5d10f96340a1cf6e3c1c59c72707d931ef",
+    "path": "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V3.json"
+  },
+  "runtime_semantics": {
+    "authoritative_token_counter": "http://127.0.0.1:8080/v1/chat/completions/input_tokens",
+    "binding_note": "enforced through runtime_contract.canonical_sha256 and spec equality with the contract-derived spec; listed here explicitly for review",
+    "context_tokens": 8192,
+    "forbidden_environment_prefix": "LLAMA_ARG_",
+    "max_tokens": 4096,
+    "model_loading": "-m frozen GGUF; -hf forbidden",
+    "network_offline_flag": "--offline",
+    "reasoning": "on",
+    "reasoning_budget_flag": "ABSENT"
+  },
+  "source_provenance": {
+    "bound_source_count": 7,
+    "branch": "codex/phase1c-v3-feasibility-preparation",
+    "source_commit": "b255606528388dda6bc098f7cb07a5e22d033b2b"
+  },
+  "spec": {
+    "cases": [
+      {
+        "case_id": "rbcal-001",
+        "request_sha256": "d3f7d2bfc81d5a9ef647df5f7c8837333355d5f6a5d1f6952e5c412a456e3b64"
+      },
+      {
+        "case_id": "rbcal-002",
+        "request_sha256": "c6a515beb0afc62e1cdadc2bfd7b3197abe69820d2cfc922bcaae8e1a64bea6a"
+      },
+      {
+        "case_id": "rbcal-003",
+        "request_sha256": "161b25cf79d835534c53c54ee7469f6e7bcf237f6e7d0923623e5acb5e29e088"
+      }
+    ],
+    "contract_path": "docs/phase-1/PHASE_1C_SCORED_RUNTIME_CONTRACT_V3.json",
+    "contract_sha256": "f73250f33235f6dfd5396c6ed68a3e5d10f96340a1cf6e3c1c59c72707d931ef",
+    "deadlines": {
+      "connect_timeout_ms": 1000,
+      "inference_request_timeout_ms": 2400000,
+      "non_request_margin_ms": 120000,
+      "readiness_timeout_ms": 1000,
+      "supervisor_deadline_ms": 7501000,
+      "token_count_request_timeout_ms": 60000
+    },
+    "evidence_root": "experiments/runs/phase1c-scored-capability-v3/feasibility-gate",
+    "forbidden_environment_prefix": "LLAMA_ARG_",
+    "forbidden_launch_arguments": [
+      "--reasoning-budget",
+      "--reasoning-budget-message",
+      "-hf",
+      "--hf-repo",
+      "-hff",
+      "--hf-file",
+      "--mmproj",
+      "-mm"
+    ],
+    "gate_id": "phase1c-v3-feasibility-gate",
+    "inference_endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+    "launch_arguments": [
+      "serve",
+      "-m",
+      "D:\\Prefixity-Lab\\models\\models--ggml-org--Qwen3.5-0.8B-GGUF\\snapshots\\8fea620810c4afa23dd6443f999a48574c1611a3\\Qwen3.5-0.8B-Q4_0.gguf",
+      "-c",
+      "8192",
+      "-np",
+      "1",
+      "--metrics",
+      "--reasoning",
+      "on",
+      "--offline",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8080"
+    ],
+    "limits": {
+      "adaptive_replicates": 0,
+      "context_tokens": 8192,
+      "fallback_requests": 0,
+      "inference_requests": 3,
+      "max_tokens": 4096,
+      "readiness_contacts": 1,
+      "retry_requests": 0,
+      "token_count_contacts": 3,
+      "warmup_requests": 0
+    },
+    "model_file": {
+      "file_size": 563036064,
+      "path": "D:\\Prefixity-Lab\\models\\models--ggml-org--Qwen3.5-0.8B-GGUF\\snapshots\\8fea620810c4afa23dd6443f999a48574c1611a3\\Qwen3.5-0.8B-Q4_0.gguf",
+      "sha256": "57d1997790d1744fba5b40a7317df71ea5e2acee28c47e78f0cce39c0703f8cf",
+      "windows_file_id": "volume=ba2f80f4;index=00030000002035c4"
+    },
+    "runtime_executable": {
+      "file_size": 15277056,
+      "path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+      "windows_file_id": "volume=c4c93b54;index=00060000001ea970"
+    },
+    "runtime_version": "b10217-ddd4ec142",
+    "token_count_endpoint": "http://127.0.0.1:8080/v1/chat/completions/input_tokens"
+  },
+  "status": "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+  "stopping_rule": {
+    "otherwise": "CURRENT_QWEN_SCORED_PATH_CLOSED; permits different-capable-model design review only",
+    "pass": "V3_FEASIBILITY_PASSED only if no context bound and all three cases PASS; permits V3 pilot preparation only",
+    "pre_inference_failure": "GATE_PRE_INFERENCE_FAILURE consumes identity 1; at most one replacement identity 2"
+  }
+}
