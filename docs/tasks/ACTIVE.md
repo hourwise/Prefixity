@@ -3552,3 +3552,61 @@ inference_requests=0
 attempt_010_executions_added=0
 attempt_011_executions=0
 ```
+
+## Phase 1C Attempt 011 budget-256 execution — terminal calibration result
+
+Attempt 011 was executed exactly once from promoted preparation `427cfc9`
+(source provenance `4dd619e`, identity `60b442a1…03ed`) against an
+operator-started server (PID 6880) whose command line, executable identity,
+exclusivity, and sole port-8080 ownership were verified read-only
+beforehand. The frozen supervisor (PID 6220) launched the frozen child (PID
+29544) once; the child passed the shared live prerequisites, recorded
+`EXCLUSIVE_POSTSTART`, made one passed readiness check, and issued exactly
+three requests with the frozen hashes.
+
+```text
+ATTEMPT_011_EXECUTED_ONCE
+ATTEMPT_011_INTEGRITY_ACCEPTED
+ATTEMPT_011_CALIBRATION_ADMISSIBLE
+```
+
+Admissible outcome at budget 256: rbcal-001 FAIL (`stop`, 359 tokens,
+structural/schema), rbcal-002 FAIL (`length`, 2048 tokens, token
+exhaustion), rbcal-003 FAIL (`stop`, 298 tokens, structural/schema).
+Candidate state `FAIL`, case set complete, selected budget null, next budget
+null. Budget 256 is the last registered candidate, so the frozen protocol's
+terminal classification applies:
+
+```text
+REASONING-ON / 2048-TOKEN SCORED CONFIGURATION NOT FEASIBLE
+```
+
+The claim is bounded to `ggml-org/Qwen3.5-0.8B-GGUF:Q4_0`, the three
+registered calibration cases, this reasoning-on configuration, the 2048-token
+output ceiling, and the frozen protocol. Evidence manifest
+`5e8ccbc7be4fe5cb9b6d4041a3fc4c47943d5a889f0a4916ebab4e8fbebf73cd` verifies all
+23 raw files. The verified server PID was terminated after evidence sealing.
+The transition registry is unchanged (it has no terminal-state schema).
+
+```text
+LAST_ADMISSIBLE_ATTEMPT   = 011
+LAST_ADMISSIBLE_BUDGET    = 256
+LAST_ADMISSIBLE_STATE     = FAIL
+CALIBRATION_TERMINAL      = true
+SELECTED_REASONING_BUDGET = null
+NEXT_CANDIDATE_BUDGET     = null
+ATTEMPT_011_CONSUMED      = true
+
+operator_model_server_startups=1
+agent_model_server_startups=0
+readiness_contacts=1
+http_model_requests=3
+inference_requests=3
+retry_requests=0
+fallback_requests=0
+adaptive_replicates=0
+warmup_requests=0
+attempt_011_executions=1
+```
+
+Record: `docs/phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_EXECUTION_RECORD.md`.
