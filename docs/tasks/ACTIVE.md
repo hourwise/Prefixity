@@ -3610,3 +3610,47 @@ attempt_011_executions=1
 ```
 
 Record: `docs/phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_EXECUTION_RECORD.md`.
+
+## Phase 1C scored-runtime V3 design decision
+
+Design only; no code, inference, model startup, or evidence change. After the
+terminal reasoning-budget calibration, the V3 decision
+(`docs/phase-1/PHASE_1C_SCORED_RUNTIME_V3_DESIGN_DECISION.md`) is
+`PHASE_1C_V3_DESIGN_RECOMMENDED`, framed as a **final bounded
+feasibility/falsification gate for the existing Qwen3.5-0.8B instrument**,
+not an expected fix. Offline re-reading of the calibration evidence shows two
+independent failure classes: runaway repetitive final output after bounded
+reasoning (every `length` failure) and structural-format failure on normal
+termination (including code-fenced JSON).
+
+V3 changes only the output ceiling (2048 -> 4096) and the request and
+supervisor deadlines (1200000 -> 2400000 ms; 1320000 -> 2520000 ms). Unrestricted
+reasoning is operationally `reasoning = on`, `reasoning_budget_flag = ABSENT`,
+`max_tokens = 4096`, `context = 8192`, bound to a frozen llama.cpp executable
+identity and a hashed GGUF model file. Preparation must prove
+`projected_prompt_tokens + 4096 <= 8192` with the frozen tokenizer for every
+statically determined pilot and full-cohort request. Before every live
+request, the runner tokenizes the exact request and requires
+`exact_prompt_tokens + 4096 <= 8192`; on failure it does not dispatch, records
+`INCONCLUSIVE_CONTEXT_BOUND`, and never truncates, summarizes, drops history,
+reduces `max_tokens`, increases context, or retries. In the feasibility gate
+this closes the Qwen path; in a later V3 pilot it is an inconclusive
+observation counted toward the >10% pause rule and never reclassifies the
+gate. A control arm that becomes context-bound while INTERVENTION fits is
+recorded only as descriptive mechanism evidence, not as preserved task
+success or a scored win.
+
+The gate reuses the three frozen `rbcal` cases and the unchanged calibration
+predicate on one fresh server, with at most three requests and no retries. All
+three passing authorizes only V3 pilot preparation. Any `length`, timeout,
+inconclusive, structural failure, or failed input proof classifies
+`CURRENT_QWEN_SCORED_PATH_CLOSED`: no second ceiling, no further Qwen
+remediation, and the next permitted design review is for a different capable
+model/runtime. A genuine zero-inference integrity failure may receive one
+replacement gate identity. The runner must be driven by one compact spec with
+generic validators; no new hand-cloned attempt-validator family.
+
+V2 remains frozen and valid, V3 is a new lineage starting every arm fresh
+from BASELINE, and no V1/V2/calibration observation enters the V3 comparison.
+The stale `docs/INDEX.md` Stage 1 status was corrected. The next task is
+offline V3 preparation; no inference is authorized.

@@ -60,6 +60,7 @@
 | [`phase-1/PHASE_1C_AUTHORITATIVE_CANDIDATE_TRANSITIONS.md`](phase-1/PHASE_1C_AUTHORITATIVE_CANDIDATE_TRANSITIONS.md) and [`fixtures/phase1c/calibration-candidate-transitions.json`](../fixtures/phase1c/calibration-candidate-transitions.json) | Single tracked registry and resolver for authoritative calibration predecessor transitions (008: 1024 FAIL -> 512; 010: 512 FAIL -> 256), replacing the 512 special case and the generic budget-256 lookup. | Reviewing candidate order before preparing a 256 attempt; Attempt 011 is not prepared. |
 | [`phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_PREPARATION.md`](phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_PREPARATION.md) and [`PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_IDENTITY_V1.json`](phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_IDENTITY_V1.json) | Attempt 011 budget-256 preparation: eligibility, registry-resolved Attempt010 transition, frozen contract and executables, frozen-supervisor live-prerequisite traversal, substitution rejection, and future commands. | Reviewing the prepared Attempt 011 and its consumed live result recorded separately below. |
 | [`phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_EXECUTION_RECORD.md`](phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_EXECUTION_RECORD.md) | Single consumed Attempt 011 live execution at budget 256: server verification, request ledger, integrity acceptance, evidence manifest, admissible FAIL, and the terminal calibration classification `REASONING-ON / 2048-TOKEN SCORED CONFIGURATION NOT FEASIBLE`. | Reviewing the terminal Phase 1C calibration result; no budget was selected, no further candidate exists, and Attempt 011 must not be rerun. |
+| [`phase-1/PHASE_1C_SCORED_RUNTIME_V3_DESIGN_DECISION.md`](phase-1/PHASE_1C_SCORED_RUNTIME_V3_DESIGN_DECISION.md) | V3 design decision after the terminal calibration: a final bounded feasibility/falsification gate for the existing Qwen instrument (reasoning on, budget flag absent, 4096-token ceiling, context 8192), its input-feasibility proof, and the pre-registered `CURRENT_QWEN_SCORED_PATH_CLOSED` stop. | Reviewing whether and how Phase 1C scored work may continue; it authorizes only offline preparation, no inference. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
@@ -106,8 +107,16 @@ state.
 
 There is currently no `benches/` directory or tracked end-to-end quality report.
 The Phase 1B decision layer and controlled evidence path are complete through
-the 1B.9 held-out study. Phase 1C Stage 0 is certified offline, while Stage 1
-is blocked by the external trajectory admission dependency. The Phase 1A
+the 1B.9 held-out study. Phase 1C Stage 0 is certified offline. The external
+trajectory (ContextBench/Tracebench) admission path remains blocked, but
+Stage 1 proceeded through a separately authorized local-Qwen schema-smoke
+path: Smoke 01 failed and Smoke 02 (reasoning off, non-scored) passed. The
+scored h001 BASELINE was inconclusive under runtime V1 (request deadline) and
+V2 (2048-token ceiling), and the reasoning-budget calibration is terminal
+(`REASONING-ON / 2048-TOKEN SCORED CONFIGURATION NOT FEASIBLE`). The V3 design
+decision defines a final bounded feasibility gate for the Qwen instrument; no
+scored comparison has completed and no inference is currently authorized. The
+Phase 1A
 corpus/import evidence and the later Phase 1B/1C results are documented in the
 linked closeouts and gates above.
 
