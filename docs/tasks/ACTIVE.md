@@ -3512,3 +3512,43 @@ inference_requests=0
 attempt_010_executions_added=0
 attempt_011_executions=0
 ```
+
+## Phase 1C Attempt 011 budget-256 preparation
+
+Attempt 011 was prepared at budget 256 from accepted baseline
+`292dd1f0951f20fdcf6f49facbb446076d80a135`. Code commit
+`4dd619e82a4d494f0ee8ca954440d46bb30f300e` adds the Attempt-011 path, whose
+live entry point and offline `attempt-011-live-prerequisites` command share
+one prerequisite function including `calibration_prestart_checks(256)`.
+After fmt, clippy, the full workspace tests (controlled-benchmark library 150
+passed, 0 failed), and the bins build passed, the supervisor (`9dbf6dff…b8b1`,
+1259008 bytes, `volume=ba2f80f4;index=0006000000387bbc`) and child
+(`10533899…15d5`, 9281536 bytes, `volume=ba2f80f4;index=0005000000387bbd`)
+were frozen into `target/phase1c-attempt-011-frozen/` without overwrite.
+
+The identity canonical SHA-256 is
+`60b442a1b09a4ff817b1ca40c103853f6972baeb3d13c91f551cb58ff5bd03ed`, computed
+independently by the generator and the frozen child. Candidate 256 resolves
+only through the authoritative transition registry to Attempt 010 (512 FAIL
+-> 256, manifest `5673e55b…c4b9`); 007 and 009 are excluded and 008 is not a
+source. Fingerprint, repository contract, preflight (`EXCLUSIVE_PRESTART`),
+dry run, and preparation validation passed; the real frozen supervisor ->
+frozen child traversal reached `READY_FOR_MODEL_READINESS_BOUNDARY` with
+runtime/contract parity; mutable, same-content, and Attempt-010 substitutions
+were rejected before spawn. A clean-checkout integration test runs the
+Attempt-011 contract in CI.
+
+**Budget 256 remains untested. Attempt 011 is prepared, not executed.** The
+historical Attempt-008 validator defect is not on the Attempt-011 path and
+stays deferred. Record:
+`docs/phase-1/PHASE_1C_REASONING_BUDGET_256_ATTEMPT_011_PREPARATION.md`.
+
+```text
+model_server_startups=0
+port_8080_contacts=0
+tcp_readiness_contacts=0
+http_model_requests=0
+inference_requests=0
+attempt_010_executions_added=0
+attempt_011_executions=0
+```
