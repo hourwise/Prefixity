@@ -255,16 +255,17 @@ pub fn registered_workflow_identity_from_file(
         match binding.attempt {
             5..=8 => 1024,
             9 | 10 => 512,
+            11 => 256,
             _ => 0,
         }
     };
-    if (!matches!(binding.attempt, 5..=10) && !certification_identity)
+    if (!matches!(binding.attempt, 5..=11) && !certification_identity)
         || binding.candidate_budget != expected_budget
         || identity.pointer("/candidate/maximum_requests") != Some(&json!(3))
         || identity.pointer("/candidate/automatic_retries") != Some(&json!(0))
     {
         return Err(H001Error::Validation(
-            "registered workflow identity is not an Attempt-005/006/007/008 1024 or Attempt-009/010 512 candidate"
+            "registered workflow identity is not an Attempt-005/006/007/008 1024, Attempt-009/010 512, or Attempt-011 256 candidate"
                 .to_string(),
         ));
     }
@@ -569,6 +570,37 @@ mod tests {
         assert_eq!(accepted.candidate_budget, 512);
         assert!(register(10, 1024).is_err());
         assert!(register(11, 512).is_err());
+        std::fs::remove_dir_all(&directory).unwrap();
+    }
+
+    #[test]
+    fn attempt_011_registers_only_as_a_256_candidate() {
+        let directory = std::env::temp_dir().join(format!(
+            "prefixity-attempt-011-registration-{}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let register = |attempt: u32, budget: u32| {
+            let path = directory.join(format!("attempt-{attempt}-{budget}.json"));
+            let identity = json!({
+                "attempt": attempt,
+                "candidate": {
+                    "reasoning_budget": budget,
+                    "calibration_candidate_identity": format!("phase1c-reasoning-budget-{budget}"),
+                    "maximum_requests": 3,
+                    "automatic_retries": 0
+                },
+                format!("attempt_{attempt:03}_evidence_root"): "budget-256-attempt-011/"
+            });
+            std::fs::write(&path, serde_json::to_vec(&identity).unwrap()).unwrap();
+            registered_workflow_identity_from_file(&path)
+        };
+
+        let accepted = register(11, 256).unwrap();
+        assert_eq!(accepted.attempt, 11);
+        assert_eq!(accepted.candidate_budget, 256);
+        assert!(register(11, 512).is_err());
+        assert!(register(12, 256).is_err());
         std::fs::remove_dir_all(&directory).unwrap();
     }
 

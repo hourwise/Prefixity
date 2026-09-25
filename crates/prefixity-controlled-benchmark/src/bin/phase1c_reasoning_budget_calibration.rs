@@ -19,6 +19,11 @@ use prefixity_controlled_benchmark::{
     preflight_attempt_010, validate_attempt_010_live_prerequisites,
     validate_attempt_010_preparation, validate_attempt_010_repository_contract,
 };
+use prefixity_controlled_benchmark::{
+    dry_run_attempt_011, execute_attempt_011, fingerprint_attempt_011, freeze_attempt_011,
+    preflight_attempt_011, validate_attempt_011_live_prerequisites,
+    validate_attempt_011_preparation, validate_attempt_011_repository_contract,
+};
 use std::env;
 
 fn main() {
@@ -97,6 +102,20 @@ fn main() {
             validate_attempt_010_live_prerequisites()
         }
         Ok(CalibrationCliCommand::RunAttempt010) => execute_attempt_010(),
+        Ok(CalibrationCliCommand::Attempt011Fingerprint) => fingerprint_attempt_011(),
+        Ok(CalibrationCliCommand::Attempt011Preflight) => preflight_attempt_011(),
+        Ok(CalibrationCliCommand::Attempt011DryRun) => dry_run_attempt_011(),
+        Ok(CalibrationCliCommand::Attempt011Freeze) => freeze_attempt_011(),
+        Ok(CalibrationCliCommand::Attempt011ValidatePreparation) => {
+            validate_attempt_011_preparation()
+        }
+        Ok(CalibrationCliCommand::Attempt011RepositoryContract) => {
+            validate_attempt_011_repository_contract()
+        }
+        Ok(CalibrationCliCommand::Attempt011LivePrerequisites) => {
+            validate_attempt_011_live_prerequisites()
+        }
+        Ok(CalibrationCliCommand::RunAttempt011) => execute_attempt_011(),
         Ok(CalibrationCliCommand::WorkflowIdentityCertification { result_path }) => {
             certify_workflow_identity(&result_path)
         }
