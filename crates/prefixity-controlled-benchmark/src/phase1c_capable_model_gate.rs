@@ -69,8 +69,11 @@ pub const LOCAL_9B_GATE_PRE_INFERENCE_FAILURE: &str = "GATE_PRE_INFERENCE_FAILUR
 
 const CHILD_BINARY: &str = "prefixity-phase1c-capable-model-gate.exe";
 const SUPERVISOR_BINARY: &str = "prefixity-phase1c-live-supervisor.exe";
-const STRUCTURAL_REQUESTS: u32 = 3;
-const TASK_TURN_CEILING: u32 = 3;
+/// Stage A: the three frozen structural probes.
+const STRUCTURAL_INFERENCE_LIMIT: u32 = 3;
+/// Stage B: the frozen h001 no-tool contract terminates on its first
+/// response, so the task stage can legitimately issue exactly one request.
+const TASK_INFERENCE_LIMIT: u32 = 1;
 
 /// Implementation sources whose current bytes must equal the prepared ones.
 pub const LOCAL_9B_BOUND_SOURCES: [&str; 9] = [
@@ -112,6 +115,7 @@ pub struct ModelSourceSpec {
 pub struct ReasoningSpec {
     pub mode: String,
     pub launch_flag: Vec<String>,
+    pub request_chat_template_kwargs: String,
     pub forbidden_request_fields: Vec<String>,
 }
 
@@ -130,14 +134,14 @@ pub struct TaskCaseSpec {
     pub task_id: String,
     pub arm: String,
     pub request_sha256: String,
-    pub turn_ceiling: u32,
+    pub inference_limit: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct StageLimitsSpec {
-    pub structural_requests: u32,
-    pub task_turn_ceiling: u32,
+    pub structural_inference_limit: u32,
+    pub task_inference_limit: u32,
     pub task_stage_requires_all_structural_pass: bool,
 }
 
@@ -157,6 +161,8 @@ pub struct CapableModelGateSpec {
     pub launch_arguments: Vec<String>,
     pub forbidden_launch_arguments: Vec<String>,
     pub forbidden_environment_prefix: String,
+    pub multimodal_projector: String,
+    pub request_content: String,
     pub reasoning: ReasoningSpec,
     pub structural_cases: Vec<CaseSpec>,
     pub task_case: TaskCaseSpec,
@@ -199,8 +205,8 @@ fn gate_limits() -> LimitsSpec {
         context_tokens: LOCAL_9B_CONTEXT_TOKENS,
         max_tokens: LOCAL_9B_MAX_TOKENS,
         readiness_contacts: 1,
-        token_count_contacts: STRUCTURAL_REQUESTS + TASK_TURN_CEILING,
-        inference_requests: STRUCTURAL_REQUESTS + TASK_TURN_CEILING,
+        token_count_contacts: STRUCTURAL_INFERENCE_LIMIT + TASK_INFERENCE_LIMIT,
+        inference_requests: STRUCTURAL_INFERENCE_LIMIT + TASK_INFERENCE_LIMIT,
         retry_requests: 0,
         fallback_requests: 0,
         adaptive_replicates: 0,
@@ -331,15 +337,23 @@ pub fn validate_local_9b_contract(contract: &Value) -> Result<()> {
     )?;
     expect(
         contract,
-        "/gate/structural_requests",
-        json!(STRUCTURAL_REQUESTS),
+        "/gate/structural_inference_limit",
+        json!(STRUCTURAL_INFERENCE_LIMIT),
     )?;
     expect(
         contract,
-        "/gate/task_turn_ceiling",
-        json!(TASK_TURN_CEILING),
+        "/gate/task_inference_limit",
+        json!(TASK_INFERENCE_LIMIT),
     )?;
-    expect(contract, "/gate/max_inference_requests", json!(6))?;
+    expect(contract, "/gate/max_inference_requests", json!(4))?;
+    expect(contract, "/gate/max_token_count_contacts", json!(4))?;
+    expect(contract, "/runtime/multimodal_projector", json!("ABSENT"))?;
+    expect(contract, "/runtime/request_content", json!("text-only"))?;
+    expect(
+        contract,
+        "/runtime/reasoning_mechanism/request_chat_template_kwargs",
+        json!("ABSENT"),
+    )?;
     for key in [
         "automatic_retries",
         "fallback_requests",
@@ -361,6 +375,7 @@ pub fn validate_local_9b_contract(contract: &Value) -> Result<()> {
     if launch != &json!(local_9b_launch_arguments(&model_path)) {
         return Err(invalid("capable-model contract launch arguments changed"));
     }
+    parse_server_options(&string_list(contract, "/runtime/launch_arguments")?)?;
     let forbidden = string_list(contract, "/runtime/forbidden_launch_arguments")?;
     for required in [
         "--reasoning-budget",
@@ -388,9 +403,12 @@ pub fn validate_local_9b_contract(contract: &Value) -> Result<()> {
     Ok(())
 }
 
-/// Reject any request field that could re-enable reasoning or alter template
-/// semantics per request.
-pub fn validate_reasoning_neutral_request(request: &Value) -> Result<()> {
+/// Registered requests are reasoning-neutral and text-only: no field that
+/// could re-enable reasoning or alter template semantics per request (in
+/// particular `chat_template_kwargs` must be absent, not merely non-thinking),
+/// and every message content is a plain string, so no image, audio, or other
+/// multimodal part can be sent to this text-only runtime.
+pub fn validate_registered_request(request: &Value) -> Result<()> {
     let object = request
         .as_object()
         .ok_or_else(|| invalid("capable-model request is not a JSON object"))?;
@@ -401,6 +419,19 @@ pub fn validate_reasoning_neutral_request(request: &Value) -> Result<()> {
         return Err(invalid(&format!(
             "capable-model request carries forbidden reasoning field {key}"
         )));
+    }
+    let messages = object
+        .get("messages")
+        .and_then(Value::as_array)
+        .filter(|messages| !messages.is_empty())
+        .ok_or_else(|| invalid("capable-model request has no messages"))?;
+    if messages
+        .iter()
+        .any(|message| !message.get("content").is_some_and(Value::is_string))
+    {
+        return Err(invalid(
+            "capable-model request content is not text-only string content",
+        ));
     }
     Ok(())
 }
@@ -435,7 +466,7 @@ pub fn structural_requests(gate_manifest: &Value) -> Result<Vec<(String, Value, 
                 .find(|case| case.get("case_id").and_then(Value::as_str) == Some(case_id))
                 .ok_or_else(|| invalid(&format!("manifest case {case_id} is missing")))?;
             let request = build_request(gate_manifest, case)?;
-            validate_reasoning_neutral_request(&request)?;
+            validate_registered_request(&request)?;
             Ok((case_id.to_string(), case.clone(), request))
         })
         .collect()
@@ -461,7 +492,7 @@ pub fn task_request(model_label: &str) -> Result<Value> {
             .get_mut(key)
             .ok_or_else(|| invalid(&format!("h001 request {key} is missing")))? = value;
     }
-    validate_reasoning_neutral_request(&request)?;
+    validate_registered_request(&request)?;
     Ok(request)
 }
 
@@ -515,9 +546,15 @@ pub fn derive_local_9b_gate_spec(
         launch_arguments: string_list(contract, "/runtime/launch_arguments")?,
         forbidden_launch_arguments: string_list(contract, "/runtime/forbidden_launch_arguments")?,
         forbidden_environment_prefix: text(contract, "/runtime/forbidden_environment_prefix")?,
+        multimodal_projector: text(contract, "/runtime/multimodal_projector")?,
+        request_content: text(contract, "/runtime/request_content")?,
         reasoning: ReasoningSpec {
             mode: text(contract, "/runtime/reasoning")?,
             launch_flag: string_list(contract, "/runtime/reasoning_mechanism/launch_flag")?,
+            request_chat_template_kwargs: text(
+                contract,
+                "/runtime/reasoning_mechanism/request_chat_template_kwargs",
+            )?,
             forbidden_request_fields: string_list(
                 contract,
                 "/runtime/reasoning_mechanism/forbidden_request_fields",
@@ -528,7 +565,7 @@ pub fn derive_local_9b_gate_spec(
             task_id: "h001".to_string(),
             arm: H001Arm::Baseline.as_str().to_string(),
             request_sha256: canonical_hash(&task)?,
-            turn_ceiling: TASK_TURN_CEILING,
+            inference_limit: TASK_INFERENCE_LIMIT,
         },
         evaluators: EvaluatorSpec {
             structural_manifest_sha256: canonical_hash(manifest)?,
@@ -537,8 +574,8 @@ pub fn derive_local_9b_gate_spec(
             task_tool_contract_version: text(&tool_contract, "/tool_contract_version")?,
         },
         stages: StageLimitsSpec {
-            structural_requests: STRUCTURAL_REQUESTS,
-            task_turn_ceiling: TASK_TURN_CEILING,
+            structural_inference_limit: STRUCTURAL_INFERENCE_LIMIT,
+            task_inference_limit: TASK_INFERENCE_LIMIT,
             task_stage_requires_all_structural_pass: true,
         },
         limits: gate_limits(),
@@ -566,7 +603,7 @@ pub fn validate_local_9b_gate_spec(
 
 /// Stage B runs only when all three structural probes passed.
 pub fn task_stage_permitted(structural_states: &[&str]) -> bool {
-    structural_states.len() == STRUCTURAL_REQUESTS as usize
+    structural_states.len() == STRUCTURAL_INFERENCE_LIMIT as usize
         && structural_states.iter().all(|state| *state == "PASS")
 }
 
@@ -651,9 +688,56 @@ pub fn split_windows_command_line(command_line: &str) -> Vec<String> {
     arguments
 }
 
-/// The server's argument vector must be exactly the registered executable
-/// followed by exactly the registered launch arguments. Reasoning mode is
-/// server-wide in b10217, so a missing or different `--reasoning off` fails.
+/// Options the registered server command may carry, each exactly once.
+/// Anything else, including aliases such as `-rea` or `--model`, fails closed.
+const SERVER_VALUE_OPTIONS: [&str; 6] = ["-m", "-c", "-np", "--reasoning", "--host", "--port"];
+const SERVER_FLAG_OPTIONS: [&str; 2] = ["--metrics", "--offline"];
+
+/// Parse server launch arguments into their effective options. The first
+/// argument must be `serve`; every option must be registered and appear
+/// exactly once, so a later duplicate cannot change effective semantics.
+pub fn parse_server_options(
+    arguments: &[String],
+) -> Result<std::collections::BTreeMap<String, Option<String>>> {
+    let Some((subcommand, rest)) = arguments.split_first() else {
+        return Err(invalid("server launch arguments are empty"));
+    };
+    if subcommand != "serve" {
+        return Err(invalid("server launch subcommand is not serve"));
+    }
+    let mut options = std::collections::BTreeMap::new();
+    let mut index = 0;
+    while index < rest.len() {
+        let option = rest[index].as_str();
+        let value = if SERVER_VALUE_OPTIONS.contains(&option) {
+            index += 1;
+            Some(
+                rest.get(index)
+                    .ok_or_else(|| invalid(&format!("server option {option} has no value")))?
+                    .clone(),
+            )
+        } else if SERVER_FLAG_OPTIONS.contains(&option) {
+            None
+        } else {
+            return Err(invalid(&format!(
+                "server launch argument {option} is not registered"
+            )));
+        };
+        if options.insert(option.to_string(), value).is_some() {
+            return Err(invalid(&format!(
+                "server launch argument {option} appears more than once"
+            )));
+        }
+        index += 1;
+    }
+    Ok(options)
+}
+
+/// The server's argument vector must name the registered executable and
+/// carry exactly the registered effective options: the frozen `-m` GGUF,
+/// `-c 8192`, `-np 1`, `--metrics`, one `--reasoning off`, `--offline`,
+/// `--host 127.0.0.1`, and `--port 8080`, and nothing else. Reasoning mode
+/// is server-wide in b10217, so any other reasoning setting fails.
 pub fn validate_server_arguments(arguments: &[String], spec: &CapableModelGateSpec) -> Result<()> {
     let Some((program, rest)) = arguments.split_first() else {
         return Err(invalid("server command line is empty"));
@@ -663,9 +747,9 @@ pub fn validate_server_arguments(arguments: &[String], spec: &CapableModelGateSp
             "server command line names an unregistered executable",
         ));
     }
-    if rest != spec.launch_arguments.as_slice() {
+    if parse_server_options(rest)? != parse_server_options(&spec.launch_arguments)? {
         return Err(invalid(
-            "server launch arguments differ from the registered launch arguments",
+            "server effective options differ from the registered launch arguments",
         ));
     }
     Ok(())
@@ -1128,6 +1212,16 @@ fn gate_result(
     }))
 }
 
+/// Refuse a contact that would exceed its registered stage capacity.
+fn ensure_capacity(used: u32, limit: u32, contact: &str) -> Result<()> {
+    if used >= limit {
+        return Err(invalid(&format!(
+            "local-9B {contact} would exceed its registered limit of {limit}"
+        )));
+    }
+    Ok(())
+}
+
 fn seal_result(root: &Path, result: &Value) -> Result<()> {
     write_json(&root.join("gate-result.json"), result)?;
     write_bytes(
@@ -1242,6 +1336,11 @@ pub fn execute_local_9b_feasibility_gate() -> Result<Value> {
     let mut structural_results = Vec::new();
     let mut context_bound = false;
     for (case_id, case, request) in &prerequisites.structural {
+        ensure_capacity(
+            accounting.structural_token_counts,
+            spec.stages.structural_inference_limit,
+            "structural token count",
+        )?;
         let (input_tokens, record) =
             match count_input_tokens(&client, &spec.token_count_endpoint, token_timeout, request) {
                 Ok(counted) => counted,
@@ -1272,6 +1371,11 @@ pub fn execute_local_9b_feasibility_gate() -> Result<Value> {
         }
         let case_dir = root.join(case_id);
         fs::create_dir_all(&case_dir)?;
+        ensure_capacity(
+            accounting.structural_inference,
+            spec.stages.structural_inference_limit,
+            "structural inference request",
+        )?;
         accounting.structural_inference += 1;
         let outcome = execute_case(&prerequisites.gate_manifest, case, None, &case_dir, &client)?;
         let passed = outcome.get("state").and_then(Value::as_str) == Some("PASS");
@@ -1295,6 +1399,11 @@ pub fn execute_local_9b_feasibility_gate() -> Result<Value> {
     let mut task_detail = Value::Null;
     if !context_bound && task_stage_permitted(&structural_states) {
         let request = &prerequisites.task;
+        ensure_capacity(
+            accounting.task_token_counts,
+            spec.stages.task_inference_limit,
+            "task token count",
+        )?;
         let (input_tokens, record) =
             match count_input_tokens(&client, &spec.token_count_endpoint, token_timeout, request) {
                 Ok(counted) => counted,
@@ -1322,6 +1431,11 @@ pub fn execute_local_9b_feasibility_gate() -> Result<Value> {
         if fits {
             let task_dir = root.join("h001-baseline");
             fs::create_dir_all(&task_dir)?;
+            ensure_capacity(
+                accounting.task_inference,
+                spec.stages.task_inference_limit,
+                "task inference request",
+            )?;
             accounting.task_inference += 1;
             let arm_result = h001::execute_h001_turn(H001TurnInput {
                 arm: H001Arm::Baseline,
@@ -1408,9 +1522,14 @@ mod tests {
         let spec = spec();
         assert_eq!(spec.limits.max_tokens, 1024);
         assert_eq!(spec.limits.context_tokens, 8192);
-        assert_eq!(spec.limits.inference_requests, 6);
-        assert_eq!(spec.limits.token_count_contacts, 6);
         assert_eq!(spec.limits.readiness_contacts, 1);
+        // REGISTERED_MAX_INFERENCE_REQUESTS = 3 structural + 1 frozen h001 BASELINE.
+        assert_eq!(spec.limits.inference_requests, 4);
+        assert_eq!(spec.limits.token_count_contacts, 4);
+        assert_eq!(spec.stages.structural_inference_limit, 3);
+        assert_eq!(spec.stages.task_inference_limit, 1);
+        assert_eq!(spec.task_case.inference_limit, 1);
+        assert!(spec.stages.task_stage_requires_all_structural_pass);
         assert_eq!(spec.model_file.sha256, LOCAL_9B_GGUF_SHA256);
         assert_eq!(spec.model_source.upstream_sha256, LOCAL_9B_GGUF_SHA256);
         assert_eq!(
@@ -1419,27 +1538,54 @@ mod tests {
         );
         assert_eq!(spec.reasoning.mode, "off");
         assert_eq!(spec.reasoning.launch_flag, ["--reasoning", "off"]);
-        assert_eq!(spec.stages.structural_requests, 3);
-        assert_eq!(spec.stages.task_turn_ceiling, 3);
-        assert!(spec.stages.task_stage_requires_all_structural_pass);
+        assert_eq!(spec.reasoning.request_chat_template_kwargs, "ABSENT");
+        assert_eq!(spec.multimodal_projector, "ABSENT");
+        assert_eq!(spec.request_content, "text-only");
         assert_eq!(spec.task_case.task_id, "h001");
         assert_eq!(spec.task_case.arm, "BASELINE");
+
+        for (pointer, value) in [
+            ("/gate/max_inference_requests", json!(6)),
+            ("/gate/max_token_count_contacts", json!(6)),
+            ("/gate/task_inference_limit", json!(3)),
+            (
+                "/runtime/multimodal_projector",
+                json!("mmproj-Qwen3.5-9B-BF16.gguf"),
+            ),
+            ("/runtime/request_content", json!("multimodal")),
+            (
+                "/runtime/reasoning_mechanism/request_chat_template_kwargs",
+                json!({ "enable_thinking": false }),
+            ),
+        ] {
+            let mut changed = contract();
+            *changed.pointer_mut(pointer).unwrap() = value;
+            assert!(validate_local_9b_contract(&changed).is_err(), "{pointer}");
+        }
     }
 
     #[test]
     fn derived_deadline_covers_every_contact_and_rejects_independent_values() {
         let spec = spec();
         let d = &spec.deadlines;
-        assert_eq!(
-            d.supervisor_deadline_ms,
-            d.readiness_timeout_ms
-                + 6 * d.token_count_request_timeout_ms
-                + 6 * d.inference_request_timeout_ms
-                + d.non_request_margin_ms
-        );
+        let stages = &spec.stages;
+        let structural = u64::from(stages.structural_inference_limit);
+        let task = u64::from(stages.task_inference_limit);
+        let derived = d.readiness_timeout_ms
+            + structural * d.token_count_request_timeout_ms
+            + task * d.token_count_request_timeout_ms
+            + structural * d.inference_request_timeout_ms
+            + task * d.inference_request_timeout_ms
+            + d.non_request_margin_ms;
+        // 1*1000 + 3*60000 + 1*60000 + 3*3540000 + 1*3540000 + 1200000
+        assert_eq!(derived, 15_601_000);
+        assert_eq!(d.supervisor_deadline_ms, derived);
+
+        let mut six_request_capacity = contract();
+        six_request_capacity["timeout_policy"]["supervisor_deadline_ms"] = json!(22_801_000);
+        assert!(validate_local_9b_contract(&six_request_capacity).is_err());
         let mut independent = contract();
-        independent["timeout_policy"]["supervisor_deadline_ms"] =
-            json!(d.supervisor_deadline_ms + 1);
+        independent["timeout_policy"]["supervisor_deadline_ms"] = json!(derived + 1);
         assert!(validate_local_9b_contract(&independent).is_err());
         let mut v3_inference = contract();
         v3_inference["timeout_policy"]["inference_request_timeout_ms"] = json!(2_400_000);
@@ -1447,6 +1593,11 @@ mod tests {
         let mut changed = spec.clone();
         changed.deadlines.non_request_margin_ms += 1;
         assert!(validate_local_9b_gate_spec(&changed, &contract(), &manifest()).is_err());
+        let mut widened = spec.clone();
+        widened.limits.inference_requests = 6;
+        widened.limits.token_count_contacts = 6;
+        widened.deadlines.supervisor_deadline_ms = 22_801_000;
+        assert!(validate_local_9b_gate_spec(&widened, &contract(), &manifest()).is_err());
     }
 
     #[test]
@@ -1484,20 +1635,67 @@ mod tests {
 
     #[test]
     fn request_level_reasoning_overrides_are_rejected() {
+        let spec = spec();
         let (_, _, request) = structural_requests(
-            &gate_calibration_manifest(&manifest(), &spec().model_label).unwrap(),
+            &gate_calibration_manifest(&manifest(), &spec.model_label).unwrap(),
         )
         .unwrap()
         .remove(0);
-        validate_reasoning_neutral_request(&request).unwrap();
-        for key in FORBIDDEN_REQUEST_FIELDS {
-            let mut overridden = request.clone();
-            overridden[key] = json!({ "enable_thinking": true });
-            assert!(
-                validate_reasoning_neutral_request(&overridden).is_err(),
-                "{key}"
-            );
+        let task = task_request(&spec.model_label).unwrap();
+        for registered in [&request, &task] {
+            validate_registered_request(registered).unwrap();
+            assert!(registered.get("chat_template_kwargs").is_none());
+
+            // chat_template_kwargs is rejected whatever it carries, including
+            // an explicit thinking-disabled value.
+            for kwargs in [
+                json!({ "enable_thinking": true }),
+                json!({ "enable_thinking": false }),
+                json!({}),
+                json!({ "other": 1 }),
+            ] {
+                let mut overridden = registered.clone();
+                overridden["chat_template_kwargs"] = kwargs.clone();
+                assert!(
+                    validate_registered_request(&overridden).is_err(),
+                    "{kwargs}"
+                );
+                assert_ne!(
+                    canonical_hash(&overridden).unwrap(),
+                    canonical_hash(registered).unwrap()
+                );
+            }
+            for key in FORBIDDEN_REQUEST_FIELDS {
+                let mut overridden = registered.clone();
+                overridden[key] = json!("none");
+                assert!(validate_registered_request(&overridden).is_err(), "{key}");
+            }
         }
+        // Registered hashes bind the absence: a request carrying
+        // chat_template_kwargs cannot match the registered hash.
+        let mut enabled = task.clone();
+        enabled["chat_template_kwargs"] = json!({ "enable_thinking": true });
+        assert_ne!(
+            canonical_hash(&enabled).unwrap(),
+            spec.task_case.request_sha256
+        );
+    }
+
+    #[test]
+    fn requests_are_text_only() {
+        let task = task_request(&spec().model_label).unwrap();
+        let mut image = task.clone();
+        image["messages"][0]["content"] = json!([
+            { "type": "text", "text": "x" },
+            { "type": "image_url", "image_url": { "url": "data:image/png;base64,AA==" } }
+        ]);
+        assert!(validate_registered_request(&image).is_err());
+        let mut parts = task.clone();
+        parts["messages"][0]["content"] = json!([{ "type": "text", "text": "x" }]);
+        assert!(validate_registered_request(&parts).is_err());
+        let mut empty = task.clone();
+        empty["messages"] = json!([]);
+        assert!(validate_registered_request(&empty).is_err());
     }
 
     #[test]
@@ -1583,46 +1781,114 @@ mod tests {
     #[test]
     fn server_command_line_must_match_registered_arguments() {
         let spec = spec();
-        let exact = format!(
-            "\"{}\" {}",
-            spec.runtime_executable.path,
-            spec.launch_arguments.join(" ")
+        let exe = &spec.runtime_executable.path;
+        let model = &spec.model_file.path;
+        let build = |arguments: &str| format!("\"{exe}\" serve {arguments}");
+        let accepted = format!(
+            "-m {model} -c 8192 -np 1 --metrics --reasoning off --offline --host 127.0.0.1 --port 8080"
         );
-        let arguments = split_windows_command_line(&exact);
-        validate_server_arguments(&arguments, &spec).unwrap();
-        let unquoted = format!(
-            "{} {}",
-            spec.runtime_executable.path,
-            spec.launch_arguments.join("  ")
+        validate_server_arguments(&split_windows_command_line(&build(&accepted)), &spec).unwrap();
+        // Order does not change effective semantics; unquoted program is accepted.
+        let reordered = format!(
+            "--port 8080 --host 127.0.0.1 --offline --reasoning off --metrics -np 1 -c 8192 -m {model}"
         );
-        validate_server_arguments(&split_windows_command_line(&unquoted), &spec).unwrap();
+        validate_server_arguments(&split_windows_command_line(&build(&reordered)), &spec).unwrap();
+        validate_server_arguments(
+            &split_windows_command_line(&format!("{exe} serve {accepted}")),
+            &spec,
+        )
+        .unwrap();
 
-        for (label, command_line) in [
-            (
-                "reasoning on",
-                exact.replace("--reasoning off", "--reasoning on"),
-            ),
-            ("reasoning absent", exact.replace(" --reasoning off", "")),
-            ("budget added", format!("{exact} --reasoning-budget 256")),
-            (
-                "kwargs added",
-                format!("{exact} --chat-template-kwargs {{\"enable_thinking\":true}}"),
-            ),
-            (
-                "other model",
-                exact.replace("Qwen3.5-9B-Q4_K_M", "Qwen3.5-4B-Q4_K_M"),
-            ),
-            (
-                "other executable",
-                exact.replace("llama.exe", "llama-server.exe"),
-            ),
-        ] {
+        let rejected = |label: &str, arguments: String| {
             assert!(
-                validate_server_arguments(&split_windows_command_line(&command_line), &spec)
+                validate_server_arguments(&split_windows_command_line(&build(&arguments)), &spec)
                     .is_err(),
                 "{label}"
             );
-        }
+        };
+        rejected(
+            "reasoning omitted",
+            accepted.replace(" --reasoning off", ""),
+        );
+        rejected(
+            "reasoning on",
+            accepted.replace("--reasoning off", "--reasoning on"),
+        );
+        rejected(
+            "reasoning auto",
+            accepted.replace("--reasoning off", "--reasoning auto"),
+        );
+        rejected(
+            "duplicate reasoning off",
+            format!("{accepted} --reasoning off"),
+        );
+        rejected(
+            "conflicting reasoning",
+            format!("{accepted} --reasoning on"),
+        );
+        rejected(
+            "reasoning alias",
+            accepted.replace("--reasoning off", "-rea off"),
+        );
+        rejected(
+            "reasoning equals form",
+            accepted.replace("--reasoning off", "--reasoning=off"),
+        );
+        rejected(
+            "reasoning budget",
+            format!("{accepted} --reasoning-budget 256"),
+        );
+        rejected(
+            "chat template kwargs",
+            format!("{accepted} --chat-template-kwargs {{\"enable_thinking\":false}}"),
+        );
+        rejected(
+            "hugging face",
+            accepted.replace(
+                &format!("-m {model}"),
+                "-hf lmstudio-community/Qwen3.5-9B-GGUF:Q4_K_M",
+            ),
+        );
+        rejected(
+            "mmproj",
+            format!("{accepted} --mmproj D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\mmproj-Qwen3.5-9B-BF16.gguf"),
+        );
+        rejected("mm alias", format!("{accepted} -mm D:\\x.gguf"));
+        rejected(
+            "other model path",
+            accepted.replace(
+                model.as_str(),
+                "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\copy.gguf",
+            ),
+        );
+        rejected("model alias", accepted.replace("-m ", "--model "));
+        rejected("duplicate model", format!("{accepted} -m {model}"));
+        rejected("context 4096", accepted.replace("-c 8192", "-c 4096"));
+        rejected(
+            "context alias",
+            accepted.replace("-c 8192", "--ctx-size 8192"),
+        );
+        rejected("slots 2", accepted.replace("-np 1", "-np 2"));
+        rejected("metrics omitted", accepted.replace(" --metrics", ""));
+        rejected("offline omitted", accepted.replace(" --offline", ""));
+        rejected(
+            "host 0.0.0.0",
+            accepted.replace("--host 127.0.0.1", "--host 0.0.0.0"),
+        );
+        rejected("port 8081", accepted.replace("--port 8080", "--port 8081"));
+        rejected("value missing", accepted.replace(" --port 8080", " --port"));
+        rejected("unknown flag", format!("{accepted} --jinja"));
+        assert!(validate_server_arguments(
+            &split_windows_command_line(&format!("\"{exe}\" cli {accepted}")),
+            &spec
+        )
+        .is_err());
+        assert!(validate_server_arguments(
+            &split_windows_command_line(&build(&accepted).replace("llama.exe", "llama-server.exe")),
+            &spec
+        )
+        .is_err());
+
         assert_eq!(
             split_windows_command_line(r#""C:\a b\x.exe" "q r" s\"t u\\\"v"#),
             [r"C:\a b\x.exe", "q r", "s\"t", "u\\\"v"]

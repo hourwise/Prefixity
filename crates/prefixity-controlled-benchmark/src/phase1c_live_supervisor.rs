@@ -287,7 +287,8 @@ const GATE_IDENTITY_KINDS: [GateIdentityKind; 2] = [
         prefix: LOCAL_9B_FEASIBILITY_GATE_IDENTITY_PREFIX,
         gate_id: "phase1c-local-9b-feasibility-gate",
         max_tokens: 1024,
-        inference_requests: 6,
+        // 3 structural probes + 1 frozen h001 BASELINE request.
+        inference_requests: 4,
     },
 ];
 
@@ -1006,10 +1007,10 @@ mod tests {
             std::fs::write(&path, serde_json::to_vec(&identity).unwrap()).unwrap();
             path
         };
-        // 1*1000 + 6*60000 + 6*3540000 + 1200000
-        let derived = 22_801_000;
+        // 1*1000 + 3*60000 + 1*60000 + 3*3540000 + 1*3540000 + 1200000
+        let derived = 15_601_000;
         let gate = "phase1c-local-9b-feasibility-gate";
-        let accepted = write("gate.json", gate, limits(1024, 6), deadlines(derived));
+        let accepted = write("gate.json", gate, limits(1024, 4), deadlines(derived));
         let registered = registered_workflow_identity_from_file(&accepted).unwrap();
         assert_eq!(registered.attempt, 1);
         assert_eq!(registered.candidate_budget, 1024);
@@ -1023,15 +1024,18 @@ mod tests {
             derived
         );
 
+        // The earlier six-request capacity is rejected even with its own
+        // consistent derived deadline.
         for (name, gate_id, limits, deadline) in [
+            ("six-requests.json", gate, limits(1024, 6), 22_801_000),
             ("v3-limits.json", gate, limits(4096, 3), derived),
             (
                 "v3-gate-id.json",
                 "phase1c-v3-feasibility-gate",
-                limits(1024, 6),
+                limits(1024, 4),
                 derived,
             ),
-            ("independent.json", gate, limits(1024, 6), derived + 1),
+            ("independent.json", gate, limits(1024, 4), derived + 1),
         ] {
             let path = write(name, gate_id, limits, deadlines(deadline));
             assert!(

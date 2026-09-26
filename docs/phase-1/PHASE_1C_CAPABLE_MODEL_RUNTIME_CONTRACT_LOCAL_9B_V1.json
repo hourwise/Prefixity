@@ -41,17 +41,20 @@
     "parallel_slots": 1,
     "metrics": "enabled",
     "reasoning": "off",
+    "multimodal_projector": "ABSENT",
+    "request_content": "text-only",
     "reasoning_mechanism": {
       "launch_flag": [
         "--reasoning",
         "off"
       ],
+      "request_chat_template_kwargs": "ABSENT",
       "source_evidence": "b10217 common/arg.cpp: --reasoning off sets enable_reasoning=0 and default_template_kwargs.enable_thinking=false; server-context.cpp derives chat_params.enable_thinking=false",
       "scope": "server-wide default; a request chat_template_kwargs.enable_thinking or reasoning_effort would override it per request (server-common.cpp oaicompat_chat_params_parse), so those fields are forbidden in request bodies",
       "template_effect": "the embedded Qwen3.5 template ends the generation prompt with an empty think block ('<think>' newline newline '</think>' newline newline) when enable_thinking is false, instead of an open '<think>' newline; request formatting changes, not only generation behaviour",
       "token_counter_same_semantics": "POST /v1/chat/completions and /v1/chat/completions/input_tokens both call oaicompat_chat_params_parse with the same server chat_params",
       "environment_precedence": "environment variables are applied before command-line arguments; an explicit --reasoning off overrides LLAMA_ARG_REASONING and an enable_thinking from LLAMA_ARG_CHAT_TEMPLATE_KWARGS; no LLAMA_ARG_* variable may be present",
-      "live_verification": "the gate reads the verified server process command line and requires it to equal the registered launch arguments",
+      "live_verification": "the gate reads the verified server process command line, parses its effective options, and requires exactly the registered options: the frozen -m GGUF, -c 8192, -np 1, --metrics, one --reasoning off, --offline, --host 127.0.0.1, --port 8080, and nothing else (duplicates, aliases, and unregistered arguments fail closed)",
       "forbidden_request_fields": [
         "chat_template_kwargs",
         "reasoning_effort",
@@ -123,7 +126,7 @@
       "rbcal-002",
       "rbcal-003"
     ],
-    "structural_requests": 3,
+    "structural_inference_limit": 3,
     "structural_evaluator": "unchanged calibration evaluator: HTTP 200, terminal non-length content, exact three-key object, code fences rejected",
     "task_case": {
       "task_id": "h001",
@@ -131,10 +134,13 @@
       "evaluator": "stage0-deterministic-evaluator-v1",
       "tool_contract": "phase1c-h001-no-tools-v1"
     },
-    "task_turn_ceiling": 3,
-    "task_turn_note": "the frozen h001 no-tool contract terminates on the first response, so the task stage issues one request",
+    "task_inference_limit": 1,
+    "task_inference_note": "the frozen h001 no-tool contract terminates on its first response, so the task stage can legitimately issue exactly one request; MAX_TURNS=3 in the historical h001 design is a declared bound, not an active loop",
     "task_stage_requires_all_structural_pass": true,
-    "max_inference_requests": 6,
+    "max_inference_requests": 4,
+    "max_token_count_contacts": 4,
+    "registered_max_inference_requests_basis": "3 structural + 1 frozen h001 BASELINE request",
+    "stage_a_failure_accounting": "task_token_count_contacts = 0 and task_inference_requests = 0",
     "not_executed": [
       "NO_OP",
       "INTERVENTION",
@@ -152,10 +158,10 @@
     "token_count_request_timeout_ms": 60000,
     "inference_request_timeout_ms": 3540000,
     "non_request_margin_ms": 1200000,
-    "supervisor_deadline_ms": 22801000,
-    "supervisor_deadline_derivation": "readiness_contacts * readiness_timeout_ms + token_count_contacts * token_count_request_timeout_ms + inference_requests * inference_request_timeout_ms + non_request_margin_ms = 1 * 1000 + 6 * 60000 + 6 * 3540000 + 1200000",
-    "inference_bound_basis": "conservative preparation estimate, not a 9B measurement: a full 1024-token response at a slow-session decode rate of about 0.3 tokens/s (0.8B measurements varied about 4x between sessions); kept below the frozen server's default 3600 s read/write timeout",
-    "non_request_margin_basis": "measured: debug-build identity hashing of the 9B GGUF took 550943 ms on this host; the margin is about 2x the estimated non-request child work",
+    "supervisor_deadline_ms": 15601000,
+    "supervisor_deadline_derivation": "1 readiness * 1000 + 3 structural token counts * 60000 + 1 task token count * 60000 + 3 structural inference * 3540000 + 1 task inference * 3540000 + margin 1200000 = 15601000",
+    "inference_bound_basis": "structural and task inference share one bound; conservative preparation estimate, not a 9B measurement: a full 1024-token response at a slow-session decode rate of about 0.3 tokens/s (0.8B measurements varied about 4x between sessions); kept below the frozen server's default 3600 s read/write timeout",
+    "non_request_margin_basis": "measured: debug-build identity hashing of the 9B GGUF took 550943 ms (idle) and 674945 ms (under concurrent builds) on this host; the margin is about 2x the idle estimate of non-request child work",
     "per_contact_bounds": "each readiness, token-count, and inference contact has its own complete bound"
   },
   "retry_policy": {
