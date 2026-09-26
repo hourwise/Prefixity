@@ -3787,3 +3787,51 @@ about 4x between sessions.
 
 Next permitted task: separately authorized local-9B feasibility preparation.
 No live inference is authorized.
+
+## Phase 1C local-9B feasibility-gate preparation
+
+```text
+LOCAL_9B_FEASIBILITY_GATE_PREPARED
+LOCAL_9B_FEASIBILITY_GATE_NOT_EXECUTED
+REGISTERED_MAX_INFERENCE_REQUESTS = 4   (3 structural + 1 frozen h001 BASELINE request)
+NO_LIVE_INFERENCE_AUTHORIZED
+```
+
+Preparation only; record:
+`docs/phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_PREPARATION.md`. The model was
+downloaded and fingerprinted but never loaded; no server startup, port-8080
+contact, readiness, token-count, or inference request occurred.
+
+Work completed:
+
+- Artifact: `lmstudio-community/Qwen3.5-9B-GGUF` @ `1379f25`, file
+  `Qwen3.5-9B-Q4_K_M.gguf` (Apache-2.0, base `Qwen/Qwen3.5-9B`), downloaded once
+  to `D:\Prefixity-Lab\models\Qwen3.5-9B\`; SHA-256 `cd76ec20…2a13` equals
+  upstream, 5627044256 bytes, file ID `volume=ba2f80f4;index=00050000004555a6`
+  (cwd-independent). llama.exe matches the accepted b10217 identity.
+- Reasoning off from exact-build source: `--reasoning off` is a server-wide
+  default that request `chat_template_kwargs`/`reasoning_effort` could
+  override; the token counter shares the inference template path. Enforced by
+  the launch contract, `chat_template_kwargs` ABSENT (bound in request
+  hashes), text-only content, `mmproj` ABSENT, and live parsed-argv
+  verification of the server command line. No model load was needed.
+- One spec-driven capable-model gate (`CapableModelGateSpec`) reusing V3
+  infrastructure and the unchanged rbcal and h001 evaluators. Limits: 3
+  structural + 1 h001 BASELINE request, token counts <= 4, readiness 1, no
+  retries; Stage B only after three structural passes. Deadline
+  1*1000 + 3*60000 + 1*60000 + 3*3540000 + 1*3540000 + 1200000 = 15601000 ms.
+- Source provenance `0703fa1` (superseding `0d19d41`, tightened before freeze
+  acceptance with zero inference); frozen supervisor `8c015dc1…92f2`, child
+  `d1ac159a…7b18`; gate identity `62412a9b…df9a`.
+
+Validation performed: fmt, clippy (`-D warnings`), workspace tests (623
+passed), bin build, MSRV 1.86 check. Frozen dry run, preflight, and frozen
+supervisor -> child traversal (`READY_FOR_MODEL_READINESS_BOUNDARY`, applied
+deadline 15601000 ms) all stopped before readiness with zero contacts.
+Mutable, copied, and historical executables and tampered GGUF, llama.exe,
+reasoning, capacity, and request identities were rejected.
+
+Remaining: the live gate needs separate operator authorization and a server
+started with the recorded command. `LOCAL_9B_FEASIBILITY_PASSED` is not
+claimed; a pass would permit only the offline
+`PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW`.

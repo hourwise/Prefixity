@@ -1,0 +1,351 @@
+{
+  "build_provenance": {
+    "build_command": "cargo build -p prefixity-controlled-benchmark --bins --locked --offline",
+    "build_dependent_validation_completed_before_freeze": true,
+    "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "child_build_output": {
+      "file_id": "volume=ba2f80f4;index=0005000000456849",
+      "file_size": 8903168,
+      "sha256": "d1ac159a3a446a650dd3ee7dbdc89f249552f9142c87625536348040f6cd7b18"
+    },
+    "freeze_command": "prefixity-phase1c-capable-model-gate local-9b-freeze",
+    "frozen_stage": "target/phase1c-local-9b-feasibility-frozen/",
+    "lockfile_path": "Cargo.lock",
+    "lockfile_sha256": "79f4fb5ea5e2b698c9785ac609294ed44e793dd8674f49cd53001792a2491cf8",
+    "profile": "dev",
+    "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "source_commit": "0703fa18d25055a2af4f1116106c76db86dd2f25",
+    "supervisor_build_output": {
+      "file_id": "volume=ba2f80f4;index=000700000045580f",
+      "file_size": 1412096,
+      "sha256": "8c015dc1d7a1430b45b88f701a40595cbdb453f35a9d713331a09be35fa692f2"
+    },
+    "target": "x86_64-pc-windows-msvc"
+  },
+  "calibration_manifest": {
+    "canonical_sha256": "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b",
+    "path": "docs/phase-1/PHASE_1C_REASONING_BUDGET_CALIBRATION_MANIFEST_V1.json"
+  },
+  "deadlines": {
+    "connect_timeout_ms": 1000,
+    "derivation": "1 readiness * 1000 + 3 structural token counts * 60000 + 1 task token count * 60000 + 3 structural inference * 3540000 + 1 task inference * 3540000 + margin 1200000 = 15601000",
+    "inference_request_timeout_ms": 3540000,
+    "non_request_margin_ms": 1200000,
+    "readiness_timeout_ms": 1000,
+    "registered_max_inference_requests": 4,
+    "registered_max_inference_requests_basis": "3 structural + 1 frozen h001 BASELINE request",
+    "registered_max_token_count_contacts": 4,
+    "supervisor_deadline_ms": 15601000,
+    "token_count_request_timeout_ms": 60000
+  },
+  "design_record": "docs/phase-1/PHASE_1C_CAPABLE_MODEL_DESIGN_DECISION.md",
+  "experiment_id": "phase-1c-capable-model-local-9b",
+  "gate_identity_number": 1,
+  "identity_version": "phase1c-local-9b-feasibility-gate-v1",
+  "implementation_fingerprints": {
+    "algorithm": "SHA-256",
+    "child_binary": {
+      "file_size": 8903168,
+      "final_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-capable-model-gate.exe",
+      "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-capable-model-gate.exe",
+      "sha256": "d1ac159a3a446a650dd3ee7dbdc89f249552f9142c87625536348040f6cd7b18",
+      "windows_file_id": "volume=ba2f80f4;index=0007000000455760"
+    },
+    "source_byte_definition": "UTF-8 checkout source bytes; CRLF and lone CR normalized to LF; UTF-8 BOM rejected",
+    "supervisor_binary": {
+      "file_size": 1412096,
+      "final_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-live-supervisor.exe",
+      "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-live-supervisor.exe",
+      "sha256": "8c015dc1d7a1430b45b88f701a40595cbdb453f35a9d713331a09be35fa692f2",
+      "windows_file_id": "volume=ba2f80f4;index=001100000045566f"
+    }
+  },
+  "implementation_sources": [
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_capable_model_gate.rs",
+      "sha256": "864644f3708145be4c0ba58f76ae1a767d22a2a061bfbf6c7106137ddbca6c37"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/bin/phase1c_capable_model_gate.rs",
+      "sha256": "c3dd2ebc4118596c5d44c251cf74e0a0ae34f0af3fdea86b30763eeaf7580e28"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_v3_feasibility.rs",
+      "sha256": "45a5b00794b3ccca88c7bee48b548c8aad57524bfd84e190065ed6e6cde6781e"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
+      "sha256": "7c8da03015657cf87cb79a0f120545cb4b373bf6850f65cb7104ae852e8b5ab5"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_h001.rs",
+      "sha256": "1a992b315eea9b71e57d65ac13c15d6c02d758806a30185d1a5dccd6d762ae5d"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_live_supervisor.rs",
+      "sha256": "906b76afb8e78817108644df406773d58710d501697373a25a194ce56feebfcb"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/bin/phase1c_live_supervisor.rs",
+      "sha256": "5b3cc976f41801504a15e0c7efaf196fe7b129b1199ba2164c6b9eb19f86a282"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_windows_runtime_exclusivity.rs",
+      "sha256": "9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29"
+    },
+    {
+      "path": "crates/prefixity-controlled-benchmark/src/phase1c_executable_identity.rs",
+      "sha256": "cffbff046bb7d42208d6fb85c7331a0244270e6d3b95534e860e50d6f82334dc"
+    }
+  ],
+  "launch_plan": {
+    "execution_authorized": false,
+    "operator_starts_server": true,
+    "server_command": [
+      "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "serve",
+      "-m",
+      "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+      "-c",
+      "8192",
+      "-np",
+      "1",
+      "--metrics",
+      "--reasoning",
+      "off",
+      "--offline",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8080"
+    ],
+    "server_environment": "no LLAMA_ARG_* variable may be present",
+    "supervisor_gate_command": [
+      "D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-live-supervisor.exe",
+      "--attempt-identity",
+      "docs/phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_IDENTITY_V1.json",
+      "--evidence",
+      "experiments/runs/phase1c-capable-model-local-9b/feasibility-gate-supervisor-result.json",
+      "--",
+      "D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-capable-model-gate.exe",
+      "run-local-9b-feasibility-gate"
+    ],
+    "supervisor_result_path": "experiments/runs/phase1c-capable-model-local-9b/feasibility-gate-supervisor-result.json",
+    "working_directory": "D:\\Users\\fleur\\Prefixity"
+  },
+  "network_policy": {
+    "gate_executions": 0,
+    "inference_requests": 0,
+    "model_server_startups": 0,
+    "port_8080_contacts": 0,
+    "readiness_contacts": 0,
+    "token_count_contacts": 0
+  },
+  "runtime_contract": {
+    "canonical_sha256": "c971fcda6d69646bc75b0594ec2967d532de90848c36f8bf042119aede55b889",
+    "path": "docs/phase-1/PHASE_1C_CAPABLE_MODEL_RUNTIME_CONTRACT_LOCAL_9B_V1.json"
+  },
+  "runtime_semantics": {
+    "authoritative_token_counter": "http://127.0.0.1:8080/v1/chat/completions/input_tokens",
+    "binding_note": "enforced through runtime_contract.canonical_sha256, spec equality with the contract-derived spec, reasoning-neutral request validation, and live server command-line verification; listed here explicitly for review",
+    "context_tokens": 8192,
+    "forbidden_environment_prefix": "LLAMA_ARG_",
+    "max_tokens": 1024,
+    "model": "Qwen3.5-9B Q4_K_M",
+    "model_loading": "-m frozen GGUF on D:; -hf forbidden; --offline",
+    "multimodal_projector": "ABSENT",
+    "reasoning": "off",
+    "reasoning_mechanism": {
+      "environment_precedence": "environment variables are applied before command-line arguments; an explicit --reasoning off overrides LLAMA_ARG_REASONING and an enable_thinking from LLAMA_ARG_CHAT_TEMPLATE_KWARGS; no LLAMA_ARG_* variable may be present",
+      "forbidden_request_fields": [
+        "chat_template_kwargs",
+        "reasoning_effort",
+        "reasoning_format",
+        "reasoning_budget_tokens",
+        "thinking_budget_tokens",
+        "reasoning_budget_message"
+      ],
+      "launch_flag": [
+        "--reasoning",
+        "off"
+      ],
+      "live_verification": "the gate reads the verified server process command line, parses its effective options, and requires exactly the registered options: the frozen -m GGUF, -c 8192, -np 1, --metrics, one --reasoning off, --offline, --host 127.0.0.1, --port 8080, and nothing else (duplicates, aliases, and unregistered arguments fail closed)",
+      "request_chat_template_kwargs": "ABSENT",
+      "scope": "server-wide default; a request chat_template_kwargs.enable_thinking or reasoning_effort would override it per request (server-common.cpp oaicompat_chat_params_parse), so those fields are forbidden in request bodies",
+      "source_evidence": "b10217 common/arg.cpp: --reasoning off sets enable_reasoning=0 and default_template_kwargs.enable_thinking=false; server-context.cpp derives chat_params.enable_thinking=false",
+      "template_effect": "the embedded Qwen3.5 template ends the generation prompt with an empty think block ('<think>' newline newline '</think>' newline newline) when enable_thinking is false, instead of an open '<think>' newline; request formatting changes, not only generation behaviour",
+      "token_counter_same_semantics": "POST /v1/chat/completions and /v1/chat/completions/input_tokens both call oaicompat_chat_params_parse with the same server chat_params"
+    },
+    "request_chat_template_kwargs": "ABSENT",
+    "request_content": "text-only",
+    "seed": 1,
+    "stream": false,
+    "temperature": 0,
+    "top_p": 1
+  },
+  "source_provenance": {
+    "accepted_design_commit": "34f88e582d011f7434cab1707cec1f568856b999",
+    "bound_source_count": 9,
+    "branch": "codex/phase1c-local-9b-feasibility-preparation",
+    "source_commit": "0703fa18d25055a2af4f1116106c76db86dd2f25",
+    "superseded_preparation": {
+      "frozen_stage_archived_as": "target/phase1c-local-9b-feasibility-frozen-superseded-0d19d41/",
+      "reason": "tightened before freeze acceptance: registered capacity 6 -> 4, chat_template_kwargs ABSENT, parsed server-argv validation, text-only boundary; no inference or gate execution occurred",
+      "source_commit": "0d19d411f60d6a8f066f9fa00fefc971133c8372"
+    }
+  },
+  "spec": {
+    "contract_path": "docs/phase-1/PHASE_1C_CAPABLE_MODEL_RUNTIME_CONTRACT_LOCAL_9B_V1.json",
+    "contract_sha256": "c971fcda6d69646bc75b0594ec2967d532de90848c36f8bf042119aede55b889",
+    "deadlines": {
+      "connect_timeout_ms": 1000,
+      "inference_request_timeout_ms": 3540000,
+      "non_request_margin_ms": 1200000,
+      "readiness_timeout_ms": 1000,
+      "supervisor_deadline_ms": 15601000,
+      "token_count_request_timeout_ms": 60000
+    },
+    "evaluators": {
+      "structural_manifest_sha256": "4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b",
+      "task_evaluator_sha256": "5fc19f47bd36e8625535e63939caebbb0e9ca1a458bb41b357de9d3f6d1f7fe3",
+      "task_evaluator_version": "stage0-deterministic-evaluator-v1",
+      "task_tool_contract_version": "phase1c-h001-no-tools-v1"
+    },
+    "evidence_root": "experiments/runs/phase1c-capable-model-local-9b/feasibility-gate",
+    "experiment_id": "phase-1c-capable-model-local-9b",
+    "forbidden_environment_prefix": "LLAMA_ARG_",
+    "forbidden_launch_arguments": [
+      "--reasoning-budget",
+      "--reasoning-budget-message",
+      "--chat-template-kwargs",
+      "--chat-template",
+      "--chat-template-file",
+      "--no-jinja",
+      "--skip-chat-parsing",
+      "--reasoning-preserve",
+      "-hf",
+      "--hf-repo",
+      "-hff",
+      "--hf-file",
+      "--mmproj",
+      "-mm"
+    ],
+    "gate_id": "phase1c-local-9b-feasibility-gate",
+    "inference_endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+    "launch_arguments": [
+      "serve",
+      "-m",
+      "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+      "-c",
+      "8192",
+      "-np",
+      "1",
+      "--metrics",
+      "--reasoning",
+      "off",
+      "--offline",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8080"
+    ],
+    "limits": {
+      "adaptive_replicates": 0,
+      "context_tokens": 8192,
+      "fallback_requests": 0,
+      "inference_requests": 4,
+      "max_tokens": 1024,
+      "readiness_contacts": 1,
+      "retry_requests": 0,
+      "token_count_contacts": 4,
+      "warmup_requests": 0
+    },
+    "model_file": {
+      "file_size": 5627044256,
+      "path": "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+      "sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+      "windows_file_id": "volume=ba2f80f4;index=00050000004555a6"
+    },
+    "model_label": "lmstudio-community/Qwen3.5-9B-GGUF:Q4_K_M",
+    "model_source": {
+      "base_model": "Qwen/Qwen3.5-9B",
+      "filename": "Qwen3.5-9B-Q4_K_M.gguf",
+      "license": "apache-2.0",
+      "repository": "lmstudio-community/Qwen3.5-9B-GGUF",
+      "revision": "1379f25c6b505a3fc737bd7818cb09389cf807c1",
+      "upstream_sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13"
+    },
+    "multimodal_projector": "ABSENT",
+    "reasoning": {
+      "forbidden_request_fields": [
+        "chat_template_kwargs",
+        "reasoning_effort",
+        "reasoning_format",
+        "reasoning_budget_tokens",
+        "thinking_budget_tokens",
+        "reasoning_budget_message"
+      ],
+      "launch_flag": [
+        "--reasoning",
+        "off"
+      ],
+      "mode": "off",
+      "request_chat_template_kwargs": "ABSENT"
+    },
+    "request_content": "text-only",
+    "runtime_executable": {
+      "file_size": 15277056,
+      "path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+      "windows_file_id": "volume=c4c93b54;index=00060000001ea970"
+    },
+    "runtime_version": "b10217-ddd4ec142",
+    "stages": {
+      "structural_inference_limit": 3,
+      "task_inference_limit": 1,
+      "task_stage_requires_all_structural_pass": true
+    },
+    "structural_cases": [
+      {
+        "case_id": "rbcal-001",
+        "request_sha256": "5552f95ea160e023f06efe29641e2dd378e9d136511e93d3f7a0d91b11a35c50"
+      },
+      {
+        "case_id": "rbcal-002",
+        "request_sha256": "4377f602a9e99ba25c318f8c856e54e363d39b92846006b83c1f7b300847e9ab"
+      },
+      {
+        "case_id": "rbcal-003",
+        "request_sha256": "3bc1e46aef64a6975c11988f8d0d3fe53354a7fe2194fb8857d94c0fed14ce9e"
+      }
+    ],
+    "task_case": {
+      "arm": "BASELINE",
+      "inference_limit": 1,
+      "request_sha256": "5b54046ecf52aefee74271731f3728c620e56a5cba3490c501cb29d60bf60a05",
+      "task_id": "h001"
+    },
+    "token_count_endpoint": "http://127.0.0.1:8080/v1/chat/completions/input_tokens"
+  },
+  "status": "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+  "stopping_rule": {
+    "otherwise": "LOCAL_9B_FEASIBILITY_FAILED; closes the local-9B path; permits only CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW",
+    "pass": "LOCAL_9B_FEASIBILITY_PASSED only if all three structural probes PASS, the h001 BASELINE trajectory PASSes, and no request is length, timeout, context-bound, or inconclusive; permits only PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW",
+    "replacement_identity": "exactly one, only for a genuine pre-inference infrastructure/integrity failure with inference_requests = 0 and no model output; any dispatched request consumes the identity",
+    "stage_b": "not executed unless all three structural probes PASS"
+  },
+  "task_artifacts": {
+    "arm_projections": {
+      "canonical_sha256": "1e09aaf51d1b93bddadb54e198b987481490083405a0de8d480b18393cb81416",
+      "path": "docs/phase-1/PHASE_1C_H001_ARM_PROJECTIONS_V1.json"
+    },
+    "evaluator": {
+      "canonical_sha256": "5fc19f47bd36e8625535e63939caebbb0e9ca1a458bb41b357de9d3f6d1f7fe3",
+      "path": "docs/phase-1/PHASE_1C_H001_EVALUATOR_V1.json"
+    },
+    "tool_contract": {
+      "canonical_sha256": "1105e16039acc4d9f1db6d784f6a5eb0653d4601117aeefcc8686338df7552a9",
+      "path": "docs/phase-1/PHASE_1C_H001_TOOL_CONTRACT_V1.json"
+    }
+  }
+}
