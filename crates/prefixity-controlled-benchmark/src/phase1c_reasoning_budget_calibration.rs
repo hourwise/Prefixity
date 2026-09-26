@@ -3744,6 +3744,17 @@ pub(crate) fn execute_case(
         .get("max_tokens")
         .and_then(Value::as_u64)
         .ok_or_else(|| missing("max_tokens"))?;
+    // The record labels come from the manifest and request actually used, so a
+    // reusing gate records its own experiment and model. For the calibration
+    // manifest they equal EXPERIMENT_ID and MODEL_ID.
+    let experiment_id = manifest
+        .get("experiment_id")
+        .and_then(Value::as_str)
+        .ok_or_else(|| missing("experiment_id"))?;
+    let model = request
+        .get("model")
+        .and_then(Value::as_str)
+        .ok_or_else(|| missing("model"))?;
     let request_bytes = serde_json::to_vec(&request)?;
     let request_sha256 = canonical_hash(&request)?;
     let wire_request_sha256 = sha256_hex(&request_bytes);
@@ -3751,10 +3762,10 @@ pub(crate) fn execute_case(
     let request_record = json!({
         "schema_id": REQUEST_SCHEMA_ID,
         "schema_version": 1,
-        "experiment_id": EXPERIMENT_ID,
+        "experiment_id": experiment_id,
         "case_id": case_id,
         "budget": budget,
-        "model": MODEL_ID,
+        "model": model,
         "request_sha256": request_sha256,
         "wire_request_sha256": wire_request_sha256,
         "request_bytes": request_bytes.len(),

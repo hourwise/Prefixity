@@ -25,6 +25,7 @@ mod observation_diagnostics;
 mod oracle;
 mod paired_mutation;
 mod phase1b9;
+mod phase1c_capable_model_gate;
 mod phase1c_executable_identity;
 mod phase1c_h001;
 mod phase1c_h001_v2;
@@ -182,6 +183,14 @@ pub use phase1b9::{
     Phase1b9Report, ResearchInterventionClass, ResearchPolicyDecision, PHASE_1B9_POLICY_VERSION,
     PHASE_1B9_SCOPE,
 };
+pub use phase1c_capable_model_gate::{
+    classify_local_9b_gate, derive_local_9b_gate_spec, dry_run_local_9b_gate,
+    execute_local_9b_feasibility_gate, freeze_local_9b_gate, local_9b_gate_permission,
+    preflight_local_9b_gate, validate_local_9b_contract, validate_local_9b_live_prerequisites,
+    CapableModelGateSpec, LOCAL_9B_BOUND_SOURCES, LOCAL_9B_CONTRACT_PATH,
+    LOCAL_9B_FEASIBILITY_FAILED, LOCAL_9B_FEASIBILITY_PASSED, LOCAL_9B_GATE_EVIDENCE_ROOT,
+    LOCAL_9B_GATE_FROZEN_STAGE_ROOT, LOCAL_9B_GATE_IDENTITY_PATH, LOCAL_9B_GATE_TRAVERSAL_ROOT,
+};
 pub use phase1c_executable_identity::{
     freeze_copy, inspect as inspect_executable_identity, validate_frozen_executable_binding,
     ExecutableIdentity, FrozenExecutableBinding,
@@ -198,6 +207,7 @@ pub use phase1c_h001_v2::{
     V2_H001_ATTEMPT_002_FINGERPRINT_PATH, V2_H001_ATTEMPT_002_IDENTITY_PATH, V2_H001_EVIDENCE_ROOT,
     V2_LIVE_CONFIRMATION_FLAG, V2_PILOT_FINGERPRINT_PATH, V2_PILOT_MANIFEST_PATH,
 };
+pub use phase1c_live_supervisor::LOCAL_9B_FEASIBILITY_GATE_IDENTITY_PREFIX;
 pub use phase1c_live_supervisor::{
     build_workflow_launch_metadata, persist_supervisor_result,
     registered_workflow_identity_from_file, run_supervised,

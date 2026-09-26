@@ -181,8 +181,8 @@ pub fn registered_workflow_identity_from_file(
     path: &Path,
 ) -> Result<RegisteredWorkflowIdentity, H001Error> {
     let identity = read_registered_identity(path)?;
-    if is_v3_gate_identity(&identity) {
-        return registered_v3_feasibility_gate_identity(path, &identity);
+    if let Some(kind) = gate_identity_kind(&identity) {
+        return registered_gate_identity(kind, path, &identity);
     }
     let attempt = identity
         .pointer("/attempt")
@@ -260,23 +260,57 @@ pub fn registered_workflow_identity_from_file(
 /// V3 runtime has no reasoning-budget flag.
 pub const V3_FEASIBILITY_GATE_IDENTITY_PREFIX: &str = "phase1c-v3-feasibility-gate-";
 
-/// Supervisor deadline for a registered identity. For a V3 feasibility-gate
-/// identity it is the complete child-lifecycle bound re-derived from the bound
-/// spec's limits and deadline components; a recorded deadline that differs
-/// from that derivation is rejected. Every other identity keeps the existing
-/// production deadline.
-pub fn registered_supervisor_deadline_ms(path: &Path) -> Result<u64, H001Error> {
-    let identity = read_registered_identity(path)?;
-    if !is_v3_gate_identity(&identity) {
-        return Ok(PRODUCTION_SUPERVISOR_TIMEOUT_MS);
-    }
-    v3_gate_supervisor_deadline_ms(&identity)
+/// Identity-version prefix of the Phase 1C local-9B capable-model
+/// feasibility gate. Registration follows the V3 gate convention.
+pub const LOCAL_9B_FEASIBILITY_GATE_IDENTITY_PREFIX: &str = "phase1c-local-9b-feasibility-gate-";
+
+/// A registered spec-driven gate identity kind: its identity prefix, gate id,
+/// output ceiling, and inference-request limit.
+struct GateIdentityKind {
+    label: &'static str,
+    prefix: &'static str,
+    gate_id: &'static str,
+    max_tokens: u32,
+    inference_requests: u64,
 }
 
-fn v3_gate_supervisor_deadline_ms(identity: &Value) -> Result<u64, H001Error> {
+const GATE_IDENTITY_KINDS: [GateIdentityKind; 2] = [
+    GateIdentityKind {
+        label: "V3 feasibility gate",
+        prefix: V3_FEASIBILITY_GATE_IDENTITY_PREFIX,
+        gate_id: "phase1c-v3-feasibility-gate",
+        max_tokens: 4096,
+        inference_requests: 3,
+    },
+    GateIdentityKind {
+        label: "local-9B feasibility gate",
+        prefix: LOCAL_9B_FEASIBILITY_GATE_IDENTITY_PREFIX,
+        gate_id: "phase1c-local-9b-feasibility-gate",
+        max_tokens: 1024,
+        inference_requests: 6,
+    },
+];
+
+/// Supervisor deadline for a registered identity. For a gate identity it is
+/// the complete child-lifecycle bound re-derived from the bound spec's limits
+/// and deadline components; a recorded deadline that differs from that
+/// derivation is rejected. Every other identity keeps the existing production
+/// deadline.
+pub fn registered_supervisor_deadline_ms(path: &Path) -> Result<u64, H001Error> {
+    let identity = read_registered_identity(path)?;
+    match gate_identity_kind(&identity) {
+        Some(kind) => gate_supervisor_deadline_ms(kind, &identity),
+        None => Ok(PRODUCTION_SUPERVISOR_TIMEOUT_MS),
+    }
+}
+
+fn gate_supervisor_deadline_ms(
+    kind: &GateIdentityKind,
+    identity: &Value,
+) -> Result<u64, H001Error> {
     let component = |pointer: &str| {
         identity.pointer(pointer).cloned().ok_or_else(|| {
-            H001Error::Validation(format!("V3 feasibility gate identity is missing {pointer}"))
+            H001Error::Validation(format!("{} identity is missing {pointer}", kind.label))
         })
     };
     let limits: LimitsSpec = serde_json::from_value(component("/spec/limits")?)?;
@@ -297,11 +331,11 @@ fn read_registered_identity(path: &Path) -> Result<Value, H001Error> {
     Ok(serde_json::from_slice(&std::fs::read(read_path)?)?)
 }
 
-fn is_v3_gate_identity(identity: &Value) -> bool {
-    identity
-        .get("identity_version")
-        .and_then(Value::as_str)
-        .is_some_and(|version| version.starts_with(V3_FEASIBILITY_GATE_IDENTITY_PREFIX))
+fn gate_identity_kind(identity: &Value) -> Option<&'static GateIdentityKind> {
+    let version = identity.get("identity_version").and_then(Value::as_str)?;
+    GATE_IDENTITY_KINDS
+        .iter()
+        .find(|kind| version.starts_with(kind.prefix))
 }
 
 fn reject_mutable_frozen_binding(binding: &FrozenExecutableBinding) -> Result<(), H001Error> {
@@ -329,53 +363,52 @@ fn registered_frozen_binding(
         .map_err(H001Error::Validation)
 }
 
-fn registered_v3_feasibility_gate_identity(
+fn registered_gate_identity(
+    kind: &GateIdentityKind,
     path: &Path,
     identity: &Value,
 ) -> Result<RegisteredWorkflowIdentity, H001Error> {
+    let label = kind.label;
     let field = |pointer: &str| {
-        identity.pointer(pointer).ok_or_else(|| {
-            H001Error::Validation(format!("V3 feasibility gate identity is missing {pointer}"))
-        })
+        identity
+            .pointer(pointer)
+            .ok_or_else(|| H001Error::Validation(format!("{label} identity is missing {pointer}")))
     };
     let gate_number = field("/gate_identity_number")?
         .as_u64()
         .filter(|number| matches!(number, 1 | 2))
-        .ok_or_else(|| {
-            H001Error::Validation("V3 feasibility gate identity number must be 1 or 2".to_string())
-        })? as u32;
-    if field("/spec/limits/max_tokens")? != &json!(4096)
-        || field("/spec/limits/inference_requests")? != &json!(3)
+        .ok_or_else(|| H001Error::Validation(format!("{label} identity number must be 1 or 2")))?
+        as u32;
+    if field("/spec/limits/max_tokens")? != &json!(kind.max_tokens)
+        || field("/spec/limits/inference_requests")? != &json!(kind.inference_requests)
         || field("/spec/limits/retry_requests")? != &json!(0)
     {
-        return Err(H001Error::Validation(
-            "V3 feasibility gate identity limits are not the registered gate limits".to_string(),
-        ));
+        return Err(H001Error::Validation(format!(
+            "{label} identity limits are not the registered gate limits"
+        )));
     }
-    v3_gate_supervisor_deadline_ms(identity)?;
+    gate_supervisor_deadline_ms(kind, identity)?;
     let candidate_identity = field("/spec/gate_id")?
         .as_str()
-        .filter(|value| *value == "phase1c-v3-feasibility-gate")
-        .ok_or_else(|| H001Error::Validation("V3 feasibility gate id is invalid".to_string()))?
+        .filter(|value| *value == kind.gate_id)
+        .ok_or_else(|| H001Error::Validation(format!("{label} id is invalid")))?
         .to_string();
     let evidence_root = field("/spec/evidence_root")?
         .as_str()
         .map(|root| format!("{}/", root.trim_end_matches('/')))
-        .ok_or_else(|| {
-            H001Error::Validation("V3 feasibility gate evidence root is invalid".to_string())
-        })?;
+        .ok_or_else(|| H001Error::Validation(format!("{label} evidence root is invalid")))?;
     let frozen_executable_binding = registered_frozen_binding(identity)?;
     let Some(binding) = &frozen_executable_binding else {
-        return Err(H001Error::Validation(
-            "V3 feasibility gate identity is missing frozen executable identity".to_string(),
-        ));
+        return Err(H001Error::Validation(format!(
+            "{label} identity is missing frozen executable identity"
+        )));
     };
     reject_mutable_frozen_binding(binding)?;
     let registered = RegisteredWorkflowIdentity {
         attempt_identity_path: path.to_string_lossy().into_owned(),
         attempt_identity_sha256: canonical_hash(identity)?,
         attempt: gate_number,
-        candidate_budget: 4096,
+        candidate_budget: kind.max_tokens,
         candidate_identity,
         evidence_root,
         frozen_executable_binding,
@@ -913,6 +946,100 @@ mod tests {
             "non_request_margin_ms": 120_000,
             "supervisor_deadline_ms": 7_501_000
         })
+    }
+
+    #[test]
+    fn local_9b_gate_identity_registers_only_with_its_own_limits() {
+        let directory = std::env::temp_dir().join(format!(
+            "prefixity-local-9b-gate-registration-{}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let staged = |name: &str| {
+            json!({
+                "raw_path": format!("D:/frozen/target/phase1c-local-9b-feasibility-frozen/{name}"),
+                "final_path": format!("D:/frozen/target/phase1c-local-9b-feasibility-frozen/{name}"),
+                "file_size": 1,
+                "sha256": "a".repeat(64),
+                "file_id": "volume=1;index=1"
+            })
+        };
+        let limits = |max_tokens: u64, requests: u64| {
+            json!({
+                "context_tokens": 8192,
+                "max_tokens": max_tokens,
+                "readiness_contacts": 1,
+                "token_count_contacts": requests,
+                "inference_requests": requests,
+                "retry_requests": 0,
+                "fallback_requests": 0,
+                "adaptive_replicates": 0,
+                "warmup_requests": 0
+            })
+        };
+        let deadlines = |supervisor_deadline_ms: u64| {
+            json!({
+                "connect_timeout_ms": 1_000,
+                "readiness_timeout_ms": 1_000,
+                "token_count_request_timeout_ms": 60_000,
+                "inference_request_timeout_ms": 3_540_000,
+                "non_request_margin_ms": 1_200_000,
+                "supervisor_deadline_ms": supervisor_deadline_ms
+            })
+        };
+        let write = |name: &str, gate_id: &str, limits: Value, deadlines: Value| {
+            let identity = json!({
+                "identity_version": "phase1c-local-9b-feasibility-gate-v1",
+                "gate_identity_number": 1,
+                "spec": {
+                    "gate_id": gate_id,
+                    "evidence_root": "experiments/runs/phase1c-capable-model-local-9b/feasibility-gate",
+                    "limits": limits,
+                    "deadlines": deadlines
+                },
+                "implementation_fingerprints": {
+                    "supervisor_binary": staged("supervisor.exe"),
+                    "child_binary": staged("child.exe")
+                }
+            });
+            let path = directory.join(name);
+            std::fs::write(&path, serde_json::to_vec(&identity).unwrap()).unwrap();
+            path
+        };
+        // 1*1000 + 6*60000 + 6*3540000 + 1200000
+        let derived = 22_801_000;
+        let gate = "phase1c-local-9b-feasibility-gate";
+        let accepted = write("gate.json", gate, limits(1024, 6), deadlines(derived));
+        let registered = registered_workflow_identity_from_file(&accepted).unwrap();
+        assert_eq!(registered.attempt, 1);
+        assert_eq!(registered.candidate_budget, 1024);
+        assert_eq!(registered.candidate_identity, gate);
+        assert_eq!(
+            registered.evidence_root,
+            "experiments/runs/phase1c-capable-model-local-9b/feasibility-gate/"
+        );
+        assert_eq!(
+            registered_supervisor_deadline_ms(&accepted).unwrap(),
+            derived
+        );
+
+        for (name, gate_id, limits, deadline) in [
+            ("v3-limits.json", gate, limits(4096, 3), derived),
+            (
+                "v3-gate-id.json",
+                "phase1c-v3-feasibility-gate",
+                limits(1024, 6),
+                derived,
+            ),
+            ("independent.json", gate, limits(1024, 6), derived + 1),
+        ] {
+            let path = write(name, gate_id, limits, deadlines(deadline));
+            assert!(
+                registered_workflow_identity_from_file(&path).is_err(),
+                "{name}"
+            );
+        }
+        std::fs::remove_dir_all(&directory).unwrap();
     }
 
     #[test]

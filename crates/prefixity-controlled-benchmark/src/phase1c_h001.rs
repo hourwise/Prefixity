@@ -232,9 +232,6 @@ pub(crate) fn execute_h001_arm_with_spec(
         ));
     }
 
-    let request_bytes = serde_json::to_vec(&request)?;
-    let request_sha256 = canonical_hash(&request)?;
-    let wire_request_sha256 = sha256_hex(&request_bytes);
     if evidence_dir.exists() {
         return Err(H001Error::Validation(format!(
             "h001 arm evidence already exists: {}",
@@ -287,17 +284,64 @@ pub(crate) fn execute_h001_arm_with_spec(
             "elapsed_ms": readiness_elapsed_ms,
         }),
     )?;
+    execute_h001_turn(H001TurnInput {
+        arm,
+        request,
+        evidence_dir: &evidence_dir,
+        experiment_id,
+        readiness_elapsed_ms,
+        timeouts: || {
+            Ok((
+                Duration::from_millis(contract_u64(contract, "timeout_policy.connect_timeout_ms")?),
+                Duration::from_millis(contract_u64(
+                    contract,
+                    "timeout_policy.complete_request_timeout_ms",
+                )?),
+            ))
+        },
+    })
+}
+
+/// Inputs of one h001 model turn; see [`execute_h001_turn`].
+pub(crate) struct H001TurnInput<'a, F>
+where
+    F: FnOnce() -> Result<(Duration, Duration), H001Error>,
+{
+    pub arm: H001Arm,
+    pub request: &'a Value,
+    pub evidence_dir: &'a Path,
+    pub experiment_id: &'a str,
+    pub readiness_elapsed_ms: u64,
+    /// Resolves (connect, complete-request) timeouts after the request file is
+    /// written, preserving the historical order of operations.
+    pub timeouts: F,
+}
+
+/// Dispatch one h001 turn to an already verified runtime and persist the
+/// request, response, normalized turn, trajectory state, and arm result in an
+/// existing evidence directory. The frozen h001 contract has no tools, so the
+/// first response is terminal. Callers own readiness and runtime confirmation.
+pub(crate) fn execute_h001_turn<F>(input: H001TurnInput<'_, F>) -> Result<Value, H001Error>
+where
+    F: FnOnce() -> Result<(Duration, Duration), H001Error>,
+{
+    let H001TurnInput {
+        arm,
+        request,
+        evidence_dir,
+        experiment_id,
+        readiness_elapsed_ms,
+        timeouts,
+    } = input;
+    let request_bytes = serde_json::to_vec(request)?;
+    let request_sha256 = canonical_hash(request)?;
+    let wire_request_sha256 = sha256_hex(&request_bytes);
     write_bytes(&evidence_dir.join("request-turn-1.json"), &request_bytes)?;
 
+    let (connect_timeout, request_timeout) = timeouts()?;
     let client = Client::builder()
-        .connect_timeout(Duration::from_millis(contract_u64(
-            contract,
-            "timeout_policy.connect_timeout_ms",
-        )?))
-        .timeout(Duration::from_millis(contract_u64(
-            contract,
-            "timeout_policy.complete_request_timeout_ms",
-        )?))
+        .connect_timeout(connect_timeout)
+        .timeout(request_timeout)
         .redirect(Policy::none())
         .build()
         .map_err(|error| H001Error::Transport(error.to_string()))?;
@@ -322,7 +366,7 @@ pub(crate) fn execute_h001_arm_with_spec(
                 error: format!("request dispatch/completion is ambiguous: {error}"),
                 experiment_id,
             });
-            persist_ambiguous(&evidence_dir, &result)?;
+            persist_ambiguous(evidence_dir, &result)?;
             return Ok(result);
         }
     };
@@ -348,7 +392,7 @@ pub(crate) fn execute_h001_arm_with_spec(
             error: format!("response body read is ambiguous: {error}"),
             experiment_id,
         });
-        persist_ambiguous(&evidence_dir, &result)?;
+        persist_ambiguous(evidence_dir, &result)?;
         return Ok(result);
     }
 

@@ -1,0 +1,188 @@
+{
+  "contract_version": "phase1c-capable-model-runtime-local-9b-v1",
+  "experiment_id": "phase-1c-capable-model-local-9b",
+  "status": "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
+  "design_record": "docs/phase-1/PHASE_1C_CAPABLE_MODEL_DESIGN_DECISION.md",
+  "claim": "Claim 2 measuring-instrument competence gate; tests the model, not Prefixity",
+  "runtime": {
+    "engine": "llama.cpp",
+    "executable": {
+      "path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "version": "b10217-ddd4ec142",
+      "source_commit": "ddd4ec1428a6201e18975ea52b07c71e0f9aef26",
+      "sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+      "file_size": 15277056,
+      "windows_file_id": "volume=c4c93b54;index=00060000001ea970"
+    },
+    "model": {
+      "label": "lmstudio-community/Qwen3.5-9B-GGUF:Q4_K_M",
+      "repository": "lmstudio-community/Qwen3.5-9B-GGUF",
+      "revision": "1379f25c6b505a3fc737bd7818cb09389cf807c1",
+      "filename": "Qwen3.5-9B-Q4_K_M.gguf",
+      "source_url": "https://huggingface.co/lmstudio-community/Qwen3.5-9B-GGUF/resolve/1379f25c6b505a3fc737bd7818cb09389cf807c1/Qwen3.5-9B-Q4_K_M.gguf",
+      "upstream_sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+      "quantizer": "LM Studio team using llama.cpp release b8185",
+      "base_model": "Qwen/Qwen3.5-9B",
+      "base_model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "license": "apache-2.0",
+      "license_reference": "https://huggingface.co/Qwen/Qwen3.5-9B/blob/main/LICENSE",
+      "architecture": "qwen35",
+      "quantization": "Q4_K_M",
+      "gguf_file_type": 15,
+      "embedded_chat_template_sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+      "multimodal_projector": "not acquired; --mmproj forbidden; text-only runtime",
+      "loading": "direct frozen file via -m with --offline; -hf is forbidden",
+      "path": "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+      "sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+      "file_size": 5627044256,
+      "windows_file_id": "volume=ba2f80f4;index=00050000004555a6"
+    },
+    "context_size": 8192,
+    "parallel_slots": 1,
+    "metrics": "enabled",
+    "reasoning": "off",
+    "reasoning_mechanism": {
+      "launch_flag": [
+        "--reasoning",
+        "off"
+      ],
+      "source_evidence": "b10217 common/arg.cpp: --reasoning off sets enable_reasoning=0 and default_template_kwargs.enable_thinking=false; server-context.cpp derives chat_params.enable_thinking=false",
+      "scope": "server-wide default; a request chat_template_kwargs.enable_thinking or reasoning_effort would override it per request (server-common.cpp oaicompat_chat_params_parse), so those fields are forbidden in request bodies",
+      "template_effect": "the embedded Qwen3.5 template ends the generation prompt with an empty think block ('<think>' newline newline '</think>' newline newline) when enable_thinking is false, instead of an open '<think>' newline; request formatting changes, not only generation behaviour",
+      "token_counter_same_semantics": "POST /v1/chat/completions and /v1/chat/completions/input_tokens both call oaicompat_chat_params_parse with the same server chat_params",
+      "environment_precedence": "environment variables are applied before command-line arguments; an explicit --reasoning off overrides LLAMA_ARG_REASONING and an enable_thinking from LLAMA_ARG_CHAT_TEMPLATE_KWARGS; no LLAMA_ARG_* variable may be present",
+      "live_verification": "the gate reads the verified server process command line and requires it to equal the registered launch arguments",
+      "forbidden_request_fields": [
+        "chat_template_kwargs",
+        "reasoning_effort",
+        "reasoning_format",
+        "reasoning_budget_tokens",
+        "thinking_budget_tokens",
+        "reasoning_budget_message"
+      ]
+    },
+    "network_offline_flag": "--offline",
+    "host": "127.0.0.1",
+    "port": 8080,
+    "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+    "launch_arguments": [
+      "serve",
+      "-m",
+      "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+      "-c",
+      "8192",
+      "-np",
+      "1",
+      "--metrics",
+      "--reasoning",
+      "off",
+      "--offline",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8080"
+    ],
+    "forbidden_launch_arguments": [
+      "--reasoning-budget",
+      "--reasoning-budget-message",
+      "--chat-template-kwargs",
+      "--chat-template",
+      "--chat-template-file",
+      "--no-jinja",
+      "--skip-chat-parsing",
+      "--reasoning-preserve",
+      "-hf",
+      "--hf-repo",
+      "-hff",
+      "--hf-file",
+      "--mmproj",
+      "-mm"
+    ],
+    "forbidden_environment_prefix": "LLAMA_ARG_"
+  },
+  "generation": {
+    "max_tokens": 1024,
+    "temperature": 0,
+    "top_p": 1,
+    "seed": 1,
+    "stream": false,
+    "additional_sampling_parameters": {}
+  },
+  "context_budget": {
+    "context_tokens": 8192,
+    "output_ceiling_tokens": 1024,
+    "bound": "input_tokens + 1024 <= 8192",
+    "authoritative_token_counter": "frozen llama.cpp b10217 + frozen GGUF + POST /v1/chat/completions/input_tokens",
+    "token_counter_is_inference": false,
+    "token_counter_request_body": "the exact inference request body; no projection",
+    "on_bound_failure": "INCONCLUSIVE_CONTEXT_BOUND: the request is not dispatched and the local-9B gate fails; no truncation, summarization, history drop, ceiling change, context increase, prompt change, or retry"
+  },
+  "gate": {
+    "structural_cases": [
+      "rbcal-001",
+      "rbcal-002",
+      "rbcal-003"
+    ],
+    "structural_requests": 3,
+    "structural_evaluator": "unchanged calibration evaluator: HTTP 200, terminal non-length content, exact three-key object, code fences rejected",
+    "task_case": {
+      "task_id": "h001",
+      "arm": "BASELINE",
+      "evaluator": "stage0-deterministic-evaluator-v1",
+      "tool_contract": "phase1c-h001-no-tools-v1"
+    },
+    "task_turn_ceiling": 3,
+    "task_turn_note": "the frozen h001 no-tool contract terminates on the first response, so the task stage issues one request",
+    "task_stage_requires_all_structural_pass": true,
+    "max_inference_requests": 6,
+    "not_executed": [
+      "NO_OP",
+      "INTERVENTION",
+      "Prefixity efficacy comparison"
+    ],
+    "pass_state": "LOCAL_9B_FEASIBILITY_PASSED",
+    "fail_state": "LOCAL_9B_FEASIBILITY_FAILED",
+    "after_pass": "PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW (offline); the scored pilot is not authorized",
+    "after_fail": "CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW",
+    "replacement_identity": "exactly one, only for a genuine pre-inference infrastructure/integrity failure with inference_requests = 0 and no model output; any dispatched request consumes the identity"
+  },
+  "timeout_policy": {
+    "connect_timeout_ms": 1000,
+    "readiness_timeout_ms": 1000,
+    "token_count_request_timeout_ms": 60000,
+    "inference_request_timeout_ms": 3540000,
+    "non_request_margin_ms": 1200000,
+    "supervisor_deadline_ms": 22801000,
+    "supervisor_deadline_derivation": "readiness_contacts * readiness_timeout_ms + token_count_contacts * token_count_request_timeout_ms + inference_requests * inference_request_timeout_ms + non_request_margin_ms = 1 * 1000 + 6 * 60000 + 6 * 3540000 + 1200000",
+    "inference_bound_basis": "conservative preparation estimate, not a 9B measurement: a full 1024-token response at a slow-session decode rate of about 0.3 tokens/s (0.8B measurements varied about 4x between sessions); kept below the frozen server's default 3600 s read/write timeout",
+    "non_request_margin_basis": "measured: debug-build identity hashing of the 9B GGUF took 550943 ms on this host; the margin is about 2x the estimated non-request child work",
+    "per_contact_bounds": "each readiness, token-count, and inference contact has its own complete bound"
+  },
+  "retry_policy": {
+    "automatic_retries": 0,
+    "fallback_requests": 0,
+    "adaptive_replicates": 0,
+    "warmup_requests": 0
+  },
+  "accounting_classes": [
+    "operator_server_startups",
+    "readiness_contacts",
+    "structural_token_count_contacts",
+    "task_level_token_count_contacts",
+    "structural_inference_requests",
+    "task_level_inference_requests",
+    "retry_requests",
+    "fallback_requests",
+    "warmup_requests",
+    "adaptive_replicates"
+  ],
+  "not_carried_forward": [
+    "Qwen3.5-0.8B as the Claim-2 ruler",
+    "reasoning-budget calibration",
+    "output-ceiling escalation",
+    "0.8B-derived deadlines",
+    "-hf loading",
+    "hand-written identity fields",
+    "per-attempt validator families"
+  ]
+}

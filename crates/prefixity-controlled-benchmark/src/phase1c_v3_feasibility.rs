@@ -227,30 +227,30 @@ pub enum ContextDecision {
     Bound,
 }
 
-fn invalid(message: &str) -> ReasoningBudgetCalibrationError {
+pub(crate) fn invalid(message: &str) -> ReasoningBudgetCalibrationError {
     ReasoningBudgetCalibrationError::Validation(message.to_string())
 }
 
-fn field<'a>(value: &'a Value, pointer: &str) -> Result<&'a Value> {
+pub(crate) fn field<'a>(value: &'a Value, pointer: &str) -> Result<&'a Value> {
     value
         .pointer(pointer)
         .ok_or_else(|| invalid(&format!("V3 value is missing {pointer}")))
 }
 
-fn text(value: &Value, pointer: &str) -> Result<String> {
+pub(crate) fn text(value: &Value, pointer: &str) -> Result<String> {
     field(value, pointer)?
         .as_str()
         .map(str::to_string)
         .ok_or_else(|| invalid(&format!("V3 value {pointer} is not a string")))
 }
 
-fn number(value: &Value, pointer: &str) -> Result<u64> {
+pub(crate) fn number(value: &Value, pointer: &str) -> Result<u64> {
     field(value, pointer)?
         .as_u64()
         .ok_or_else(|| invalid(&format!("V3 value {pointer} is not an unsigned integer")))
 }
 
-fn expect(value: &Value, pointer: &str, expected: Value) -> Result<()> {
+pub(crate) fn expect(value: &Value, pointer: &str, expected: Value) -> Result<()> {
     if field(value, pointer)? != &expected {
         return Err(invalid(&format!("V3 contract value {pointer} changed")));
     }
@@ -654,7 +654,7 @@ fn tracked_contract() -> Result<Value> {
     Ok(contract)
 }
 
-fn tracked_manifest() -> Result<Value> {
+pub(crate) fn tracked_manifest() -> Result<Value> {
     let manifest = read_manifest(true)?;
     validate_manifest(&manifest, true)?;
     Ok(manifest)
@@ -775,7 +775,7 @@ pub fn validate_gate_identity_document(identity: &Value) -> Result<()> {
     Ok(())
 }
 
-fn validate_source_binding(identity: &Value) -> Result<()> {
+pub(crate) fn validate_source_binding(identity: &Value) -> Result<()> {
     for source in field(identity, "/implementation_sources")?
         .as_array()
         .into_iter()
@@ -791,7 +791,7 @@ fn validate_source_binding(identity: &Value) -> Result<()> {
     Ok(())
 }
 
-fn validate_frozen_executables(identity: &Value) -> Result<Value> {
+pub(crate) fn validate_frozen_executables(identity: &Value) -> Result<Value> {
     let binding =
         executable_identity::FrozenExecutableBinding::from_implementation_fingerprints(identity)
             .map_err(|error| invalid(&error))?
@@ -954,7 +954,7 @@ pub fn validate_v3_live_prerequisites() -> Result<Value> {
     Ok(report)
 }
 
-fn poststart_ownership() -> Result<Value> {
+pub(crate) fn poststart_ownership() -> Result<Value> {
     let processes = windows_exclusivity::process_table()
         .map_err(|failure| invalid(&format!("post-start process inspection failed: {failure}")))?;
     let llama_processes = windows_exclusivity::llama_processes(&processes);
@@ -968,7 +968,7 @@ fn poststart_ownership() -> Result<Value> {
     attempt_003_runtime_ownership_with_expected_workflow(llama_processes[0].pid, &expected_workflow)
 }
 
-fn count_input_tokens(
+pub(crate) fn count_input_tokens(
     client: &Client,
     endpoint: &str,
     timeout: Duration,

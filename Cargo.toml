@@ -28,4 +28,5 @@ windows-sys = { version = "0.61.2", features = [
     "Win32_Storage_FileSystem",
     "Win32_System_Diagnostics_ToolHelp",
     "Win32_System_Threading",
+    "Wdk_System_Threading",
 ] }
