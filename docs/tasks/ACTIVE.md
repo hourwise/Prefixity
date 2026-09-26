@@ -3743,3 +3743,47 @@ Not authorized: a second ceiling, an 8192-token experiment, a new reasoning
 budget, a reasoning-off fallback, another 0.8B quantization, a gate rerun, a
 V3 scored pilot, or any inference. Next permitted substantive work:
 `DIFFERENT_CAPABLE_MODEL_DESIGN_REVIEW`.
+
+## Phase 1C capable measuring-model design decision
+
+```text
+LOCAL_9B_FEASIBILITY_RECOMMENDED
+CLAIM_2_PRIMARY_REASONING_OFF
+LOCAL_9B_SINGLE_GATE_ONLY
+PILOT_CONTEXT_ADEQUACY_REVIEW_REQUIRED_AFTER_PASS
+NO_LIVE_INFERENCE_AUTHORIZED
+```
+
+Design only; record:
+`docs/phase-1/PHASE_1C_CAPABLE_MODEL_DESIGN_DECISION.md`. No model was
+downloaded, llama.cpp was not started, and no inference was performed. The
+Qwen3.5-0.8B scored path stays closed.
+
+The programme is separated into Claim 1 (deterministic mechanism, largely
+offline on recorded trajectories), Claim 2 (downstream efficacy on a
+competent measuring model), and Claim 3 (constrained-model benefit, where the
+0.8B and possibly 2B/4B models may return). For Claim 2 the decision selects
+local Qwen3.5-9B Q4_K_M on CPU/system RAM with reasoning off as a new explicit
+decision (not the 0.8B reasoning-on setting); 4B is not an intermediate
+Claim-2 gate. Model artifacts go under `D:\Prefixity-Lab\models\`, are
+loaded with `-m` and `--offline`, and are frozen by repository, revision,
+license, SHA-256, size, and Windows file identity before preparation.
+
+The single competence gate allows at most six requests: the three frozen
+`rbcal` probes, then, only if all pass, one h001 BASELINE trajectory of up to
+three turns; envelope reasoning off, context 8192, `max_tokens` 1024,
+temperature 0, top_p 1, seed 1, no retries or ladders; timeouts to be derived
+from bounded 9B performance, not 0.8B values. A pass
+(`LOCAL_9B_FEASIBILITY_PASSED`) permits only an offline
+`PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW` (the h001 turn-1 prompt is only
+about 389 tokens); any model-side failure leads to
+`CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW`. One replacement identity is
+permitted only for a genuine pre-inference infrastructure/integrity failure
+with `inference_requests = 0` and no model output; any dispatched request
+consumes the identity. The exact pilot BASELINE adequacy threshold is
+deferred to the context-adequacy review. Throughput figures for 4B/9B in the
+record are estimates extrapolated from measured 0.8B runs, whose speed varied
+about 4x between sessions.
+
+Next permitted task: separately authorized local-9B feasibility preparation.
+No live inference is authorized.
