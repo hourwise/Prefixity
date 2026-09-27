@@ -3876,3 +3876,47 @@ tok/s. The server was terminated after sealing.
 Interpretation: Qwen3.5-9B Q4_K_M with reasoning off is accepted as the
 Claim-2 measuring instrument, subject to the pilot-context adequacy review.
 The scored pilot is not authorized and the gate identity is consumed.
+
+## Phase 1C pilot context adequacy review
+
+The offline review is recorded in
+`docs/phase-1/PHASE_1C_PILOT_CONTEXT_ADEQUACY_REVIEW.md`:
+
+```text
+LOCAL_9B_FEASIBILITY_RESULT_ACCEPTED
+LOCAL_9B_FEASIBILITY_PASSED
+LOCAL_9B_INSTRUMENT_ACCEPTED
+EXISTING_DEPENDENCY_SAFETY_BATTERY_RETAINED
+EXISTING_CLAIM_2_PILOT_WORKLOAD_REJECTED
+PILOT_CONTEXT_INADEQUATE
+CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN_ONLY
+```
+
+Evidence: the accepted Qwen3.5-9B Q4_K_M configuration is reasoning off,
+context 8192, `max_tokens` 1024, temperature 0, `top_p` 1, and seed 1. Its
+sealed gate passed three structural probes and one h001 BASELINE request;
+h001 input was 391 measured tokens. The six nominal cases remain h001 PRUNE
+e002, h004 PRUNE e003, h006 DO_NOTHING, h007 DEFER e001, h009
+RELOCATE_CANDIDATE e002, and h010 DO_NOTHING, each specified in BASELINE →
+NO_OP → INTERVENTION order.
+Only h001 is currently a runnable model-visible scored task, operationally
+one inference request. The other five remain structural traces without an
+implemented multi-turn model trajectory. `MAX_TURNS = 3` is a ceiling; the
+manifest's 54-request formula does not describe an implemented three-turn
+efficacy workload. The measured h001 task is a short duplicate-removal check
+without meaningful long-horizon context accumulation; h009 relocation removes
+zero context. Unmeasured reduction figures remain estimates.
+
+Interpretation: instrument competence and workload adequacy are independent.
+Retain all six cases as a dependency-safety battery, but reject the current
+workload as the primary Claim-2 efficacy test. A future context-pressure
+stratum should use plausible accumulated history, not meaningless padding.
+No LOW/MODERATE/HIGH thresholds, 5/6 or 80% rule, minimum eight positives,
+or final BASELINE competence threshold is frozen. No scored pilot is prepared
+or authorized; no inference is authorized.
+
+Validation: inspect the CI workflow; this publication changes documentation
+only. Markdown links and cited paths were checked, and staged diff whitespace
+validation is recorded with the publication commit. CI has not been claimed
+here. Remaining work is only the separately authorized
+`CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN`; do not start it from this record.

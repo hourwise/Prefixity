@@ -66,6 +66,7 @@
 | [`phase-1/PHASE_1C_CAPABLE_MODEL_DESIGN_DECISION.md`](phase-1/PHASE_1C_CAPABLE_MODEL_DESIGN_DECISION.md) | Claim-2 measuring-instrument decision after the V3 closure: Claim 1/2/3 separation, local Qwen3.5-9B Q4_K_M with reasoning off, one six-request competence gate and its stopping rule, D: model storage and identity requirements, deferred pilot adequacy threshold, and a mandatory pilot-context adequacy review after a pass. | Preparing the local-9B feasibility gate; it authorizes no download, startup, or inference. |
 | [`phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_PREPARATION.md`](phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_PREPARATION.md), [`PHASE_1C_CAPABLE_MODEL_RUNTIME_CONTRACT_LOCAL_9B_V1.json`](phase-1/PHASE_1C_CAPABLE_MODEL_RUNTIME_CONTRACT_LOCAL_9B_V1.json), and [`PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_IDENTITY_V1.json`](phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_IDENTITY_V1.json) | Local-9B gate preparation: Qwen3.5-9B Q4_K_M artifact provenance and D: identity, exact-build reasoning-off semantics, 3 structural + 1 h001 BASELINE request limit, derived 15601000 ms deadline, PASSED/FAILED/INCONCLUSIVE/pre-inference terminal states, frozen supervisor/child, gate identity, frozen dry run/preflight/traversal, substitution rejection, and future commands. | Reviewing the prepared, not executed, local-9B gate before any separately authorized live run. |
 | [`phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_EXECUTION_RECORD.md`](phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_EXECUTION_RECORD.md) | Single local-9B gate execution: server verification, token counts 334/337/341/391, four PASS requests (3 structural + h001 BASELINE), integrity acceptance, evidence manifest and gate-result seal, measured CPU throughput, and `LOCAL_9B_FEASIBILITY_PASSED`. | Reviewing the accepted Claim-2 instrument; it permits only the offline pilot-context adequacy review. |
+| [`phase-1/PHASE_1C_PILOT_CONTEXT_ADEQUACY_REVIEW.md`](phase-1/PHASE_1C_PILOT_CONTEXT_ADEQUACY_REVIEW.md) | Offline finding that the accepted 9B instrument is competent but the existing six-case pilot lacks meaningful accumulated context; retains the cases as a dependency-safety battery and rejects them as the primary Claim-2 efficacy workload. | Reviewing the completed adequacy decision and the boundary for context-pressure workload design. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
@@ -123,12 +124,14 @@ feasibility gate (reasoning on, no budget flag, 4096-token ceiling) executed
 once with integrity accepted and failed on all three cases
 (`CURRENT_QWEN_SCORED_PATH_CLOSED`). The capable-model design decision selects
 a local Qwen3.5-9B Q4_K_M instrument with reasoning off for Claim 2; its single
-competence gate executed once and passed (`LOCAL_9B_FEASIBILITY_PASSED`),
-permitting only the offline pilot-context adequacy review. No scored
-comparison has completed and no inference is currently authorized. The
-Phase 1A
-corpus/import evidence and the later Phase 1B/1C results are documented in the
-linked closeouts and gates above.
+competence gate executed once and passed (`LOCAL_9B_FEASIBILITY_PASSED`). The
+offline pilot-context adequacy review accepted the instrument but found the
+existing workload inadequate for Claim-2 efficacy, retaining its six cases
+only as a dependency-safety battery. The only next authorized task is
+`CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN`. No scored comparison has completed
+and no inference is currently authorized. The Phase 1A corpus/import evidence
+and the later Phase 1B/1C results are documented in the linked closeouts and
+gates above.
 
 For history, use `git log` and [`research/PRIOR_ART.md`](research/PRIOR_ART.md)
 when the task requires provenance or prior-art context.
