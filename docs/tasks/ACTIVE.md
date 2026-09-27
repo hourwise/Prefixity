@@ -4171,3 +4171,87 @@ This records offline acceptance before publication; staging, exact-candidate
 CI and promotion remain with the supervisor and are reported in the closeout.
 No tokenization or inference was performed. The exact next authorized task is
 `NON_INFERENCE_CONTEXT_TOKENIZATION_PASS`; do not begin it from this record.
+
+## Phase 1C Claim-2 exact non-inference request reproduction
+
+Status: `TOKENIZATION_REQUEST_LEDGER_READY_FOR_PHASE_2_HASH_REVIEW`.
+
+The accepted materialization successor and advancing-output domain ledger
+reproduce exactly 54 fully bound request bodies offline: six cases, three
+independently constructed arms, and three request slots. The canonical
+advancing response and pinned receipt for each preceding slot are carried by
+that same arm's `Claim2ArmState`; request-3 final outputs are not constructed.
+Each record stores ordered rendered message roles/content, the exact current
+renderer `request_json` bytes as the future input-token body, message and full
+body hashes, byte lengths, fixture identities, and explicit future-tokenizable
+versus live-dispatchable status. The exact body includes the accepted model,
+messages, `max_tokens`, temperature, `top_p`, seed, and stream setting, with
+request-level `chat_template_kwargs` absent.
+
+Evidence: exact-body SHA-256 grouping produced 22 unique bodies and 32 logical
+duplicates across the 54 records. Requests 1 and 2 each yield one body per
+case across arms; CP01–CP04 request 3 yields BASELINE = NO_OP and a distinct
+INTERVENTION; CP05–CP06 request 3 remains equal across all arms. This matches
+the accepted review expectation without modifying or normalizing any body.
+All requests remain uncounted; the ledger is marked offline and
+non-dispatchable, with zero server contacts and zero inference requests.
+
+Reproduction: `cargo run -p prefixity-controlled-benchmark --example
+claim2_tokenization_requests --offline --locked -- --write
+fixtures/claim2/tokenization-request-ledger-v1.json`. Focused verification
+passed: all 54 identities/settings/body hashes, exact message hashes, empty
+unbound slots, arm-local output/receipt carry, fixture and predecessor hashes,
+hidden-key isolation, exact hash-group mapping, and byte-for-byte regeneration
+(four tests). `cargo fmt --all -- --check` and package Clippy with warnings
+denied passed. No tokenizer client, token count, server start, port contact, or
+inference was performed.
+
+Next: supervisor review of the exact-body hash groups before any later phase.
+This Phase 1 result authorizes no tokenizer client or server operation.
+
+## Phase 1C Claim-2 tokenization client preparation draft
+
+Status: `PHASE_3_IMPLEMENTATION_DRAFT_PENDING_SUPERVISOR_FREEZE`. The Phase 2
+exact-hash review has been accepted by the supervisor; this entry supersedes
+the earlier Phase2-only next-step note. The exact Phase 1 ledger remains
+unchanged at SHA-256
+`739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45`.
+Offline deduplication of its exact body bytes yields 54 logical requests, 22
+sorted unique body hashes, and 32 duplicates avoided. The equality proof is:
+request slots 1 and 2 have one body per case across all three arms (6 each);
+CP01–CP04 slot 3 has BASELINE = NO_OP and a separate INTERVENTION (8 total);
+CP05–CP06 slot 3 has all arms equal (2 total). No body was normalized or
+changed to reach these counts.
+
+The frozen contact plan at
+`fixtures/claim2/tokenization-contact-plan-v1.json` has SHA-256
+`6b7634a3fc7a3d4b76289aea1772c1df686a6641309acc9e307e5f330dfefdf6`. It
+records one maximum readiness contact, 22 maximum input-token contacts, and
+zero inference allowance. The dedicated Rust executable validates the whole
+plan, full ledger hash, every request body's exact bytes/hash/settings,
+mapping, and deterministic order before transport creation. Its fixed
+allowlist is only GET `/health` and POST
+`/v1/chat/completions/input_tokens` on `127.0.0.1:8080`; generation, redirect,
+proxy, alternate host/path, and retry operations are not registered. Offline
+preflight reads files only. Execute requires explicit operator-started and
+runtime identity confirmations; failures stop and preserve partial evidence.
+
+The draft preparation and preregistered metric definitions are recorded in
+`docs/phase-1/PHASE_1C_CLAIM_2_NON_INFERENCE_TOKENIZATION_PREPARATION.md`.
+Every token count, context result, reduction, threshold result, control result,
+and updated CPU-practicality outcome remains null/unknown. This draft does not
+claim operator-server readiness: source provenance commit, executable freeze,
+separate tokenization identity, offline certification, CI, and promotion
+remain with the supervisor. No Phase 4 identity or later task was started.
+
+Validation evidence: `cargo run -p prefixity-controlled-benchmark --bin
+phase1c_claim2_tokenization --offline --locked -- preflight` passed as
+`OFFLINE_PREFLIGHT_PASSED_ZERO_CONTACTS`, reporting ledger hash
+`739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45`, plan
+hash `6b7634a3fc7a3d4b76289aea1772c1df686a6641309acc9e307e5f330dfefdf6`, 54
+logical requests, 22 unique bodies, and zero server/inference contacts. Focused
+endpoint/client tests passed 7/7 and executable-guard tests passed 1/1. The
+full `cargo test --workspace --offline --locked` passed, as did formatting,
+warnings-denied workspace Clippy, and Rust 1.86 workspace check. Plan
+generation reproduced the pinned bytes. All execution tests used the fake
+transport; no loopback endpoint or model was contacted.

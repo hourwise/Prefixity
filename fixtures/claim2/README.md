@@ -144,6 +144,20 @@ Missing counts return `EXACT_TOKENIZATION_REQUIRED`. The materiality evaluator
 uses token proof inputs only and returns that same status when they are absent;
 it never infers token savings from UTF-8 lengths.
 
+The exact offline request-preparation ledger is reproducible with:
+
+```text
+cargo run -p prefixity-controlled-benchmark --example claim2_tokenization_requests --offline --locked -- --write fixtures/claim2/tokenization-request-ledger-v1.json
+```
+
+It records the 54 canonical-history requests rendered by `Claim2ArmState`,
+including ordered message roles/content, exact future input-token request
+bodies, SHA-256 identities, pinned arm-local prior outputs and receipts, and
+exact-body hash groups. It confirms the expected 22 unique request bodies in
+this fixture state; this is offline identity evidence, not a token count or a
+live dispatch plan. Every row is prepared for a future input-token counter call
+but is marked non-dispatchable, and no tokenization or server contact occurs.
+
 Before adding any CP fixture, verify the case against the accepted
 `PHASE_1C_CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN.md`. Preserve the earlier
 six-case dependency-safety battery and all historical evidence separately.
@@ -153,3 +167,41 @@ natural duplicate context attachments; CP05 must keep equal bytes at different
 states; CP06 must keep the same-state duplicate when a consumer or protected
 protocol relation makes it ineligible. The positive set has one selected
 target per case and no size-based ranking.
+
+## Phase 3 tokenization-client preparation draft
+
+The Phase 2-reviewed request ledger remains unchanged at SHA-256
+`739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45`.
+The separate offline contact plan is
+[`tokenization-contact-plan-v1.json`](tokenization-contact-plan-v1.json),
+SHA-256 `6b7634a3fc7a3d4b76289aea1772c1df686a6641309acc9e307e5f330dfefdf6`.
+It fixes 54 logical requests to 22 unique exact-body hashes, 32 logical
+duplicates avoided, at most one readiness contact, at most 22 token-count
+contacts, and zero inference allowance. Hashes are ordered ascending, and each
+row binds its representative exact-body identity and all logical request IDs.
+
+Regenerate the plan without contact:
+
+```text
+cargo run -p prefixity-controlled-benchmark --example claim2_tokenization_contact_plan --offline --locked -- --write fixtures/claim2/tokenization-contact-plan-v1.json
+```
+
+The dedicated `prefixity-phase1c-claim2-tokenization` executable validates the
+entire accepted ledger, plan hash and plan contents, request bodies and fixed
+settings before its transport can be created. The static production allowlist
+is only `GET http://127.0.0.1:8080/health` and
+`POST http://127.0.0.1:8080/v1/chat/completions/input_tokens`; redirects and
+proxies are disabled, and no completion/generation API is registered. The
+future `preflight` command reads only repository files. A separate future
+`execute` mode requires explicit operator-started and runtime-identity
+confirmations, has no endpoint or runtime override, and preserves partial
+evidence when the single readiness or any input-token request fails. It does
+not start a process, retry, or fall back to another tokenizer.
+
+Preparation draft:
+[`../../docs/phase-1/PHASE_1C_CLAIM_2_NON_INFERENCE_TOKENIZATION_PREPARATION.md`](../../docs/phase-1/PHASE_1C_CLAIM_2_NON_INFERENCE_TOKENIZATION_PREPARATION.md).
+The client, executable, plan and draft have not yet been source-committed,
+executable-frozen, bound into a separate experiment identity, offline-certified,
+CI-promoted, or accepted for operator use. No readiness check or token count
+has been performed. Context-fit, positive-reduction, materiality, control and
+CPU-practicality outcomes remain unknown.

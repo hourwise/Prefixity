@@ -26,6 +26,7 @@ mod oracle;
 mod paired_mutation;
 mod phase1b9;
 mod phase1c_capable_model_gate;
+pub mod phase1c_claim2_tokenization;
 mod phase1c_claim2_workload;
 mod phase1c_executable_identity;
 mod phase1c_h001;
