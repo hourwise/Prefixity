@@ -3794,6 +3794,7 @@ No live inference is authorized.
 LOCAL_9B_FEASIBILITY_GATE_PREPARED
 LOCAL_9B_FEASIBILITY_GATE_NOT_EXECUTED
 REGISTERED_MAX_INFERENCE_REQUESTS = 4   (3 structural + 1 frozen h001 BASELINE request)
+TERMINAL STATES: PASSED | FAILED (model-side) | INCONCLUSIVE (infrastructure after dispatch) | GATE_PRE_INFERENCE_FAILURE
 NO_LIVE_INFERENCE_AUTHORIZED
 ```
 
@@ -3820,11 +3821,20 @@ Work completed:
   structural + 1 h001 BASELINE request, token counts <= 4, readiness 1, no
   retries; Stage B only after three structural passes. Deadline
   1*1000 + 3*60000 + 1*60000 + 3*3540000 + 1*3540000 + 1200000 = 15601000 ms.
-- Source provenance `0703fa1` (superseding `0d19d41`, tightened before freeze
-  acceptance with zero inference); frozen supervisor `8c015dc1…92f2`, child
-  `d1ac159a…7b18`; gate identity `62412a9b…df9a`.
+- Source provenance `2ad3143`, superseding `0d19d41` (capacity tightened to
+  3 + 1) and `0703fa1` (terminal classification split), both with zero
+  inference; frozen supervisor `dd20deb2…4a0a`, child `f59b7f2b…0e90`; gate
+  identity `d84ba488…f3d8`.
+- Terminal states: model-side evidence (evaluator or structural FAIL,
+  `length`, timeout after dispatch, no acceptable answer, context bound) is
+  `LOCAL_9B_FEASIBILITY_FAILED` and permits only a cloud-GPU design review;
+  an infrastructure or integrity failure after any dispatch is
+  `LOCAL_9B_FEASIBILITY_INCONCLUSIVE` (identity consumed, no replacement,
+  design review required, no capability conclusion); a zero-inference
+  failure keeps the single-replacement rule.
 
-Validation performed: fmt, clippy (`-D warnings`), workspace tests (623
+Validation performed: fmt, clippy (`-D warnings`), workspace tests (628
+passed; one run hit the pre-existing 500 ms handoff timing flake, two reruns
 passed), bin build, MSRV 1.86 check. Frozen dry run, preflight, and frozen
 supervisor -> child traversal (`READY_FOR_MODEL_READINESS_BOUNDARY`, applied
 deadline 15601000 ms) all stopped before readiness with zero contacts.

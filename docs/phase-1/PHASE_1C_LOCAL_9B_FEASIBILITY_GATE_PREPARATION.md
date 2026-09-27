@@ -6,6 +6,8 @@ Status:
 LOCAL_9B_FEASIBILITY_GATE_PREPARED
 LOCAL_9B_FEASIBILITY_GATE_NOT_EXECUTED
 REGISTERED_MAX_INFERENCE_REQUESTS = 4   (3 structural + 1 frozen h001 BASELINE request)
+TERMINAL STATES: LOCAL_9B_FEASIBILITY_PASSED | LOCAL_9B_FEASIBILITY_FAILED |
+                 LOCAL_9B_FEASIBILITY_INCONCLUSIVE | GATE_PRE_INFERENCE_FAILURE
 NO_LIVE_INFERENCE_AUTHORIZED
 ```
 
@@ -20,23 +22,33 @@ inference request was made. `LOCAL_9B_FEASIBILITY_PASSED` is not claimed.
 
 ```text
 accepted design (main)          34f88e582d011f7434cab1707cec1f568856b999
-source provenance               0703fa18d25055a2af4f1116106c76db86dd2f25
-superseded source provenance    0d19d411f60d6a8f066f9fa00fefc971133c8372 (preparation history only)
+source provenance               2ad31436abab4b149de0b0bf425b979616b1cb8a
+superseded source provenance    0d19d411f60d6a8f066f9fa00fefc971133c8372 and
+                                0703fa18d25055a2af4f1116106c76db86dd2f25 (preparation history only)
 gate identity                   docs/phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_IDENTITY_V1.json
-identity canonical SHA-256      62412a9bb6216519ab5a44e08340c13bef15313ee752a7be74a7317e0873df9a
+identity canonical SHA-256      d84ba488321334c9bb885fc34ad5fdeaeff59f8dc4ac7802a8cef373eb2ef3d8
 runtime contract                docs/phase-1/PHASE_1C_CAPABLE_MODEL_RUNTIME_CONTRACT_LOCAL_9B_V1.json
-contract canonical SHA-256      c971fcda6d69646bc75b0594ec2967d532de90848c36f8bf042119aede55b889
+contract canonical SHA-256      6b97193d0b3d8422aefe1b82d4fe28f3b02e71e85a5866839d6db82e90d9de88
 calibration manifest SHA-256    4c9be251b077d8e21824efca48c8a73f0428cf750d0d499c539645084f11405b
 ```
 
-**Superseded candidate.** Source `0d19d41` registered a six-request capacity.
-Implementation showed that the frozen h001 BASELINE path issues exactly one
-request, so the gate was tightened before any freeze was accepted (section
-D). Its frozen stage is archived as
-`target/phase1c-local-9b-feasibility-frozen-superseded-0d19d41/` and its
-identity is not tracked or reused. Its frozen dry run was stopped during
-hashing and produced no result. No inference or gate execution occurred
-(`inference_requests = 0`, `gate_executions = 0`), so nothing was consumed.
+**Superseded candidates.** No inference or gate execution occurred for
+either (`inference_requests = 0`, `gate_executions = 0`), so nothing was
+consumed, and neither frozen object nor identity is reused.
+
+- `0d19d41` registered a six-request capacity. Implementation showed that the
+  frozen h001 BASELINE path issues exactly one request, so the gate was
+  tightened before any freeze was accepted (section D). Its frozen stage is
+  archived as `target/phase1c-local-9b-feasibility-frozen-superseded-0d19d41/`;
+  its identity was never tracked; its frozen dry run was stopped during
+  hashing and produced no result.
+- `0703fa1` (identity `62412a9b…df9a`, promoted as `3d15ef8`) classified an
+  infrastructure failure after dispatch as `LOCAL_9B_FEASIBILITY_FAILED`.
+  That over-states the capability result, so the terminal classification was
+  split (section I) before live authorization. Its frozen stage and traversal
+  output are archived with the suffix `-superseded-0703fa1`. The correction
+  also fixed a defect: after an ambiguous h001 transport the gate would have
+  tried to score a normalized turn that the h001 executor does not write.
 
 ## B. Model artifact (acquired once, on D:)
 
@@ -147,33 +159,36 @@ supervisor deadline              = 15601000 ms
   3600 s read/write timeout.
 - Margin 1200000 ms: measured debug-build GGUF identity hashing took 550943
   ms idle and 674945 ms under concurrent builds; the frozen traversal
-  (section F) took 492682 ms end to end.
+  (section F) took 493774 ms end to end.
 
 ## E. Frozen executables and bound sources
 
-Built at `0703fa1` from a clean tree with
+Built at `2ad3143` from a clean tree with
 `cargo build -p prefixity-controlled-benchmark --bins --locked --offline`
 (cargo/rustc 1.97.1, x86_64-pc-windows-msvc, dev profile) after fmt, clippy
-(`-D warnings`), workspace tests (623 passed), and an MSRV 1.86 check, then
+(`-D warnings`), workspace tests (628 passed), and an MSRV 1.86 check, then
 frozen with `local-9b-freeze` (non-overwriting). Each frozen copy equals its
-build output and has its own file ID; both differ from the superseded
-candidate.
+build output and has its own file ID; both differ in content and file ID
+from the superseded candidates. One pre-commit test run hit the pre-existing
+500 ms handoff timing flake
+(`expected_workflow_handoff_serializes_supervisor_generated_identity`, from
+`56cdcc8`); two further full runs passed 628/628 and the test is unchanged.
 
 ```text
 supervisor  target/phase1c-local-9b-feasibility-frozen/prefixity-phase1c-live-supervisor.exe
-            8c015dc1d7a1430b45b88f701a40595cbdb453f35a9d713331a09be35fa692f2  1412096  volume=ba2f80f4;index=001100000045566f
+            dd20deb27a6c486e2d75ea2914efe631d81f514b5cc365f10fd327956bf84a0a  1412096  volume=ba2f80f4;index=00080000004557b1
 child       target/phase1c-local-9b-feasibility-frozen/prefixity-phase1c-capable-model-gate.exe
-            d1ac159a3a446a650dd3ee7dbdc89f249552f9142c87625536348040f6cd7b18  8903168  volume=ba2f80f4;index=0007000000455760
+            f59b7f2b0eda35f7557504b9a2cec3ebcaf956565875c7d7368120caaccb0e90  8920576  volume=ba2f80f4;index=000a0000004557b4
 ```
 
-Bound sources (UTF-8, CRLF/CR normalized to LF), each equal to `0703fa1`:
+Bound sources (UTF-8, CRLF/CR normalized to LF), each equal to `2ad3143`:
 
 ```text
-864644f3708145be4c0ba58f76ae1a767d22a2a061bfbf6c7106137ddbca6c37  src/phase1c_capable_model_gate.rs
+0aa2a8af1208e402e422bfb68022b46b77b23853515cfa712f44871958d076fa  src/phase1c_capable_model_gate.rs
 c3dd2ebc4118596c5d44c251cf74e0a0ae34f0af3fdea86b30763eeaf7580e28  src/bin/phase1c_capable_model_gate.rs
 45a5b00794b3ccca88c7bee48b548c8aad57524bfd84e190065ed6e6cde6781e  src/phase1c_v3_feasibility.rs
-7c8da03015657cf87cb79a0f120545cb4b373bf6850f65cb7104ae852e8b5ab5  src/phase1c_reasoning_budget_calibration.rs
-1a992b315eea9b71e57d65ac13c15d6c02d758806a30185d1a5dccd6d762ae5d  src/phase1c_h001.rs
+44ceed653871aefa08feb44a85f41d6d560e652acaa9aebfb7885eec7d825375  src/phase1c_reasoning_budget_calibration.rs
+3e9504aa39d54bc50c78de0b61e72bdf472cb6e2fdfdea9ae6a348cf883e1325  src/phase1c_h001.rs
 906b76afb8e78817108644df406773d58710d501697373a25a194ce56feebfcb  src/phase1c_live_supervisor.rs
 5b3cc976f41801504a15e0c7efaf196fe7b129b1199ba2164c6b9eb19f86a282  src/bin/phase1c_live_supervisor.rs
 9b9188b1e90b686d705ec5cf7cdd0ba40692c5e5f0db413bb6bc1b78c4968b29  src/phase1c_windows_runtime_exclusivity.rs
@@ -204,7 +219,9 @@ identities through a small gate-kind table (V3 unchanged); calibration
 request records take their experiment and model labels from the manifest and
 request actually used (identical for historical calls, whose manifest pins
 them); h001 single-turn dispatch is extracted into a helper that the
-historical executor still calls in the same order. The consumed V3 gate
+historical executor still calls in the same order; both executors record
+`transport_timeout` on their ambiguous-transport branches so a timeout after
+dispatch is distinguishable from other transport failures. The consumed V3 gate
 identity now fails closed on its source binding (tested). No historical
 identity or evidence changed.
 
@@ -215,9 +232,9 @@ no llama process and no port-8080 listener.
 
 | Run | Result |
 | --- | --- |
-| frozen child `local-9b-dry-run` | rc 0, `LOCAL_9B_FEASIBILITY_GATE_DRY_RUN`, identity present, runtime objects match; 496514 ms |
-| frozen child `local-9b-preflight` | rc 0, `LOCAL_9B_FEASIBILITY_GATE_PREPARED` / `LOCAL_9B_FEASIBILITY_GATE_NOT_EXECUTED`, identity SHA matches, Windows exclusivity `READY` / `EXCLUSIVE_PRESTART`; 480662 ms |
-| frozen supervisor -> frozen child `local-9b-live-prerequisites` | supervisor `COMPLETED`, applied deadline 15601000 ms, one launch, no retry; child `READY_FOR_MODEL_READINESS_BOUNDARY`, every check flag true; 492682 ms |
+| frozen child `local-9b-dry-run` | rc 0, `LOCAL_9B_FEASIBILITY_GATE_DRY_RUN`, identity present, runtime objects match; 568765 ms |
+| frozen child `local-9b-preflight` | rc 0, `LOCAL_9B_FEASIBILITY_GATE_PREPARED` / `LOCAL_9B_FEASIBILITY_GATE_NOT_EXECUTED`, identity SHA matches, Windows exclusivity `READY` / `EXCLUSIVE_PRESTART`; 495614 ms |
+| frozen supervisor -> frozen child `local-9b-live-prerequisites` | supervisor `COMPLETED`, applied deadline 15601000 ms, one launch, no retry; child `READY_FOR_MODEL_READINESS_BOUNDARY`, every check flag true; 493774 ms |
 
 Every run: model_server_startups 0, port_8080_contacts 0, readiness 0,
 token counts 0, inference 0. The traversal stopped before post-start
@@ -269,7 +286,16 @@ Unit tests (all passing) cover the remaining live-only checks:
   `enable_thinking: false`, `{}`, or any other key rejected, and every other
   reasoning field rejected; array/image content and empty messages rejected;
 - the registered GGUF volume equals its containing volume; the supervisor
-  rejects the former six-request capacity and V3 limits for this gate kind.
+  rejects the former six-request capacity and V3 limits for this gate kind;
+- terminal classification (section I): zero-inference failure keeps
+  replacement eligibility; structural FAIL, `length`, a timeout after
+  dispatch, and an h001 evaluator FAIL give `LOCAL_9B_FEASIBILITY_FAILED`;
+  infrastructure failure after structural inference but before a later
+  count or dispatch, and a non-timeout transport failure, non-200 status, or
+  unusable body of a dispatched request give `LOCAL_9B_FEASIBILITY_INCONCLUSIVE`
+  with the identity consumed and no replacement; only four passes give
+  `LOCAL_9B_FEASIBILITY_PASSED`. The persisted calibration and h001 record
+  shapes are mapped by the same tests.
 
 ## H. Future commands (not executed; require separate live authorization)
 
@@ -286,22 +312,39 @@ Frozen supervisor gate command (working directory `D:\Users\fleur\Prefixity`):
 D:\Users\fleur\Prefixity\target\phase1c-local-9b-feasibility-frozen\prefixity-phase1c-live-supervisor.exe --attempt-identity docs/phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_IDENTITY_V1.json --evidence experiments/runs/phase1c-capable-model-local-9b/feasibility-gate-supervisor-result.json -- D:\Users\fleur\Prefixity\target\phase1c-local-9b-feasibility-frozen\prefixity-phase1c-capable-model-gate.exe run-local-9b-feasibility-gate
 ```
 
-## I. Stopping rule and after-states
+## I. Stopping rule and terminal states
 
-- `LOCAL_9B_FEASIBILITY_PASSED` only if all three structural probes PASS, the
-  h001 BASELINE request PASSes, and no request is `length`, timeout,
-  context-bound, or inconclusive. It permits only the offline
-  `PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW`; the scored pilot stays
+Every dispatched request is classified from its persisted record, in
+dispatch order, and the first non-pass decides.
+
+- **`LOCAL_9B_FEASIBILITY_PASSED`** only for the complete registered path:
+  three structural PASSes and an h001 BASELINE PASS, with no `length`,
+  timeout, context bound, or infrastructure failure. It permits only the
+  offline `PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW`; the scored pilot stays
   unauthorized.
-- Any model-side failure: `LOCAL_9B_FEASIBILITY_FAILED`, closing the local-9B
-  path; next permitted state `CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW`. No
-  reasoning enable, ceiling raise, quantization or file change, 4B step-down,
-  or rerun.
-- Exactly one replacement identity, only for a genuine pre-inference
-  infrastructure/integrity failure with `inference_requests = 0` and no model
-  output. A token-count failure after any dispatch is recorded as
-  `LOCAL_9B_FEASIBILITY_FAILED` with failure class
-  `INFRASTRUCTURE_AFTER_DISPATCH`; the identity is consumed.
+- **`LOCAL_9B_FEASIBILITY_FAILED`** (model-side) only for evidence
+  attributable to the model or scored request path: an evaluator FAIL or
+  structural failure, `finish_reason = length`, an inference timeout after
+  dispatch, no acceptable terminal answer, or a context bound under the
+  registered rule. It closes the local-9B Claim-2 path and permits only
+  `CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW`. No reasoning enable, ceiling raise,
+  quantization or file change, 4B step-down, or rerun.
+- **`GATE_PRE_INFERENCE_FAILURE`** for a readiness, token-count, or executor
+  failure while `inference_requests = 0`: exactly one replacement identity may
+  be considered under the registered rule; nothing broader.
+- **`LOCAL_9B_FEASIBILITY_INCONCLUSIVE`** for an infrastructure or integrity
+  failure after any inference was dispatched: a transport failure other than
+  a timeout, a non-200 status, an unusable response body, or a token-count or
+  executor failure after dispatch (for example, three structural passes and
+  then a failing h001 token count). Flags:
+  `LOCAL_9B_GATE_IDENTITY_CONSUMED`, `INFRASTRUCTURE_AFTER_DISPATCH`,
+  `NO_REPLACEMENT_AUTHORIZED`, `DESIGN_REVIEW_REQUIRED`. It establishes
+  neither a pass nor model inadequacy, authorizes no replacement identity and
+  no cloud-GPU progression, and requires an explicit design decision.
+
+Each sealed gate result records `identity_consumed`,
+`replacement_identity_eligible`, `capability_result_established`,
+`model_inadequacy_established`, `cloud_gpu_review_authorized`, and the flags.
 
 ## J. Notes for live review
 

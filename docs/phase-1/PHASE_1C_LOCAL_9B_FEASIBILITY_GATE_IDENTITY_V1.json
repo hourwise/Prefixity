@@ -4,9 +4,9 @@
     "build_dependent_validation_completed_before_freeze": true,
     "cargo_version": "cargo 1.97.1 (c980f4866 2026-06-30)",
     "child_build_output": {
-      "file_id": "volume=ba2f80f4;index=0005000000456849",
-      "file_size": 8903168,
-      "sha256": "d1ac159a3a446a650dd3ee7dbdc89f249552f9142c87625536348040f6cd7b18"
+      "file_id": "volume=ba2f80f4;index=00060000004557f4",
+      "file_size": 8920576,
+      "sha256": "f59b7f2b0eda35f7557504b9a2cec3ebcaf956565875c7d7368120caaccb0e90"
     },
     "freeze_command": "prefixity-phase1c-capable-model-gate local-9b-freeze",
     "frozen_stage": "target/phase1c-local-9b-feasibility-frozen/",
@@ -14,11 +14,11 @@
     "lockfile_sha256": "79f4fb5ea5e2b698c9785ac609294ed44e793dd8674f49cd53001792a2491cf8",
     "profile": "dev",
     "rustc_version": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
-    "source_commit": "0703fa18d25055a2af4f1116106c76db86dd2f25",
+    "source_commit": "2ad31436abab4b149de0b0bf425b979616b1cb8a",
     "supervisor_build_output": {
-      "file_id": "volume=ba2f80f4;index=000700000045580f",
+      "file_id": "volume=ba2f80f4;index=0005000000456aeb",
       "file_size": 1412096,
-      "sha256": "8c015dc1d7a1430b45b88f701a40595cbdb453f35a9d713331a09be35fa692f2"
+      "sha256": "dd20deb27a6c486e2d75ea2914efe631d81f514b5cc365f10fd327956bf84a0a"
     },
     "target": "x86_64-pc-windows-msvc"
   },
@@ -45,25 +45,25 @@
   "implementation_fingerprints": {
     "algorithm": "SHA-256",
     "child_binary": {
-      "file_size": 8903168,
+      "file_size": 8920576,
       "final_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-capable-model-gate.exe",
       "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-capable-model-gate.exe",
-      "sha256": "d1ac159a3a446a650dd3ee7dbdc89f249552f9142c87625536348040f6cd7b18",
-      "windows_file_id": "volume=ba2f80f4;index=0007000000455760"
+      "sha256": "f59b7f2b0eda35f7557504b9a2cec3ebcaf956565875c7d7368120caaccb0e90",
+      "windows_file_id": "volume=ba2f80f4;index=000a0000004557b4"
     },
     "source_byte_definition": "UTF-8 checkout source bytes; CRLF and lone CR normalized to LF; UTF-8 BOM rejected",
     "supervisor_binary": {
       "file_size": 1412096,
       "final_path": "\\\\?\\D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-live-supervisor.exe",
       "raw_path": "D:\\Users\\fleur\\Prefixity\\target\\phase1c-local-9b-feasibility-frozen\\prefixity-phase1c-live-supervisor.exe",
-      "sha256": "8c015dc1d7a1430b45b88f701a40595cbdb453f35a9d713331a09be35fa692f2",
-      "windows_file_id": "volume=ba2f80f4;index=001100000045566f"
+      "sha256": "dd20deb27a6c486e2d75ea2914efe631d81f514b5cc365f10fd327956bf84a0a",
+      "windows_file_id": "volume=ba2f80f4;index=00080000004557b1"
     }
   },
   "implementation_sources": [
     {
       "path": "crates/prefixity-controlled-benchmark/src/phase1c_capable_model_gate.rs",
-      "sha256": "864644f3708145be4c0ba58f76ae1a767d22a2a061bfbf6c7106137ddbca6c37"
+      "sha256": "0aa2a8af1208e402e422bfb68022b46b77b23853515cfa712f44871958d076fa"
     },
     {
       "path": "crates/prefixity-controlled-benchmark/src/bin/phase1c_capable_model_gate.rs",
@@ -75,11 +75,11 @@
     },
     {
       "path": "crates/prefixity-controlled-benchmark/src/phase1c_reasoning_budget_calibration.rs",
-      "sha256": "7c8da03015657cf87cb79a0f120545cb4b373bf6850f65cb7104ae852e8b5ab5"
+      "sha256": "44ceed653871aefa08feb44a85f41d6d560e652acaa9aebfb7885eec7d825375"
     },
     {
       "path": "crates/prefixity-controlled-benchmark/src/phase1c_h001.rs",
-      "sha256": "1a992b315eea9b71e57d65ac13c15d6c02d758806a30185d1a5dccd6d762ae5d"
+      "sha256": "3e9504aa39d54bc50c78de0b61e72bdf472cb6e2fdfdea9ae6a348cf883e1325"
     },
     {
       "path": "crates/prefixity-controlled-benchmark/src/phase1c_live_supervisor.rs",
@@ -142,7 +142,7 @@
     "token_count_contacts": 0
   },
   "runtime_contract": {
-    "canonical_sha256": "c971fcda6d69646bc75b0594ec2967d532de90848c36f8bf042119aede55b889",
+    "canonical_sha256": "6b97193d0b3d8422aefe1b82d4fe28f3b02e71e85a5866839d6db82e90d9de88",
     "path": "docs/phase-1/PHASE_1C_CAPABLE_MODEL_RUNTIME_CONTRACT_LOCAL_9B_V1.json"
   },
   "runtime_semantics": {
@@ -187,16 +187,24 @@
     "accepted_design_commit": "34f88e582d011f7434cab1707cec1f568856b999",
     "bound_source_count": 9,
     "branch": "codex/phase1c-local-9b-feasibility-preparation",
-    "source_commit": "0703fa18d25055a2af4f1116106c76db86dd2f25",
-    "superseded_preparation": {
-      "frozen_stage_archived_as": "target/phase1c-local-9b-feasibility-frozen-superseded-0d19d41/",
-      "reason": "tightened before freeze acceptance: registered capacity 6 -> 4, chat_template_kwargs ABSENT, parsed server-argv validation, text-only boundary; no inference or gate execution occurred",
-      "source_commit": "0d19d411f60d6a8f066f9fa00fefc971133c8372"
-    }
+    "source_commit": "2ad31436abab4b149de0b0bf425b979616b1cb8a",
+    "superseded_preparation": [
+      {
+        "frozen_stage_archived_as": "target/phase1c-local-9b-feasibility-frozen-superseded-0d19d41/",
+        "reason": "tightened before freeze acceptance: registered capacity 6 -> 4, chat_template_kwargs ABSENT, parsed server-argv validation, text-only boundary; no inference or gate execution occurred",
+        "source_commit": "0d19d411f60d6a8f066f9fa00fefc971133c8372"
+      },
+      {
+        "frozen_stage_archived_as": "target/phase1c-local-9b-feasibility-frozen-superseded-0703fa1/",
+        "identity_sha256": "62412a9bb6216519ab5a44e08340c13bef15313ee752a7be74a7317e0873df9a",
+        "reason": "terminal-classification correction before live authorization: infrastructure failure after dispatch is LOCAL_9B_FEASIBILITY_INCONCLUSIVE, not a model failure; no inference or gate execution occurred",
+        "source_commit": "0703fa18d25055a2af4f1116106c76db86dd2f25"
+      }
+    ]
   },
   "spec": {
     "contract_path": "docs/phase-1/PHASE_1C_CAPABLE_MODEL_RUNTIME_CONTRACT_LOCAL_9B_V1.json",
-    "contract_sha256": "c971fcda6d69646bc75b0594ec2967d532de90848c36f8bf042119aede55b889",
+    "contract_sha256": "6b97193d0b3d8422aefe1b82d4fe28f3b02e71e85a5866839d6db82e90d9de88",
     "deadlines": {
       "connect_timeout_ms": 1000,
       "inference_request_timeout_ms": 3540000,
@@ -329,7 +337,9 @@
   },
   "status": "PREPARATION_ONLY_NO_INFERENCE_AUTHORIZED",
   "stopping_rule": {
-    "otherwise": "LOCAL_9B_FEASIBILITY_FAILED; closes the local-9B path; permits only CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW",
+    "fail_scope": "only evidence attributable to the model or scored request path: evaluator FAIL, structural failure, finish_reason length, inference timeout after dispatch, context bound, or no acceptable terminal answer",
+    "inconclusive": "LOCAL_9B_FEASIBILITY_INCONCLUSIVE for an infrastructure or integrity failure after any inference was dispatched: LOCAL_9B_GATE_IDENTITY_CONSUMED, INFRASTRUCTURE_AFTER_DISPATCH, NO_REPLACEMENT_AUTHORIZED, DESIGN_REVIEW_REQUIRED; establishes neither a pass nor model inadequacy; no automatic cloud-GPU progression",
+    "model_failure": "LOCAL_9B_FEASIBILITY_FAILED; closes the local-9B path; permits only CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW",
     "pass": "LOCAL_9B_FEASIBILITY_PASSED only if all three structural probes PASS, the h001 BASELINE trajectory PASSes, and no request is length, timeout, context-bound, or inconclusive; permits only PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW",
     "replacement_identity": "exactly one, only for a genuine pre-inference infrastructure/integrity failure with inference_requests = 0 and no model output; any dispatched request consumes the identity",
     "stage_b": "not executed unless all three structural probes PASS"

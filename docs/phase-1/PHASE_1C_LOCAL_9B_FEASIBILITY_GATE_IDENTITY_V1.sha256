@@ -1,6 +1,6 @@
 {
   "algorithm": "SHA-256",
   "artifact_path": "docs/phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_IDENTITY_V1.json",
-  "canonical_sha256": "62412a9bb6216519ab5a44e08340c13bef15313ee752a7be74a7317e0873df9a",
+  "canonical_sha256": "d84ba488321334c9bb885fc34ad5fdeaeff59f8dc4ac7802a8cef373eb2ef3d8",
   "canonicalization": "sorted JSON object keys; arrays preserve order"
 }
