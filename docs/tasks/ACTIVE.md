@@ -4044,3 +4044,10 @@ Next substantive task: separately authorized
 and static variants. This task does not authorize it. No model startup,
 port-8080 contact, tokenizer call, live gate preparation, or inference occurred.
 Do not start another task from this record.
+
+CI correction: initial candidate `0d13347` passed Linux/macOS/MSRV but Windows
+exposed CRLF conversion of the byte-hashed historical preregistration. A scoped
+Git attribute preserves its original Git bytes, confirmed with an explicit
+`core.autocrlf=true` filtered read. No historical content/hash or parity
+assertion changed. That failed candidate was not promoted; corrected-candidate
+CI must pass all jobs before promotion.

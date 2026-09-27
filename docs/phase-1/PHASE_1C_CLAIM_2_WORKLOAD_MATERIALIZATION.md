@@ -227,6 +227,18 @@ Report/README links and working/staged diff whitespace were checked before
 publication. No benchmark outcome criteria or historical evidence was changed.
 The reproducible offline ledger comparison includes all 54 projections.
 
+Initial candidate `0d13347c9724104a6867aac7ec2d359fe3fe4544` passed Linux,
+macOS, and MSRV CI; Windows failed the strict historical report parity check.
+The decoded difference was only the preregistration hash and its derived
+report hash: Windows checkout translated the raw-hashed historical Markdown
+to CRLF. A scoped `docs/phase-1/.gitattributes` entry now preserves that one
+file's exact Git bytes. The historical file, report, hashes, and parity
+assertion are unchanged. An explicit `core.autocrlf=true` filtered-read check
+matches historical SHA-256
+`e12846776660960093f9208b099ca171dc4b9c9583150b58de340e965409cd3b`.
+The initial failed commit was not promoted; the corrected candidate must pass
+all CI jobs independently before promotion.
+
 The first full workspace run exposed 20 failures from the old h001 checker
 reading evolving `phase1b9.rs` as if it were the manifest's historical commit.
 The fix preserves an exact 58,755-byte Git blob at
