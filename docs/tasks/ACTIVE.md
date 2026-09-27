@@ -3920,3 +3920,70 @@ only. Markdown links and cited paths were checked, and staged diff whitespace
 validation is recorded with the publication commit. CI has not been claimed
 here. Remaining work is only the separately authorized
 `CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN`; do not start it from this record.
+
+## Phase 1C Claim-2 context-pressure workload design
+
+Current status: `CLAIM_2_WORKLOAD_DESIGN_READY` — accepted design for offline
+materialization preparation only. Design record:
+`docs/phase-1/PHASE_1C_CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN.md`.
+This current entry supersedes earlier next-step statements above.
+
+The design retains h001, h004, h007, h009, h006, and h010 unchanged as the
+`DEPENDENCY_SAFETY_BATTERY`; it excludes them from the new efficacy cohort.
+The proposed cohort is CP01–CP06: four positive coding, repository, metadata,
+and branch/backtrack trajectories with one naturally repeated same-state
+context attachment each, plus two controls for same text from different
+states and an explicit duplicate dependency. Each proposed arm would carry
+three actual model requests and intervening deterministic environment
+outputs. Positive cases can use only the frozen controlled Phase 1B.9
+`EXACT_DUPLICATE_PRUNE` selection; controls must pass the unchanged policy as
+`DO_NOTHING`. The production Phase 1B planner is not substituted or changed.
+
+The full proposed comparison is at most 18 case-arm trajectories, 54 model
+requests, and 18 fresh-server starts, with one replicate and no retries.
+BASELINE and NO_OP require byte-identical carried inputs; NO_OP uses an
+explicit frozen forced `DO_NOTHING`. The design proposes exact task,
+dependency, context, structural, and completeness gates; all six BASELINE
+tasks must pass all three requests for the final analytical adequacy gate.
+Evaluate that gate after the fixed case-major schedule, report every failure,
+and make no preservation claim if any BASELINE case fails. Incorrect model
+responses are observed task/structural failures; transport, integrity,
+context-bound, or pre-intervention identity failures are inconclusive, with
+unexecuted request slots retained in the denominator.
+Context sizes, token reductions, and CPU duration remain design estimates.
+
+Evidence: the accepted Qwen3.5-9B Q4_K_M reasoning-off instrument and its
+391-token h001 gate result are historical measurements; they do not establish
+competence on the proposed longer tasks. Request sizes (0.8–1.6k, 2.2–3.4k,
+4.0–5.5k), candidate attachment sizes, 800-token/20% final reduction, 8%
+trajectory reduction, and CPU runtime are estimates or proposed future
+admission criteria. The design preserves the 8,192 context / 1,024 output
+envelope. A later separately authorized
+`NON_INFERENCE_CONTEXT_TOKENIZATION_PASS` must count fully specified static
+request variants and prove conservative carried-output/environment/renderer
+envelopes before outcomes; actual fully rendered requests still require an
+authoritative pre-dispatch count once each arm's own generated history exists.
+Exact future carried-history counts are therefore not known at design time.
+
+Interpretation: the candidate cohort tests omission of a duplicate attached
+context message, not arbitrary removal of chronological tool results or
+general production pruning. If actual native workflows do not produce
+eligible natural duplicates, if policy selection differs, or if dependencies
+are unclear, return for an offline design decision; do not pad or alter the
+frozen policy.
+
+Validation performed:
+
+```text
+cargo test -p prefixity-controlled-benchmark --test research_state_consistency --offline --locked
+PASS: 12 passed, 0 failed
+```
+
+The local Markdown link check, `git diff --check`, and staged
+`git diff --cached --check` all passed. No fixtures, runtime/planner code,
+historical identities, tokenization, model startup, port-8080 contact, or
+inference are part of this task.
+
+Next authorized task: `CLAIM_2_WORKLOAD_MATERIALIZATION_PREPARATION`, offline
+only. Exact tokenization and scored or live work require separate later
+authorization. Do not start those tasks from this design record.
