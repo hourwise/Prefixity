@@ -66,6 +66,16 @@ pub const LOCAL_9B_TOKEN_COUNT_ENDPOINT: &str =
 pub const LOCAL_9B_FEASIBILITY_PASSED: &str = "LOCAL_9B_FEASIBILITY_PASSED";
 pub const LOCAL_9B_FEASIBILITY_FAILED: &str = "LOCAL_9B_FEASIBILITY_FAILED";
 pub const LOCAL_9B_GATE_PRE_INFERENCE_FAILURE: &str = "GATE_PRE_INFERENCE_FAILURE";
+/// An infrastructure or integrity failure after at least one inference
+/// request was dispatched. It consumes the identity but establishes neither a
+/// pass nor model inadequacy; see [`LOCAL_9B_INCONCLUSIVE_TERMINAL_FLAGS`].
+pub const LOCAL_9B_FEASIBILITY_INCONCLUSIVE: &str = "LOCAL_9B_FEASIBILITY_INCONCLUSIVE";
+pub const LOCAL_9B_INCONCLUSIVE_TERMINAL_FLAGS: [&str; 4] = [
+    "LOCAL_9B_GATE_IDENTITY_CONSUMED",
+    "INFRASTRUCTURE_AFTER_DISPATCH",
+    "NO_REPLACEMENT_AUTHORIZED",
+    "DESIGN_REVIEW_REQUIRED",
+];
 
 const CHILD_BINARY: &str = "prefixity-phase1c-capable-model-gate.exe";
 const SUPERVISOR_BINARY: &str = "prefixity-phase1c-live-supervisor.exe";
@@ -347,6 +357,16 @@ pub fn validate_local_9b_contract(contract: &Value) -> Result<()> {
     )?;
     expect(contract, "/gate/max_inference_requests", json!(4))?;
     expect(contract, "/gate/max_token_count_contacts", json!(4))?;
+    expect(
+        contract,
+        "/gate/inconclusive_state",
+        json!(LOCAL_9B_FEASIBILITY_INCONCLUSIVE),
+    )?;
+    expect(
+        contract,
+        "/gate/inconclusive_flags",
+        json!(LOCAL_9B_INCONCLUSIVE_TERMINAL_FLAGS),
+    )?;
     expect(contract, "/runtime/multimodal_projector", json!("ABSENT"))?;
     expect(contract, "/runtime/request_content", json!("text-only"))?;
     expect(
@@ -601,23 +621,161 @@ pub fn validate_local_9b_gate_spec(
     Ok(())
 }
 
-/// Stage B runs only when all three structural probes passed.
-pub fn task_stage_permitted(structural_states: &[&str]) -> bool {
-    structural_states.len() == STRUCTURAL_INFERENCE_LIMIT as usize
-        && structural_states.iter().all(|state| *state == "PASS")
+/// The classified result of one dispatched inference request.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RequestOutcome {
+    Pass,
+    /// Evidence attributable to the model or the scored request path.
+    ModelFailure(&'static str),
+    /// The request was dispatched but transport or the server did not yield
+    /// a classifiable model result.
+    InfrastructureAfterDispatch(&'static str),
 }
 
-/// The pre-registered stopping rule: pass only when all three structural
-/// probes and the h001 BASELINE trajectory pass with no context bound.
+impl RequestOutcome {
+    fn value(self) -> Value {
+        match self {
+            Self::Pass => json!({ "outcome": "PASS" }),
+            Self::ModelFailure(reason) => json!({ "outcome": "MODEL_FAILURE", "reason": reason }),
+            Self::InfrastructureAfterDispatch(reason) => {
+                json!({ "outcome": "INFRASTRUCTURE_AFTER_DISPATCH", "reason": reason })
+            }
+        }
+    }
+}
+
+/// The frozen evaluator's verdict on a completed response.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Verdict {
+    Pass,
+    Fail,
+    /// No acceptable terminal answer (no content, tool call, or equivalent).
+    NoAcceptableAnswer,
+}
+
+/// Facts of one dispatched request, taken from its persisted record.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DispatchObservation<'a> {
+    pub transport_completed: bool,
+    pub transport_timeout: bool,
+    pub http_status: Option<u64>,
+    pub body_complete: bool,
+    pub json_parsed: bool,
+    pub finish_reason: Option<&'a str>,
+    pub verdict: Verdict,
+}
+
+/// Classify one dispatched request. An inference timeout after dispatch,
+/// `length`, an evaluator FAIL, or no acceptable answer is a model-side
+/// failure; any other transport failure, a non-200 status, or an unusable
+/// response body is infrastructure after dispatch.
+pub fn classify_dispatch(observation: &DispatchObservation<'_>) -> RequestOutcome {
+    if !observation.transport_completed {
+        return if observation.transport_timeout {
+            RequestOutcome::ModelFailure("INFERENCE_TIMEOUT_AFTER_DISPATCH")
+        } else {
+            RequestOutcome::InfrastructureAfterDispatch("TRANSPORT_FAILED_AFTER_DISPATCH")
+        };
+    }
+    if observation.http_status != Some(200) {
+        return RequestOutcome::InfrastructureAfterDispatch("HTTP_STATUS_NOT_200");
+    }
+    if !observation.body_complete || !observation.json_parsed {
+        return RequestOutcome::InfrastructureAfterDispatch("RESPONSE_BODY_UNUSABLE");
+    }
+    if observation.finish_reason == Some("length") {
+        return RequestOutcome::ModelFailure("LENGTH");
+    }
+    match observation.verdict {
+        Verdict::Pass => RequestOutcome::Pass,
+        Verdict::Fail => RequestOutcome::ModelFailure("EVALUATOR_FAIL"),
+        Verdict::NoAcceptableAnswer => {
+            RequestOutcome::ModelFailure("NO_ACCEPTABLE_TERMINAL_ANSWER")
+        }
+    }
+}
+
+/// Observation of a structural probe from its calibration `case-result`.
+pub fn structural_observation(case_result: &Value) -> DispatchObservation<'_> {
+    let validation = &case_result["validation"];
+    let response = &case_result["response"];
+    DispatchObservation {
+        transport_completed: validation["transport_ambiguous"] != true,
+        transport_timeout: validation["transport_timeout"] == true,
+        http_status: response["http_status"].as_u64(),
+        body_complete: response["complete"] == true,
+        json_parsed: validation["response_json_parsed"] == true,
+        finish_reason: response["finish_reason"].as_str(),
+        verdict: match case_result["state"].as_str() {
+            Some("PASS") => Verdict::Pass,
+            Some("FAIL") => Verdict::Fail,
+            _ => Verdict::NoAcceptableAnswer,
+        },
+    }
+}
+
+/// Observation of the h001 request from its arm result, normalized turn,
+/// and Stage 0 evaluator result (absent when transport was ambiguous).
+pub fn task_observation<'a>(
+    arm_result: &'a Value,
+    normalized: Option<&'a Value>,
+    evaluator_result: Option<&str>,
+) -> DispatchObservation<'a> {
+    DispatchObservation {
+        transport_completed: arm_result["state"] != "AMBIGUOUS",
+        transport_timeout: arm_result["validation"]["transport_timeout"] == true,
+        http_status: arm_result["response"]["http_status"].as_u64(),
+        body_complete: arm_result["response"]["complete"] == true,
+        json_parsed: arm_result["validation"]["response_json_parsed"] == true,
+        finish_reason: normalized.and_then(|turn| turn["finish_reason"].as_str()),
+        verdict: match evaluator_result {
+            Some("PASS") => Verdict::Pass,
+            Some("FAIL") => Verdict::Fail,
+            _ => Verdict::NoAcceptableAnswer,
+        },
+    }
+}
+
+/// Stage B runs only when all three structural probes passed.
+pub fn task_stage_permitted(outcomes: &[RequestOutcome]) -> bool {
+    outcomes.len() == STRUCTURAL_INFERENCE_LIMIT as usize
+        && outcomes
+            .iter()
+            .all(|outcome| *outcome == RequestOutcome::Pass)
+}
+
+/// The pre-registered terminal classification. Dispatched requests are read
+/// in order and the first non-pass decides: a model-side failure fails the
+/// gate; infrastructure after dispatch is inconclusive. A token-count,
+/// readiness, or executor failure is a pre-inference failure only while no
+/// inference was dispatched, otherwise inconclusive. A context bound fails the
+/// gate. Only the complete registered path of four passes passes.
 pub fn classify_local_9b_gate(
+    inference_requests: u32,
+    infrastructure_failure: bool,
     context_bound: bool,
-    structural_states: &[&str],
-    task_result: Option<&str>,
+    outcomes: &[RequestOutcome],
 ) -> &'static str {
-    if !context_bound && task_stage_permitted(structural_states) && task_result == Some("PASS") {
-        LOCAL_9B_FEASIBILITY_PASSED
+    if let Some(first) = outcomes
+        .iter()
+        .find(|outcome| **outcome != RequestOutcome::Pass)
+    {
+        return match first {
+            RequestOutcome::ModelFailure(_) => LOCAL_9B_FEASIBILITY_FAILED,
+            _ => LOCAL_9B_FEASIBILITY_INCONCLUSIVE,
+        };
+    }
+    let registered_path = (STRUCTURAL_INFERENCE_LIMIT + TASK_INFERENCE_LIMIT) as usize;
+    if !infrastructure_failure && !context_bound && outcomes.len() == registered_path {
+        return LOCAL_9B_FEASIBILITY_PASSED;
+    }
+    if context_bound && !infrastructure_failure {
+        return LOCAL_9B_FEASIBILITY_FAILED;
+    }
+    if inference_requests == 0 {
+        LOCAL_9B_GATE_PRE_INFERENCE_FAILURE
     } else {
-        LOCAL_9B_FEASIBILITY_FAILED
+        LOCAL_9B_FEASIBILITY_INCONCLUSIVE
     }
 }
 
@@ -626,8 +784,31 @@ pub fn local_9b_gate_permission(classification: &str) -> &'static str {
     match classification {
         LOCAL_9B_FEASIBILITY_PASSED => "PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW_ONLY",
         LOCAL_9B_FEASIBILITY_FAILED => "CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW",
-        _ => "REPLACEMENT_IDENTITY_REVIEW_ONLY_IF_ZERO_INFERENCE",
+        LOCAL_9B_GATE_PRE_INFERENCE_FAILURE => "REPLACEMENT_IDENTITY_REVIEW_ONLY_IF_ZERO_INFERENCE",
+        _ => "DESIGN_REVIEW_REQUIRED",
     }
+}
+
+/// Terminal semantics recorded with every gate result.
+pub fn terminal_state(classification: &str, inference_requests: u32) -> Value {
+    let consumed = inference_requests > 0;
+    let inconclusive = classification == LOCAL_9B_FEASIBILITY_INCONCLUSIVE;
+    json!({
+        "identity_consumed": consumed,
+        "replacement_identity_eligible":
+            classification == LOCAL_9B_GATE_PRE_INFERENCE_FAILURE && !consumed,
+        "capability_result_established": matches!(
+            classification,
+            LOCAL_9B_FEASIBILITY_PASSED | LOCAL_9B_FEASIBILITY_FAILED
+        ),
+        "model_inadequacy_established": classification == LOCAL_9B_FEASIBILITY_FAILED,
+        "cloud_gpu_review_authorized": classification == LOCAL_9B_FEASIBILITY_FAILED,
+        "flags": if inconclusive {
+            json!(LOCAL_9B_INCONCLUSIVE_TERMINAL_FLAGS)
+        } else {
+            json!([])
+        }
+    })
 }
 
 /// Split a Windows command line with the `CommandLineToArgvW` rules: the
@@ -1206,6 +1387,7 @@ fn gate_result(
         "identity_sha256": prerequisites.identity_sha256,
         "classification": classification,
         "permits": local_9b_gate_permission(classification),
+        "terminal": terminal_state(classification, accounting.inference()),
         "detail": detail,
         "accounting": accounting.value(),
         "recorded_at_unix_ms": now_unix_ms()?
@@ -1230,38 +1412,27 @@ fn seal_result(root: &Path, result: &Value) -> Result<()> {
     )
 }
 
-/// A token-count transport or HTTP failure: a pre-inference failure while no
-/// inference has been dispatched, otherwise a consumed failing gate.
-fn token_count_failure(
-    prerequisites: &GatePrerequisites,
-    root: &Path,
+/// A non-request infrastructure failure: before any inference it is a
+/// pre-inference failure; after dispatch it is recorded for the inconclusive
+/// classification.
+fn infrastructure_record(
     accounting: &Accounting,
+    stage: &str,
     case_id: &str,
-    error: &ReasoningBudgetCalibrationError,
-    counts: &[Value],
-) -> Result<Value> {
-    let (classification, failure_class) = if accounting.inference() == 0 {
-        (
-            LOCAL_9B_GATE_PRE_INFERENCE_FAILURE,
-            "TOKEN_COUNT_FAILED_BEFORE_INFERENCE",
-        )
+    contact: &str,
+    error: &dyn std::fmt::Display,
+) -> Value {
+    let when = if accounting.inference() == 0 {
+        "BEFORE_INFERENCE"
     } else {
-        (LOCAL_9B_FEASIBILITY_FAILED, "INFRASTRUCTURE_AFTER_DISPATCH")
+        "AFTER_DISPATCH"
     };
-    write_json(&root.join("token-counts.json"), &json!(counts))?;
-    let result = gate_result(
-        prerequisites,
-        classification,
-        json!({
-            "failure_class": failure_class,
-            "case_id": case_id,
-            "error": error.to_string(),
-            "token_counts": counts
-        }),
-        accounting,
-    )?;
-    seal_result(root, &result)?;
-    Ok(result)
+    json!({
+        "failure_class": format!("{contact}_FAILED_{when}"),
+        "stage": stage,
+        "case_id": case_id,
+        "error": error.to_string()
+    })
 }
 
 /// Live entry point. It is not called by preparation.
@@ -1331,95 +1502,110 @@ pub fn execute_local_9b_feasibility_gate() -> Result<Value> {
         .map_err(|error| ReasoningBudgetCalibrationError::Transport(error.to_string()))?;
     let token_timeout = Duration::from_millis(spec.deadlines.token_count_request_timeout_ms);
     let mut counts = Vec::new();
-
-    // Stage A: structural probes, each counted and guarded before dispatch.
-    let mut structural_results = Vec::new();
+    let mut outcomes = Vec::new();
+    let mut requests = Vec::new();
     let mut context_bound = false;
-    for (case_id, case, request) in &prerequisites.structural {
-        ensure_capacity(
-            accounting.structural_token_counts,
-            spec.stages.structural_inference_limit,
-            "structural token count",
-        )?;
-        let (input_tokens, record) =
-            match count_input_tokens(&client, &spec.token_count_endpoint, token_timeout, request) {
+    let mut infrastructure = None;
+
+    'stages: {
+        // Stage A: structural probes, each counted and guarded before dispatch.
+        for (case_id, case, request) in &prerequisites.structural {
+            ensure_capacity(
+                accounting.structural_token_counts,
+                spec.stages.structural_inference_limit,
+                "structural token count",
+            )?;
+            accounting.structural_token_counts += 1;
+            let (input_tokens, record) = match count_input_tokens(
+                &client,
+                &spec.token_count_endpoint,
+                token_timeout,
+                request,
+            ) {
                 Ok(counted) => counted,
                 Err(error) => {
-                    accounting.structural_token_counts += 1;
-                    return token_count_failure(
-                        &prerequisites,
-                        &root,
+                    infrastructure = Some(infrastructure_record(
                         &accounting,
+                        "structural",
                         case_id,
+                        "TOKEN_COUNT",
                         &error,
-                        &counts,
-                    );
+                    ));
+                    break 'stages;
                 }
             };
-        accounting.structural_token_counts += 1;
-        let fits = context_guard(input_tokens, &spec.limits) == ContextDecision::Fits;
-        counts.push(json!({
-            "stage": "structural",
-            "case_id": case_id,
-            "input_tokens": input_tokens,
-            "fits": fits,
-            "record": record
-        }));
-        if !fits {
-            context_bound = true;
-            break;
+            let fits = context_guard(input_tokens, &spec.limits) == ContextDecision::Fits;
+            counts.push(json!({
+                "stage": "structural",
+                "case_id": case_id,
+                "input_tokens": input_tokens,
+                "fits": fits,
+                "record": record
+            }));
+            if !fits {
+                context_bound = true;
+                break 'stages;
+            }
+            let case_dir = root.join(case_id);
+            fs::create_dir_all(&case_dir)?;
+            ensure_capacity(
+                accounting.structural_inference,
+                spec.stages.structural_inference_limit,
+                "structural inference request",
+            )?;
+            accounting.structural_inference += 1;
+            let case_result =
+                match execute_case(&prerequisites.gate_manifest, case, None, &case_dir, &client) {
+                    Ok(case_result) => case_result,
+                    Err(error) => {
+                        infrastructure = Some(infrastructure_record(
+                            &accounting,
+                            "structural",
+                            case_id,
+                            "EXECUTOR",
+                            &error,
+                        ));
+                        break 'stages;
+                    }
+                };
+            let outcome = classify_dispatch(&structural_observation(&case_result));
+            requests.push(json!({
+                "stage": "structural",
+                "case_id": case_id,
+                "evaluator_state": case_result.get("state"),
+                "classification": outcome.value()
+            }));
+            outcomes.push(outcome);
+            if outcome != RequestOutcome::Pass {
+                break 'stages;
+            }
         }
-        let case_dir = root.join(case_id);
-        fs::create_dir_all(&case_dir)?;
-        ensure_capacity(
-            accounting.structural_inference,
-            spec.stages.structural_inference_limit,
-            "structural inference request",
-        )?;
-        accounting.structural_inference += 1;
-        let outcome = execute_case(&prerequisites.gate_manifest, case, None, &case_dir, &client)?;
-        let passed = outcome.get("state").and_then(Value::as_str) == Some("PASS");
-        structural_results.push(outcome);
-        if !passed {
-            break;
-        }
-    }
-    let structural_states = structural_results
-        .iter()
-        .map(|result| {
-            result
-                .get("state")
-                .and_then(Value::as_str)
-                .unwrap_or("INCONCLUSIVE")
-        })
-        .collect::<Vec<_>>();
 
-    // Stage B: one h001 BASELINE trajectory, only after three structural passes.
-    let mut task_result = None;
-    let mut task_detail = Value::Null;
-    if !context_bound && task_stage_permitted(&structural_states) {
+        // Stage B: one h001 BASELINE request, only after three structural passes.
+        if !task_stage_permitted(&outcomes) {
+            break 'stages;
+        }
         let request = &prerequisites.task;
         ensure_capacity(
             accounting.task_token_counts,
             spec.stages.task_inference_limit,
             "task token count",
         )?;
+        accounting.task_token_counts += 1;
         let (input_tokens, record) =
             match count_input_tokens(&client, &spec.token_count_endpoint, token_timeout, request) {
                 Ok(counted) => counted,
                 Err(error) => {
-                    accounting.task_token_counts += 1;
-                    return token_count_failure(
-                        &prerequisites,
-                        &root,
+                    infrastructure = Some(infrastructure_record(
                         &accounting,
+                        "task_level",
                         "h001",
+                        "TOKEN_COUNT",
                         &error,
-                        &counts,
-                    );
+                    ));
+                    break 'stages;
                 }
             };
-        accounting.task_token_counts += 1;
         let fits = context_guard(input_tokens, &spec.limits) == ContextDecision::Fits;
         counts.push(json!({
             "stage": "task_level",
@@ -1428,58 +1614,105 @@ pub fn execute_local_9b_feasibility_gate() -> Result<Value> {
             "fits": fits,
             "record": record
         }));
-        if fits {
-            let task_dir = root.join("h001-baseline");
-            fs::create_dir_all(&task_dir)?;
-            ensure_capacity(
-                accounting.task_inference,
-                spec.stages.task_inference_limit,
-                "task inference request",
-            )?;
-            accounting.task_inference += 1;
-            let arm_result = h001::execute_h001_turn(H001TurnInput {
-                arm: H001Arm::Baseline,
-                request,
-                evidence_dir: &task_dir,
-                experiment_id: &spec.experiment_id,
-                readiness_elapsed_ms,
-                timeouts: || {
-                    Ok((
-                        Duration::from_millis(spec.deadlines.connect_timeout_ms),
-                        Duration::from_millis(spec.deadlines.inference_request_timeout_ms),
-                    ))
-                },
-            })
-            .map_err(h001_error)?;
-            let scored =
-                h001::score_h001_arm_at(H001Arm::Baseline, task_dir).map_err(h001_error)?;
-            task_result = scored
-                .get("result")
-                .and_then(Value::as_str)
-                .map(str::to_string);
-            task_detail = json!({
-                "arm_state": arm_result.get("state"),
-                "evaluator_result": task_result,
-                "http_status": arm_result.pointer("/response/http_status"),
-                "validation": arm_result.get("validation")
-            });
-        } else {
+        if !fits {
             context_bound = true;
+            break 'stages;
         }
+        let task_dir = root.join("h001-baseline");
+        fs::create_dir_all(&task_dir)?;
+        ensure_capacity(
+            accounting.task_inference,
+            spec.stages.task_inference_limit,
+            "task inference request",
+        )?;
+        accounting.task_inference += 1;
+        let turn = h001::execute_h001_turn(H001TurnInput {
+            arm: H001Arm::Baseline,
+            request,
+            evidence_dir: &task_dir,
+            experiment_id: &spec.experiment_id,
+            readiness_elapsed_ms,
+            timeouts: || {
+                Ok((
+                    Duration::from_millis(spec.deadlines.connect_timeout_ms),
+                    Duration::from_millis(spec.deadlines.inference_request_timeout_ms),
+                ))
+            },
+        });
+        let arm_result = match turn {
+            Ok(arm_result) => arm_result,
+            Err(error) => {
+                infrastructure = Some(infrastructure_record(
+                    &accounting,
+                    "task_level",
+                    "h001",
+                    "EXECUTOR",
+                    &error,
+                ));
+                break 'stages;
+            }
+        };
+        // An ambiguous transport leaves no normalized turn, so it is not scored.
+        let scored = if arm_result["state"] == "AMBIGUOUS" {
+            None
+        } else {
+            let evaluation = fs::read(task_dir.join("normalized-turn-1.json"))
+                .map_err(H001Error::from)
+                .and_then(|bytes| Ok(serde_json::from_slice::<Value>(&bytes)?))
+                .and_then(|normalized| {
+                    Ok((
+                        normalized,
+                        h001::score_h001_arm_at(H001Arm::Baseline, task_dir.clone())?,
+                    ))
+                });
+            match evaluation {
+                Ok(scored) => Some(scored),
+                Err(error) => {
+                    infrastructure = Some(infrastructure_record(
+                        &accounting,
+                        "task_level",
+                        "h001",
+                        "EXECUTOR",
+                        &error,
+                    ));
+                    break 'stages;
+                }
+            }
+        };
+        let evaluator_result = scored
+            .as_ref()
+            .and_then(|(_, evaluation)| evaluation["result"].as_str());
+        let outcome = classify_dispatch(&task_observation(
+            &arm_result,
+            scored.as_ref().map(|(normalized, _)| normalized),
+            evaluator_result,
+        ));
+        requests.push(json!({
+            "stage": "task_level",
+            "case_id": "h001",
+            "arm_state": arm_result.get("state"),
+            "evaluator_result": evaluator_result,
+            "http_status": arm_result.pointer("/response/http_status"),
+            "classification": outcome.value()
+        }));
+        outcomes.push(outcome);
     }
     write_json(&root.join("token-counts.json"), &json!(counts))?;
 
-    let classification =
-        classify_local_9b_gate(context_bound, &structural_states, task_result.as_deref());
+    let classification = classify_local_9b_gate(
+        accounting.inference(),
+        infrastructure.is_some(),
+        context_bound,
+        &outcomes,
+    );
     let result = gate_result(
         &prerequisites,
         classification,
         json!({
             "context_result": if context_bound { json!(INCONCLUSIVE_CONTEXT_BOUND) } else { Value::Null },
-            "structural_states": structural_states,
+            "infrastructure": infrastructure,
+            "requests": requests,
             "task_stage_executed": accounting.task_inference > 0,
-            "task_result": task_result,
-            "task_detail": task_detail,
             "token_counts": counts
         }),
         &accounting,
@@ -1553,6 +1786,14 @@ mod tests {
                 json!("mmproj-Qwen3.5-9B-BF16.gguf"),
             ),
             ("/runtime/request_content", json!("multimodal")),
+            (
+                "/gate/inconclusive_state",
+                json!("LOCAL_9B_FEASIBILITY_FAILED"),
+            ),
+            (
+                "/gate/inconclusive_flags",
+                json!(["DESIGN_REVIEW_REQUIRED"]),
+            ),
             (
                 "/runtime/reasoning_mechanism/request_chat_template_kwargs",
                 json!({ "enable_thinking": false }),
@@ -1895,47 +2136,308 @@ mod tests {
         );
     }
 
-    #[test]
-    fn task_stage_runs_only_after_three_structural_passes() {
-        assert!(task_stage_permitted(&["PASS", "PASS", "PASS"]));
-        for states in [
-            vec!["PASS", "PASS"],
-            vec!["FAIL"],
-            vec!["PASS", "FAIL"],
-            vec!["PASS", "PASS", "FAIL"],
-            vec!["PASS", "PASS", "INCONCLUSIVE"],
-        ] {
-            assert!(!task_stage_permitted(&states), "{states:?}");
+    use RequestOutcome::{InfrastructureAfterDispatch, ModelFailure, Pass};
+
+    fn completed(finish_reason: &str, verdict: Verdict) -> DispatchObservation<'_> {
+        DispatchObservation {
+            transport_completed: true,
+            transport_timeout: false,
+            http_status: Some(200),
+            body_complete: true,
+            json_parsed: true,
+            finish_reason: Some(finish_reason),
+            verdict,
         }
     }
 
+    const PASSES: [RequestOutcome; 3] = [Pass, Pass, Pass];
+
     #[test]
-    fn only_three_structural_passes_and_a_task_pass_pass_the_gate() {
-        let passed = classify_local_9b_gate(false, &["PASS", "PASS", "PASS"], Some("PASS"));
-        assert_eq!(passed, LOCAL_9B_FEASIBILITY_PASSED);
+    fn zero_inference_pre_inference_failure_keeps_the_replacement_rule() {
+        // Readiness or first token-count failure: nothing dispatched.
+        let classification = classify_local_9b_gate(0, true, false, &[]);
+        assert_eq!(classification, LOCAL_9B_GATE_PRE_INFERENCE_FAILURE);
         assert_eq!(
-            local_9b_gate_permission(passed),
-            "PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW_ONLY"
+            local_9b_gate_permission(classification),
+            "REPLACEMENT_IDENTITY_REVIEW_ONLY_IF_ZERO_INFERENCE"
         );
-        for (context_bound, structural, task) in [
-            (true, vec!["PASS", "PASS", "PASS"], Some("PASS")),
-            (false, vec!["PASS", "PASS", "PASS"], Some("FAIL")),
-            (false, vec!["PASS", "PASS", "PASS"], Some("INCONCLUSIVE")),
-            (false, vec!["PASS", "PASS", "PASS"], None),
-            (false, vec!["PASS", "FAIL"], None),
-            (false, vec!["PASS", "PASS", "FAIL"], Some("PASS")),
-        ] {
-            let classification = classify_local_9b_gate(context_bound, &structural, task);
+        let terminal = terminal_state(classification, 0);
+        assert_eq!(terminal["identity_consumed"], false);
+        assert_eq!(terminal["replacement_identity_eligible"], true);
+        assert_eq!(terminal["capability_result_established"], false);
+        assert_eq!(terminal["cloud_gpu_review_authorized"], false);
+    }
+
+    #[test]
+    fn structural_model_failure_after_dispatch_fails_the_gate() {
+        let outcome = classify_dispatch(&completed("stop", Verdict::Fail));
+        assert_eq!(outcome, ModelFailure("EVALUATOR_FAIL"));
+        let no_answer = classify_dispatch(&completed("stop", Verdict::NoAcceptableAnswer));
+        assert_eq!(no_answer, ModelFailure("NO_ACCEPTABLE_TERMINAL_ANSWER"));
+        for outcomes in [vec![outcome], vec![Pass, no_answer]] {
+            let classification =
+                classify_local_9b_gate(outcomes.len() as u32, false, false, &outcomes);
             assert_eq!(classification, LOCAL_9B_FEASIBILITY_FAILED);
             assert_eq!(
                 local_9b_gate_permission(classification),
                 "CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW"
             );
+            let terminal = terminal_state(classification, outcomes.len() as u32);
+            assert_eq!(terminal["identity_consumed"], true);
+            assert_eq!(terminal["model_inadequacy_established"], true);
+            assert_eq!(terminal["cloud_gpu_review_authorized"], true);
         }
+        assert!(!task_stage_permitted(&[Pass, outcome]));
+    }
+
+    #[test]
+    fn length_after_dispatch_fails_the_gate() {
+        // Length decides even if the evaluator verdict were otherwise.
+        for verdict in [Verdict::Fail, Verdict::NoAcceptableAnswer, Verdict::Pass] {
+            assert_eq!(
+                classify_dispatch(&completed("length", verdict)),
+                ModelFailure("LENGTH")
+            );
+        }
+        let structural = [ModelFailure("LENGTH")];
         assert_eq!(
-            local_9b_gate_permission(LOCAL_9B_GATE_PRE_INFERENCE_FAILURE),
-            "REPLACEMENT_IDENTITY_REVIEW_ONLY_IF_ZERO_INFERENCE"
+            classify_local_9b_gate(1, false, false, &structural),
+            LOCAL_9B_FEASIBILITY_FAILED
         );
+        let task = [Pass, Pass, Pass, ModelFailure("LENGTH")];
+        assert_eq!(
+            classify_local_9b_gate(4, false, false, &task),
+            LOCAL_9B_FEASIBILITY_FAILED
+        );
+        // An inference timeout after dispatch is model-side.
+        let timeout = DispatchObservation {
+            transport_completed: false,
+            transport_timeout: true,
+            http_status: None,
+            body_complete: false,
+            json_parsed: false,
+            finish_reason: None,
+            verdict: Verdict::NoAcceptableAnswer,
+        };
+        assert_eq!(
+            classify_dispatch(&timeout),
+            ModelFailure("INFERENCE_TIMEOUT_AFTER_DISPATCH")
+        );
+    }
+
+    #[test]
+    fn h001_evaluator_model_failure_fails_the_gate() {
+        let arm_result = json!({
+            "state": "COMPLETE",
+            "response": { "http_status": 200, "complete": true },
+            "validation": { "response_json_parsed": true }
+        });
+        let normalized = json!({ "finish_reason": "stop" });
+        let outcome = classify_dispatch(&task_observation(
+            &arm_result,
+            Some(&normalized),
+            Some("FAIL"),
+        ));
+        assert_eq!(outcome, ModelFailure("EVALUATOR_FAIL"));
+        assert_eq!(
+            classify_local_9b_gate(4, false, false, &[Pass, Pass, Pass, outcome]),
+            LOCAL_9B_FEASIBILITY_FAILED
+        );
+        // No terminal answer (for example a tool call) is also model-side.
+        let incomplete = json!({
+            "state": "INCONCLUSIVE",
+            "response": { "http_status": 200, "complete": true },
+            "validation": { "response_json_parsed": true }
+        });
+        assert_eq!(
+            classify_dispatch(&task_observation(
+                &incomplete,
+                Some(&normalized),
+                Some("INCONCLUSIVE")
+            )),
+            ModelFailure("NO_ACCEPTABLE_TERMINAL_ANSWER")
+        );
+    }
+
+    #[test]
+    fn infrastructure_after_structural_inference_is_inconclusive_and_consumed() {
+        // Three structural passes dispatched; the h001 token count then fails
+        // before h001 inference.
+        let classification = classify_local_9b_gate(3, true, false, &PASSES);
+        assert_eq!(classification, LOCAL_9B_FEASIBILITY_INCONCLUSIVE);
+        assert_ne!(classification, LOCAL_9B_FEASIBILITY_FAILED);
+        assert_ne!(classification, LOCAL_9B_FEASIBILITY_PASSED);
+        assert_eq!(
+            local_9b_gate_permission(classification),
+            "DESIGN_REVIEW_REQUIRED"
+        );
+        let terminal = terminal_state(classification, 3);
+        assert_eq!(terminal["identity_consumed"], true);
+        assert_eq!(terminal["replacement_identity_eligible"], false);
+        assert_eq!(terminal["capability_result_established"], false);
+        assert_eq!(terminal["model_inadequacy_established"], false);
+        assert_eq!(terminal["cloud_gpu_review_authorized"], false);
+        assert_eq!(
+            terminal["flags"],
+            json!(LOCAL_9B_INCONCLUSIVE_TERMINAL_FLAGS)
+        );
+        // Also after only one structural request.
+        assert_eq!(
+            classify_local_9b_gate(1, true, false, &[Pass]),
+            LOCAL_9B_FEASIBILITY_INCONCLUSIVE
+        );
+        let record = infrastructure_record(
+            &Accounting {
+                structural_token_counts: 3,
+                task_token_counts: 1,
+                structural_inference: 3,
+                task_inference: 0,
+            },
+            "task_level",
+            "h001",
+            "TOKEN_COUNT",
+            &"connection refused",
+        );
+        assert_eq!(record["failure_class"], "TOKEN_COUNT_FAILED_AFTER_DISPATCH");
+        let before = infrastructure_record(
+            &Accounting::default(),
+            "structural",
+            "rbcal-001",
+            "TOKEN_COUNT",
+            &"connection refused",
+        );
+        assert_eq!(
+            before["failure_class"],
+            "TOKEN_COUNT_FAILED_BEFORE_INFERENCE"
+        );
+    }
+
+    #[test]
+    fn transport_failure_of_a_dispatched_request_is_inconclusive_and_consumed() {
+        let reset = DispatchObservation {
+            transport_completed: false,
+            transport_timeout: false,
+            http_status: None,
+            body_complete: false,
+            json_parsed: false,
+            finish_reason: None,
+            verdict: Verdict::NoAcceptableAnswer,
+        };
+        let server_error = DispatchObservation {
+            http_status: Some(503),
+            ..completed("stop", Verdict::Fail)
+        };
+        let unusable = DispatchObservation {
+            json_parsed: false,
+            ..completed("stop", Verdict::Fail)
+        };
+        let truncated = DispatchObservation {
+            body_complete: false,
+            ..completed("stop", Verdict::Fail)
+        };
+        for (observation, reason) in [
+            (&reset, "TRANSPORT_FAILED_AFTER_DISPATCH"),
+            (&server_error, "HTTP_STATUS_NOT_200"),
+            (&unusable, "RESPONSE_BODY_UNUSABLE"),
+            (&truncated, "RESPONSE_BODY_UNUSABLE"),
+        ] {
+            let outcome = classify_dispatch(observation);
+            assert_eq!(outcome, InfrastructureAfterDispatch(reason));
+            for outcomes in [vec![outcome], vec![Pass, Pass, Pass, outcome]] {
+                let classification =
+                    classify_local_9b_gate(outcomes.len() as u32, false, false, &outcomes);
+                assert_eq!(
+                    classification, LOCAL_9B_FEASIBILITY_INCONCLUSIVE,
+                    "{reason}"
+                );
+                let terminal = terminal_state(classification, outcomes.len() as u32);
+                assert_eq!(terminal["identity_consumed"], true);
+                assert_eq!(terminal["replacement_identity_eligible"], false);
+            }
+        }
+        // The persisted records map onto the same classes.
+        let structural_reset = json!({
+            "state": "INCONCLUSIVE",
+            "response": { "http_status": null, "complete": false },
+            "validation": { "transport_ambiguous": true, "transport_timeout": false, "response_json_parsed": false }
+        });
+        assert_eq!(
+            classify_dispatch(&structural_observation(&structural_reset)),
+            InfrastructureAfterDispatch("TRANSPORT_FAILED_AFTER_DISPATCH")
+        );
+        let structural_timeout = json!({
+            "state": "INCONCLUSIVE",
+            "response": { "http_status": null, "complete": false },
+            "validation": { "transport_ambiguous": true, "transport_timeout": true, "response_json_parsed": false }
+        });
+        assert_eq!(
+            classify_dispatch(&structural_observation(&structural_timeout)),
+            ModelFailure("INFERENCE_TIMEOUT_AFTER_DISPATCH")
+        );
+        let h001_ambiguous = json!({
+            "state": "AMBIGUOUS",
+            "response": { "http_status": null, "complete": false },
+            "validation": { "response_json_parsed": false, "transport_timeout": false }
+        });
+        assert_eq!(
+            classify_dispatch(&task_observation(&h001_ambiguous, None, None)),
+            InfrastructureAfterDispatch("TRANSPORT_FAILED_AFTER_DISPATCH")
+        );
+        let structural_503 = json!({
+            "state": "FAIL",
+            "response": { "http_status": 503, "complete": true, "finish_reason": null },
+            "validation": { "transport_ambiguous": false, "response_json_parsed": false }
+        });
+        assert_eq!(
+            classify_dispatch(&structural_observation(&structural_503)),
+            InfrastructureAfterDispatch("HTTP_STATUS_NOT_200")
+        );
+    }
+
+    #[test]
+    fn only_the_complete_registered_path_passes() {
+        let pass = classify_dispatch(&completed("stop", Verdict::Pass));
+        assert_eq!(pass, Pass);
+        let full = [Pass, Pass, Pass, Pass];
+        let classification = classify_local_9b_gate(4, false, false, &full);
+        assert_eq!(classification, LOCAL_9B_FEASIBILITY_PASSED);
+        assert_eq!(
+            local_9b_gate_permission(classification),
+            "PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW_ONLY"
+        );
+        assert_eq!(
+            terminal_state(classification, 4)["capability_result_established"],
+            true
+        );
+        assert!(task_stage_permitted(&PASSES));
+
+        // Every incomplete, bounded, or disrupted path is not a pass.
+        for (inference, infrastructure, context_bound, outcomes) in [
+            (3, false, false, PASSES.to_vec()),
+            (3, false, true, PASSES.to_vec()),
+            (4, true, false, full.to_vec()),
+            (2, false, false, vec![Pass, Pass]),
+            (0, false, true, vec![]),
+            (3, true, false, PASSES.to_vec()),
+        ] {
+            assert_ne!(
+                classify_local_9b_gate(inference, infrastructure, context_bound, &outcomes),
+                LOCAL_9B_FEASIBILITY_PASSED,
+                "{inference} {infrastructure} {context_bound} {outcomes:?}"
+            );
+        }
+        // A context bound under the registered rule fails the gate.
+        assert_eq!(
+            classify_local_9b_gate(3, false, true, &PASSES),
+            LOCAL_9B_FEASIBILITY_FAILED
+        );
+        assert_eq!(
+            classify_local_9b_gate(0, false, true, &[]),
+            LOCAL_9B_FEASIBILITY_FAILED
+        );
+        for incomplete in [vec![Pass], vec![Pass, Pass]] {
+            assert!(!task_stage_permitted(&incomplete));
+        }
     }
 
     #[test]

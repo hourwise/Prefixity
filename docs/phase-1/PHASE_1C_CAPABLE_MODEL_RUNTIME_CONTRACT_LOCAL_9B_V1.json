@@ -149,7 +149,17 @@
     "pass_state": "LOCAL_9B_FEASIBILITY_PASSED",
     "fail_state": "LOCAL_9B_FEASIBILITY_FAILED",
     "after_pass": "PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW (offline); the scored pilot is not authorized",
+    "fail_scope": "only evidence attributable to the model or scored request path: evaluator FAIL, structural failure, finish_reason length, inference timeout after dispatch, context bound, or no acceptable terminal answer",
     "after_fail": "CLOUD_GPU_CAPABLE_MODEL_DESIGN_REVIEW",
+    "inconclusive_state": "LOCAL_9B_FEASIBILITY_INCONCLUSIVE",
+    "inconclusive_scope": "infrastructure or integrity failure after any inference request was dispatched (transport failure other than timeout, non-200 status, unusable response body, token-count or executor failure after dispatch)",
+    "inconclusive_flags": [
+      "LOCAL_9B_GATE_IDENTITY_CONSUMED",
+      "INFRASTRUCTURE_AFTER_DISPATCH",
+      "NO_REPLACEMENT_AUTHORIZED",
+      "DESIGN_REVIEW_REQUIRED"
+    ],
+    "after_inconclusive": "explicit design decision required; neither a pass nor model inadequacy is established; no replacement identity and no automatic cloud-GPU progression",
     "replacement_identity": "exactly one, only for a genuine pre-inference infrastructure/integrity failure with inference_requests = 0 and no model output; any dispatched request consumes the identity"
   },
   "timeout_policy": {

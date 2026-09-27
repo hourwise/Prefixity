@@ -2,5 +2,5 @@
   "artifact_path": "docs/phase-1/PHASE_1C_CAPABLE_MODEL_RUNTIME_CONTRACT_LOCAL_9B_V1.json",
   "algorithm": "SHA-256",
   "canonicalization": "sorted JSON object keys; arrays preserve order",
-  "canonical_sha256": "c971fcda6d69646bc75b0594ec2967d532de90848c36f8bf042119aede55b889"
+  "canonical_sha256": "6b97193d0b3d8422aefe1b82d4fe28f3b02e71e85a5866839d6db82e90d9de88"
 }

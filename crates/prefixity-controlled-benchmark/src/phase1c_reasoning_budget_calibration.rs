@@ -3822,6 +3822,7 @@ pub(crate) fn execute_case(
                 },
                 "validation": {
                     "transport_ambiguous": true,
+                    "transport_timeout": error.is_timeout(),
                     "response_json_parsed": false,
                     "terminal_final_content": false,
                     "structural_response_valid": false,
@@ -3871,6 +3872,7 @@ pub(crate) fn execute_case(
             },
             "validation": {
                 "transport_ambiguous": true,
+                "transport_timeout": io_error_is_timeout(&error),
                 "response_json_parsed": false,
                 "terminal_final_content": false,
                 "structural_response_valid": false,
@@ -8444,6 +8446,16 @@ fn candidate_result(
         "capability_claims_permitted": false,
         "error": error
     }))
+}
+
+/// Whether a response-body read failed because the request's complete bound
+/// elapsed, directly or through a wrapped transport error.
+pub(crate) fn io_error_is_timeout(error: &std::io::Error) -> bool {
+    error.kind() == std::io::ErrorKind::TimedOut
+        || error
+            .get_ref()
+            .and_then(|inner| inner.downcast_ref::<reqwest::Error>())
+            .is_some_and(reqwest::Error::is_timeout)
 }
 
 fn structurally_matches(content: &str, expected: &Value) -> bool {

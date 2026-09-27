@@ -363,6 +363,7 @@ where
                 request_bytes: request_bytes.len(),
                 readiness_elapsed_ms,
                 transport_elapsed_ms,
+                transport_timeout: error.is_timeout(),
                 error: format!("request dispatch/completion is ambiguous: {error}"),
                 experiment_id,
             });
@@ -389,6 +390,9 @@ where
             request_bytes: request_bytes.len(),
             readiness_elapsed_ms,
             transport_elapsed_ms,
+            transport_timeout: crate::phase1c_reasoning_budget_calibration::io_error_is_timeout(
+                &error,
+            ),
             error: format!("response body read is ambiguous: {error}"),
             experiment_id,
         });
@@ -1156,6 +1160,7 @@ struct AmbiguousResultInput<'a> {
     request_bytes: usize,
     readiness_elapsed_ms: u64,
     transport_elapsed_ms: u64,
+    transport_timeout: bool,
     error: String,
     experiment_id: &'a str,
 }
@@ -1182,7 +1187,7 @@ fn ambiguous_result(input: AmbiguousResultInput<'_>) -> Value {
         },
         "readiness": {"listener_check_attempts": 1, "inference_requests": 0, "elapsed_ms": input.readiness_elapsed_ms},
         "response": {"complete": false, "http_status": null, "response_body_bytes": null, "response_body_sha256": null, "response_body_file": null, "transport_elapsed_ms": input.transport_elapsed_ms},
-        "validation": {"response_json_parsed": false, "final_content_available": false, "terminal_final_content": false, "reasoning_diagnostic_only": true, "error": input.error},
+        "validation": {"response_json_parsed": false, "final_content_available": false, "terminal_final_content": false, "reasoning_diagnostic_only": true, "transport_timeout": input.transport_timeout, "error": input.error},
         "next_arm": null
     })
 }
