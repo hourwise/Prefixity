@@ -1,0 +1,551 @@
+{
+  "baseline_commit": "4a25e4ca31716b70bec4af6dd5472afccdcae435",
+  "baseline_verification": "HEAD, local main, origin/main and remote main matched; tracked tree clean before modification",
+  "cardinality_scope": "Unbounded raw language accepted by frozen offline schema/transition API; not the token-limited runtime output space",
+  "cases": [
+    {
+      "case_id": "CP01",
+      "evaluation_key_sha256": "cbc28532dd7cfc20e806662a751a1fe8b2f133e8b0919a37786b660a9b04ad42",
+      "exhaustive_byte_equality": "NOT_EVALUATED",
+      "kind": "positive",
+      "legal_control_reduction": null,
+      "manifest_sha256": "cba6f36548f898ea26cb6299b7b9156eb251fe58d37074740e7fdc08431eb494",
+      "requests": [
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 1,
+          "runtime_valid_history_variants": 1,
+          "schema_valid_history_variants": 1,
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 2,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 3,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        }
+      ],
+      "token_admission": "NOT_EVALUATED",
+      "token_equality": "NOT_EVALUATED",
+      "transitions": [
+        {
+          "advancing_action_id": "inspect_retry_implementation",
+          "nonadvancing_action_ids": [
+            "inspect_dispatch_defaults"
+          ],
+          "public_action_ids": [
+            "inspect_retry_implementation",
+            "inspect_dispatch_defaults"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp01/environment/receipt1.txt",
+          "receipt_sha256": "3eaddfcb86e49ad105f6d11f3a900affae2e5ad3d0a10c54f4078ccff86484a8",
+          "request_slot": 1,
+          "result_event_id": "e-result1",
+          "result_id": "r-result1",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "source_loaded"
+        },
+        {
+          "advancing_action_id": "run_retry_regression",
+          "nonadvancing_action_ids": [
+            "check_timeout_units"
+          ],
+          "public_action_ids": [
+            "run_retry_regression",
+            "check_timeout_units"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp01/environment/receipt2.txt",
+          "receipt_sha256": "aa90d37f70fafb34c9409a7e025efe4636afb5ba1d3934d777e8aa88078bd7f2",
+          "request_slot": 2,
+          "result_event_id": "e-result2",
+          "result_id": "r-result2",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "retry_regression_failed_on_r41"
+        }
+      ]
+    },
+    {
+      "case_id": "CP02",
+      "evaluation_key_sha256": "dbb16cdb9869a4068374ad7059a958131e85ef76f6b806314700af9bd222e826",
+      "exhaustive_byte_equality": "NOT_EVALUATED",
+      "kind": "positive",
+      "legal_control_reduction": null,
+      "manifest_sha256": "93ecf6581bf6a0c436710526d5f8c7b53f971470c99db0578509f5b2cda0913d",
+      "requests": [
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 1,
+          "runtime_valid_history_variants": 1,
+          "schema_valid_history_variants": 1,
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 2,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 3,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        }
+      ],
+      "token_admission": "NOT_EVALUATED",
+      "token_equality": "NOT_EVALUATED",
+      "transitions": [
+        {
+          "advancing_action_id": "build_symbol_inventory",
+          "nonadvancing_action_ids": [
+            "skip_inventory"
+          ],
+          "public_action_ids": [
+            "build_symbol_inventory",
+            "skip_inventory"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp02/bodies/receipt1.txt",
+          "receipt_sha256": "e62dea11ce37d189ac0aaa84cb6a1510ebc3845294c10875952ad8c755ee3afa",
+          "request_slot": 1,
+          "result_event_id": "e-result-inventory",
+          "result_id": "r-inventory",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "inventory_ready"
+        },
+        {
+          "advancing_action_id": "inspect_resolution_chain",
+          "nonadvancing_action_ids": [
+            "inspect_cli_surface"
+          ],
+          "public_action_ids": [
+            "inspect_resolution_chain",
+            "inspect_cli_surface"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp02/bodies/receipt2.txt",
+          "receipt_sha256": "4e81fd820ed9740b04bea9111f95317130ceb193b16efb6ba7d8089cf4481777",
+          "request_slot": 2,
+          "result_event_id": "e-result-callsite",
+          "result_id": "r-callsite",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "callsites_opened"
+        }
+      ]
+    },
+    {
+      "case_id": "CP03",
+      "evaluation_key_sha256": "f568dbc069bc96e2897f57e70c632116dcbc16fdaa51fca380549f5be0b177a5",
+      "exhaustive_byte_equality": "NOT_EVALUATED",
+      "kind": "positive",
+      "legal_control_reduction": null,
+      "manifest_sha256": "f740e754a28fb17bbdac756bff01f4ca166edd7edd89484668e393a98814f47d",
+      "requests": [
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 1,
+          "runtime_valid_history_variants": 1,
+          "schema_valid_history_variants": 1,
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 2,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 3,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        }
+      ],
+      "token_admission": "NOT_EVALUATED",
+      "token_equality": "NOT_EVALUATED",
+      "transitions": [
+        {
+          "advancing_action_id": "collect_dependency_inventory",
+          "nonadvancing_action_ids": [
+            "skip_inventory"
+          ],
+          "public_action_ids": [
+            "collect_dependency_inventory",
+            "skip_inventory"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp03/bodies/receipt1.txt",
+          "receipt_sha256": "df82948814e3851a98709fb122964ba7f3274becb87c2afb0c6c8909411123e9",
+          "request_slot": 1,
+          "result_event_id": "e-result-inventory",
+          "result_id": "r-inventory",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "inventory_ready"
+        },
+        {
+          "advancing_action_id": "verify_snapshot_and_constraints",
+          "nonadvancing_action_ids": [
+            "verify_toolchain_only"
+          ],
+          "public_action_ids": [
+            "verify_snapshot_and_constraints",
+            "verify_toolchain_only"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp03/bodies/receipt2.txt",
+          "receipt_sha256": "d832c457e33ba7cc109116f2510b8980b08b09ca3431ad4add0a426d9340ab67",
+          "request_slot": 2,
+          "result_event_id": "e-result-verify",
+          "result_id": "r-verify",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "snapshot_verified"
+        }
+      ]
+    },
+    {
+      "case_id": "CP04",
+      "evaluation_key_sha256": "d89525072cd7717fa75b1aa9fcae5c97a72673eab9a03429252d7bb6600369bd",
+      "exhaustive_byte_equality": "NOT_EVALUATED",
+      "kind": "positive",
+      "legal_control_reduction": null,
+      "manifest_sha256": "270b942e171a8c3c4392eaf6e67e59def9e0a2375895f88936f9914098e7496f",
+      "requests": [
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 1,
+          "runtime_valid_history_variants": 1,
+          "schema_valid_history_variants": 1,
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 2,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 3,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        }
+      ],
+      "token_admission": "NOT_EVALUATED",
+      "token_equality": "NOT_EVALUATED",
+      "transitions": [
+        {
+          "advancing_action_id": "run_candidate_guardrail_probe",
+          "nonadvancing_action_ids": [
+            "inspect_branch_topology"
+          ],
+          "public_action_ids": [
+            "run_candidate_guardrail_probe",
+            "inspect_branch_topology"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp04/environment/receipt1.txt",
+          "receipt_sha256": "6ab3eb54f41ecf9ff1ba4a38b147a16c91f6425b073bd98357c7a98252546b69",
+          "request_slot": 1,
+          "result_event_id": "e-result1",
+          "result_id": "r-result1",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "candidate_failed_origin_restored"
+        },
+        {
+          "advancing_action_id": "verify_restored_state",
+          "nonadvancing_action_ids": [
+            "read_failed_candidate_diff"
+          ],
+          "public_action_ids": [
+            "verify_restored_state",
+            "read_failed_candidate_diff"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp04/environment/receipt2.txt",
+          "receipt_sha256": "e68f339375c2fe0c36583226e3e35db64e63407574ac7ec7d44d89b0d34ec874",
+          "request_slot": 2,
+          "result_event_id": "e-result2",
+          "result_id": "r-result2",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "restored_origin_verified"
+        }
+      ]
+    },
+    {
+      "case_id": "CP05",
+      "evaluation_key_sha256": "6cf63794c4ca309ff480f7260a7f5f64b04de85d1bd45ad5923534d13e324c9a",
+      "exhaustive_byte_equality": "NOT_EVALUATED",
+      "kind": "control",
+      "legal_control_reduction": 0,
+      "manifest_sha256": "beef5f855323e7cfbe5e48fc82c74f4ed987d12c7016862efcdfecb8669a6ed2",
+      "requests": [
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 1,
+          "runtime_valid_history_variants": 1,
+          "schema_valid_history_variants": 1,
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 2,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 3,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        }
+      ],
+      "token_admission": "NOT_EVALUATED",
+      "token_equality": "NOT_EVALUATED",
+      "transitions": [
+        {
+          "advancing_action_id": "inspect_initial_catalog",
+          "nonadvancing_action_ids": [
+            "read_health_only"
+          ],
+          "public_action_ids": [
+            "inspect_initial_catalog",
+            "read_health_only"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp05/bodies/receipt-inspect.txt",
+          "receipt_sha256": "2b424ac040d25e4eed01bff4ab4407b0ddabd95435811f89ef7dd1e8002dd53a",
+          "request_slot": 1,
+          "result_event_id": "e-inspect-result",
+          "result_id": "r-route-inspect-017",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "route_registry_r17_inspected"
+        },
+        {
+          "advancing_action_id": "rebuild_route_index_and_export",
+          "nonadvancing_action_ids": [
+            "read_health_summary"
+          ],
+          "public_action_ids": [
+            "rebuild_route_index_and_export",
+            "read_health_summary"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp05/bodies/receipt-reindex.txt",
+          "receipt_sha256": "588976b08d47a5b9d899502a41a85a6d231c7aea002ef85354bb0be76010f747",
+          "request_slot": 2,
+          "result_event_id": "e-reindex-result",
+          "result_id": "r-route-index-064",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "route_registry_r18_reindexed"
+        }
+      ]
+    },
+    {
+      "case_id": "CP06",
+      "evaluation_key_sha256": "d08c1e750118ae28210aef4e058722e8e9e2bac89d88fe51e1fb32872e5350e6",
+      "exhaustive_byte_equality": "NOT_EVALUATED",
+      "kind": "control",
+      "legal_control_reduction": 0,
+      "manifest_sha256": "bc1d91824c7d88fa79bcc406e1d0a8cfc1f8b90da8c1ba32b2ff43761303a741",
+      "requests": [
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 1,
+          "runtime_valid_history_variants": 1,
+          "schema_valid_history_variants": 1,
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 2,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        },
+        {
+          "context_hard_stop": "NOT_EVALUATED",
+          "input_tokens_max": null,
+          "input_tokens_min": null,
+          "max_request_sha256": null,
+          "min_request_sha256": null,
+          "request_slot": 3,
+          "runtime_valid_history_variants": null,
+          "schema_valid_history_variants": "countably_infinite",
+          "scope": "per arm; all three arms"
+        }
+      ],
+      "token_admission": "NOT_EVALUATED",
+      "token_equality": "NOT_EVALUATED",
+      "transitions": [
+        {
+          "advancing_action_id": "inspect_policy_index",
+          "nonadvancing_action_ids": [
+            "read_policy_summary"
+          ],
+          "public_action_ids": [
+            "inspect_policy_index",
+            "read_policy_summary"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp06/bodies/receipt-policy-inspect.txt",
+          "receipt_sha256": "c8500e2bdaea68ec5275f0c8f55e1de332fd4433734b88d1b4135afcecc89694",
+          "request_slot": 1,
+          "result_event_id": "e-policy-inspect-result",
+          "result_id": "r-policy-inspect-084",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "policy_index_s84_inspected"
+        },
+        {
+          "advancing_action_id": "verify_audit_receipt",
+          "nonadvancing_action_ids": [
+            "check_export_signature_only"
+          ],
+          "public_action_ids": [
+            "verify_audit_receipt",
+            "check_export_signature_only"
+          ],
+          "raw_language": "L(case, slot): exact parser preimage defined in review",
+          "receipt_path": "fixtures/claim2/cp06/bodies/receipt-audit-2081.txt",
+          "receipt_sha256": "f1711d4e3232120b0a53306bba96cc3e601ff04d456c6690908b90bd46f476eb",
+          "request_slot": 2,
+          "result_event_id": "e-audit-result",
+          "result_id": "r-audit-AUD-2081",
+          "runtime_bounded_cardinality": null,
+          "schema_raw_language_cardinality": "countably_infinite",
+          "state_after": "audit_receipt_AUD_2081_verified"
+        }
+      ]
+    }
+  ],
+  "contact_accounting": {
+    "duplicate_requests_avoided": 0,
+    "inference_requests": 0,
+    "readiness_contacts": 0,
+    "unique_token_count_contacts": 0
+  },
+  "disposition": "STOP after Phase 1; no enumerator, client or later task started",
+  "endpoint": null,
+  "enumeration_frozen": false,
+  "evidence_kind": "OFFLINE_PHASE_1_REVIEW_NOT_TOKENIZATION_LEDGER",
+  "frozen_source_sha256": "bd00e0f89900851044fd661a4e58786869bde6ce704b694bc72ec2a7d6240dc8",
+  "materialization_ledger_sha256": "3d9571ddd4e17096b55971040531aac6197b6b9b7bc3d01afefd8992c28f6c65",
+  "offline_diagnostic": {
+    "exit_code": 0,
+    "source_sha256": "1ebc71602d1b71324847c3a0bbe1750916d66a2470fb90b85cb41f06633f9a1c",
+    "stdout": "OFFLINE_DIAGNOSTIC_ONLY: synthetic raw strings; zero model/tokenization calls\ncp01: PASS request2/3 advancing; raw1_bytes=116 receipt1_event=e-result1 state=source_loaded; raw2_bytes=168 receipt2_event=e-result2 state=retry_regression_failed_on_r41; request3_assistant_bodies=exact\ncp01: PASS positional JSON arrays advance at slots 1 and 2; raw arrays carried exactly\ncp02: PASS request2/3 advancing; raw1_bytes=110 receipt1_event=e-result-inventory state=inventory_ready; raw2_bytes=192 receipt2_event=e-result-callsite state=callsites_opened; request3_assistant_bodies=exact\ncp02: PASS positional JSON arrays advance at slots 1 and 2; raw arrays carried exactly\ncp03: PASS request2/3 advancing; raw1_bytes=116 receipt1_event=e-result-inventory state=inventory_ready; raw2_bytes=234 receipt2_event=e-result-verify state=snapshot_verified; request3_assistant_bodies=exact\ncp03: PASS positional JSON arrays advance at slots 1 and 2; raw arrays carried exactly\ncp04: PASS request2/3 advancing; raw1_bytes=117 receipt1_event=e-result1 state=candidate_failed_origin_restored; raw2_bytes=174 receipt2_event=e-result2 state=restored_origin_verified; request3_assistant_bodies=exact\ncp04: PASS positional JSON arrays advance at slots 1 and 2; raw arrays carried exactly\ncp05: PASS request2/3 advancing; raw1_bytes=111 receipt1_event=e-inspect-result state=route_registry_r17_inspected; raw2_bytes=228 receipt2_event=e-reindex-result state=route_registry_r18_reindexed; request3_assistant_bodies=exact\ncp05: PASS positional JSON arrays advance at slots 1 and 2; raw arrays carried exactly\ncp06: PASS request2/3 advancing; raw1_bytes=108 receipt1_event=e-policy-inspect-result state=policy_index_s84_inspected; raw2_bytes=168 receipt2_event=e-audit-result state=audit_receipt_AUD_2081_verified; request3_assistant_bodies=exact\ncp06: PASS positional JSON arrays advance at slots 1 and 2; raw arrays carried exactly\ncp01 in_menu_but_wrong: rejected as advancing; request 2 NOT_EXECUTED_AFTER_FAILURE\ncp01 unknown_action: rejected as advancing; request 2 NOT_EXECUTED_AFTER_FAILURE\ncp01 unknown_field: rejected as advancing; request 2 NOT_EXECUTED_AFTER_FAILURE\ncp01 duplicate_field: rejected as advancing; request 2 NOT_EXECUTED_AFTER_FAILURE\n"
+  },
+  "phase_1_stop_reason": "TOKENIZATION_BOUND_NOT_FINITE",
+  "primary_state": "TOKENIZATION_PASS_INCONCLUSIVE",
+  "recorded_at_utc": "2026-09-27T19:07:17.555065+00:00",
+  "runtime_caveat": "Finite vocabulary and 1024 generated tokens imply finitely many runtime sequences. Exact accepted-runtime decoding/filtering and exhaustive enumeration were not established in this phase.",
+  "runtime_identity": {
+    "build": "b10217-ddd4ec142",
+    "chat_template_kwargs": "ABSENT",
+    "context": 8192,
+    "gguf_sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+    "max_tokens": 1024,
+    "model": "Qwen3.5-9B Q4_K_M",
+    "reasoning": "off",
+    "verified_live_this_pass": false
+  },
+  "schema_id": "prefixity.claim2.tokenization-domain-review",
+  "schema_version": 1,
+  "tokenization_records": []
+}

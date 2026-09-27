@@ -4051,3 +4051,55 @@ Git attribute preserves its original Git bytes, confirmed with an explicit
 `core.autocrlf=true` filtered read. No historical content/hash or parity
 assertion changed. That failed candidate was not promoted; corrected-candidate
 CI must pass all jobs before promotion.
+
+## Phase 1C Claim-2 non-inference tokenization review
+
+Current primary state: `TOKENIZATION_PASS_INCONCLUSIVE`.
+Phase 1 stop reason: `TOKENIZATION_BOUND_NOT_FINITE`.
+This entry supersedes earlier next-step statements. Record:
+`docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_DOMAIN_REVIEW.md` and its sealed
+machine-readable Phase 1 review (not a token-count ledger).
+
+Work completed: verified the clean exact 4a25e4c baseline; read the accepted
+design, materialization and full ledger; delegated one offline domain review;
+reviewed all twelve advancing transitions and their pinned receipts. Each
+case has one semantic action sequence but unbounded raw JSON spellings at
+both advancing slots. The parser accepts object and positional sequence
+forms, whitespace and string escapes, and carries exact raw bytes forward.
+Incorrect/malformed responses terminate and create no later request.
+
+Evidence: the source-level whitespace family proves the schema/API raw
+language is not finite. The offline diagnostic passes exact raw-carry checks
+for both advancing slots in all six fixtures and representative failure
+checks. All twelve advancing receipt hashes match their manifests and event
+observations. No model output was generated; these are synthetic parser
+witnesses, not tokenization placeholders.
+
+Interpretation: the 1024-token ceiling and finite vocabulary make actual
+runtime token sequences finite. Their exact decoded/filtered domain was not
+established here. Do not interpret the API-language finding as unlimited
+runtime generation or as a measured token/context admission failure. All
+input-token and reduction measurements remain unknown. No CPU recalculation
+is possible; model-capability acceptance is unchanged.
+
+The explicit Phase 1 stop rule prevents phases 2-4. No enumerator/client,
+server operation, readiness/token-count/inference contact or later task was
+performed. Existing fixtures, materialization ledger, runtime contract and
+criteria remain unchanged. The task stops with the domain proof unresolved;
+do not start a remediation or operator-server task from this record.
+
+Validation: the research-state consistency suite passed 12/12; the diagnostic
+passed for all six cases; canonical review seal, twelve receipt hashes,
+Markdown links and diff whitespace were checked. Changes are review-only,
+local and uncommitted at the initial closeout; no publication or promotion
+had followed the Phase 1 stop.
+
+Part A publication preparation: the independent read-only audit passed the
+scientific findings, all twelve transition/receipt mappings, canonical seal,
+prose/JSON agreement, links, whitespace and five-file scope. The review now
+documents that its original diagnostic source hash includes a UTF-8 BOM.
+The user subsequently authorized this documentation-only publication,
+requiring every CI job to pass before promotion. Only after that exact SHA
+is promoted may Part B implement the separately authorized canonical
+advancing-output protocol correction. No tokenization or inference is
+authorized by either part.
