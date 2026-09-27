@@ -4103,3 +4103,71 @@ requiring every CI job to pass before promotion. Only after that exact SHA
 is promoted may Part B implement the separately authorized canonical
 advancing-output protocol correction. No tokenization or inference is
 authorized by either part.
+
+## Phase 1C Claim-2 advancing-output domain correction
+
+Supervisor offline status: `WORKLOAD_PROTOCOL_DOMAIN_CORRECTION_ACCEPTED`.
+Publication remains subject to exact-candidate CI and promotion.
+The Part-A review was promoted at exact SHA
+`1fa391bc333fa6c698cf67e4b97fe48c77124626` after CI run `36346330551` passed
+all four jobs. This implementation branch was created from that exact SHA.
+Correction record:
+`docs/phase-1/PHASE_1C_CLAIM_2_ADVANCING_OUTPUT_PROTOCOL_CORRECTION.md`.
+
+Work completed: the offline adapter derives compact canonical JSON bytes from
+the separate frozen expected action ID for intermediate slots 1 and 2, compares
+raw UTF-8 bytes before parsing/transition acceptance, and retains the observed
+raw response unchanged. A mismatch is an observed structural `FAIL`, creates
+no receipt for that step, and marks every later slot
+`NOT_EXECUTED_AFTER_FAILURE`. Existing semantic/state/receipt validation runs
+after equality. Request-3 parsing and final-answer evaluation are unchanged;
+the 1024-token envelope is unchanged and no byte cap was added.
+
+Evidence: the versioned
+`fixtures/claim2/advancing-output-domain-v1.json` records twelve transitions,
+each with one canonical response and SHA-256, deterministic receipt identity,
+path/hash, next state and cardinality 1 for all three arms. The successor
+`fixtures/claim2/materialization-report-v2.json` pins the unchanged version-1
+materialization report by SHA-256, confirms all 54 historical static
+projections reproduce byte-for-byte, and records 18 independently constructed
+arm-local trajectories, 36 advancing transition replays and 54 request renders
+across slots 1–3. The fixture manifests, evaluation keys, task bodies, action
+menus, receipts, dependencies, policy, selection, NO_OP projection and Phase
+1B.9 evidence were not altered.
+
+Interpretation and limits: exact byte equality reduces the accepted raw
+advancing-response language to one string at each intermediate case/slot.
+The tests exercise 540 noncanonical, malformed, wrong-menu, wrong-slot,
+wrong-case, duplicate-field, alternate-escape and other spellings across all
+12 points and all 3 arms; all fail while retaining raw bytes. This finite
+source-level domain does not establish token counts, context fit, savings,
+materiality, task performance, or runtime benefit. No model output was
+generated and no inference, tokenizer, server, or endpoint was contacted.
+
+Validation performed:
+
+```text
+cargo test --workspace --offline --locked: PASS (all workspace suites)
+cargo test -p prefixity-controlled-benchmark --test claim2_advancing_output --offline --locked: PASS (3 passed)
+cargo fmt --all -- --check: PASS
+cargo clippy --workspace --all-targets --all-features --offline --locked -- -D warnings: PASS
+cargo +1.86.0 check --workspace --offline --locked: PASS
+git diff --check: PASS
+```
+
+The new tests include canonical carry in every case/arm, retention and
+no-later-request assertions for failed spellings, the final-schema whitespace
+regression, exact old-report hash/parity, successor reproducibility, receipt
+pins, and source/protocol hash provenance. The first validation attempt found
+an assertion setup error in the synthetic final-output whitespace regression;
+the response was lengthened to exceed the planning estimate, then the complete
+workspace suite passed. Clippy's initial type-complexity warning was resolved
+with a named evidence type before final validation.
+
+Supervisor review accepted the complete source/fixture diff, the twelve
+canonical responses and receipt mappings, the finite-domain proof and the
+versioned evidence. Part A's post-promotion main CI `36346596731` also passed.
+This records offline acceptance before publication; staging, exact-candidate
+CI and promotion remain with the supervisor and are reported in the closeout.
+No tokenization or inference was performed. The exact next authorized task is
+`NON_INFERENCE_CONTEXT_TOKENIZATION_PASS`; do not begin it from this record.

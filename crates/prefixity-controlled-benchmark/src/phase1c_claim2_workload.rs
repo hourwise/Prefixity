@@ -23,6 +23,16 @@ pub const CLAIM2_MODEL_LABEL: &str = "lmstudio-community/Qwen3.5-9B-GGUF:Q4_K_M"
 pub const CLAIM2_CONTEXT_TOKENS: u32 = 8192;
 pub const CLAIM2_MAX_OUTPUT_TOKENS: u32 = 1024;
 pub const CLAIM2_INPUT_PREFLIGHT_TOKENS: u32 = 6000;
+pub const CLAIM2_ADVANCING_OUTPUT_PROTOCOL_ID: &str =
+    "prefixity.phase1c.claim2-canonical-advancing-output.v1";
+
+/// Return the sole canonical UTF-8 wire representation for an advancing action.
+/// The output is compact JSON with one `action_id` field and no terminator.
+pub fn canonical_claim2_action_output(action_id: &str) -> String {
+    let encoded_action_id =
+        serde_json::to_string(action_id).expect("serializing a string cannot fail");
+    format!("{{\"action_id\":{encoded_action_id}}}")
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -350,6 +360,14 @@ impl Claim2ArmState {
         self.assistant_outputs.push(raw.clone());
         self.output_schema_valid.push(false);
         if slot < 3 {
+            let expected_action =
+                case.evaluation_key.expected_action_ids[usize::from(slot - 1)].as_str();
+            if raw != canonical_claim2_action_output(expected_action) {
+                self.fail_from(slot);
+                let evaluation = failed_evaluation(case, "noncanonical_intermediate_action_output");
+                self.terminal_assessment = Some(evaluation.clone());
+                return Ok(Some(evaluation));
+            }
             let action_output: Claim2ActionOutput = match serde_json::from_str(&raw) {
                 Ok(output) => output,
                 Err(_) => {
@@ -369,8 +387,6 @@ impl Claim2ArmState {
                 self.terminal_assessment = Some(evaluation.clone());
                 return Ok(Some(evaluation));
             };
-            let expected_action =
-                case.evaluation_key.expected_action_ids[usize::from(slot - 1)].as_str();
             let expected_state =
                 case.evaluation_key.expected_states_after_action[usize::from(slot - 1)].as_str();
             if transition.action_id != expected_action || transition.state_after != expected_state {
@@ -2850,20 +2866,67 @@ mod tests {
     }
 
     #[test]
-    fn planning_bytes_do_not_lower_the_accepted_output_ceiling() {
+    fn intermediate_output_is_exact_while_final_schema_still_accepts_whitespace() {
         let (root, case) = synthetic_case();
         let mut arm = Claim2ArmState::new(&case, Claim2ProjectionMode::Baseline);
         arm.render_next(&case).unwrap();
-        let raw = format!(
+        let noncanonical = format!(
             "{}{}",
             " ".repeat(case.manifest.assistant_output_planning_bytes + 1),
-            serde_json::json!({"action_id": "inspect_source"})
+            canonical_claim2_action_output("inspect_source")
         );
-        assert!(arm.record_output(&case, raw.clone()).unwrap().is_none());
-        let next = arm.render_next(&case).unwrap();
-        assert!(next.messages.iter().any(|message| message.content == raw));
-        assert_eq!(next.metrics.carried_assistant_utf8_bytes, raw.len());
+        let failure = arm
+            .record_output(&case, noncanonical.clone())
+            .unwrap()
+            .unwrap();
+        assert_eq!(failure.status, Claim2SlotStatus::Fail);
+        assert_eq!(
+            arm.slots()[0].raw_assistant_output.as_deref(),
+            Some(noncanonical.as_str())
+        );
+        assert_eq!(arm.slots()[0].status, Claim2SlotStatus::Fail);
+        assert_eq!(
+            arm.slots()[1].status,
+            Claim2SlotStatus::NotExecutedAfterFailure
+        );
+        assert!(arm.environment_receipts().is_empty());
+
+        let mut final_arm = complete_two_actions_and_render_final(&case);
+        let final_raw = format!(
+            "{}{}",
+            " ".repeat(case.manifest.assistant_output_planning_bytes + 1),
+            serde_json::json!({"answer": case.evaluation_key.expected_final_answer.clone()})
+        );
+        assert!(final_raw.len() > case.manifest.assistant_output_planning_bytes);
+        let final_result = final_arm
+            .record_output(&case, final_raw.clone())
+            .unwrap()
+            .unwrap();
+        assert_eq!(final_result.status, Claim2SlotStatus::Pass);
+        assert_eq!(
+            final_arm.slots()[2].raw_assistant_output.as_deref(),
+            Some(final_raw.as_str())
+        );
         fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn canonical_action_encoder_has_a_pinned_compact_json_shape() {
+        for (action_id, expected) in [
+            ("inspect_source", r#"{"action_id":"inspect_source"}"#),
+            (
+                "run_retry_regression",
+                r#"{"action_id":"run_retry_regression"}"#,
+            ),
+            ("é", r#"{"action_id":"é"}"#),
+            ("a\nb", r#"{"action_id":"a\nb"}"#),
+        ] {
+            let encoded = canonical_claim2_action_output(action_id);
+            assert_eq!(encoded, expected);
+            assert!(!encoded.starts_with('\u{feff}'));
+            assert!(!encoded.ends_with(' '));
+            assert!(!encoded.ends_with('\n'));
+        }
     }
 
     #[test]

@@ -95,6 +95,16 @@ or live dispatch path. Use `Claim2ArmState::preview_request` or
 and receipt slots remain separately listed as unbound, and every static
 projection is marked `dispatchable: false`.
 
+For the frozen CP01–CP06 cohort, the advancing-output protocol correction
+requires request-1 and request-2 raw outputs to equal the exact canonical JSON
+object generated for that slot's expected action ID. A byte mismatch fails
+the slot and retains the original bytes; it is never normalized before carry.
+The rule applies independently to BASELINE, NO_OP, and INTERVENTION. See the
+[protocol correction record](../../docs/phase-1/PHASE_1C_CLAIM_2_ADVANCING_OUTPUT_PROTOCOL_CORRECTION.md),
+[12-transition finite-domain ledger](advancing-output-domain-v1.json), and
+[version-2 materialization successor](materialization-report-v2.json). The
+older version-1 materialization report remains historical and unchanged.
+
 After all three trajectories, `compare_paired_arms` checks exact BASELINE/NO_OP
 request and output equality and INTERVENTION request/output equality before
 treatment. A mismatch marks the affected arm `INCONCLUSIVE`; this comparison
@@ -118,9 +128,12 @@ request bytes, unbound output slots, and the per-response planning byte estimate
 Static projections report the estimated carried raw-output UTF-8 bytes and list
 each possible pinned receipt body size for unbound action slots. The estimates
 are not enforced output caps or conservative bounds. The later tokenization
-review must establish a bound covering the full 1024-token prior-response
-envelope; it must also account for JSON escaping. Byte measurements remain
-separate from token counts. The request
+review can count the fully rendered request bodies using the canonical
+arm-local histories in the version-2 successor; it must still count the actual
+serialized request and its JSON escaping. The full 1024-token envelope remains
+the accepted runtime output setting, but is not an estimate of the one
+canonical advancing response. Byte measurements remain separate from token
+counts. The request
 keeps the accepted settings:
 model label `lmstudio-community/Qwen3.5-9B-GGUF:Q4_K_M`, `max_tokens: 1024`,
 temperature `0`, `top_p: 1`, seed `1`, and `stream: false`; reasoning stays
