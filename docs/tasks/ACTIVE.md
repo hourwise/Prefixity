@@ -3845,3 +3845,34 @@ Remaining: the live gate needs separate operator authorization and a server
 started with the recorded command. `LOCAL_9B_FEASIBILITY_PASSED` is not
 claimed; a pass would permit only the offline
 `PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW`.
+
+## Phase 1C local-9B feasibility-gate execution — result
+
+```text
+LOCAL_9B_FEASIBILITY_RESULT_ACCEPTED
+LOCAL_9B_FEASIBILITY_EXECUTED_ONCE
+LOCAL_9B_FEASIBILITY_INTEGRITY_ACCEPTED
+LOCAL_9B_FEASIBILITY_PASSED
+PREFIXITY_PILOT_CONTEXT_ADEQUACY_REVIEW_ONLY
+```
+
+Result publication only; record:
+`docs/phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_EXECUTION_RECORD.md`. The gate
+ran once at repository `8348550` (identity `d84ba488…f3d8`) on an
+operator-started Qwen3.5-9B Q4_K_M server with reasoning off, context 8192,
+`max_tokens` 1024, temperature 0, top_p 1, seed 1.
+
+Evidence (measured): token counts 334, 337, 341 (structural) and 391 (h001);
+rbcal-001/002/003 PASS with 100/34/36 completion tokens and
+`finish_reason = stop`; h001 BASELINE PASS with 90 completion tokens, task
+success true, required-context recall 1.0, dependency protocol valid, zero
+critical regressions. Accounting: 4 inference requests, 4 token counts, 1
+readiness contact, no retry, fallback, warmup, or replicate. Integrity was
+accepted before outcomes were interpreted; gate-result seal `06483255…4a95`,
+evidence manifest `61ce8241…f49a` over 30 raw artifacts. Measured CPU
+throughput (descriptive): prompt about 9-10 tok/s, decode about 1.2-2.0
+tok/s. The server was terminated after sealing.
+
+Interpretation: Qwen3.5-9B Q4_K_M with reasoning off is accepted as the
+Claim-2 measuring instrument, subject to the pilot-context adequacy review.
+The scored pilot is not authorized and the gate identity is consumed.
