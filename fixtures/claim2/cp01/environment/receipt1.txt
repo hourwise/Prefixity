@@ -1,0 +1,1 @@
+Inspection receipt INS-CP01-17. Pinned repo snapshot: cp01-r41. The complete retry source, TOML settings, regression test, and retry contract were read from the initial export. Source occurrence e-source contains the implementation and its caller contract; configured max_attempts is 4. No project state changed.

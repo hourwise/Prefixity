@@ -1,0 +1,3 @@
+Request 1 action menu (choose one action_id):
+- run_candidate_guardrail_probe: execute the bounded account-scope probe on the proposed fast route and restore the original revision on failure.
+- inspect_branch_topology: read the branch graph without running the bounded probe.

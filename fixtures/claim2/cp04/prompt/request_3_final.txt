@@ -1,0 +1,1 @@
+Request 3 final task: using the original user task, original source attachment, both raw action outputs, and both environment receipts, return exactly these answer fields: selected_branch, verified_source_revision, account_scope_required, rejected_candidate_branch, invariant. Use a JSON boolean for account_scope_required and strings for the other fields.

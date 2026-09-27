@@ -1,0 +1,4 @@
+Request 1 action menu:
+- collect_dependency_inventory: generate the deterministic dependency/build inventory for project dep-audit at revision dep-audit-r1.
+- skip_inventory: skip inventory generation.
+Return {"action_id":"collect_dependency_inventory"} or {"action_id":"skip_inventory"}.

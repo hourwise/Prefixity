@@ -1,0 +1,4 @@
+Request 1 action menu:
+- build_symbol_inventory: run the deterministic broad symbol inventory for repository revision quarry-ledger-r1 and query symbol-map-v1.
+- skip_inventory: skip the broad inventory.
+Return {"action_id":"build_symbol_inventory"} or {"action_id":"skip_inventory"}.

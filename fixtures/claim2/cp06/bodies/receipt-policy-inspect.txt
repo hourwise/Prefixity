@@ -1,0 +1,1 @@
+Policy-index inspection receipt POL-INSPECT-084. occurrence_id=e-policy-original; source_revision=access-policy-export@S84; world_state_revision=policy-index@S84; workspace_snapshot=policy-world-s84; export_object=policy-index-bc84; artifact_sha256=24458ef55c345b7f1a85cf3f7c5f797d593351e4c7f723766a839775da74ad41; binding_count=11.

@@ -1,0 +1,771 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-workload-case",
+  "schema_version": 1,
+  "case_id": "CP03",
+  "kind": "positive",
+  "planner_input": {
+    "events": [
+      {
+        "event_id": "e-task",
+        "sequence_index": 0,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-task",
+        "world_state_revision": "dep-audit-task-r1",
+        "order": {
+          "logical_tick": 0,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "0ecae63cadea017c31b86779caefa7844c5a489c6f853bdd9ab1261b12c520cb",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "dep-audit-r1/task",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "0ecae63cadea017c31b86779caefa7844c5a489c6f853bdd9ab1261b12c520cb",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action-inventory",
+        "sequence_index": 1,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-task"
+        ],
+        "action": {
+          "action_id": "collect_dependency_inventory",
+          "tool_name": "collect_dependency_inventory",
+          "argument_hash": "facf604dea47fe4876db24fb4241bd434c07d89c1a849e568d40ac6a2c43b861"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 1,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/workflow/action/collect_dependency_inventory",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "be2a4be27bd4f585ce55c3ff7451aac6916820aba2c738c70b616d8f514cc30d",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result-inventory",
+        "sequence_index": 2,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action-inventory"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-inventory",
+          "originating_action_id": "collect_dependency_inventory",
+          "observation_hash": "df82948814e3851a98709fb122964ba7f3274becb87c2afb0c6c8909411123e9",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 2,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/workflow/result/collect_dependency_inventory",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "5d8a551d12091018176e92ef68e9e774662c802d849176eed57a7ddf104dfc40",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-inventory-original",
+        "sequence_index": 3,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result-inventory"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-inventory-original",
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 3,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "3373755dcee0ffa4aed8a891a9a77b5612cb5ef0dc59165ce3dfe976c708839f",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "dep-audit-r1/native-export/dependency-inventory-v1",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "3373755dcee0ffa4aed8a891a9a77b5612cb5ef0dc59165ce3dfe976c708839f",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action-skip-inventory",
+        "sequence_index": 4,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-task"
+        ],
+        "action": {
+          "action_id": "skip_inventory",
+          "tool_name": "skip_inventory",
+          "argument_hash": "5b080af2a11484f19d92cdfc8b55c4dca50206b03ce55907031f79750a33497b"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 4,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/workflow/action/skip_inventory",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "bd69d0ebb14a88bcf8c7040702d38e04fb9db9acd8afb0078d8f32ef28a20f49",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result-skip-inventory",
+        "sequence_index": 5,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action-skip-inventory"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-skip-inventory",
+          "originating_action_id": "skip_inventory",
+          "observation_hash": "3aa922601ace0bf89824f5624e3bc8749e03b9b64692153d39468163180b3632",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 5,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/workflow/result/skip_inventory",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "4df5265de0c252c20f794619257e6e3ffc300e293e8ceb692ccc5e864492138c",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action-verify",
+        "sequence_index": 6,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-result-inventory"
+        ],
+        "action": {
+          "action_id": "verify_snapshot_and_constraints",
+          "tool_name": "verify_snapshot_and_constraints",
+          "argument_hash": "95997e1ba270490b2e258375ee91137d6ad419f48887b04f877bebf24af543e9"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 6,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/workflow/action/verify_snapshot_and_constraints",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "602fcac39e0ca805f0ceb93b9d5c5fe9ab00abb59575eacb60d543f6b7dcbfa8",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result-verify",
+        "sequence_index": 7,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action-verify"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-verify",
+          "originating_action_id": "verify_snapshot_and_constraints",
+          "observation_hash": "d832c457e33ba7cc109116f2510b8980b08b09ca3431ad4add0a426d9340ab67",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 7,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/workflow/result/verify_snapshot_and_constraints",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "45d39d206eb9f5c6f682bc63636529b11c008e27ba5966162b2d17efc2818686",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action-toolchain",
+        "sequence_index": 8,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-result-inventory"
+        ],
+        "action": {
+          "action_id": "verify_toolchain_only",
+          "tool_name": "verify_toolchain_only",
+          "argument_hash": "22376b8b0d6bc08409daf8c85027efc37816ded90dda02944ff790af8ed046b0"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 8,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/workflow/action/verify_toolchain_only",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "30184e714b0ac33d704415437ea037143ca8f86d6b5db268264c7f8b820de67e",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result-toolchain",
+        "sequence_index": 9,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action-toolchain"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-toolchain",
+          "originating_action_id": "verify_toolchain_only",
+          "observation_hash": "bc05564184b4fcbc0fb40fca97f366a724afd9ff169f2517f13eef81ef144cd2",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 9,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/workflow/result/verify_toolchain_only",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "995a499c1691f907716d7321f0095007f672c2405212f0b525087ffd19564ddb",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-inventory-copy",
+        "sequence_index": 10,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result-verify"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-inventory-copy",
+        "world_state_revision": "dep-audit-state-r1",
+        "order": {
+          "logical_tick": 10,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "3373755dcee0ffa4aed8a891a9a77b5612cb5ef0dc59165ce3dfe976c708839f",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "dep-audit-r1/native-export/reconcile-output",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "3373755dcee0ffa4aed8a891a9a77b5612cb5ef0dc59165ce3dfe976c708839f",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "relation_id": "produce-inventory",
+        "relation_type": "produces",
+        "from_id": "collect_dependency_inventory",
+        "to_id": "r-inventory",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/trace/relations/produce-inventory",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "29a1b8dc92661bc70b7d64eba1bd0502a3a32a94ffbbc06788bbb8ee47b3b75b",
+            "note": "The inventory tool produced its pinned native result."
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-inventory-skip",
+        "relation_type": "produces",
+        "from_id": "skip_inventory",
+        "to_id": "r-skip-inventory",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/trace/relations/produce-inventory-skip",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "701d2a48bc56cf025c0e73df773bda376d20d7dd9654b3ba0a44882d74c6964a",
+            "note": "The bounded skip action produced its own receipt."
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-verification",
+        "relation_type": "produces",
+        "from_id": "verify_snapshot_and_constraints",
+        "to_id": "r-verify",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/trace/relations/produce-verification",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "629a7ffccb0a790ae8d01fa2df045822ee368a3ed71d48c22494babaad123408",
+            "note": "Snapshot and dependency verification produced its separate receipt."
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-toolchain",
+        "relation_type": "produces",
+        "from_id": "verify_toolchain_only",
+        "to_id": "r-toolchain",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/trace/relations/produce-toolchain",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "cadfe146c090155d8e9ff9a46802de9aec0943c6eb4d795de71584e4e8a0fda3",
+            "note": "The toolchain-only check produced its separate receipt."
+          }
+        ]
+      },
+      {
+        "relation_id": "same-state-inventory",
+        "relation_type": "same_state_revision",
+        "from_id": "e-inventory-original",
+        "to_id": "e-inventory-copy",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP03/trace/relations/same-state-inventory",
+            "source_revision": "dep-audit-r1",
+            "content_hash": "3373755dcee0ffa4aed8a891a9a77b5612cb5ef0dc59165ce3dfe976c708839f",
+            "note": "The standard reconciliation export re-emits identical inventory bytes for the unchanged project revision."
+          }
+        ]
+      }
+    ],
+    "provenance": [
+      {
+        "source_kind": "self_authored",
+        "classification": "CAPTURED_EXPLICIT",
+        "source_locator": "CP03/trace",
+        "source_revision": "dep-audit-r1",
+        "content_hash": "5a802c4516e108b89b0e10c2e046baad539a52b4d77e4a0b13b11126ad05cb94",
+        "note": "Frozen deterministic local workflow trace."
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": "task",
+      "relative_path": "bodies/task.txt",
+      "sha256": "0ecae63cadea017c31b86779caefa7844c5a489c6f853bdd9ab1261b12c520cb",
+      "kind": "context_attachment",
+      "event_id": "e-task",
+      "revision_id": "task-constraint-r1"
+    },
+    {
+      "asset_id": "inventory-original",
+      "relative_path": "bodies/inventory.txt",
+      "sha256": "3373755dcee0ffa4aed8a891a9a77b5612cb5ef0dc59165ce3dfe976c708839f",
+      "kind": "context_attachment",
+      "event_id": "e-inventory-original",
+      "revision_id": "dep-audit-r1"
+    },
+    {
+      "asset_id": "inventory-reemitted",
+      "relative_path": "bodies/inventory-reemitted.txt",
+      "sha256": "3373755dcee0ffa4aed8a891a9a77b5612cb5ef0dc59165ce3dfe976c708839f",
+      "kind": "context_attachment",
+      "event_id": "e-inventory-copy",
+      "revision_id": "dep-audit-r1"
+    },
+    {
+      "asset_id": "system",
+      "relative_path": "prompt/system.txt",
+      "sha256": "d48bfea82585aa58c4ba51458f73f1e6d70be6615812d6a1b6e55ec679e12d40",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "menu1",
+      "relative_path": "prompt/menu1.txt",
+      "sha256": "638ac2a9f500a7cc8efec32c8720b138f903e690a865061d242d2b170ce45018",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "menu2",
+      "relative_path": "prompt/menu2.txt",
+      "sha256": "0755b62da6352dff205f860ca3e6975b5c870dc6e92fa27e44d130b3af211140",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "final",
+      "relative_path": "prompt/final.txt",
+      "sha256": "ce3de5734656030a5675750c871d61038ac2ef852bc07756663db053a04fa281",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "receipt1",
+      "relative_path": "bodies/receipt1.txt",
+      "sha256": "df82948814e3851a98709fb122964ba7f3274becb87c2afb0c6c8909411123e9",
+      "kind": "environment_receipt",
+      "event_id": "e-result-inventory",
+      "revision_id": "dep-audit-r1-run-1-collect_dependency_inventory"
+    },
+    {
+      "asset_id": "receipt1-alt",
+      "relative_path": "bodies/receipt1-alt.txt",
+      "sha256": "3aa922601ace0bf89824f5624e3bc8749e03b9b64692153d39468163180b3632",
+      "kind": "environment_receipt",
+      "event_id": "e-result-skip-inventory",
+      "revision_id": "dep-audit-r1-run-1-skip_inventory"
+    },
+    {
+      "asset_id": "receipt2",
+      "relative_path": "bodies/receipt2.txt",
+      "sha256": "d832c457e33ba7cc109116f2510b8980b08b09ca3431ad4add0a426d9340ab67",
+      "kind": "environment_receipt",
+      "event_id": "e-result-verify",
+      "revision_id": "dep-audit-r1-run-2-verify_snapshot_and_constraints"
+    },
+    {
+      "asset_id": "receipt2-alt",
+      "relative_path": "bodies/receipt2-alt.txt",
+      "sha256": "bc05564184b4fcbc0fb40fca97f366a724afd9ff169f2517f13eef81ef144cd2",
+      "kind": "environment_receipt",
+      "event_id": "e-result-toolchain",
+      "revision_id": "dep-audit-r1-run-2-verify_toolchain_only"
+    }
+  ],
+  "action_menu": [
+    {
+      "action_slot": 1,
+      "action_id": "collect_dependency_inventory",
+      "action_event_id": "e-action-inventory",
+      "result_event_id": "e-result-inventory",
+      "result_asset_id": "receipt1",
+      "state_after": "inventory_ready"
+    },
+    {
+      "action_slot": 1,
+      "action_id": "skip_inventory",
+      "action_event_id": "e-action-skip-inventory",
+      "result_event_id": "e-result-skip-inventory",
+      "result_asset_id": "receipt1-alt",
+      "state_after": "inventory_skipped"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "verify_snapshot_and_constraints",
+      "action_event_id": "e-action-verify",
+      "result_event_id": "e-result-verify",
+      "result_asset_id": "receipt2",
+      "state_after": "snapshot_verified"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "verify_toolchain_only",
+      "action_event_id": "e-action-toolchain",
+      "result_event_id": "e-result-toolchain",
+      "result_asset_id": "receipt2-alt",
+      "state_after": "toolchain_only"
+    }
+  ],
+  "request_templates": [
+    {
+      "request_slot": 1,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "menu1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 2,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "menu1"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-inventory-original"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "menu2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 3,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "menu1"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-inventory-original"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "menu2"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-inventory-copy"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "final"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evaluation_key_path": "evaluation/key.json",
+  "evaluation_key_sha256": "f568dbc069bc96e2897f57e70c632116dcbc16fdaa51fca380549f5be0b177a5",
+  "assistant_output_planning_bytes": 4096,
+  "token_proof_inputs": null
+}

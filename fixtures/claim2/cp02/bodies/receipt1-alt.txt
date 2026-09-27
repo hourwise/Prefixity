@@ -1,0 +1,1 @@
+Inventory run inv-quarry-skip-001 was skipped at repository revision quarry-ledger-r1. No symbol inventory was generated or attached. The investigation cannot establish the lookup call chain from a skipped search.

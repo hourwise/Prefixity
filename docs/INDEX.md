@@ -68,6 +68,7 @@
 | [`phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_EXECUTION_RECORD.md`](phase-1/PHASE_1C_LOCAL_9B_FEASIBILITY_GATE_EXECUTION_RECORD.md) | Single local-9B gate execution: server verification, token counts 334/337/341/391, four PASS requests (3 structural + h001 BASELINE), integrity acceptance, evidence manifest and gate-result seal, measured CPU throughput, and `LOCAL_9B_FEASIBILITY_PASSED`. | Reviewing the accepted Claim-2 instrument; it permits only the offline pilot-context adequacy review. |
 | [`phase-1/PHASE_1C_PILOT_CONTEXT_ADEQUACY_REVIEW.md`](phase-1/PHASE_1C_PILOT_CONTEXT_ADEQUACY_REVIEW.md) | Offline finding that the accepted 9B instrument is competent but the existing six-case pilot lacks meaningful accumulated context; retains the cases as a dependency-safety battery and rejects them as the primary Claim-2 efficacy workload. | Reviewing the completed adequacy decision and the boundary for context-pressure workload design. |
 | [`phase-1/PHASE_1C_CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN.md`](phase-1/PHASE_1C_CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN.md) | Offline six-case proposal for a Claim-2 context-pressure cohort, four natural same-state duplicate-attachment positives and two dependency controls, with proposed three-request carried histories, using only the controlled Phase 1B.9 research policy. Includes size/token estimates, deterministic gates, exact next-step and no-inference boundary. | Reviewing the accepted design before separately authorized offline workload materialization. |
+| [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_MATERIALIZATION.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_MATERIALIZATION.md) | Six materialized offline fixtures, shared frozen-policy adapter/evaluators, 54 static projections, exact byte ledger, provenance preservation, validation, and unresolved token/context/runtime qualification. | Reviewing materialization before a separately authorized tokenization pass. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
@@ -133,13 +134,16 @@ only as a dependency-safety battery. The offline
 `CLAIM_2_WORKLOAD_DESIGN_READY`: it proposes four positive duplicate-context
 cases and two dependency controls, with actual three-request trajectories and
 deterministic evaluation. The historical battery remains separate and
-unchanged. The only next authorized task is
-`CLAIM_2_WORKLOAD_MATERIALIZATION_PREPARATION`. Exact request tokenization is a
-later separately authorized `NON_INFERENCE_CONTEXT_TOKENIZATION_PASS`; no
-fixtures, scored comparison, tokenization, or inference have been performed
-for the new design. No scored comparison has completed and no inference is
-currently authorized. The Phase 1A corpus/import evidence and the later Phase
-1B/1C results are documented in the linked closeouts and gates above.
+unchanged. Offline materialization is now complete:
+`CLAIM_2_WORKLOAD_MATERIALIZATION_READY_FOR_TOKENIZATION_REVIEW`.
+The six fixtures, deterministic three-request machinery, and 54-slot byte
+ledger exist; no model requests have run. All token-fit and reduction proofs
+remain `EXACT_TOKENIZATION_REQUIRED`. Larger-output CPU scenarios require
+practicality review. The next substantive task is a separately authorized
+`NON_INFERENCE_CONTEXT_TOKENIZATION_PASS`; this record authorizes no server
+startup, tokenization, live preparation, or inference. No scored comparison
+has completed and no inference is currently authorized. The Phase 1A
+corpus/import evidence and the later Phase 1B/1C results are documented in the linked closeouts and gates above.
 
 For history, use `git log` and [`research/PRIOR_ART.md`](research/PRIOR_ART.md)
 when the task requires provenance or prior-art context.

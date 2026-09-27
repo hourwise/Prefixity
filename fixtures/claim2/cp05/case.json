@@ -1,0 +1,698 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-workload-case",
+  "schema_version": 1,
+  "case_id": "CP05",
+  "kind": "control",
+  "planner_input": {
+    "events": [
+      {
+        "event_id": "e-catalog-initial",
+        "sequence_index": 0,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-catalog-initial",
+        "world_state_revision": "route-registry@R17",
+        "order": {
+          "logical_tick": 0,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "efd9e93f3cb6837e6a6161d58c826595b8d116c88b12690d40119df96f2eb4df",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/world/state-before.json#catalog_artifact_sha256",
+            "source_revision": "route-catalog-export@R17",
+            "content_hash": "3634d52599ddf531787c91d6b14d01dde2e5ac4c1c267ab857065e639789fdfd"
+          }
+        ]
+      },
+      {
+        "event_id": "e-inspect-action",
+        "sequence_index": 1,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-catalog-initial"
+        ],
+        "action": {
+          "action_id": "inspect_initial_catalog",
+          "tool_name": "inspect_initial_catalog",
+          "argument_hash": "fa05e6bc82e0bf34431ddca5004b33afbe96f0e2683fd250fc6929ec36e59118"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "route-registry@R17",
+        "order": {
+          "logical_tick": 1,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/workflow.md#request-1",
+            "source_revision": "workspace-r17",
+            "content_hash": "efd9e93f3cb6837e6a6161d58c826595b8d116c88b12690d40119df96f2eb4df"
+          }
+        ]
+      },
+      {
+        "event_id": "e-inspect-result",
+        "sequence_index": 2,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-catalog-initial"
+        ],
+        "action": null,
+        "result": {
+          "result_id": "r-route-inspect-017",
+          "originating_action_id": "inspect_initial_catalog",
+          "observation_hash": "2b424ac040d25e4eed01bff4ab4407b0ddabd95435811f89ef7dd1e8002dd53a",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "route-registry@R17",
+        "order": {
+          "logical_tick": 2,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/world/state-before.json#inspection-receipt",
+            "source_revision": "route-inspect-receipt-017",
+            "content_hash": "2b424ac040d25e4eed01bff4ab4407b0ddabd95435811f89ef7dd1e8002dd53a"
+          }
+        ]
+      },
+      {
+        "event_id": "e-reindex-action",
+        "sequence_index": 3,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-inspect-result"
+        ],
+        "action": {
+          "action_id": "rebuild_route_index_and_export",
+          "tool_name": "rebuild_route_index_and_export",
+          "argument_hash": "08606ca4e8d63276a582cb7fb51a3fa95d62500c09a6cbf5307c562c19f7bc74"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "route-registry@R17",
+        "order": {
+          "logical_tick": 3,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/workflow.md#reindex-operation",
+            "source_revision": "workspace-r17",
+            "content_hash": "c6cd013fdf89fbc3cde64726ff7056ae44b1364b36eaa1fb4d4f9d56c1cb26dc"
+          }
+        ]
+      },
+      {
+        "event_id": "e-reindex-result",
+        "sequence_index": 4,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-route-index-064",
+          "originating_action_id": "rebuild_route_index_and_export",
+          "observation_hash": "588976b08d47a5b9d899502a41a85a6d231c7aea002ef85354bb0be76010f747",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "route-registry@R18",
+        "order": {
+          "logical_tick": 4,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/world/state-after.json#operation-receipt",
+            "source_revision": "route-index-receipt-064",
+            "content_hash": "588976b08d47a5b9d899502a41a85a6d231c7aea002ef85354bb0be76010f747"
+          }
+        ]
+      },
+      {
+        "event_id": "e-catalog-after-reindex",
+        "sequence_index": 5,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-reindex-result"
+        ],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-catalog-after-reindex",
+        "world_state_revision": "route-registry@R18",
+        "order": {
+          "logical_tick": 5,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "efd9e93f3cb6837e6a6161d58c826595b8d116c88b12690d40119df96f2eb4df",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/world/state-after.json#catalog_artifact_sha256",
+            "source_revision": "route-catalog-export@R18",
+            "content_hash": "52fd766b382056d3099e1e08a8a2c521588f101503aa45e050755715cbf9f5ab"
+          }
+        ]
+      },
+      {
+        "event_id": "e-health-action",
+        "sequence_index": 6,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": {
+          "action_id": "read_health_only",
+          "tool_name": "read_health_only",
+          "argument_hash": "507e168dc84180d2431c5956eebfafdec1581b2a0a13b4d830ccf8cd8ead8ce3"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "route-registry@R17",
+        "order": {
+          "logical_tick": 6,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/workflow.md#alternate-action-1",
+            "source_revision": "workspace-r17",
+            "content_hash": "507e168dc84180d2431c5956eebfafdec1581b2a0a13b4d830ccf8cd8ead8ce3"
+          }
+        ]
+      },
+      {
+        "event_id": "e-health-result",
+        "sequence_index": 7,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-route-health-017",
+          "originating_action_id": "read_health_only",
+          "observation_hash": "001275fddebab9d49d89e305240baee7a174e4c730cf1dbf132c070adba4c229",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "route-registry@R17",
+        "order": {
+          "logical_tick": 7,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/workflow.md#alternate-result-1",
+            "source_revision": "route-health-receipt-017",
+            "content_hash": "001275fddebab9d49d89e305240baee7a174e4c730cf1dbf132c070adba4c229"
+          }
+        ]
+      },
+      {
+        "event_id": "e-health-summary-action",
+        "sequence_index": 8,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-inspect-result"
+        ],
+        "action": {
+          "action_id": "read_health_summary",
+          "tool_name": "read_health_summary",
+          "argument_hash": "c3e07aba9e63f8f80010c533e8c0ae44360c2653b86cf624a85bb5587fd46a9d"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "route-registry@R18",
+        "order": {
+          "logical_tick": 8,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/workflow.md#alternate-action-2",
+            "source_revision": "workspace-r18",
+            "content_hash": "c3e07aba9e63f8f80010c533e8c0ae44360c2653b86cf624a85bb5587fd46a9d"
+          }
+        ]
+      },
+      {
+        "event_id": "e-health-summary-result",
+        "sequence_index": 9,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-route-health-summary-018",
+          "originating_action_id": "read_health_summary",
+          "observation_hash": "ccb7fa0d23a44a127bf13f305aff0429bf1b1438f686bd631d3fe772d44b8eef",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "route-registry@R18",
+        "order": {
+          "logical_tick": 9,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/workflow.md#alternate-result-2",
+            "source_revision": "route-health-summary-018",
+            "content_hash": "ccb7fa0d23a44a127bf13f305aff0429bf1b1438f686bd631d3fe772d44b8eef"
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "relation_id": "produce-inspect",
+        "relation_type": "produces",
+        "from_id": "inspect_initial_catalog",
+        "to_id": "r-route-inspect-017",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/world/state-before.json#inspect-producer",
+            "source_revision": "workspace-r17",
+            "content_hash": "2b424ac040d25e4eed01bff4ab4407b0ddabd95435811f89ef7dd1e8002dd53a"
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-reindex",
+        "relation_type": "produces",
+        "from_id": "rebuild_route_index_and_export",
+        "to_id": "r-route-index-064",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/world/state-after.json#reindex-producer",
+            "source_revision": "workspace-r18",
+            "content_hash": "588976b08d47a5b9d899502a41a85a6d231c7aea002ef85354bb0be76010f747"
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-health",
+        "relation_type": "produces",
+        "from_id": "read_health_only",
+        "to_id": "r-route-health-017",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/workflow.md#health-producer",
+            "source_revision": "workspace-r17",
+            "content_hash": "001275fddebab9d49d89e305240baee7a174e4c730cf1dbf132c070adba4c229"
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-health-summary",
+        "relation_type": "produces",
+        "from_id": "read_health_summary",
+        "to_id": "r-route-health-summary-018",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp05/workflow.md#health-summary-producer",
+            "source_revision": "workspace-r18",
+            "content_hash": "ccb7fa0d23a44a127bf13f305aff0429bf1b1438f686bd631d3fe772d44b8eef"
+          }
+        ]
+      }
+    ],
+    "provenance": [
+      {
+        "source_kind": "self_authored",
+        "classification": "CAPTURED_EXPLICIT",
+        "source_locator": "cp05/workflow.md",
+        "source_revision": "cp05-route-world-v1",
+        "content_hash": "05e7df24933b4fd6d6da9a99bfdd5e586eecc00284b252b5881f4f9d53dba73a"
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": "system",
+      "relative_path": "prompt/system.txt",
+      "sha256": "2ce5efaf85ffef41e28188797606bf9641e6865fb0aa2775acace5708e33d2aa",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "task",
+      "relative_path": "prompt/task.txt",
+      "sha256": "d8587318e6b03d63ec4fb29f06c86ff81bcc4691533c0e0e8cd0966b6a1ab897",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "request1",
+      "relative_path": "prompt/request1.txt",
+      "sha256": "8f119ed80afddea9459f438018a7c37f6849eb96f5e223b8c7e0761da02f305c",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "request2",
+      "relative_path": "prompt/request2.txt",
+      "sha256": "c1d3fa588979f4015276153fd7255ad0d4fff575465f26d7c1ad56207de45d12",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "request3",
+      "relative_path": "prompt/request3.txt",
+      "sha256": "1d73a81396d812e5ad89c7e455d91f6be60502c09a4bd7ee0bdc062bef7dd6df",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "catalog_initial",
+      "relative_path": "bodies/route_catalog_initial.json",
+      "sha256": "efd9e93f3cb6837e6a6161d58c826595b8d116c88b12690d40119df96f2eb4df",
+      "kind": "context_attachment",
+      "event_id": "e-catalog-initial",
+      "revision_id": "route-catalog-export@R17"
+    },
+    {
+      "asset_id": "catalog_after",
+      "relative_path": "bodies/route_catalog_after_reindex.json",
+      "sha256": "efd9e93f3cb6837e6a6161d58c826595b8d116c88b12690d40119df96f2eb4df",
+      "kind": "context_attachment",
+      "event_id": "e-catalog-after-reindex",
+      "revision_id": "route-catalog-export@R18"
+    },
+    {
+      "asset_id": "receipt_inspect",
+      "relative_path": "bodies/receipt-inspect.txt",
+      "sha256": "2b424ac040d25e4eed01bff4ab4407b0ddabd95435811f89ef7dd1e8002dd53a",
+      "kind": "environment_receipt",
+      "event_id": "e-inspect-result",
+      "revision_id": "route-inspect-receipt-017"
+    },
+    {
+      "asset_id": "receipt_health",
+      "relative_path": "bodies/receipt-health.txt",
+      "sha256": "001275fddebab9d49d89e305240baee7a174e4c730cf1dbf132c070adba4c229",
+      "kind": "environment_receipt",
+      "event_id": "e-health-result",
+      "revision_id": "route-health-receipt-017"
+    },
+    {
+      "asset_id": "receipt_reindex",
+      "relative_path": "bodies/receipt-reindex.txt",
+      "sha256": "588976b08d47a5b9d899502a41a85a6d231c7aea002ef85354bb0be76010f747",
+      "kind": "environment_receipt",
+      "event_id": "e-reindex-result",
+      "revision_id": "route-index-receipt-064"
+    },
+    {
+      "asset_id": "receipt_health_summary",
+      "relative_path": "bodies/receipt-health-summary.txt",
+      "sha256": "ccb7fa0d23a44a127bf13f305aff0429bf1b1438f686bd631d3fe772d44b8eef",
+      "kind": "environment_receipt",
+      "event_id": "e-health-summary-result",
+      "revision_id": "route-health-summary-018"
+    }
+  ],
+  "action_menu": [
+    {
+      "action_slot": 1,
+      "action_id": "inspect_initial_catalog",
+      "action_event_id": "e-inspect-action",
+      "result_event_id": "e-inspect-result",
+      "result_asset_id": "receipt_inspect",
+      "state_after": "route_registry_r17_inspected"
+    },
+    {
+      "action_slot": 1,
+      "action_id": "read_health_only",
+      "action_event_id": "e-health-action",
+      "result_event_id": "e-health-result",
+      "result_asset_id": "receipt_health",
+      "state_after": "health_only_unverified"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "rebuild_route_index_and_export",
+      "action_event_id": "e-reindex-action",
+      "result_event_id": "e-reindex-result",
+      "result_asset_id": "receipt_reindex",
+      "state_after": "route_registry_r18_reindexed"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "read_health_summary",
+      "action_event_id": "e-health-summary-action",
+      "result_event_id": "e-health-summary-result",
+      "result_asset_id": "receipt_health_summary",
+      "state_after": "route_health_summary_only"
+    }
+  ],
+  "request_templates": [
+    {
+      "request_slot": 1,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request1"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-catalog-initial"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 2,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request1"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-catalog-initial"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "request2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 3,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request1"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-catalog-initial"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "request2"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "request3"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-catalog-after-reindex"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evaluation_key_path": "evaluation/key.json",
+  "evaluation_key_sha256": "6cf63794c4ca309ff480f7260a7f5f64b04de85d1bd45ad5923534d13e324c9a",
+  "assistant_output_planning_bytes": 4096,
+  "token_proof_inputs": null
+}

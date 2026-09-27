@@ -1,0 +1,2 @@
+# Pinned UTF-8 assets and manifests must retain their exact bytes on checkout.
+* -text

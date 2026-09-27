@@ -379,25 +379,58 @@ fn frozen_planner_baseline(cases: &[HeldOutCase]) -> Result<FrozenPlannerBaselin
     })
 }
 
-fn research_policy(trace: &BlindedTrace) -> ResearchPolicyDecision {
-    if let Some(target) = exact_duplicate_target(trace) {
+/// Planner-rule candidates exposed to the Claim-2 materialization adapter.
+///
+/// These are computed by the same predicates used by `research_policy`; they
+/// are evidence for fixture admission, not a second policy or a ranking input.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ResearchPolicyCandidates {
+    pub exact_duplicate_prune: Vec<ResearchPolicyCandidate>,
+    pub explicit_supersession_defer: Vec<ResearchPolicyCandidate>,
+    pub same_zone_protocol_relocate: Vec<ResearchPolicyCandidate>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ResearchPolicyCandidate {
+    pub class: ResearchInterventionClass,
+    pub target_event_id: String,
+    pub rule: &'static str,
+    pub evidence_relation_ids: Vec<String>,
+    pub matching_earlier_event_ids: Vec<String>,
+    pub content_hash: Option<String>,
+    pub sequence_index: u32,
+}
+
+pub(crate) fn research_policy_candidates(trace: &BlindedTrace) -> ResearchPolicyCandidates {
+    ResearchPolicyCandidates {
+        exact_duplicate_prune: exact_duplicate_candidates(trace),
+        explicit_supersession_defer: superseded_candidates(trace),
+        same_zone_protocol_relocate: relocation_candidates(trace),
+    }
+}
+
+pub(crate) fn research_policy(trace: &BlindedTrace) -> ResearchPolicyDecision {
+    if let Some(candidate) = exact_duplicate_candidates(trace)
+        .into_iter()
+        .max_by_key(|candidate| candidate.sequence_index)
+    {
         return ResearchPolicyDecision {
             class: ResearchInterventionClass::Prune,
-            target_event_id: Some(target),
+            target_event_id: Some(candidate.target_event_id),
             rule: "EXACT_DUPLICATE_PRUNE".to_string(),
         };
     }
-    if let Some(target) = superseded_target(trace) {
+    if let Some(candidate) = superseded_candidates(trace).into_iter().next() {
         return ResearchPolicyDecision {
             class: ResearchInterventionClass::Defer,
-            target_event_id: Some(target),
+            target_event_id: Some(candidate.target_event_id),
             rule: "EXPLICIT_SUPERSESSION_DEFER".to_string(),
         };
     }
-    if let Some(target) = relocation_target(trace) {
+    if let Some(candidate) = relocation_candidates(trace).into_iter().next() {
         return ResearchPolicyDecision {
             class: ResearchInterventionClass::RelocateCandidate,
-            target_event_id: Some(target),
+            target_event_id: Some(candidate.target_event_id),
             rule: "SAME_ZONE_PROTOCOL_RELOCATE".to_string(),
         };
     }
@@ -408,7 +441,7 @@ fn research_policy(trace: &BlindedTrace) -> ResearchPolicyDecision {
     }
 }
 
-fn exact_duplicate_target(trace: &BlindedTrace) -> Option<String> {
+fn exact_duplicate_candidates(trace: &BlindedTrace) -> Vec<ResearchPolicyCandidate> {
     let mut candidates = Vec::new();
     for target in trace
         .events
@@ -418,39 +451,55 @@ fn exact_duplicate_target(trace: &BlindedTrace) -> Option<String> {
         let Some(hash) = &target.content_hash else {
             continue;
         };
-        let has_same_state = trace.relations.iter().any(|relation| {
-            relation.relation_type == RelationType::SameStateRevision
-                && ((relation.from_id == target.event_id
-                    && trace.events.iter().any(|event| {
-                        event.event_id == relation.to_id
-                            && event.content_hash.as_ref() == Some(hash)
-                    }))
-                    || (relation.to_id == target.event_id
+        let same_state_relations = trace
+            .relations
+            .iter()
+            .filter(|relation| {
+                relation.relation_type == RelationType::SameStateRevision
+                    && ((relation.from_id == target.event_id
                         && trace.events.iter().any(|event| {
-                            event.event_id == relation.from_id
+                            event.event_id == relation.to_id
                                 && event.content_hash.as_ref() == Some(hash)
-                        })))
-        });
-        if !has_same_state
+                        }))
+                        || (relation.to_id == target.event_id
+                            && trace.events.iter().any(|event| {
+                                event.event_id == relation.from_id
+                                    && event.content_hash.as_ref() == Some(hash)
+                            })))
+            })
+            .map(|relation| relation.relation_id.clone())
+            .collect::<Vec<_>>();
+        if same_state_relations.is_empty()
             || has_consumer(trace, target)
             || has_protected_relation(trace, &target.event_id)
         {
             continue;
         }
-        if trace.events.iter().any(|earlier| {
-            earlier.sequence_index < target.sequence_index
-                && earlier.content_hash.as_ref() == Some(hash)
-        }) {
-            candidates.push(target);
+        let matching_earlier_event_ids = trace
+            .events
+            .iter()
+            .filter(|earlier| {
+                earlier.sequence_index < target.sequence_index
+                    && earlier.content_hash.as_ref() == Some(hash)
+            })
+            .map(|earlier| earlier.event_id.clone())
+            .collect::<Vec<_>>();
+        if !matching_earlier_event_ids.is_empty() {
+            candidates.push(ResearchPolicyCandidate {
+                class: ResearchInterventionClass::Prune,
+                target_event_id: target.event_id.clone(),
+                rule: "EXACT_DUPLICATE_PRUNE",
+                evidence_relation_ids: same_state_relations,
+                matching_earlier_event_ids,
+                content_hash: Some(hash.clone()),
+                sequence_index: target.sequence_index,
+            });
         }
     }
     candidates
-        .into_iter()
-        .max_by_key(|event| event.sequence_index)
-        .map(|event| event.event_id.clone())
 }
 
-fn superseded_target(trace: &BlindedTrace) -> Option<String> {
+fn superseded_candidates(trace: &BlindedTrace) -> Vec<ResearchPolicyCandidate> {
     trace
         .relations
         .iter()
@@ -485,15 +534,37 @@ fn superseded_target(trace: &BlindedTrace) -> Option<String> {
                 && !has_consumer(trace, older)
                 && !has_protected_relation(trace, &older.event_id)
             {
-                Some(older.event_id.clone())
+                Some(ResearchPolicyCandidate {
+                    class: ResearchInterventionClass::Defer,
+                    target_event_id: older.event_id.clone(),
+                    rule: "EXPLICIT_SUPERSESSION_DEFER",
+                    evidence_relation_ids: trace
+                        .relations
+                        .iter()
+                        .filter(|protocol| {
+                            protocol.relation_type == RelationType::ProtocolPrecedes
+                                && protocol.from_id == newer.event_id
+                                && (protocol.to_id == action.event_id
+                                    || action
+                                        .action_id
+                                        .as_ref()
+                                        .is_some_and(|id| protocol.to_id == *id))
+                        })
+                        .map(|protocol| protocol.relation_id.clone())
+                        .chain(std::iter::once(relation.relation_id.clone()))
+                        .collect(),
+                    matching_earlier_event_ids: vec![newer.event_id.clone()],
+                    content_hash: older.content_hash.clone(),
+                    sequence_index: older.sequence_index,
+                })
             } else {
                 None
             }
         })
-        .next()
+        .collect()
 }
 
-fn relocation_target(trace: &BlindedTrace) -> Option<String> {
+fn relocation_candidates(trace: &BlindedTrace) -> Vec<ResearchPolicyCandidate> {
     trace
         .relations
         .iter()
@@ -522,9 +593,17 @@ fn relocation_target(trace: &BlindedTrace) -> Option<String> {
             {
                 return None;
             }
-            Some(source.event_id.clone())
+            Some(ResearchPolicyCandidate {
+                class: ResearchInterventionClass::RelocateCandidate,
+                target_event_id: source.event_id.clone(),
+                rule: "SAME_ZONE_PROTOCOL_RELOCATE",
+                evidence_relation_ids: vec![relation.relation_id.clone()],
+                matching_earlier_event_ids: Vec::new(),
+                content_hash: source.content_hash.clone(),
+                sequence_index: source.sequence_index,
+            })
         })
-        .next()
+        .collect()
 }
 
 fn references_event(action: &BlindedEvent, source: &BlindedEvent) -> bool {
@@ -588,7 +667,7 @@ fn has_conflicting_relation(
     })
 }
 
-fn apply_decision(
+pub(crate) fn apply_decision(
     input: &PlannerInput,
     decision: &ResearchPolicyDecision,
 ) -> Result<PlannerInput, BenchmarkError> {
@@ -822,7 +901,7 @@ fn zone_for(event_type: EventType) -> &'static str {
     }
 }
 
-fn blinded_trace(input: &PlannerInput) -> Result<BlindedTrace, BenchmarkError> {
+pub(crate) fn blinded_trace(input: &PlannerInput) -> Result<BlindedTrace, BenchmarkError> {
     let events = input
         .events
         .iter()

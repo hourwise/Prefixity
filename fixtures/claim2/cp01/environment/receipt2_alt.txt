@@ -1,0 +1,1 @@
+Unit-check receipt TEST-CP01-UNIT-03 on cp01-r41. Parsed backoff_ms=125 and observed conversion=0.125 seconds; connect_timeout_ms=250 and request_timeout_ms=1800 remain millisecond inputs. Result: PASS. The retry regression was not executed; this check does not provide its observed attempt count. Normal export packet recorded the unit check.

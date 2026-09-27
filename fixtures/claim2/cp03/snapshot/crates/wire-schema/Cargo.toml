@@ -1,0 +1,9 @@
+[package]
+name = "wire-schema"
+version = "2.4.1"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"

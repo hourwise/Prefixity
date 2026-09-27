@@ -1,0 +1,1 @@
+Health-only receipt rcpt-health-017. No route catalog was inspected; workspace_snapshot=workspace-r17.

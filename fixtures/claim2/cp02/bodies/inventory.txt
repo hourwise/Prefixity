@@ -1,0 +1,71 @@
+repository=quarry-ledger
+revision=quarry-ledger-r1
+query_id=symbol-map-v1
+source_files=21
+source_sha256=56c6e50d50c8cc3bc0f4ea717e009e2b744f0f7df40ea4dd2ba838908310a8a2
+entries:
+src/bloom.rs:3: declaration: BloomFilter
+src/bloom.rs:9: declaration: BloomFilter::new
+src/bloom.rs:14: declaration: BloomFilter::insert
+src/bloom.rs:20: declaration: BloomFilter::might_contain
+src/builder.rs:5: declaration: IndexBuilder
+src/builder.rs:11: declaration: IndexBuilder::add_record
+src/builder.rs:16: declaration: IndexBuilder::finish
+src/cache.rs:8: declaration: IndexCache
+src/cache.rs:14: declaration: IndexCache::get_or_load
+src/cache.rs:25: qualified-call: Arc::new
+src/cache.rs:34: declaration: IndexCache::evict
+src/checksum.rs:2: declaration: hash_key
+src/checksum.rs:9: declaration: fingerprint
+src/compaction.rs:3: declaration: CompactionPlan
+src/compaction.rs:9: declaration: plan_compaction
+src/error.rs:5: declaration: LookupError
+src/error.rs:13: declaration: LookupError::fmt
+src/error.rs:26: declaration: Result
+src/filter.rs:3: declaration: RecordPredicate
+src/filter.rs:9: declaration: RecordPredicate::starts_with
+src/filter.rs:14: declaration: RecordPredicate::matches
+src/index.rs:9: declaration: IndexSnapshot
+src/index.rs:17: declaration: IndexSnapshot::new
+src/index.rs:32: declaration: IndexSnapshot::lookup
+src/index.rs:52: declaration: IndexSnapshot::segment_path
+src/index.rs:57: declaration: IndexSnapshot::index_path
+src/lib.rs:30: declaration: open
+src/lib.rs:31: qualified-call: Library::open
+src/main.rs:4: declaration: main
+src/main.rs:6: qualified-call: PathBuf::from
+src/main.rs:9: qualified-call: LookupQuery::new
+src/manifest.rs:3: declaration: SegmentManifest
+src/manifest.rs:12: declaration: SegmentManifest::validate
+src/manifest.rs:19: declaration: SegmentManifest::segment_name
+src/metrics.rs:3: declaration: ReadMetrics
+src/metrics.rs:11: declaration: ReadMetrics::record_cache_hit
+src/metrics.rs:17: declaration: ReadMetrics::record_segment_load
+src/pagination.rs:3: declaration: PageToken
+src/pagination.rs:9: declaration: next_page
+src/query.rs:5: declaration: LookupQuery
+src/query.rs:11: declaration: LookupQuery::new
+src/query.rs:23: declaration: LookupQuery::key
+src/record.rs:3: declaration: LedgerRecord
+src/record.rs:10: declaration: LookupOutcome
+src/routing.rs:3: declaration: KeyRoute
+src/routing.rs:10: declaration: route_key
+src/service.rs:10: declaration: Library
+src/service.rs:17: declaration: Library::open
+src/service.rs:21: qualified-call: Path::new
+src/service.rs:23: qualified-call: IndexSnapshot::new
+src/service.rs:26: qualified-call: SegmentStore::default
+src/service.rs:31: declaration: Library::find_record
+src/service.rs:37: declaration: Library::find_raw
+src/service.rs:38: qualified-call: LookupQuery::new
+src/snapshot.rs:3: declaration: SnapshotId
+src/snapshot.rs:10: declaration: SnapshotId::from_manifest
+src/snapshot.rs:18: declaration: SnapshotId::matches
+src/store.rs:10: declaration: SegmentStore
+src/store.rs:16: declaration: SegmentStore::read_segment
+src/store.rs:26: declaration: SegmentStore::decode_segment
+src/transaction.rs:3: declaration: SegmentWriteTxn
+src/transaction.rs:10: declaration: SegmentWriteTxn::begin
+src/transaction.rs:15: declaration: SegmentWriteTxn::commit_name
+src/version.rs:3: declaration: FormatVersion
+src/version.rs:10: declaration: FormatVersion::supported_by

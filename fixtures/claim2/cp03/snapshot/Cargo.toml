@@ -1,0 +1,21 @@
+[workspace]
+members = [
+  "crates/wire-schema",
+  "crates/segment-format",
+  "crates/snapshot-index",
+  "crates/cache-engine",
+  "crates/query-router",
+  "crates/recovery-journal",
+  "crates/audit-cli",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.78"
+license = "MIT"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"

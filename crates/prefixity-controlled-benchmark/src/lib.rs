@@ -26,6 +26,7 @@ mod oracle;
 mod paired_mutation;
 mod phase1b9;
 mod phase1c_capable_model_gate;
+mod phase1c_claim2_workload;
 mod phase1c_executable_identity;
 mod phase1c_h001;
 mod phase1c_h001_v2;
@@ -180,8 +181,8 @@ pub use paired_mutation::{
 pub use phase1b9::{
     blinded_trace_json, canonical_phase1b9_report_json, preregistration_hash, run_phase1b9_study,
     BlindedEvent, BlindedRelation, BlindedTrace, FrozenPlannerBaseline, Phase1b9DecisionRecord,
-    Phase1b9Report, ResearchInterventionClass, ResearchPolicyDecision, PHASE_1B9_POLICY_VERSION,
-    PHASE_1B9_SCOPE,
+    Phase1b9Report, ResearchInterventionClass, ResearchPolicyCandidate, ResearchPolicyCandidates,
+    ResearchPolicyDecision, PHASE_1B9_POLICY_VERSION, PHASE_1B9_SCOPE,
 };
 pub use phase1c_capable_model_gate::{
     classify_local_9b_gate, derive_local_9b_gate_spec, dry_run_local_9b_gate,
@@ -190,6 +191,22 @@ pub use phase1c_capable_model_gate::{
     CapableModelGateSpec, LOCAL_9B_BOUND_SOURCES, LOCAL_9B_CONTRACT_PATH,
     LOCAL_9B_FEASIBILITY_FAILED, LOCAL_9B_FEASIBILITY_PASSED, LOCAL_9B_GATE_EVIDENCE_ROOT,
     LOCAL_9B_GATE_FROZEN_STAGE_ROOT, LOCAL_9B_GATE_IDENTITY_PATH, LOCAL_9B_GATE_TRAVERSAL_ROOT,
+};
+pub use phase1c_claim2_workload::{
+    apply as apply_claim2_decision, compare_paired_arms, evaluate as evaluate_claim2_arm,
+    load_case as load_claim2_case, materiality_result, precheck_cohort as precheck_claim2_cohort,
+    project_trace as project_claim2_trace, render as render_claim2_request,
+    select as select_claim2_decision, token_guard as claim2_token_guard,
+    validate_case as validate_claim2_case, Claim2ActionTransition, Claim2ArmState, Claim2AssetKind,
+    Claim2CaseKind, Claim2CaseManifest, Claim2EnvironmentReceipt, Claim2Evaluation,
+    Claim2EvaluationKey, Claim2MaterialityResult, Claim2PairComparison, Claim2PinnedAsset,
+    Claim2PrecheckSlot, Claim2ProjectedTrace, Claim2ProjectionMode, Claim2PromptMessage,
+    Claim2PromptPart, Claim2PromptRole, Claim2ReceiptSize, Claim2RenderedMessage,
+    Claim2RenderedRequest, Claim2RequestMetrics, Claim2RequestTemplate, Claim2Selection,
+    Claim2SlotRecord, Claim2SlotStatus, Claim2TokenCountStatus, Claim2TokenGuardResult,
+    Claim2TokenProofInputs, LoadedClaim2Case, CLAIM2_CASE_SCHEMA_ID, CLAIM2_CASE_SCHEMA_VERSION,
+    CLAIM2_CONTEXT_TOKENS, CLAIM2_INPUT_PREFLIGHT_TOKENS, CLAIM2_MAX_OUTPUT_TOKENS,
+    CLAIM2_MODEL_LABEL,
 };
 pub use phase1c_executable_identity::{
     freeze_copy, inspect as inspect_executable_identity, validate_frozen_executable_binding,

@@ -1,0 +1,13 @@
+{
+  "snapshot_schema": "prefixity.local.world-snapshot.v1",
+  "workspace": "marketplace-edge",
+  "workspace_snapshot_id": "workspace-r17",
+  "world_state_revision": "route-registry@R17",
+  "source_revision": "route-catalog-export@R17",
+  "route_index_generation": 71,
+  "last_route_catalog_operation": "publish-route-catalog-063",
+  "catalog_artifact_sha256": "efd9e93f3cb6837e6a6161d58c826595b8d116c88b12690d40119df96f2eb4df",
+  "catalog_routes": 10,
+  "active_catalog_revision": "catalog-object-6f3a",
+  "note": "catalog object unchanged at snapshot boundary"
+}

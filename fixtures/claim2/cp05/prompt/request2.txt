@@ -1,0 +1,1 @@
+Verify the transition after inspection. Choose one action. The normal re-index workflow can re-emit the catalog after recording the operation. Allowed actions: {"action_id":"rebuild_route_index_and_export"} or {"action_id":"read_health_summary"}.

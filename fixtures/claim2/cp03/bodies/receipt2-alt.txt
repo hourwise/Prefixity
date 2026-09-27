@@ -1,0 +1,1 @@
+Toolchain-only check verify-dep-audit-toolchain-001 completed at revision dep-audit-r1. The Rust toolchain pin and CI matrix were read, but package version compatibility and inventory-tree identity were not verified.

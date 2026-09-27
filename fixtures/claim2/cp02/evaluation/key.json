@@ -1,0 +1,52 @@
+{
+  "expected_action_ids": [
+    "build_symbol_inventory",
+    "inspect_resolution_chain"
+  ],
+  "expected_states_after_action": [
+    "inventory_ready",
+    "callsites_opened"
+  ],
+  "expected_result_event_ids": [
+    "e-result-inventory",
+    "e-result-callsite"
+  ],
+  "expected_final_answer": {
+    "entry_symbol": "Library::find_record",
+    "entry_path": "src/service.rs",
+    "index_symbol": "IndexSnapshot::lookup",
+    "index_path": "src/index.rs",
+    "store_symbol": "SegmentStore::read_segment",
+    "store_path": "src/store.rs",
+    "cache_symbol": "IndexCache::get_or_load",
+    "cache_path": "src/cache.rs",
+    "repository_revision": "quarry-ledger-r1",
+    "query_id": "symbol-map-v1"
+  },
+  "required_event_ids": [
+    "e-task",
+    "e-inventory-original",
+    "e-result-inventory",
+    "e-result-callsite",
+    "e-read-service",
+    "e-read-index",
+    "e-read-store",
+    "e-read-cache"
+  ],
+  "required_relation_ids": [
+    "produce-inventory",
+    "produce-callsite",
+    "callchain-index",
+    "callchain-store",
+    "callchain-cache"
+  ],
+  "critical_event_ids": [
+    "e-task",
+    "e-inventory-original",
+    "e-result-callsite",
+    "e-read-service",
+    "e-read-index",
+    "e-read-store",
+    "e-read-cache"
+  ]
+}

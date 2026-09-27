@@ -1,0 +1,109 @@
+# Edge Router source/config export, pinned revision cp04-r41
+
+# Export is the native initial-inspection attachment for CP04.
+
+## source/runtime.toml
+
+[deployment]
+active_release_channel = "stable"
+source_revision = "R41"
+
+[authorization]
+account_scope_required = true
+strict_tenant_match = true
+
+[routing]
+mode = "compatibility"
+allow_quick_route = false
+
+## source/branch_rules.py
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class RuntimeState:
+    active_release_channel: str
+    source_revision: str
+    account_scope_required: bool
+    strict_tenant_match: bool
+    routing_mode: str
+    allow_quick_route: bool
+
+
+def check_account_scope(state: RuntimeState, request_tenant: str, token_tenant: str) -> bool:
+    if not state.account_scope_required:
+        return True
+    return bool(request_tenant) and request_tenant == token_tenant
+
+
+def release_is_recoverable(state: RuntimeState) -> bool:
+    return (state.active_release_channel == "stable" and state.source_revision == "R41"
+            and state.account_scope_required and state.strict_tenant_match)
+
+
+def select_routing_mode(state: RuntimeState) -> str:
+    if state.allow_quick_route and state.account_scope_required:
+        return "quick"
+    return "compatibility"
+
+## source/test_branch_invariants.py
+
+import unittest
+from branch_rules import RuntimeState, check_account_scope, release_is_recoverable
+
+
+class BranchInvariantTests(unittest.TestCase):
+    def test_recovered_release_keeps_account_scope(self) -> None:
+        state = RuntimeState("stable", "R41", True, True, "compatibility", False)
+        self.assertTrue(release_is_recoverable(state))
+        self.assertTrue(check_account_scope(state, "tenant-a", "tenant-a"))
+        self.assertFalse(check_account_scope(state, "tenant-a", "tenant-b"))
+
+## source/branch-policy.toml
+
+[recovery]
+restore_origin_on_probe_failure = true
+require_clean_worktree_after_restore = true
+source_revision_is_immutable = true
+
+[acceptance]
+require_account_scope = true
+require_strict_tenant_match = true
+
+## source/recovery.py
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class RestoreReceipt:
+    branch: str
+    source_revision: str
+    dirty: bool
+    candidate_failure_id: str
+
+
+def restored_origin_is_valid(receipt: RestoreReceipt, expected_revision: str) -> bool:
+    return (receipt.branch == "stable" and receipt.source_revision == expected_revision
+            and receipt.dirty is False and bool(receipt.candidate_failure_id))
+
+## source/test_recovery.py
+
+import unittest
+from recovery import RestoreReceipt, restored_origin_is_valid
+
+
+class RecoveryTests(unittest.TestCase):
+    def test_restore_returns_exact_origin_and_keeps_failure_record(self) -> None:
+        receipt = RestoreReceipt("stable", "R41", False, "BRANCH-CP04-PROBE-42")
+        self.assertTrue(restored_origin_is_valid(receipt, "R41"))
+        self.assertFalse(restored_origin_is_valid(receipt, "R42"))
+
+## source/recovery-protocol.md
+
+A candidate branch is accepted only when account scope remains required and a
+request tenant must match the credential tenant. A failed bounded probe restores
+the exact source revision and leaves the worktree clean. The recovery packet
+reports the candidate failure and the current restored state; it reattaches the
+original revision as a native context message for the next request.

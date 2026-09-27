@@ -1,0 +1,740 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-workload-case",
+  "schema_version": 1,
+  "case_id": "CP04",
+  "kind": "positive",
+  "planner_input": {
+    "events": [
+      {
+        "event_id": "e-task",
+        "sequence_index": 0,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-task",
+        "world_state_revision": "CP04-task-v1",
+        "order": null,
+        "content_hash": "1af736cc7d41b13fd5d74ca9c126120a5d503b4456889768204052a7c524d1ba",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixtures/claim2/cp04/bodies/task_message.txt",
+            "source_revision": "CP04-task-v1",
+            "content_hash": "1af736cc7d41b13fd5d74ca9c126120a5d503b4456889768204052a7c524d1ba",
+            "note": "Original self-authored user task, frozen before outcomes."
+          }
+        ]
+      },
+      {
+        "event_id": "e-source",
+        "sequence_index": 1,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-task"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-source",
+        "world_state_revision": "cp04-r41",
+        "order": null,
+        "content_hash": "de35a0d6e94711674f8ac039debbc318324077bc397bf4cf665770e0cbaaf5fe",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "snapshot://cp04/cp04-r41/full-source-export",
+            "source_revision": "cp04-r41",
+            "content_hash": "de35a0d6e94711674f8ac039debbc318324077bc397bf4cf665770e0cbaaf5fe",
+            "note": "Complete local source/config export attached by the initial inspection workflow."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action1",
+        "sequence_index": 2,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-task",
+          "e-source"
+        ],
+        "action": {
+          "action_id": "run_candidate_guardrail_probe",
+          "tool_name": "run_candidate_guardrail_probe",
+          "argument_hash": "456e9ae377f1798f532485b654b70fafd6922ed5d21cc708944390bdaef8c5e9"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "CP04_START_R41",
+        "order": null,
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixture-world://cp04/menu/1/run_candidate_guardrail_probe",
+            "source_revision": "world-v1",
+            "note": "Finite deterministic action option frozen in the local environment menu."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result1",
+        "sequence_index": 3,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action1"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-result1",
+          "originating_action_id": "run_candidate_guardrail_probe",
+          "observation_hash": "6ab3eb54f41ecf9ff1ba4a38b147a16c91f6425b073bd98357c7a98252546b69",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "candidate_failed_origin_restored",
+        "order": null,
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixtures/claim2/cp04/environment/receipt1.txt",
+            "source_revision": "world-v1",
+            "content_hash": "6ab3eb54f41ecf9ff1ba4a38b147a16c91f6425b073bd98357c7a98252546b69",
+            "note": "Deterministic local environment receipt for this one finite action."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action1-alt",
+        "sequence_index": 4,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-task",
+          "e-source"
+        ],
+        "action": {
+          "action_id": "inspect_branch_topology",
+          "tool_name": "inspect_branch_topology",
+          "argument_hash": "bb6021972f8865cd67563c8dc70d251f28f2d5e56b343c3e63e03ac251e7f559"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "CP04_START_R41",
+        "order": null,
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixture-world://cp04/menu/1/inspect_branch_topology",
+            "source_revision": "world-v1",
+            "note": "Finite deterministic action option frozen in the local environment menu."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result1-alt",
+        "sequence_index": 5,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action1-alt"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-result1-alt",
+          "originating_action_id": "inspect_branch_topology",
+          "observation_hash": "1dc884db1cf2b63aeb0ab72355dd2034eaf6402e56efb07402bd92ffef75d043",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "branch_topology_read",
+        "order": null,
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixtures/claim2/cp04/environment/receipt1_alt.txt",
+            "source_revision": "world-v1",
+            "content_hash": "1dc884db1cf2b63aeb0ab72355dd2034eaf6402e56efb07402bd92ffef75d043",
+            "note": "Deterministic local environment receipt for this one finite action."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action2",
+        "sequence_index": 6,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-result1"
+        ],
+        "action": {
+          "action_id": "verify_restored_state",
+          "tool_name": "verify_restored_state",
+          "argument_hash": "ab45e594f3784020299e6434e788299b0d071b24d1005b528ab56841deaac40a"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "CP04_START_R41",
+        "order": null,
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixture-world://cp04/menu/2/verify_restored_state",
+            "source_revision": "world-v1",
+            "note": "Finite deterministic action option frozen in the local environment menu."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result2",
+        "sequence_index": 7,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action2"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-result2",
+          "originating_action_id": "verify_restored_state",
+          "observation_hash": "e68f339375c2fe0c36583226e3e35db64e63407574ac7ec7d44d89b0d34ec874",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "restored_origin_verified",
+        "order": null,
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixtures/claim2/cp04/environment/receipt2.txt",
+            "source_revision": "world-v1",
+            "content_hash": "e68f339375c2fe0c36583226e3e35db64e63407574ac7ec7d44d89b0d34ec874",
+            "note": "Deterministic local environment receipt for this one finite action."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action2-alt",
+        "sequence_index": 8,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-result1"
+        ],
+        "action": {
+          "action_id": "read_failed_candidate_diff",
+          "tool_name": "read_failed_candidate_diff",
+          "argument_hash": "8a86e8493559d4a4585544d554f7a599e2b6d25b497ce8d72816e8a690165281"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "CP04_START_R41",
+        "order": null,
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixture-world://cp04/menu/2/read_failed_candidate_diff",
+            "source_revision": "world-v1",
+            "note": "Finite deterministic action option frozen in the local environment menu."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result2-alt",
+        "sequence_index": 9,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action2-alt"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-result2-alt",
+          "originating_action_id": "read_failed_candidate_diff",
+          "observation_hash": "9ba0e5477f95a05b63db4c4d7446cb555062fb879750ceb95061d0ae986fec75",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "candidate_diff_read",
+        "order": null,
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixtures/claim2/cp04/environment/receipt2_alt.txt",
+            "source_revision": "world-v1",
+            "content_hash": "9ba0e5477f95a05b63db4c4d7446cb555062fb879750ceb95061d0ae986fec75",
+            "note": "Deterministic local environment receipt for this one finite action."
+          }
+        ]
+      },
+      {
+        "event_id": "e-recovery-copy",
+        "sequence_index": 10,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result2"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-repeat",
+        "world_state_revision": "cp04-r41",
+        "order": null,
+        "content_hash": "de35a0d6e94711674f8ac039debbc318324077bc397bf4cf665770e0cbaaf5fe",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "recovery-packet-exporter://cp04/RECOVERY-CP04-02/source-R41",
+            "source_revision": "cp04-r41",
+            "content_hash": "de35a0d6e94711674f8ac039debbc318324077bc397bf4cf665770e0cbaaf5fe",
+            "note": "Normal recovery-packet exporter reattaches the restored immutable R41 source/config snapshot after state verification, with occurrence e-recovery-copy."
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "relation_id": "produces-1-1",
+        "relation_type": "produces",
+        "from_id": "run_candidate_guardrail_probe",
+        "to_id": "r-result1",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixture-world://cp04/transition/run_candidate_guardrail_probe",
+            "source_revision": "world-v1",
+            "note": "Pinned action/result identity for the deterministic environment transition."
+          }
+        ]
+      },
+      {
+        "relation_id": "produces-1-2",
+        "relation_type": "produces",
+        "from_id": "inspect_branch_topology",
+        "to_id": "r-result1-alt",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixture-world://cp04/transition/inspect_branch_topology",
+            "source_revision": "world-v1",
+            "note": "Pinned action/result identity for the deterministic environment transition."
+          }
+        ]
+      },
+      {
+        "relation_id": "produces-2-1",
+        "relation_type": "produces",
+        "from_id": "verify_restored_state",
+        "to_id": "r-result2",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixture-world://cp04/transition/verify_restored_state",
+            "source_revision": "world-v1",
+            "note": "Pinned action/result identity for the deterministic environment transition."
+          }
+        ]
+      },
+      {
+        "relation_id": "produces-2-2",
+        "relation_type": "produces",
+        "from_id": "read_failed_candidate_diff",
+        "to_id": "r-result2-alt",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "fixture-world://cp04/transition/read_failed_candidate_diff",
+            "source_revision": "world-v1",
+            "note": "Pinned action/result identity for the deterministic environment transition."
+          }
+        ]
+      },
+      {
+        "relation_id": "same-state-source-repeat",
+        "relation_type": "same_state_revision",
+        "from_id": "e-source",
+        "to_id": "e-recovery-copy",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "recovery-packet-exporter://cp04/RECOVERY-CP04-02/source-R41",
+            "source_revision": "cp04-r41",
+            "note": "Exact body bytes and immutable source-state identity verified by the documented normal exporter."
+          }
+        ]
+      }
+    ],
+    "provenance": [
+      {
+        "source_kind": "self_authored",
+        "classification": "CAPTURED_EXPLICIT",
+        "source_locator": "fixtures/claim2/cp04/README.md",
+        "source_revision": "case-v1",
+        "note": "Self-authored task, source, action/result, attachment-export provenance, and exact trace inventory documented beside this case."
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": "task_message",
+      "relative_path": "bodies/task_message.txt",
+      "sha256": "1af736cc7d41b13fd5d74ca9c126120a5d503b4456889768204052a7c524d1ba",
+      "kind": "native_export_body",
+      "event_id": "e-task",
+      "revision_id": "CP04-task-v1"
+    },
+    {
+      "asset_id": "source_original",
+      "relative_path": "bodies/source_export.txt",
+      "sha256": "de35a0d6e94711674f8ac039debbc318324077bc397bf4cf665770e0cbaaf5fe",
+      "kind": "context_attachment",
+      "event_id": "e-source",
+      "revision_id": "cp04-r41"
+    },
+    {
+      "asset_id": "source_repeat",
+      "relative_path": "bodies/cp04_repeat.txt",
+      "sha256": "de35a0d6e94711674f8ac039debbc318324077bc397bf4cf665770e0cbaaf5fe",
+      "kind": "context_attachment",
+      "event_id": "e-recovery-copy",
+      "revision_id": "cp04-r41"
+    },
+    {
+      "asset_id": "system",
+      "relative_path": "prompt/system.txt",
+      "sha256": "72e04083be3efb4610490ee5369742f359a58ebf13ddc208c1468d9ae4b247c6",
+      "kind": "prompt_text",
+      "event_id": null,
+      "revision_id": null
+    },
+    {
+      "asset_id": "request_1_menu",
+      "relative_path": "prompt/request_1_menu.txt",
+      "sha256": "31e2a53a7b3cccb7d4ad50201df9c731c259737f47c1ecb1413624ee9c4c06e7",
+      "kind": "prompt_text",
+      "event_id": null,
+      "revision_id": null
+    },
+    {
+      "asset_id": "request_2_menu",
+      "relative_path": "prompt/request_2_menu.txt",
+      "sha256": "74af8c0c2cddf8535eea3e088f057e83d2b2c69d79468a484cfe0ec60fd7b169",
+      "kind": "prompt_text",
+      "event_id": null,
+      "revision_id": null
+    },
+    {
+      "asset_id": "request_3_final",
+      "relative_path": "prompt/request_3_final.txt",
+      "sha256": "9d589cab3489674f1097dfad5cc1ba356a41bcb6cc6238dbc66cb697beb56648",
+      "kind": "prompt_text",
+      "event_id": null,
+      "revision_id": null
+    },
+    {
+      "asset_id": "receipt1",
+      "relative_path": "environment/receipt1.txt",
+      "sha256": "6ab3eb54f41ecf9ff1ba4a38b147a16c91f6425b073bd98357c7a98252546b69",
+      "kind": "environment_receipt",
+      "event_id": "e-result1",
+      "revision_id": "world-v1"
+    },
+    {
+      "asset_id": "receipt1_alt",
+      "relative_path": "environment/receipt1_alt.txt",
+      "sha256": "1dc884db1cf2b63aeb0ab72355dd2034eaf6402e56efb07402bd92ffef75d043",
+      "kind": "environment_receipt",
+      "event_id": "e-result1-alt",
+      "revision_id": "world-v1"
+    },
+    {
+      "asset_id": "receipt2",
+      "relative_path": "environment/receipt2.txt",
+      "sha256": "e68f339375c2fe0c36583226e3e35db64e63407574ac7ec7d44d89b0d34ec874",
+      "kind": "environment_receipt",
+      "event_id": "e-result2",
+      "revision_id": "world-v1"
+    },
+    {
+      "asset_id": "receipt2_alt",
+      "relative_path": "environment/receipt2_alt.txt",
+      "sha256": "9ba0e5477f95a05b63db4c4d7446cb555062fb879750ceb95061d0ae986fec75",
+      "kind": "environment_receipt",
+      "event_id": "e-result2-alt",
+      "revision_id": "world-v1"
+    },
+    {
+      "asset_id": "candidate_branch_state",
+      "relative_path": "source/quick-route-v42.toml",
+      "sha256": "3b27519814cbf449c3c2b38f3707e27acfa466e20d74541c7accf3df8839ffba",
+      "kind": "prompt_text",
+      "event_id": null,
+      "revision_id": "cp04-r42"
+    }
+  ],
+  "action_menu": [
+    {
+      "action_slot": 1,
+      "action_id": "run_candidate_guardrail_probe",
+      "action_event_id": "e-action1",
+      "result_event_id": "e-result1",
+      "result_asset_id": "receipt1",
+      "state_after": "candidate_failed_origin_restored"
+    },
+    {
+      "action_slot": 1,
+      "action_id": "inspect_branch_topology",
+      "action_event_id": "e-action1-alt",
+      "result_event_id": "e-result1-alt",
+      "result_asset_id": "receipt1_alt",
+      "state_after": "branch_topology_read"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "verify_restored_state",
+      "action_event_id": "e-action2",
+      "result_event_id": "e-result2",
+      "result_asset_id": "receipt2",
+      "state_after": "restored_origin_verified"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "read_failed_candidate_diff",
+      "action_event_id": "e-action2-alt",
+      "result_event_id": "e-result2-alt",
+      "result_asset_id": "receipt2_alt",
+      "state_after": "candidate_diff_read"
+    }
+  ],
+  "request_templates": [
+    {
+      "request_slot": 1,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-source"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request_1_menu"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 2,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-source"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request_1_menu"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "request_2_menu"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 3,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-source"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request_1_menu"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "request_2_menu"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-recovery-copy"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request_3_final"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evaluation_key_path": "evaluation/key.json",
+  "evaluation_key_sha256": "d89525072cd7717fa75b1aa9fcae5c97a72673eab9a03429252d7bb6600369bd",
+  "assistant_output_planning_bytes": 2048,
+  "token_proof_inputs": null
+}

@@ -1,0 +1,3 @@
+Request 1 action menu (choose one action_id):
+- inspect_retry_implementation: inspect the complete pinned source/config export and identify the retry path.
+- inspect_dispatch_defaults: inspect the dispatcher settings only.

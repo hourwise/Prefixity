@@ -1,0 +1,43 @@
+{
+  "expected_action_ids": [
+    "inspect_initial_catalog",
+    "rebuild_route_index_and_export"
+  ],
+  "expected_states_after_action": [
+    "route_registry_r17_inspected",
+    "route_registry_r18_reindexed"
+  ],
+  "expected_result_event_ids": [
+    "e-inspect-result",
+    "e-reindex-result"
+  ],
+  "expected_final_answer": {
+    "comparison": "same_bytes_different_state",
+    "initial_occurrence_id": "e-catalog-initial",
+    "initial_source_revision": "route-catalog-export@R17",
+    "initial_world_state_revision": "route-registry@R17",
+    "later_occurrence_id": "e-catalog-after-reindex",
+    "later_source_revision": "route-catalog-export@R18",
+    "later_world_state_revision": "route-registry@R18",
+    "operation_id": "rebuild-route-index-064",
+    "changed_state_field": "route_index_generation",
+    "before": "71",
+    "after": "72",
+    "should_prune_later_occurrence": false
+  },
+  "required_event_ids": [
+    "e-catalog-initial",
+    "e-inspect-result",
+    "e-reindex-result",
+    "e-catalog-after-reindex"
+  ],
+  "required_relation_ids": [
+    "produce-inspect",
+    "produce-reindex"
+  ],
+  "critical_event_ids": [
+    "e-catalog-initial",
+    "e-catalog-after-reindex",
+    "e-reindex-result"
+  ]
+}

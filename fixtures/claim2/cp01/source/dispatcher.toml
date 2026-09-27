@@ -1,0 +1,8 @@
+[retry]
+max_attempts = 4
+retryable_statuses = [429, 503]
+backoff_ms = 125
+
+[http]
+connect_timeout_ms = 250
+request_timeout_ms = 1800

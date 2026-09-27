@@ -1,0 +1,1 @@
+Dependency inventory run inventory-dep-audit-skip-001 was skipped at project revision dep-audit-r1. No dependency/build inventory was generated or attached. A final reconciliation cannot be established from a skipped inventory.

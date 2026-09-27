@@ -1,0 +1,39 @@
+{
+  "expected_action_ids": [
+    "inspect_policy_index",
+    "verify_audit_receipt"
+  ],
+  "expected_states_after_action": [
+    "policy_index_s84_inspected",
+    "audit_receipt_AUD_2081_verified"
+  ],
+  "expected_result_event_ids": [
+    "e-policy-inspect-result",
+    "e-audit-result"
+  ],
+  "expected_final_answer": {
+    "comparison": "same_state_protected_consumer",
+    "original_occurrence_id": "e-policy-original",
+    "repeated_occurrence_id": "e-audit-repeat",
+    "source_revision": "access-policy-export@S84",
+    "world_state_revision": "policy-index@S84",
+    "receipt_id": "AUD-2081",
+    "receipt_consumes_occurrence_id": "e-audit-repeat",
+    "should_prune_repeated_occurrence": false
+  },
+  "required_event_ids": [
+    "e-policy-original",
+    "e-policy-inspect-result",
+    "e-audit-result",
+    "e-audit-repeat"
+  ],
+  "required_relation_ids": [
+    "same-state-policy-export",
+    "audit-receipt-consumes-repeat"
+  ],
+  "critical_event_ids": [
+    "e-policy-original",
+    "e-audit-repeat",
+    "e-audit-result"
+  ]
+}

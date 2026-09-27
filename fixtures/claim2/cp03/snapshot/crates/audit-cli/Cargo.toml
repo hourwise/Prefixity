@@ -1,0 +1,15 @@
+[package]
+name = "audit-cli"
+version = "0.7.2"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+query-router = { path = "../query-router", version = "1.8" }
+recovery-journal = { path = "../recovery-journal", version = "0.9" }
+wire-schema = { path = "../wire-schema", version = "2.4" }
+
+[features]
+default = ["reconcile"]
+reconcile = []

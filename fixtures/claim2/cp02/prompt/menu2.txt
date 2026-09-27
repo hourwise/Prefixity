@@ -1,0 +1,4 @@
+Request 2 action menu:
+- inspect_resolution_chain: open and inspect the call sites across service, index, store, and cache modules.
+- inspect_cli_surface: inspect only the command-line entry point.
+Return {"action_id":"inspect_resolution_chain"} or {"action_id":"inspect_cli_surface"}.

@@ -1,0 +1,13 @@
+[package]
+name = "segment-format"
+version = "1.6.4"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+wire-schema = { path = "../wire-schema", version = "2.3" }
+
+[features]
+default = ["crc"]
+crc = []

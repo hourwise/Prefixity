@@ -1,0 +1,14 @@
+{
+  "snapshot_schema": "prefixity.local.world-snapshot.v1",
+  "workspace": "identity-edge-control",
+  "workspace_snapshot_id": "policy-world-s84",
+  "world_state_revision": "policy-index@S84",
+  "source_revision": "access-policy-export@S84",
+  "immutable_export_object": "policy-index-bc84",
+  "artifact_sha256": "24458ef55c345b7f1a85cf3f7c5f797d593351e4c7f723766a839775da74ad41",
+  "binding_count": 11,
+  "operation_that_reemits": "audit-query-AUD-2081",
+  "audit_receipt_id": "AUD-2081",
+  "receipt_requires_occurrence": "e-audit-repeat",
+  "policy_index_generation": 84
+}

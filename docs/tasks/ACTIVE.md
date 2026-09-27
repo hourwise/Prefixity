@@ -3987,3 +3987,60 @@ inference are part of this task.
 Next authorized task: `CLAIM_2_WORKLOAD_MATERIALIZATION_PREPARATION`, offline
 only. Exact tokenization and scored or live work require separate later
 authorization. Do not start those tasks from this design record.
+
+## Phase 1C Claim-2 workload materialization preparation
+
+Current status: `CLAIM_2_WORKLOAD_MATERIALIZATION_READY_FOR_TOKENIZATION_REVIEW`.
+This entry supersedes earlier next-step statements. Record:
+`docs/phase-1/PHASE_1C_CLAIM_2_WORKLOAD_MATERIALIZATION.md`.
+
+Work completed: offline CP01-CP06 in fixed order, four naturally selected
+single-target `EXACT_DUPLICATE_PRUNE` positives and two `DO_NOTHING` controls;
+three arm-local requests/two deterministic environment steps per arm;
+shared version-1 schema, pinned manifests/bodies/keys/provenance, common
+renderer, unchanged-history validation, deterministic evaluators, no-retry
+failure state machine, and 54 static request projections with per-message
+byte counts, hashes, and explicit unbound raw history/receipt slots. Hidden
+keys are isolated. NO_OP uses forced DO_NOTHING through the same application
+path; future independent-output equality checks do not copy model responses.
+
+Evidence: actual frozen policy admission passes; positives remove 2954,
+3366, 2679, and 3342 native body bytes. Controls legally remove zero; their
+candidate-looking bodies are 4859 and 5282 bytes. Historical Phase 1B.9 report
+parity passes. `fixtures/claim2/materialization-report.json` is reproducible
+via the offline example and checked against all six fixtures. It records
+54 planned slots and zero inference slots executed.
+
+Interpretation/remaining issues: no token count, token-saving qualification,
+context fit, model outcome on these cases, or runtime benefit is established.
+All conservative token proof inputs are absent; every case requires
+`EXACT_TOKENIZATION_REQUIRED`. The accepted 8192-context/1024-output/6000-input
+hard-stop envelope is unchanged. Planning byte estimates are not response
+caps or conservative bounds. Larger-output cost scenarios exceed the
+8-hour review boundary: `CPU_RUNTIME_PRACTICALITY_REVIEW_REQUIRED`, separately
+from historical `MODEL_CAPABILITY_ACCEPTED`.
+
+Important corrections: CP02/CP03 templates initially retroactively inserted
+new evidence; they now append it while retaining prior prompts unchanged.
+The evaluator now checks actual rendered availability and preserves complete
+wrong-answer FAILs distinctly from malformed output. An unintended byte-cap
+check was removed so estimates cannot lower the accepted output ceiling.
+Historical h001 source validation now checks the exact archived source at its
+original pinned commit/hash, while current gate source binding still rejects
+reuse of the consumed gate. No historical fixture, manifest, consumed identity,
+answer criterion, or evidence was rewritten.
+
+Validation: full workspace tests passed 661/661; the final cohort evidence
+suite passed 2/2 after one additional gate-provenance regression test.
+Formatting, Clippy with warnings denied, and Rust 1.86 locked/offline workspace
+check passed. Shared tests passed 13/13 and case integration suites 7/7, 6/6,
+6/6. All six asset/key hash sets verified, 159 cohort files passed UTF-8/LF
+checks, and report links/diff whitespace checked. Exact candidate CI and
+promotion results are reported in the supervisor closeout, without rewriting
+consumed identities or claiming future CI in the pre-commit record.
+
+Next substantive task: separately authorized
+`NON_INFERENCE_CONTEXT_TOKENIZATION_PASS`, with full prior-output envelopes
+and static variants. This task does not authorize it. No model startup,
+port-8080 contact, tokenizer call, live gate preparation, or inference occurred.
+Do not start another task from this record.

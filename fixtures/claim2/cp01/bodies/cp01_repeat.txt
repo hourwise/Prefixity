@@ -1,0 +1,95 @@
+# Request Dispatcher source/config export, pinned revision cp01-r41
+
+# Export is the native initial-inspection attachment for CP01.
+
+## source/retry.py
+
+from dataclasses import dataclass
+from typing import Callable
+
+
+@dataclass(frozen=True)
+class RetryPolicy:
+    max_attempts: int
+    retryable_statuses: frozenset[int]
+    backoff_ms: int
+
+
+def dispatch_with_retry(send: Callable[[], int], policy: RetryPolicy, sleep_seconds: Callable[[float], None]) -> int:
+    last_status: int | None = None
+    for attempt in range(1, policy.max_attempts):
+        last_status = send()
+        if last_status not in policy.retryable_statuses:
+            return last_status
+        if attempt < policy.max_attempts:
+            sleep_seconds(policy.backoff_ms / 1000.0)
+    if last_status is None:
+        raise RuntimeError("retry loop produced no response")
+    return last_status
+
+## source/dispatcher.toml
+
+[retry]
+max_attempts = 4
+retryable_statuses = [429, 503]
+backoff_ms = 125
+
+[http]
+connect_timeout_ms = 250
+request_timeout_ms = 1800
+
+## source/test_retry.py
+
+import unittest
+from retry import RetryPolicy, dispatch_with_retry
+
+
+class RetryPolicyTests(unittest.TestCase):
+    def test_max_attempts_includes_initial_call(self) -> None:
+        statuses = iter([503, 503, 503, 200])
+        calls: list[int] = []
+        sleeps: list[float] = []
+
+        def send() -> int:
+            calls.append(len(calls) + 1)
+            return next(statuses)
+
+        result = dispatch_with_retry(send, RetryPolicy(4, frozenset({429, 503}), 125), sleeps.append)
+        self.assertEqual(len(calls), 4)
+        self.assertEqual(result, 200)
+        self.assertEqual(sleeps, [0.125, 0.125, 0.125])
+
+## source/policy_loader.py
+
+from collections.abc import Mapping
+
+from retry import RetryPolicy
+
+
+def policy_from_settings(values: Mapping[str, object]) -> RetryPolicy:
+    return RetryPolicy(
+        max_attempts=int(values["max_attempts"]),
+        retryable_statuses=frozenset(int(status) for status in values["retryable_statuses"]),
+        backoff_ms=int(values["backoff_ms"]),
+    )
+
+## source/test_policy_loader.py
+
+import unittest
+from policy_loader import policy_from_settings
+
+
+class PolicyLoaderTests(unittest.TestCase):
+    def test_settings_keep_attempt_count_and_millisecond_unit(self) -> None:
+        policy = policy_from_settings({"max_attempts": 4, "retryable_statuses": [429, 503], "backoff_ms": 125})
+        self.assertEqual(policy.max_attempts, 4)
+        self.assertEqual(policy.retryable_statuses, frozenset({429, 503}))
+        self.assertEqual(policy.backoff_ms, 125)
+
+## source/retry-contract.md
+
+max_attempts is the maximum number of transport calls, including the first
+call. A retry follows a 429 or 503 response only while an attempt remains.
+backoff_ms, connect_timeout_ms, and request_timeout_ms are milliseconds.
+The regression sends three retryable responses followed by success, so reaching
+success requires all four configured calls.

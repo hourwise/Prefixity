@@ -1,0 +1,1 @@
+Candidate diff receipt DIFF-CP04-R42. quick-route-v42 sets account_scope_required=false and strict_tenant_match=false. This diff read does not verify the current worktree or source revision and does not emit the recovery packet.

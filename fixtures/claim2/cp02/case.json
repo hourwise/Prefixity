@@ -1,0 +1,1000 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-workload-case",
+  "schema_version": 1,
+  "case_id": "CP02",
+  "kind": "positive",
+  "planner_input": {
+    "events": [
+      {
+        "event_id": "e-task",
+        "sequence_index": 0,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-task",
+        "world_state_revision": "quarry-task-r1",
+        "order": {
+          "logical_tick": 0,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "3c275f71a6bcee5418586699f96468b8cd53b219ce5f20f391eb3bb7d2128bb5",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "quarry-ledger-r1/task",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "3c275f71a6bcee5418586699f96468b8cd53b219ce5f20f391eb3bb7d2128bb5",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action-inventory",
+        "sequence_index": 1,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-task"
+        ],
+        "action": {
+          "action_id": "build_symbol_inventory",
+          "tool_name": "build_symbol_inventory",
+          "argument_hash": "adfc8a5b68a9b460f4008a9d65d619d516cc6ea4e2286df4c4b1c25cdd98ab66"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 1,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/workflow/action/build_symbol_inventory",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "e510063bd8e2cbecf225551b15658517134fed7d7d1fe1b3f2a772d78f54f079",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result-inventory",
+        "sequence_index": 2,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action-inventory"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-inventory",
+          "originating_action_id": "build_symbol_inventory",
+          "observation_hash": "e62dea11ce37d189ac0aaa84cb6a1510ebc3845294c10875952ad8c755ee3afa",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 2,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/workflow/result/build_symbol_inventory",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "7090573ae62fb2989b259349010de34ca2ebf294edc5b41bbcf9c2f2df492828",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-inventory-original",
+        "sequence_index": 3,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result-inventory"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-inventory-original",
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 3,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "4bee11535b0c8414e888f508d6d2b192aa64687e1533a033ff4db2ac1a9f92b0",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "quarry-ledger-r1/native-export/symbol-map-v1",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "4bee11535b0c8414e888f508d6d2b192aa64687e1533a033ff4db2ac1a9f92b0",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action-skip-inventory",
+        "sequence_index": 4,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-task"
+        ],
+        "action": {
+          "action_id": "skip_inventory",
+          "tool_name": "skip_inventory",
+          "argument_hash": "5b080af2a11484f19d92cdfc8b55c4dca50206b03ce55907031f79750a33497b"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 4,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/workflow/action/skip_inventory",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "ef51d7b32fb89bc9564122e315294a4f7d192b11ab3b4a4579d9d06f717c308c",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result-skip-inventory",
+        "sequence_index": 5,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action-skip-inventory"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-skip-inventory",
+          "originating_action_id": "skip_inventory",
+          "observation_hash": "6786d55e36260281b986fd8705086df6c65f0bba67df64e7b71b1aa59a57358f",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 5,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/workflow/result/skip_inventory",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "046d18118d22a95c3de8e369b03dcd5e8f98888b815b3dc174d283bb8019b96e",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action-callsite",
+        "sequence_index": 6,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-result-inventory"
+        ],
+        "action": {
+          "action_id": "inspect_resolution_chain",
+          "tool_name": "inspect_resolution_chain",
+          "argument_hash": "eb95b7af07b66318aed9ad73ceb50d45fff3cc9375d39a2afca987cc0c7b36fc"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 6,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/workflow/action/inspect_resolution_chain",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "f957a97790efa99a692c65dab9da6df44e237b2bd82dea71b63af8183e965aaa",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result-callsite",
+        "sequence_index": 7,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action-callsite"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-callsite",
+          "originating_action_id": "inspect_resolution_chain",
+          "observation_hash": "4e81fd820ed9740b04bea9111f95317130ceb193b16efb6ba7d8089cf4481777",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 7,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/workflow/result/inspect_resolution_chain",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "4978ec601041c9139ac9afe3dea41c7133f2d8f71ea92f043f8a43a80d56ace3",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-action-cli",
+        "sequence_index": 8,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-result-inventory"
+        ],
+        "action": {
+          "action_id": "inspect_cli_surface",
+          "tool_name": "inspect_cli_surface",
+          "argument_hash": "463b4808a99479c60837428c18b17c86c64eeb9de3c2f4b32fc6ac45cfb90ed1"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 8,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/workflow/action/inspect_cli_surface",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "3ae67e17d69d44c73187880cd25e070b0d4e64d772b51c943d1d70eaef6a2050",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-result-cli",
+        "sequence_index": 9,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [
+          "e-action-cli"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-cli",
+          "originating_action_id": "inspect_cli_surface",
+          "observation_hash": "d2eb2f2df039c66c6a47359b5c7afa680e6a1f59becd9f86872104925e11789e",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 9,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/workflow/result/inspect_cli_surface",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "f02b03314ebdd05c2f2a04c87f36970aa6d2e1cc3b45f874cbdb9a4276fc1566",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-read-service",
+        "sequence_index": 10,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result-callsite"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-e-read-service",
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 10,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "2dde456587c2f2672789c0435e54e45fab455a2029038f0967714904035c796e",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "quarry-ledger-r1/src/service.rs",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "2dde456587c2f2672789c0435e54e45fab455a2029038f0967714904035c796e",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-read-index",
+        "sequence_index": 11,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result-callsite"
+        ],
+        "reference_event_ids": [
+          "e-read-service"
+        ],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-e-read-index",
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 11,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "a674afc7e11bf7af347a0745e9251e17210b016470e02052ff16a0ef8c043889",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "quarry-ledger-r1/src/index.rs",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "a674afc7e11bf7af347a0745e9251e17210b016470e02052ff16a0ef8c043889",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-read-store",
+        "sequence_index": 12,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result-callsite"
+        ],
+        "reference_event_ids": [
+          "e-read-index"
+        ],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-e-read-store",
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 12,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "d26efb5991dbd5bd815aa9da5cc331a965346b9f768c12291344e2b256a76474",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "quarry-ledger-r1/src/store.rs",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "d26efb5991dbd5bd815aa9da5cc331a965346b9f768c12291344e2b256a76474",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-read-cache",
+        "sequence_index": 13,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result-callsite"
+        ],
+        "reference_event_ids": [
+          "e-read-store"
+        ],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-e-read-cache",
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 13,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "7472dda9ab111b5143ccf7798afdc00deee1bc627dbcddd47ff1b092471aff10",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "quarry-ledger-r1/src/cache.rs",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "7472dda9ab111b5143ccf7798afdc00deee1bc627dbcddd47ff1b092471aff10",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      },
+      {
+        "event_id": "e-inventory-copy",
+        "sequence_index": 14,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [
+          "e-result-callsite"
+        ],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-inventory-copy",
+        "world_state_revision": "quarry-state-r1",
+        "order": {
+          "logical_tick": 14,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "4bee11535b0c8414e888f508d6d2b192aa64687e1533a033ff4db2ac1a9f92b0",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "quarry-ledger-r1/native-export/reconciliation-packet",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "4bee11535b0c8414e888f508d6d2b192aa64687e1533a033ff4db2ac1a9f92b0",
+            "note": "Pinned self-authored fixture event provenance."
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "relation_id": "produce-inventory",
+        "relation_type": "produces",
+        "from_id": "build_symbol_inventory",
+        "to_id": "r-inventory",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/trace/relations/produce-inventory",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "9aec53886a83e6059c26a6b2ad331ae7c926515ee7a1f088e8e1c90c8ecb56f1",
+            "note": "Inventory tool produced its pinned native result."
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-inventory-skip",
+        "relation_type": "produces",
+        "from_id": "skip_inventory",
+        "to_id": "r-skip-inventory",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/trace/relations/produce-inventory-skip",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "7792aa0f025ff729c3642bc47aeeb95481f0c6ae431c3af7ca3b8f8b1b1a27f8",
+            "note": "The bounded skip action produced its own receipt."
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-callsite",
+        "relation_type": "produces",
+        "from_id": "inspect_resolution_chain",
+        "to_id": "r-callsite",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/trace/relations/produce-callsite",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "651332f88f509df7050c9910b5655384443ea3d2d08284667c4178404f6a3f0d",
+            "note": "Call-site inspection produced its own receipt."
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-cli",
+        "relation_type": "produces",
+        "from_id": "inspect_cli_surface",
+        "to_id": "r-cli",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/trace/relations/produce-cli",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "f9e1e96ecf2591386de31bae647a321bb2b1aa02c2ad4cf82fac01ceedee5f35",
+            "note": "CLI-only inspection produced its own receipt."
+          }
+        ]
+      },
+      {
+        "relation_id": "same-state-inventory",
+        "relation_type": "same_state_revision",
+        "from_id": "e-inventory-original",
+        "to_id": "e-inventory-copy",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/trace/relations/same-state-inventory",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "4bee11535b0c8414e888f508d6d2b192aa64687e1533a033ff4db2ac1a9f92b0",
+            "note": "Normal investigation export reattached identical inventory bytes at the same repository revision and query identity."
+          }
+        ]
+      },
+      {
+        "relation_id": "callchain-index",
+        "relation_type": "references",
+        "from_id": "e-read-index",
+        "to_id": "e-read-service",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/trace/relations/callchain-index",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "6cd1757e536705816934fd82cb5d305c31cd30299b2fa69487c278f8ab53993d",
+            "note": "The index call site is opened after the public service entry point."
+          }
+        ]
+      },
+      {
+        "relation_id": "callchain-store",
+        "relation_type": "references",
+        "from_id": "e-read-store",
+        "to_id": "e-read-index",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/trace/relations/callchain-store",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "281fef55779e4ee2afc3c709891d8f552e309bab8985c5fb5abf271b7a31c877",
+            "note": "The segment-store call site is opened after the index call site."
+          }
+        ]
+      },
+      {
+        "relation_id": "callchain-cache",
+        "relation_type": "references",
+        "from_id": "e-read-cache",
+        "to_id": "e-read-store",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "CP02/trace/relations/callchain-cache",
+            "source_revision": "quarry-ledger-r1",
+            "content_hash": "42d0a6f7b97638422139fc0ed953f2a287a5a417fca2ed9ea47da6f94e42cc11",
+            "note": "The cache call site is opened after the segment-store call site."
+          }
+        ]
+      }
+    ],
+    "provenance": [
+      {
+        "source_kind": "self_authored",
+        "classification": "CAPTURED_EXPLICIT",
+        "source_locator": "CP02/trace",
+        "source_revision": "quarry-ledger-r1",
+        "content_hash": "bcc0cab20664a76ceb8f01a312c2136717d950d7989818b7b73a01d82e80cd82",
+        "note": "Frozen deterministic local workflow trace."
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": "task",
+      "relative_path": "bodies/task.txt",
+      "sha256": "3c275f71a6bcee5418586699f96468b8cd53b219ce5f20f391eb3bb7d2128bb5",
+      "kind": "context_attachment",
+      "event_id": "e-task",
+      "revision_id": "task-constraint-r1"
+    },
+    {
+      "asset_id": "inventory-original",
+      "relative_path": "bodies/inventory.txt",
+      "sha256": "4bee11535b0c8414e888f508d6d2b192aa64687e1533a033ff4db2ac1a9f92b0",
+      "kind": "context_attachment",
+      "event_id": "e-inventory-original",
+      "revision_id": "quarry-ledger-r1"
+    },
+    {
+      "asset_id": "inventory-reemitted",
+      "relative_path": "bodies/inventory-reemitted.txt",
+      "sha256": "4bee11535b0c8414e888f508d6d2b192aa64687e1533a033ff4db2ac1a9f92b0",
+      "kind": "context_attachment",
+      "event_id": "e-inventory-copy",
+      "revision_id": "quarry-ledger-r1"
+    },
+    {
+      "asset_id": "read-service",
+      "relative_path": "bodies/direct-service.rs",
+      "sha256": "2dde456587c2f2672789c0435e54e45fab455a2029038f0967714904035c796e",
+      "kind": "native_export_body",
+      "event_id": "e-read-service",
+      "revision_id": "quarry-ledger-r1"
+    },
+    {
+      "asset_id": "read-index",
+      "relative_path": "bodies/direct-index.rs",
+      "sha256": "a674afc7e11bf7af347a0745e9251e17210b016470e02052ff16a0ef8c043889",
+      "kind": "native_export_body",
+      "event_id": "e-read-index",
+      "revision_id": "quarry-ledger-r1"
+    },
+    {
+      "asset_id": "read-store",
+      "relative_path": "bodies/direct-store.rs",
+      "sha256": "d26efb5991dbd5bd815aa9da5cc331a965346b9f768c12291344e2b256a76474",
+      "kind": "native_export_body",
+      "event_id": "e-read-store",
+      "revision_id": "quarry-ledger-r1"
+    },
+    {
+      "asset_id": "read-cache",
+      "relative_path": "bodies/direct-cache.rs",
+      "sha256": "7472dda9ab111b5143ccf7798afdc00deee1bc627dbcddd47ff1b092471aff10",
+      "kind": "native_export_body",
+      "event_id": "e-read-cache",
+      "revision_id": "quarry-ledger-r1"
+    },
+    {
+      "asset_id": "system",
+      "relative_path": "prompt/system.txt",
+      "sha256": "0d1fba8f1a3d338d2b77368571e5fc4b5cfda508572c4be6ffe2f18c852d3e23",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "menu1",
+      "relative_path": "prompt/menu1.txt",
+      "sha256": "a015005e4dd931dd2d1c9b87c8ef93ca884821b1280d6eeef7b4c2c2c5aff9ea",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "menu2",
+      "relative_path": "prompt/menu2.txt",
+      "sha256": "7c8997adfb027f7fe93b3e960fe370822f9f7dc6a72ca8ee850713f1d553cfdd",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "final",
+      "relative_path": "prompt/final.txt",
+      "sha256": "c0df842021604c1f5d5a324087d6fa79a64af2c8cbf14cd7435c6e7e52aa751b",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "receipt1",
+      "relative_path": "bodies/receipt1.txt",
+      "sha256": "e62dea11ce37d189ac0aaa84cb6a1510ebc3845294c10875952ad8c755ee3afa",
+      "kind": "environment_receipt",
+      "event_id": "e-result-inventory",
+      "revision_id": "quarry-ledger-r1-run-1-build_symbol_inventory"
+    },
+    {
+      "asset_id": "receipt1-alt",
+      "relative_path": "bodies/receipt1-alt.txt",
+      "sha256": "6786d55e36260281b986fd8705086df6c65f0bba67df64e7b71b1aa59a57358f",
+      "kind": "environment_receipt",
+      "event_id": "e-result-skip-inventory",
+      "revision_id": "quarry-ledger-r1-run-1-skip_inventory"
+    },
+    {
+      "asset_id": "receipt2",
+      "relative_path": "bodies/receipt2.txt",
+      "sha256": "4e81fd820ed9740b04bea9111f95317130ceb193b16efb6ba7d8089cf4481777",
+      "kind": "environment_receipt",
+      "event_id": "e-result-callsite",
+      "revision_id": "quarry-ledger-r1-run-2-inspect_resolution_chain"
+    },
+    {
+      "asset_id": "receipt2-alt",
+      "relative_path": "bodies/receipt2-alt.txt",
+      "sha256": "d2eb2f2df039c66c6a47359b5c7afa680e6a1f59becd9f86872104925e11789e",
+      "kind": "environment_receipt",
+      "event_id": "e-result-cli",
+      "revision_id": "quarry-ledger-r1-run-2-inspect_cli_surface"
+    }
+  ],
+  "action_menu": [
+    {
+      "action_slot": 1,
+      "action_id": "build_symbol_inventory",
+      "action_event_id": "e-action-inventory",
+      "result_event_id": "e-result-inventory",
+      "result_asset_id": "receipt1",
+      "state_after": "inventory_ready"
+    },
+    {
+      "action_slot": 1,
+      "action_id": "skip_inventory",
+      "action_event_id": "e-action-skip-inventory",
+      "result_event_id": "e-result-skip-inventory",
+      "result_asset_id": "receipt1-alt",
+      "state_after": "inventory_skipped"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "inspect_resolution_chain",
+      "action_event_id": "e-action-callsite",
+      "result_event_id": "e-result-callsite",
+      "result_asset_id": "receipt2",
+      "state_after": "callsites_opened"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "inspect_cli_surface",
+      "action_event_id": "e-action-cli",
+      "result_event_id": "e-result-cli",
+      "result_asset_id": "receipt2-alt",
+      "state_after": "cli_only"
+    }
+  ],
+  "request_templates": [
+    {
+      "request_slot": 1,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "menu1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 2,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "menu1"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-inventory-original"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "menu2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 3,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "menu1"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-inventory-original"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "menu2"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-read-service"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-read-index"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-read-store"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-read-cache"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-inventory-copy"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "final"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evaluation_key_path": "evaluation/key.json",
+  "evaluation_key_sha256": "dbb16cdb9869a4068374ad7059a958131e85ef76f6b806314700af9bd222e826",
+  "assistant_output_planning_bytes": 4096,
+  "token_proof_inputs": null
+}

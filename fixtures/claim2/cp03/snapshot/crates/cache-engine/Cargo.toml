@@ -1,0 +1,15 @@
+[package]
+name = "cache-engine"
+version = "5.3.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+snapshot-index = { path = "../snapshot-index", version = "3.0" }
+wire-schema = { path = "../wire-schema", version = "2.3" }
+
+[features]
+default = ["memory"]
+memory = []
+metrics = []

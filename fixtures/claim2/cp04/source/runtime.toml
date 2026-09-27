@@ -1,0 +1,11 @@
+[deployment]
+active_release_channel = "stable"
+source_revision = "R41"
+
+[authorization]
+account_scope_required = true
+strict_tenant_match = true
+
+[routing]
+mode = "compatibility"
+allow_quick_route = false

@@ -1,0 +1,1 @@
+Branch inventory receipt BRANCH-CP04-GRAPH-41. The local graph contains stable@R41 and candidate quick-route-v42@R42. The candidate was not executed and no restore operation ran. This read-only inventory gives no failed-candidate result.

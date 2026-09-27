@@ -1,0 +1,22 @@
+[protocol]
+package = "wire-schema"
+version = "2.4.1"
+wire_revision = 4
+
+[consumers.cache-engine]
+requirement = "^2.3"
+
+[consumers.segment-format]
+requirement = "^2.3"
+
+[consumers.snapshot-index]
+requirement = "^2.4"
+
+[consumers.query-router]
+requirement = "^2.4"
+
+[consumers.audit-cli]
+requirement = "^2.4"
+
+[release]
+expected_reconciliation = "compatible"

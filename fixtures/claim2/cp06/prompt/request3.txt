@@ -1,0 +1,1 @@
+Complete the audit comparison. Return answer fields: comparison, original_occurrence_id, repeated_occurrence_id, source_revision, world_state_revision, receipt_id, receipt_consumes_occurrence_id, should_prune_repeated_occurrence.

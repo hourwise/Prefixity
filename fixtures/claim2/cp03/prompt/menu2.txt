@@ -1,0 +1,4 @@
+Request 2 action menu:
+- verify_snapshot_and_constraints: recompute the pinned tree identity and reconcile all local dependency ranges.
+- verify_toolchain_only: check the Rust floor and toolchain matrix without verifying dependency ranges or the full snapshot.
+Return {"action_id":"verify_snapshot_and_constraints"} or {"action_id":"verify_toolchain_only"}.

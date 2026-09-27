@@ -1,0 +1,1 @@
+Call-site inspection run inspect-quarry-001 opened src/service.rs, src/index.rs, src/store.rs, and src/cache.rs from revision quarry-ledger-r1. The direct native reads follow this receipt. Confirmed call chain: Library::find_record invokes IndexSnapshot::lookup; IndexSnapshot::lookup invokes SegmentStore::read_segment; SegmentStore::read_segment invokes IndexCache::get_or_load.

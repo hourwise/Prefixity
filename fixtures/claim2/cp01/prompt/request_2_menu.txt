@@ -1,0 +1,3 @@
+Request 2 action menu (choose one action_id):
+- run_retry_regression: run the pinned deterministic retry regression against the configured response sequence.
+- check_timeout_units: run the pinned timeout and backoff unit check.

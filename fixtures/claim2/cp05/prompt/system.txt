@@ -1,0 +1,1 @@
+You are completing a read-only audit of a pinned local workflow. At request slots 1 and 2, return exactly one JSON object with the single string field action_id and select an action from the displayed menu. At request slot 3, return exactly one JSON object with the answer field and the requested facts. Do not invent identifiers or add fields.

@@ -1,0 +1,736 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-workload-case",
+  "schema_version": 1,
+  "case_id": "CP06",
+  "kind": "control",
+  "planner_input": {
+    "events": [
+      {
+        "event_id": "e-policy-original",
+        "sequence_index": 0,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-policy-original",
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 0,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "24458ef55c345b7f1a85cf3f7c5f797d593351e4c7f723766a839775da74ad41",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/world/policy-state.json#artifact_sha256",
+            "source_revision": "access-policy-export@S84",
+            "content_hash": "6a07973fbe9d2e4efe09615e1e8ac521f5c97dc17b72ecaff7b644b4bbdad32c"
+          }
+        ]
+      },
+      {
+        "event_id": "e-policy-inspect-action",
+        "sequence_index": 1,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-policy-original"
+        ],
+        "action": {
+          "action_id": "inspect_policy_index",
+          "tool_name": "inspect_policy_index",
+          "argument_hash": "3555aa841ad4e5e2398563f3ff7099b93fcfc02e1a5e12a0466726bae5635816"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 1,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#request-1",
+            "source_revision": "policy-world-s84",
+            "content_hash": "24458ef55c345b7f1a85cf3f7c5f797d593351e4c7f723766a839775da74ad41"
+          }
+        ]
+      },
+      {
+        "event_id": "e-policy-inspect-result",
+        "sequence_index": 2,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-policy-original"
+        ],
+        "action": null,
+        "result": {
+          "result_id": "r-policy-inspect-084",
+          "originating_action_id": "inspect_policy_index",
+          "observation_hash": "c8500e2bdaea68ec5275f0c8f55e1de332fd4433734b88d1b4135afcecc89694",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 2,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#inspection-receipt",
+            "source_revision": "policy-index@S84",
+            "content_hash": "c8500e2bdaea68ec5275f0c8f55e1de332fd4433734b88d1b4135afcecc89694"
+          }
+        ]
+      },
+      {
+        "event_id": "e-audit-action",
+        "sequence_index": 3,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-policy-original"
+        ],
+        "action": {
+          "action_id": "verify_audit_receipt",
+          "tool_name": "verify_audit_receipt",
+          "argument_hash": "fedb1b9ce018639ba864cebe169b42503ce19aa67c7cb3e9dbbd03bf7492467e"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 3,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#audit-query",
+            "source_revision": "policy-world-s84",
+            "content_hash": "0e4d4404f21b8bb42d8bd104e9ea4d25d58f7937d86154e6e66a912f582efc1f"
+          }
+        ]
+      },
+      {
+        "event_id": "e-audit-repeat",
+        "sequence_index": 4,
+        "event_type": "message",
+        "actor_role": "user",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-policy-original"
+        ],
+        "action": null,
+        "result": null,
+        "context_block_id": "ctx-policy-repeat",
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 4,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": "24458ef55c345b7f1a85cf3f7c5f797d593351e4c7f723766a839775da74ad41",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/world/policy-state.json#receipt-bound-occurrence",
+            "source_revision": "access-policy-export@S84",
+            "content_hash": "6a07973fbe9d2e4efe09615e1e8ac521f5c97dc17b72ecaff7b644b4bbdad32c"
+          }
+        ]
+      },
+      {
+        "event_id": "e-audit-result",
+        "sequence_index": 5,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-audit-repeat"
+        ],
+        "action": null,
+        "result": {
+          "result_id": "r-audit-AUD-2081",
+          "originating_action_id": "verify_audit_receipt",
+          "observation_hash": "f1711d4e3232120b0a53306bba96cc3e601ff04d456c6690908b90bd46f476eb",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 5,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/world/policy-state.json#audit-receipt-consumer",
+            "source_revision": "audit-receipt-AUD-2081",
+            "content_hash": "f1711d4e3232120b0a53306bba96cc3e601ff04d456c6690908b90bd46f476eb"
+          }
+        ]
+      },
+      {
+        "event_id": "e-policy-summary-action",
+        "sequence_index": 6,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-policy-original"
+        ],
+        "action": {
+          "action_id": "read_policy_summary",
+          "tool_name": "read_policy_summary",
+          "argument_hash": "167dcfdf4e0a4e30e472193f6e9aad65b9af028765a76746b30d52e0021a4d98"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 6,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#alternate-action-1",
+            "source_revision": "policy-world-s84",
+            "content_hash": "167dcfdf4e0a4e30e472193f6e9aad65b9af028765a76746b30d52e0021a4d98"
+          }
+        ]
+      },
+      {
+        "event_id": "e-policy-summary-result",
+        "sequence_index": 7,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-policy-summary-084",
+          "originating_action_id": "read_policy_summary",
+          "observation_hash": "136bfac015fcb5f820cb56b6b9993c4a44094deb785e7bf67cce6ea3f31ed14e",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 7,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#alternate-result-1",
+            "source_revision": "policy-index@S84",
+            "content_hash": "136bfac015fcb5f820cb56b6b9993c4a44094deb785e7bf67cce6ea3f31ed14e"
+          }
+        ]
+      },
+      {
+        "event_id": "e-signature-action",
+        "sequence_index": 8,
+        "event_type": "action",
+        "actor_role": "agent",
+        "parent_event_ids": [],
+        "reference_event_ids": [
+          "e-policy-original"
+        ],
+        "action": {
+          "action_id": "check_export_signature_only",
+          "tool_name": "check_export_signature_only",
+          "argument_hash": "27372e13d44a3f20b0f756446b981d9f08716883f6eb905574f6bf9dcb236e6c"
+        },
+        "result": null,
+        "context_block_id": null,
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 8,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#alternate-action-2",
+            "source_revision": "policy-world-s84",
+            "content_hash": "27372e13d44a3f20b0f756446b981d9f08716883f6eb905574f6bf9dcb236e6c"
+          }
+        ]
+      },
+      {
+        "event_id": "e-signature-result",
+        "sequence_index": 9,
+        "event_type": "result",
+        "actor_role": "tool",
+        "parent_event_ids": [],
+        "reference_event_ids": [],
+        "action": null,
+        "result": {
+          "result_id": "r-signature-only-084",
+          "originating_action_id": "check_export_signature_only",
+          "observation_hash": "d2897c2e73d420515fa933eb780ebeb1c9900073953043b1550ee3b85d8ea1ab",
+          "status": "success"
+        },
+        "context_block_id": null,
+        "world_state_revision": "policy-index@S84",
+        "order": {
+          "logical_tick": 9,
+          "timestamp_origin": "derived_structural"
+        },
+        "content_hash": null,
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#alternate-result-2",
+            "source_revision": "policy-index@S84",
+            "content_hash": "d2897c2e73d420515fa933eb780ebeb1c9900073953043b1550ee3b85d8ea1ab"
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "relation_id": "produce-inspect",
+        "relation_type": "produces",
+        "from_id": "inspect_policy_index",
+        "to_id": "r-policy-inspect-084",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#inspection-producer",
+            "source_revision": "policy-world-s84",
+            "content_hash": "c8500e2bdaea68ec5275f0c8f55e1de332fd4433734b88d1b4135afcecc89694"
+          }
+        ]
+      },
+      {
+        "relation_id": "same-state-policy-export",
+        "relation_type": "same_state_revision",
+        "from_id": "e-policy-original",
+        "to_id": "e-audit-repeat",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/world/policy-state.json#same-export-object",
+            "source_revision": "policy-world-s84",
+            "content_hash": "24458ef55c345b7f1a85cf3f7c5f797d593351e4c7f723766a839775da74ad41"
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-audit",
+        "relation_type": "produces",
+        "from_id": "verify_audit_receipt",
+        "to_id": "r-audit-AUD-2081",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/world/policy-state.json#audit-producer",
+            "source_revision": "policy-world-s84",
+            "content_hash": "f1711d4e3232120b0a53306bba96cc3e601ff04d456c6690908b90bd46f476eb"
+          }
+        ]
+      },
+      {
+        "relation_id": "audit-receipt-consumes-repeat",
+        "relation_type": "depends_on",
+        "from_id": "e-audit-result",
+        "to_id": "e-audit-repeat",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/world/policy-state.json#receipt-consumer-edge",
+            "source_revision": "policy-world-s84",
+            "content_hash": "f1711d4e3232120b0a53306bba96cc3e601ff04d456c6690908b90bd46f476eb"
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-summary",
+        "relation_type": "produces",
+        "from_id": "read_policy_summary",
+        "to_id": "r-policy-summary-084",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#summary-producer",
+            "source_revision": "policy-world-s84",
+            "content_hash": "136bfac015fcb5f820cb56b6b9993c4a44094deb785e7bf67cce6ea3f31ed14e"
+          }
+        ]
+      },
+      {
+        "relation_id": "produce-signature",
+        "relation_type": "produces",
+        "from_id": "check_export_signature_only",
+        "to_id": "r-signature-only-084",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "provenance": [
+          {
+            "source_kind": "self_authored",
+            "classification": "CAPTURED_EXPLICIT",
+            "source_locator": "cp06/workflow.md#signature-producer",
+            "source_revision": "policy-world-s84",
+            "content_hash": "d2897c2e73d420515fa933eb780ebeb1c9900073953043b1550ee3b85d8ea1ab"
+          }
+        ]
+      }
+    ],
+    "provenance": [
+      {
+        "source_kind": "self_authored",
+        "classification": "CAPTURED_EXPLICIT",
+        "source_locator": "cp06/workflow.md",
+        "source_revision": "cp06-access-policy-world-v1",
+        "content_hash": "d4be0bdd550131e375e0d1318513a6108e609a00ebacd507e21b8c0b8ee72437"
+      }
+    ]
+  },
+  "assets": [
+    {
+      "asset_id": "system",
+      "relative_path": "prompt/system.txt",
+      "sha256": "5ccc0705287a3cf6256a389a4efdc797c36390b19334488479091edc20887cb2",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "task",
+      "relative_path": "prompt/task.txt",
+      "sha256": "e66feb80ce8caa24ff89df5c16f0c010eb85ce1ebcfd3deee5d08de613e3db89",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "request1",
+      "relative_path": "prompt/request1.txt",
+      "sha256": "4a91ede1abe4a5aedb071664f3accd648adea67c19d8db6b2fdfe3fd32ece14f",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "request2",
+      "relative_path": "prompt/request2.txt",
+      "sha256": "4f85ae29a3a40e6afd9ac0a76a8d206762727fd948a9f1ce669f958f943575c7",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "request3",
+      "relative_path": "prompt/request3.txt",
+      "sha256": "38310fc07489b536bfee4c59e9a0e7aa49c424f35d8e9dd207bb35a498ca8af9",
+      "kind": "prompt_text"
+    },
+    {
+      "asset_id": "policy_original",
+      "relative_path": "bodies/access_policy_original.json",
+      "sha256": "24458ef55c345b7f1a85cf3f7c5f797d593351e4c7f723766a839775da74ad41",
+      "kind": "context_attachment",
+      "event_id": "e-policy-original",
+      "revision_id": "access-policy-export@S84"
+    },
+    {
+      "asset_id": "policy_repeat",
+      "relative_path": "bodies/access_policy_audit_occurrence.json",
+      "sha256": "24458ef55c345b7f1a85cf3f7c5f797d593351e4c7f723766a839775da74ad41",
+      "kind": "context_attachment",
+      "event_id": "e-audit-repeat",
+      "revision_id": "access-policy-export@S84"
+    },
+    {
+      "asset_id": "receipt_inspect",
+      "relative_path": "bodies/receipt-policy-inspect.txt",
+      "sha256": "c8500e2bdaea68ec5275f0c8f55e1de332fd4433734b88d1b4135afcecc89694",
+      "kind": "environment_receipt",
+      "event_id": "e-policy-inspect-result",
+      "revision_id": "policy-inspect-receipt-084"
+    },
+    {
+      "asset_id": "receipt_summary",
+      "relative_path": "bodies/receipt-policy-summary.txt",
+      "sha256": "136bfac015fcb5f820cb56b6b9993c4a44094deb785e7bf67cce6ea3f31ed14e",
+      "kind": "environment_receipt",
+      "event_id": "e-policy-summary-result",
+      "revision_id": "policy-summary-receipt-084"
+    },
+    {
+      "asset_id": "receipt_audit",
+      "relative_path": "bodies/receipt-audit-2081.txt",
+      "sha256": "f1711d4e3232120b0a53306bba96cc3e601ff04d456c6690908b90bd46f476eb",
+      "kind": "environment_receipt",
+      "event_id": "e-audit-result",
+      "revision_id": "audit-receipt-AUD-2081"
+    },
+    {
+      "asset_id": "receipt_signature",
+      "relative_path": "bodies/receipt-signature-only.txt",
+      "sha256": "d2897c2e73d420515fa933eb780ebeb1c9900073953043b1550ee3b85d8ea1ab",
+      "kind": "environment_receipt",
+      "event_id": "e-signature-result",
+      "revision_id": "signature-receipt-084"
+    }
+  ],
+  "action_menu": [
+    {
+      "action_slot": 1,
+      "action_id": "inspect_policy_index",
+      "action_event_id": "e-policy-inspect-action",
+      "result_event_id": "e-policy-inspect-result",
+      "result_asset_id": "receipt_inspect",
+      "state_after": "policy_index_s84_inspected"
+    },
+    {
+      "action_slot": 1,
+      "action_id": "read_policy_summary",
+      "action_event_id": "e-policy-summary-action",
+      "result_event_id": "e-policy-summary-result",
+      "result_asset_id": "receipt_summary",
+      "state_after": "policy_summary_only"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "verify_audit_receipt",
+      "action_event_id": "e-audit-action",
+      "result_event_id": "e-audit-result",
+      "result_asset_id": "receipt_audit",
+      "state_after": "audit_receipt_AUD_2081_verified"
+    },
+    {
+      "action_slot": 2,
+      "action_id": "check_export_signature_only",
+      "action_event_id": "e-signature-action",
+      "result_event_id": "e-signature-result",
+      "result_asset_id": "receipt_signature",
+      "state_after": "signature_only_checked"
+    }
+  ],
+  "request_templates": [
+    {
+      "request_slot": 1,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request1"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-policy-original"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 2,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request1"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-policy-original"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "request2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "request_slot": 3,
+      "messages": [
+        {
+          "role": "system",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "system"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "task"
+            },
+            {
+              "kind": "asset",
+              "asset_id": "request1"
+            },
+            {
+              "kind": "event_body",
+              "event_id": "e-policy-original"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "request2"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 2
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "asset",
+              "asset_id": "request3"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "parts": [
+            {
+              "kind": "event_body",
+              "event_id": "e-audit-repeat"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evaluation_key_path": "evaluation/key.json",
+  "evaluation_key_sha256": "d08c1e750118ae28210aef4e058722e8e9e2bac89d88fe51e1fb32872e5350e6",
+  "assistant_output_planning_bytes": 4096,
+  "token_proof_inputs": null
+}

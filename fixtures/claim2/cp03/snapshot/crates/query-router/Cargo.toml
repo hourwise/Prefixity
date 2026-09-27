@@ -1,0 +1,15 @@
+[package]
+name = "query-router"
+version = "1.8.3"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+cache-engine = { path = "../cache-engine", version = "5.2" }
+snapshot-index = { path = "../snapshot-index", version = "3.1" }
+wire-schema = { path = "../wire-schema", version = "2.4" }
+
+[features]
+default = ["prefix"]
+prefix = []

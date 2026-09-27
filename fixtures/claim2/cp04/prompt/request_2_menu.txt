@@ -1,0 +1,3 @@
+Request 2 action menu (choose one action_id):
+- verify_restored_state: verify the active branch, source revision, cleanliness, and account-scope setting after restoration.
+- read_failed_candidate_diff: inspect the failed candidate diff without verifying the restored worktree.

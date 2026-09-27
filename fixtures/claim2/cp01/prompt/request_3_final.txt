@@ -1,0 +1,1 @@
+Request 3 final task: use the original task, source export, both raw action outputs, and both environment receipts. Return exactly these answer fields: file, symbol, root_cause, configured_max_attempts, observed_attempts, minimal_fix, backoff_unit. Use JSON strings for text and a number for attempt counts.

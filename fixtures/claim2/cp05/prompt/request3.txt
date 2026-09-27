@@ -1,0 +1,1 @@
+Compare both native export occurrences using the receipts and snapshots. Return JSON answer fields: comparison, initial_occurrence_id, initial_source_revision, initial_world_state_revision, later_occurrence_id, later_source_revision, later_world_state_revision, operation_id, changed_state_field, before, after, should_prune_later_occurrence.

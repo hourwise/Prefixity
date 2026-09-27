@@ -1,0 +1,1 @@
+Inventory run inv-quarry-001 completed for query symbol-map-v1 at repository revision quarry-ledger-r1. The native context attachment e-inventory-original follows this receipt. The report was generated from 21 pinned source files with source-tree SHA-256 56c6e50d50c8cc3bc0f4ea717e009e2b744f0f7df40ea4dd2ba838908310a8a2; no file contents or search rows were omitted.

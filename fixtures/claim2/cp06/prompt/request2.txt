@@ -1,0 +1,1 @@
+Verify the approval receipt for the policy-index audit. Choose one action. The deterministic audit query returns the receipt and reattaches the exact policy occurrence named by the receipt. Allowed actions: {"action_id":"verify_audit_receipt"} or {"action_id":"check_export_signature_only"}.

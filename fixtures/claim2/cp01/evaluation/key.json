@@ -1,0 +1,43 @@
+{
+  "expected_action_ids": [
+    "inspect_retry_implementation",
+    "run_retry_regression"
+  ],
+  "expected_states_after_action": [
+    "source_loaded",
+    "retry_regression_failed_on_r41"
+  ],
+  "expected_result_event_ids": [
+    "e-result1",
+    "e-result2"
+  ],
+  "expected_final_answer": {
+    "file": "src/retry.py",
+    "symbol": "dispatch_with_retry",
+    "root_cause": "range(1, policy.max_attempts) excludes the configured final attempt",
+    "configured_max_attempts": 4,
+    "observed_attempts": 3,
+    "minimal_fix": "range(1, policy.max_attempts + 1)",
+    "backoff_unit": "milliseconds"
+  },
+  "required_event_ids": [
+    "e-task",
+    "e-source",
+    "e-action1",
+    "e-result1",
+    "e-action2",
+    "e-result2"
+  ],
+  "required_relation_ids": [
+    "produces-1-1",
+    "produces-2-1"
+  ],
+  "critical_event_ids": [
+    "e-task",
+    "e-source",
+    "e-action1",
+    "e-result1",
+    "e-action2",
+    "e-result2"
+  ]
+}

@@ -1,0 +1,1 @@
+Dependency inventory run inventory-dep-audit-001 completed at project revision dep-audit-r1. The native context attachment e-inventory-original follows this receipt. The report was generated from the checked-in workspace manifests, lockfile, compatibility contract, toolchain pin, and CI matrix.

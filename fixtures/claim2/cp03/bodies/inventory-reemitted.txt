@@ -1,0 +1,45 @@
+project=dep-audit
+snapshot_revision=dep-audit-r1
+inventory_producer=dependency-inventory-v1
+snapshot_tree_sha256=affa4f1dda48d1917b8044a4333fafbf259bbc0a755c10b9b35f88393787e993
+workspace_rust_version=1.78
+rust_toolchain_pin=1.82.0
+ci_toolchains=1.78.0,1.82.0
+release_profile_lto=true
+release_profile_codegen_units=1
+release_profile_panic=abort
+protocol_contract=wire-schema 2.4.1 wire_revision=4
+workspace_members:
+  crates/wire-schema: wire-schema 2.4.1 locked=2.4.1 edition=2021 rust=1.78 targets=lib features=
+  crates/segment-format: segment-format 1.6.4 locked=1.6.4 edition=2021 rust=1.78 targets=lib features=crc=[],default=[crc]
+  crates/snapshot-index: snapshot-index 3.1.0 locked=3.1.0 edition=2021 rust=1.78 targets=lib features=default=[sparse],recovery=[],sparse=[]
+  crates/cache-engine: cache-engine 5.3.0 locked=5.3.0 edition=2021 rust=1.78 targets=lib features=default=[memory],memory=[],metrics=[]
+  crates/query-router: query-router 1.8.3 locked=1.8.3 edition=2021 rust=1.78 targets=lib features=default=[prefix],prefix=[]
+  crates/recovery-journal: recovery-journal 0.9.2 locked=0.9.2 edition=2021 rust=1.78 targets=lib features=checkpoint=[],default=[checkpoint]
+  crates/audit-cli: audit-cli 0.7.2 locked=0.7.2 edition=2021 rust=1.78 targets=bin features=default=[reconcile],reconcile=[]
+dependency_edges:
+  audit-cli -> query-router: 1.8 resolves to 1.8.3; compatible=true
+  audit-cli -> recovery-journal: 0.9 resolves to 0.9.2; compatible=true
+  audit-cli -> wire-schema: 2.4 resolves to 2.4.1; compatible=true
+  cache-engine -> snapshot-index: 3.0 resolves to 3.1.0; compatible=true
+  cache-engine -> wire-schema: 2.3 resolves to 2.4.1; compatible=true
+  query-router -> cache-engine: 5.2 resolves to 5.3.0; compatible=true
+  query-router -> snapshot-index: 3.1 resolves to 3.1.0; compatible=true
+  query-router -> wire-schema: 2.4 resolves to 2.4.1; compatible=true
+  recovery-journal -> segment-format: 1.5 resolves to 1.6.4; compatible=true
+  segment-format -> wire-schema: 2.3 resolves to 2.4.1; compatible=true
+  snapshot-index -> segment-format: 1.6 resolves to 1.6.4; compatible=true
+  snapshot-index -> wire-schema: 2.4 resolves to 2.4.1; compatible=true
+protocol_consumer_contracts:
+  audit-cli: requires ^2.4; manifest_matches=true
+  cache-engine: requires ^2.3; manifest_matches=true
+  query-router: requires ^2.4; manifest_matches=true
+  segment-format: requires ^2.3; manifest_matches=true
+  snapshot-index: requires ^2.4; manifest_matches=true
+toolchain_floor_present_in_ci=true
+pinned_toolchain_present_in_ci=true
+reconciliation=compatible
+lock_package_count=7
+wire_schema_version=2.4.1
+cache_engine_version=5.3.0
+audit_cli_version=0.7.2

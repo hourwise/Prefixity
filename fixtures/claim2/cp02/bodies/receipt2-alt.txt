@@ -1,0 +1,1 @@
+CLI inspection run inspect-quarry-cli-001 opened the command entry point at revision quarry-ledger-r1. It did not inspect the service-to-index-to-cache call sites needed by the final request.

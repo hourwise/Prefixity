@@ -1,0 +1,1 @@
+Signature-only receipt SIG-VERIFY-084. No approval receipt was retrieved and no policy occurrence was attached.

@@ -1,0 +1,8 @@
+[recovery]
+restore_origin_on_probe_failure = true
+require_clean_worktree_after_restore = true
+source_revision_is_immutable = true
+
+[acceptance]
+require_account_scope = true
+require_strict_tenant_match = true

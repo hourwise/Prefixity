@@ -1,0 +1,1 @@
+Inspection receipt INS-CP01-18. Pinned repo snapshot: cp01-r41. Dispatcher defaults: connect_timeout_ms=250, request_timeout_ms=1800, max_attempts=4, backoff_ms=125. This action did not inspect the retry loop or execute a diagnostic.

@@ -41,6 +41,9 @@ const HOST: &str = "127.0.0.1";
 const PORT: u16 = 8080;
 const MAX_TURNS: u32 = 3;
 const MAX_RESPONSE_BYTES: usize = 4 * 1024 * 1024;
+// The task manifest binds a historical source revision, not the evolving policy.
+// Current live-executor provenance remains separately bound by gate identities.
+const H001_HISTORICAL_SOURCE_PATH: &str = "fixtures/provenance/phase1b9-748e4673.rs.txt";
 
 #[derive(Debug, thiserror::Error)]
 pub enum H001Error {
@@ -729,9 +732,17 @@ fn validate_artifacts(artifacts: &H001Artifacts) -> Result<(), H001Error> {
             "pilot arm set does not match h001 authorization".to_string(),
         ));
     }
-    let source_code = fs::read(workspace_path(
-        "crates/prefixity-controlled-benchmark/src/phase1b9.rs",
-    ))?;
+    expect_string(
+        &artifacts.source_manifest,
+        "source_revision.source_commit",
+        "748e4673e8454d2ac3e27cefabee9259992038aa",
+    )?;
+    expect_string(
+        &artifacts.source_manifest,
+        "source_revision.source_locator",
+        "crates/prefixity-controlled-benchmark/src/phase1b9.rs::build_held_out_cases::h001",
+    )?;
+    let source_code = fs::read(workspace_path(H001_HISTORICAL_SOURCE_PATH))?;
     let expected_source_file_sha = artifacts
         .source_manifest
         .pointer("/source_revision/source_file_sha256")
@@ -1330,10 +1341,7 @@ mod tests {
             .pointer("/source_revision/source_file_sha256")
             .and_then(Value::as_str)
             .unwrap();
-        let source = fs::read(workspace_path(
-            "crates/prefixity-controlled-benchmark/src/phase1b9.rs",
-        ))
-        .unwrap();
+        let source = fs::read(workspace_path(H001_HISTORICAL_SOURCE_PATH)).unwrap();
         let canonical = canonicalize_source_bytes(&source).unwrap();
         assert_eq!(sha256_hex(&canonical), expected);
     }

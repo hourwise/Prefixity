@@ -1,0 +1,7 @@
+# CP06 workflow: access-policy audit export and receipt consumer
+
+The pinned `identity-edge-control` workspace holds the complete effective policy-binding index used for deterministic access review. Its native exporter sorts the active bindings and omits credentials. Each row records principal, resource, effect, scope, approval, owner, enforcement point, condition, decision-cache interval, logging, retention, and operational reason. Reviewers need the whole index to trace an approval across the gateway and service boundaries.
+
+Occurrences `e-policy-original` and `e-audit-repeat` are exports of the same immutable object `policy-index-bc84`, source revision `access-policy-export@S84`, and world state `policy-index@S84`. The normal audit query `audit-query-AUD-2081` returns receipt `AUD-2081` and reattaches the export occurrence named in the signed evidence locator. The receipt body names `e-audit-repeat`, its artifact hash and revision; event `e-audit-result` references that occurrence and the frozen `DependsOn` edge points from the receipt to the repeated occurrence. The later attachment is therefore a real consumer dependency.
+
+The complete export is an operational review artifact, not content inserted to reach a byte target. Its exact body is pinned in two files because the workflow created two native occurrences from the unchanged source and state. Both occurrence IDs and the receipt ID are required in the final audit answer.

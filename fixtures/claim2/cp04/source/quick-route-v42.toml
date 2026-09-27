@@ -1,0 +1,11 @@
+[deployment]
+active_release_channel = "candidate"
+source_revision = "R42"
+
+[authorization]
+account_scope_required = false
+strict_tenant_match = false
+
+[routing]
+mode = "quick"
+allow_quick_route = true
