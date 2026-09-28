@@ -4250,8 +4250,38 @@ phase1c_claim2_tokenization --offline --locked -- preflight` passed as
 `739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45`, plan
 hash `6b7634a3fc7a3d4b76289aea1772c1df686a6641309acc9e307e5f330dfefdf6`, 54
 logical requests, 22 unique bodies, and zero server/inference contacts. Focused
-endpoint/client tests passed 7/7 and executable-guard tests passed 1/1. The
+endpoint/client tests passed 8/8 and executable-guard tests passed 1/1. The
 full `cargo test --workspace --offline --locked` passed, as did formatting,
 warnings-denied workspace Clippy, and Rust 1.86 workspace check. Plan
 generation reproduced the pinned bytes. All execution tests used the fake
 transport; no loopback endpoint or model was contacted.
+
+## Phase 1C Claim-2 tokenization preparation offline certification
+
+Current status: `OFFLINE_CERTIFIED_PENDING_EXACT_SHA_CI_AND_PROMOTION`.
+This entry supersedes the Phase 3 draft status above. The source-provenance
+commit is `2945e3af7f059df643d0f15cca45b3ba9f343249`. The release token-only
+client was rebuilt from that commit and frozen read-only at SHA-256
+`113ba4d5c9e7b8e01efa451427679572481a6196fb14aac73863e30d36d96e81`.
+The separate experiment identity is
+`claim2-tokenization-v1-a5a6b896555db8296318f38010b7120dad8ad191e1329f030e0f738f31b90b91`,
+sealed as `docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V1.json`.
+
+Evidence: the frozen executable passed offline preflight over all 54 logical
+requests and 22 unique bodies, with 32 duplicates avoided and zero contacts.
+The current GGUF and llama executable hashes matched the accepted identities.
+A read-only process/port inspection found no llama process or TCP 8080
+listener, and no `LLAMA_ARG_*` environment variable was present. One-byte
+binary substitution changed the frozen hash and was rejected; ledger and
+plan tampering/substitution tests passed. The original frozen client remained
+unchanged. The full locked/offline workspace suite, formatting, warnings-denied
+Clippy, Rust 1.86 check and focused endpoint-denial tests passed before the
+source-provenance commit. No server started; readiness, token-count and
+inference contacts are all zero.
+
+Interpretation: this is a distinct prepared tokenization experiment. All
+admission, context-fit and CPU outcomes remain unknown. The preparation is
+not operator-ready until the exact identity-bearing candidate passes every
+CI job and is promoted. The next step after successful publication is only
+the operator-started server boundary; Codex must stop before it and must not
+begin tokenization or inference.

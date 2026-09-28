@@ -1,9 +1,8 @@
 # Phase 1C Claim-2 non-inference tokenization preparation
 
-Status: `PHASE_3_IMPLEMENTATION_DRAFT_PENDING_SUPERVISOR_FREEZE`.
-No tokenizer contact, model startup, inference, source-provenance commit,
-executable freeze, tokenization identity, CI promotion, or operator-server
-readiness is claimed in this local preparation draft.
+Status: `OFFLINE_CERTIFIED_PENDING_EXACT_SHA_CI_AND_PROMOTION`.
+No tokenizer contact, model startup, inference, token admission result, CI
+promotion, or operator-server readiness is claimed by this record.
 
 ## Scope and frozen inputs
 
@@ -67,11 +66,11 @@ hash-to-logical-request mapping, per-hash token counts when usable, response
 status and body hashes, and the first failure. A fully counted record remains
 pending scientific review and makes no admission decision.
 
-The input-token response parser accepts exactly one integer count field named
-`input_tokens` or `tokens`; missing, ambiguous, non-integer, oversized, or
-non-200 responses are unusable. This response vocabulary is an implementation
-assumption pending a future operator result; any mismatch stops the pass and
-does not authorize a different tokenizer.
+The input-token response parser follows the repository's accepted
+`phase1c_v3_feasibility::parse_input_tokens` contract: `object` must equal
+`response.input_tokens`, and `input_tokens` must be an unsigned integer.
+Missing, malformed, oversized, or non-200 responses are unusable. Any future
+server-schema mismatch stops the pass and does not authorize another tokenizer.
 
 ## Preregistered metric definitions
 
@@ -121,10 +120,8 @@ Q4_K_M at
 `cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617`;
 reasoning off; context 8192; one slot; offline; loopback host and port 8080.
 
-After, and only after, the supervisor has committed source provenance, rebuilt
-and frozen the client, created the separate tokenization identity, completed
-offline certification and accepted the exact preparation, the operator may
-start the server with:
+After, and only after, the preparation has passed exact-commit CI and been
+promoted, the operator may start the server with:
 
 ```powershell
 C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe serve -m D:\Prefixity-Lab\models\Qwen3.5-9B\Qwen3.5-9B-Q4_K_M.gguf -c 8192 -np 1 --metrics --reasoning off --offline --host 127.0.0.1 --port 8080
@@ -137,14 +134,14 @@ either client mode against it.
 The intended offline command is:
 
 ```powershell
-.\target\release\phase1c_claim2_tokenization.exe preflight
+& 'D:\Users\fleur\Prefixity\target\claim2-tokenization-freeze\2945e3af7f059df643d0f15cca45b3ba9f343249\phase1c_claim2_tokenization.exe' preflight
 ```
 
-The future guarded execution command, unavailable until the separate freeze
-and identity steps are complete, is:
+The future guarded execution command, unavailable until exact-commit CI and
+promotion succeed, is:
 
 ```powershell
-.\target\release\phase1c_claim2_tokenization.exe execute --operator-started --model-path D:\Prefixity-Lab\models\Qwen3.5-9B\Qwen3.5-9B-Q4_K_M.gguf --model-sha256 cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13 --llama-path C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe --llama-sha256 cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617 --llama-build b10217-ddd4ec142 --context 8192 --slots 1 --reasoning off --offline --host 127.0.0.1 --port 8080 --evidence .\claim2-tokenization-pass-evidence-v1.json
+& 'D:\Users\fleur\Prefixity\target\claim2-tokenization-freeze\2945e3af7f059df643d0f15cca45b3ba9f343249\phase1c_claim2_tokenization.exe' execute --operator-started --model-path D:\Prefixity-Lab\models\Qwen3.5-9B\Qwen3.5-9B-Q4_K_M.gguf --model-sha256 cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13 --llama-path C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe --llama-sha256 cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617 --llama-build b10217-ddd4ec142 --context 8192 --slots 1 --reasoning off --offline --host 127.0.0.1 --port 8080 --evidence .\claim2-tokenization-pass-evidence-v1.json
 ```
 
 The command records the operator's confirmations; it does not independently
@@ -163,7 +160,7 @@ plan hashes, verified 54 logical requests and 22 sorted unique bodies, and
 reported 0 server contacts and 0 inference requests. It did not create an
 HTTP client, read the model file, or start a process.
 
-The focused client test target passed 7/7 tests, covering exact allowlist
+The focused client test target passed 8/8 tests, covering exact allowlist
 paths, generation-path rejection, plan and ledger tamper/substitution,
 unchanged 22-entry ordering, exact-body dispatch through a fake transport,
 readiness stop, token-response parse stop, no retries, and partial evidence.
@@ -173,10 +170,51 @@ warnings denied, and the Rust 1.86 locked/offline workspace check passed.
 Plan generation reproduced the pinned bytes. All contact accounting in these
 tests used fake transports; no test contacted the loopback endpoint.
 
-Interpretation: implementation and offline checks support review of this
-draft only. The Phase 2 exact-hash review has been accepted by the supervisor,
-but this Phase 3 source has not been source-committed or frozen as an
-executable. No separate experiment identity, offline executable certification,
-CI result, promotion SHA, operator server startup, readiness request, or token
-count exists yet. Supervisor review and those preparation gates remain before
-operator use.
+## Source-provenance freeze and offline certification
+
+The source-provenance commit is
+`2945e3af7f059df643d0f15cca45b3ba9f343249`, descended from
+the accepted `cabb729ba417a8f42f90848fd28f0d1bbdedfe93` main baseline.
+The locked/offline release build from that commit produced a 3,792,896-byte
+Windows executable. A read-only copy was frozen at the path used in the two
+commands above, with SHA-256
+`113ba4d5c9e7b8e01efa451427679572481a6196fb14aac73863e30d36d96e81`
+and Windows file ID `0x00000000000000000006000000459c59`.
+
+The distinct [tokenization experiment identity](PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V1.json)
+is `claim2-tokenization-v1-a5a6b896555db8296318f38010b7120dad8ad191e1329f030e0f738f31b90b91`.
+Its [canonical SHA-256 seal](PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V1.sha256)
+is `4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16`.
+It binds source blob hashes, the successor and domain ledgers, all six fixture
+identities, all 54 logical request hashes and message hashes, the 22-entry
+sorted deduplication map, frozen executable path/hash/size/file ID, accepted
+GGUF and llama executable identities, fixed runtime and endpoint contract,
+contact limits, and zero-inference rule. This identity does not reuse the
+historical 9B competence-gate identity.
+
+Before sealing, the frozen executable's offline `preflight` accepted the exact
+ledger/plan hashes and reported 54 logical requests, 22 unique bodies, 32
+duplicates avoided, and zero server or inference contacts. A read-only
+process/port check observed no llama process or TCP listener on port 8080;
+the current shell had no `LLAMA_ARG_*` variable. `Get-CimInstance` was denied
+by the environment, so `Get-Process` and `netstat` supplied the read-only
+absence check. The accepted GGUF and llama executable hashes were verified
+from the current files without loading the model. A separate one-byte
+substituted client copy had a different SHA-256 and was rejected by the
+identity check; the frozen copy remained unchanged. The focused ledger/plan
+tests reject tampering and substitution before transport creation.
+
+After promotion and immediately before any future execution, verify that the
+frozen executable still has the bound SHA-256. A substituted executable must
+not be used. The operator-started server's process, command line, loaded
+artifact, listener and exclusivity must be verified separately before any
+token-count contact; the CLI confirmation flags alone do not establish those
+runtime facts. The exact future execution command above writes to a new file
+in the repository root, whose parent already exists. Do not run it during
+this preparation.
+
+Supervisor interpretation: request identity and non-inference preparation are
+offline-certified. No actual input-token count, threshold result, context-fit
+result or updated CPU classification exists. Candidate CI and exact-SHA
+promotion remain the only preparation-publication gates. No operator server
+startup, readiness request, input-token request or inference occurred.
