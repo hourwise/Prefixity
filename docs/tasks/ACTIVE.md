@@ -4337,3 +4337,52 @@ llama processes, zero port-8080 listeners, and zero tokenization clients.
 No frozen fixture, ledger, plan, identity, source, or admission criterion was
 changed. Publication CI and exact-SHA promotion remain; the next substantive
 task is only `CLAIM_2_WORKLOAD_DESIGN_REVIEW`, which is not started here.
+
+## Phase 1C Claim-2 workload V2 design review
+
+Current status: `CLAIM_2_WORKLOAD_V2_DESIGN_READY`. The V1
+`WORKLOAD_TOKEN_ADMISSION_FAILED` outcome remains immutable. CP01 and CP04
+are each `V1_POSITIVE_FAILED_CONTEXT_PRESSURE_ADMISSION` at 775 tokens saved
+versus the 800-token absolute gate, even though both ratio gates pass. CP02
+and CP03 remain measured V1 positives; CP05 and CP06 remain unchanged
+zero-mutation controls. No V1 fixture, threshold, identity, or evidence was
+modified.
+
+The accepted offline V2 design fixes the case-major roster as
+CP02/CP03/CP07/CP08/CP05/CP06, with four positive cases, two controls, three
+requests per arm, and 54 maximum future inference requests only in separately
+authorized scored work. CP07 proposes deterministic synthetic benefits /
+coverage adjudication; CP08 proposes deterministic synthetic cold-chain lot
+disposition. Both require naturally produced, byte-identical same-state
+native-message reattachments selected by the unchanged blinded
+`EXACT_DUPLICATE_PRUNE` sequence rule. Naturalness and size margin remain
+hypotheses until offline materialization proves them. Frozen V2 criteria
+remain 800 absolute request-3 tokens, 20% request-3 reduction, 8% cumulative
+reduction, input at most 6,000 tokens and within the 8,192 context plus
+1,024 output reservation, with exact zero-mutation controls.
+
+Evidence reuse is conditional: exact UTF-8 request-body identity and matching
+tokenizer/model, llama build, template behavior, endpoint, and relevant
+runtime conditions are required to inherit the 14 sealed V1 unique counts
+covering 36 retained-case logical requests. Changed V2 bodies need counts
+unless another sealed matching measurement exists; unverifiable seals or
+instrument drift require a complete fresh V2 tokenization pass. The review
+records measured V1 evidence separately from V2 design hypotheses and CPU
+planning arithmetic.
+
+Work completed: documentation-only review in
+[`docs/phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_DESIGN_REVIEW.md`](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_DESIGN_REVIEW.md),
+with the knowledge index updated. No implementation, fixture, ledger,
+tokenization plan, identity, server contact, token count, or inference was
+performed. Remaining gates are V2 offline materialization and review, then a
+separate exact non-inference token-admission pass and review. Scored-pilot
+preparation would require its own subsequent authorization.
+
+Validation performed: review document covers the supervisor's 20 required
+decisions; changed Markdown links, whitespace, and exact three-file scope
+were checked. No Rust tests or benchmarks apply to this documentation-only
+task. Publication remains gated on exact-commit CI and promotion.
+
+Next authorized task: `CLAIM_2_WORKLOAD_V2_MATERIALIZATION_PREPARATION`.
+Do not begin tokenization, scored-pilot preparation, or inference from this
+record.

@@ -74,6 +74,7 @@
 | [`../fixtures/claim2/tokenization-request-ledger-v1.json`](../fixtures/claim2/tokenization-request-ledger-v1.json) and [`../fixtures/claim2/README.md`](../fixtures/claim2/README.md) | Exact offline canonical-history request bodies for the 54 CP01–CP06 case/arm/slot combinations, their hashes and observed exact-body grouping. | Reviewing Phase 1 request identity before any separately authorized tokenizer client or server contact. |
 | [`phase-1/PHASE_1C_CLAIM_2_NON_INFERENCE_TOKENIZATION_PREPARATION.md`](phase-1/PHASE_1C_CLAIM_2_NON_INFERENCE_TOKENIZATION_PREPARATION.md), [`PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V1.json`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V1.json), and [`../fixtures/claim2/tokenization-contact-plan-v1.json`](../fixtures/claim2/tokenization-contact-plan-v1.json) | Frozen 54-request/22-body token-only plan, source-provenance commit, executable identity, offline certification, failure accounting, preregistered future metrics, and operator boundary. | Historical preparation record; the executed result is recorded separately below. |
 | [`phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_EXECUTION_RESULT.md`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_EXECUTION_RESULT.md), [`PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V1.json`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V1.json), and [`../claim2-tokenization-pass-evidence-v1.json`](../claim2-tokenization-pass-evidence-v1.json) | Single non-inference pass: 22 authoritative unique counts mapped to 54 logical requests, context fit, CP01/CP04 800-token failures, controls, CPU planning, evidence/result seals, and verified server shutdown. | Reviewing the observed `WORKLOAD_TOKEN_ADMISSION_FAILED` result; no scored pilot or workload redesign is included. |
+| [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_DESIGN_REVIEW.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_DESIGN_REVIEW.md) | Accepted offline V2 response to the immutable V1 admission failure: retained V1 classifications and counts, CP07/CP08 family designs, fixed roster and criteria, conditional evidence reuse, workload/runtime caveats, and materialization boundary. | Reviewing `CLAIM_2_WORKLOAD_V2_DESIGN_READY`; only offline V2 materialization preparation is next. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
@@ -135,20 +136,18 @@ competence gate executed once and passed (`LOCAL_9B_FEASIBILITY_PASSED`). The
 offline pilot-context adequacy review accepted the instrument but found the
 existing workload inadequate for Claim-2 efficacy, retaining its six cases
 only as a dependency-safety battery. The offline
-`CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN` is accepted as
-`CLAIM_2_WORKLOAD_DESIGN_READY`: it proposes four positive duplicate-context
-cases and two dependency controls, with actual three-request trajectories and
-deterministic evaluation. The historical battery remains separate and
-unchanged. Offline materialization is now complete:
-`CLAIM_2_WORKLOAD_MATERIALIZATION_READY_FOR_TOKENIZATION_REVIEW`.
-The six fixtures, deterministic three-request machinery, and 54-slot byte
-ledger exist; no model requests have run. All token-fit and reduction proofs
-remain `EXACT_TOKENIZATION_REQUIRED`. Larger-output CPU scenarios require
-practicality review. The next substantive task is a separately authorized
-`NON_INFERENCE_CONTEXT_TOKENIZATION_PASS`; this record authorizes no server
-startup, tokenization, live preparation, or inference. No scored comparison
-has completed and no inference is currently authorized. The Phase 1A
-corpus/import evidence and the later Phase 1B/1C results are documented in the linked closeouts and gates above.
+`CLAIM_2_CONTEXT_PRESSURE_WORKLOAD_DESIGN` and its six-case materialization
+remain historical and unchanged. The single V1 non-inference pass completed
+with `WORKLOAD_TOKEN_ADMISSION_FAILED`: CP01 and CP04 each measured 775 tokens
+of reduction against the 800-token gate; CP02 and CP03 passed, and CP05/CP06
+remained zero-mutation controls. The offline V2 design review is accepted as
+`CLAIM_2_WORKLOAD_V2_DESIGN_READY`, with fixed roster
+CP02/CP03/CP07/CP08/CP05/CP06 and conditional reuse of exact sealed V1 counts.
+The next task is only offline
+`CLAIM_2_WORKLOAD_V2_MATERIALIZATION_PREPARATION`; no V2 fixtures, counts,
+scored-pilot preparation, server startup, or inference are authorized here.
+The Phase 1A corpus/import evidence and later Phase 1B/1C results remain in
+the linked closeouts and gates above.
 
 For history, use `git log` and [`research/PRIOR_ART.md`](research/PRIOR_ART.md)
 when the task requires provenance or prior-art context.
