@@ -40,9 +40,12 @@ impl TokenizationTransport for FakeTransport {
     fn input_tokens(&mut self, exact_body: &[u8]) -> Result<RawHttpResponse, String> {
         self.token_calls += 1;
         self.sent_bodies.push(exact_body.to_vec());
-        self.token_results
-            .pop_front()
-            .unwrap_or_else(|| Ok(response(200, b"{\"input_tokens\":100}")))
+        self.token_results.pop_front().unwrap_or_else(|| {
+            Ok(response(
+                200,
+                b"{\"input_tokens\":100,\"object\":\"response.input_tokens\"}",
+            ))
+        })
     }
 }
 
@@ -211,8 +214,14 @@ fn malformed_token_response_stops_without_retry_and_preserves_partial_counts() {
     let inputs = accepted_inputs();
     let mut fake = FakeTransport {
         token_results: VecDeque::from([
-            Ok(response(200, b"{\"input_tokens\":\"100\"}")),
-            Ok(response(200, b"{\"input_tokens\":101}")),
+            Ok(response(
+                200,
+                b"{\"input_tokens\":\"100\",\"object\":\"response.input_tokens\"}",
+            )),
+            Ok(response(
+                200,
+                b"{\"input_tokens\":101,\"object\":\"response.input_tokens\"}",
+            )),
         ]),
         ..FakeTransport::default()
     };
@@ -233,6 +242,30 @@ fn malformed_token_response_stops_without_retry_and_preserves_partial_counts() {
     assert_eq!(evidence.unique_request_results[0].input_tokens, None);
     assert_eq!(evidence.unique_request_results[1].status, "NOT_CONTACTED");
     assert_eq!(saved.last().unwrap(), &evidence);
+}
+
+#[test]
+fn token_response_requires_the_accepted_llama_object_and_input_tokens_field() {
+    let inputs = accepted_inputs();
+    for body in [
+        br#"{"input_tokens":100}"#.as_slice(),
+        br#"{"tokens":100,"object":"response.input_tokens"}"#.as_slice(),
+        br#"{"input_tokens":100,"object":"another.response"}"#.as_slice(),
+    ] {
+        let mut fake = FakeTransport {
+            token_results: VecDeque::from([Ok(response(200, body))]),
+            ..FakeTransport::default()
+        };
+        let evidence = execute_plan_with_transport(&inputs, &mut fake, |_| Ok(())).unwrap();
+        assert_eq!(fake.readiness_calls, 1);
+        assert_eq!(fake.token_calls, 1);
+        assert_eq!(
+            evidence.terminal_classification.as_deref(),
+            Some("TOKENIZATION_PASS_INCONCLUSIVE")
+        );
+        assert_eq!(evidence.unique_request_results[0].status, "FAILED");
+        assert_eq!(evidence.unique_request_results[1].status, "NOT_CONTACTED");
+    }
 }
 
 #[test]

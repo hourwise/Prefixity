@@ -562,20 +562,16 @@ fn parse_token_count(response: &RawHttpResponse) -> Result<ParsedTokenCount, Str
     let object = value
         .as_object()
         .ok_or_else(|| "input-token response is not a JSON object".to_owned())?;
-    let fields = ["input_tokens", "tokens"]
-        .into_iter()
-        .filter(|key| object.contains_key(*key))
-        .collect::<Vec<_>>();
-    if fields.len() != 1 {
-        return Err("input-token response must contain exactly one supported count field".into());
+    if object.get("object").and_then(Value::as_str) != Some("response.input_tokens") {
+        return Err("input-token response object is not response.input_tokens".into());
     }
-    let field = fields[0];
-    let count = object[field].as_u64().ok_or_else(|| {
-        format!("input-token response field {field} is not a nonnegative integer")
-    })?;
+    let count = object
+        .get("input_tokens")
+        .and_then(Value::as_u64)
+        .ok_or_else(|| "input-token response has no unsigned input_tokens".to_owned())?;
     Ok(ParsedTokenCount {
         count,
-        field: field.to_owned(),
+        field: "input_tokens".to_owned(),
     })
 }
 
