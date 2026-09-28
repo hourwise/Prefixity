@@ -4285,3 +4285,55 @@ not operator-ready until the exact identity-bearing candidate passes every
 CI job and is promoted. The next step after successful publication is only
 the operator-started server boundary; Codex must stop before it and must not
 begin tokenization or inference.
+
+## Phase 1C Claim-2 non-inference tokenization execution result
+
+Current state: `WORKLOAD_TOKEN_ADMISSION_FAILED`. This entry supersedes the
+offline preparation status above. The one fixed client execution used the
+promoted preparation commit `0177b2a7277aeb5cf1c75974f95fcb8259677b7f`,
+identity `claim2-tokenization-v1-a5a6b896555db8296318f38010b7120dad8ad191e1329f030e0f738f31b90b91`,
+and frozen executable SHA-256
+`113ba4d5c9e7b8e01efa451427679572481a6196fb14aac73863e30d36d96e81`.
+Before contact, the promoted repository, identity seal, request-plan and
+predecessor hashes, frozen executable, GGUF, llama executable, operator-started
+PID/command line/listener, empty `LLAMA_ARG_*` environment, absent competing
+client, and fresh evidence target were checked. No server was started or
+reconfigured by Codex.
+
+Raw evidence is `claim2-tokenization-pass-evidence-v1.json`, 14,789 bytes,
+SHA-256 `caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264`.
+The separately interpreted result is
+`docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V1.json`, canonical seal
+`03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040`.
+The result document is
+`docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_EXECUTION_RESULT.md`.
+
+Evidence: one readiness contact and all 22 registered unique input-token
+contacts succeeded with HTTP 200; 32 duplicate contacts were avoided and 54
+logical requests were mapped. Inference requests were zero. All 54 inputs
+were at most 6,000 tokens and satisfied the 8,192 context with the 1,024-token
+output reservation; maximum input was 4,078 at CP02 BASELINE/NO_OP slot 3.
+CP01 and CP04 each saved 775 tokens, missing the preregistered 800-token
+minimum. CP02 saved 985 and CP03 saved 898; all positives passed the 20%
+request-3 and 8% cumulative ratio gates. CP05 and CP06 preserved exact body
+and count equality across arms with zero legal reduction. This is a valid
+workload-admission failure, not an infrastructure or model-side outcome.
+
+Planning interpretation: complete-cohort logical input was 88,772 tokens
+(BASELINE 30,735; NO_OP 30,735; INTERVENTION 27,302). Historical-rate
+prefill arithmetic is 2.466–2.740 hours; 50–150 output-token scenarios yield
+2.841–4.615 hours before 18 fresh starts and overhead, while the full output
+ceiling yields 10.146–15.540 hours. No full-workload runtime was measured.
+Keep historical `MODEL_CAPABILITY_ACCEPTED` separate from
+`CPU_RUNTIME_PRACTICALITY_REVIEW_REQUIRED`; neither changes the failed
+token-admission result.
+
+Validation: the raw hash, canonical result seal, ordered 22-count plan,
+54-request mapping, integer thresholds, case/control arithmetic, and context
+limits were independently checked. The original operator server was
+re-identified by PID, parent, executable, creation time, command line, and
+listener ownership before shutdown. Final read-only inspection found zero
+llama processes, zero port-8080 listeners, and zero tokenization clients.
+No frozen fixture, ledger, plan, identity, source, or admission criterion was
+changed. Publication CI and exact-SHA promotion remain; the next substantive
+task is only `CLAIM_2_WORKLOAD_DESIGN_REVIEW`, which is not started here.

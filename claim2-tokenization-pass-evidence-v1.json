@@ -1,0 +1,395 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-tokenization-pass-evidence",
+  "schema_version": 1,
+  "status": "TOKENIZATION_COUNTS_COMPLETE_PENDING_REVIEW",
+  "terminal_classification": null,
+  "source_identities": {
+    "ledger_sha256": "739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45",
+    "contact_plan_sha256": "6b7634a3fc7a3d4b76289aea1772c1df686a6641309acc9e307e5f330dfefdf6"
+  },
+  "planned_accounting": {
+    "logical_requests": 54,
+    "unique_request_bodies": 22,
+    "duplicate_logical_requests_avoided": 32,
+    "maximum_readiness_contacts": 1,
+    "maximum_token_count_contacts": 22,
+    "inference_allowance": 0
+  },
+  "operator_runtime_confirmation": {
+    "context_tokens": "8192",
+    "host": "127.0.0.1",
+    "llama_build": "b10217-ddd4ec142",
+    "llama_executable_path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+    "llama_sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+    "model_path": "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+    "model_sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+    "offline": true,
+    "operator_started_server": true,
+    "port": "8080",
+    "reasoning": "off",
+    "slots": "1"
+  },
+  "contact_accounting": {
+    "readiness_contacts": 1,
+    "unique_token_count_contacts": 22,
+    "inference_requests": 0
+  },
+  "readiness": {
+    "status": "READY",
+    "http_status": 200,
+    "response_body_sha256": "a29ee2b15c494311c52521766e44af56a3ad2248e7a8ab465e5206463c13d288",
+    "response_body_utf8_byte_length": 15,
+    "error": null
+  },
+  "unique_request_results": [
+    {
+      "request_body_sha256": "1c2f560d657c92dc6fc15de741d1d2288047c9042529c5d8c5837dbdd0d052ba",
+      "representative_logical_request_id": "CP04/BASELINE/slot-1",
+      "logical_request_ids": [
+        "CP04/BASELINE/slot-1",
+        "CP04/INTERVENTION/slot-1",
+        "CP04/NO_OP/slot-1"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 995,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "cd0add2b747b0df0f2038aa6397d0b5f167a99daab0a99e0842b9272e74d2caf",
+      "response_body_utf8_byte_length": 53,
+      "error": null
+    },
+    {
+      "request_body_sha256": "42e10249297e65ffc01d958288646c5a06abfc302d42630ed34467c37b9e174e",
+      "representative_logical_request_id": "CP04/BASELINE/slot-3",
+      "logical_request_ids": [
+        "CP04/BASELINE/slot-3",
+        "CP04/NO_OP/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 2139,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "f8aa1a729b64dad8b2ef7f20bb7aef39c6a12f60723ee76e9088158f9992eeab",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "54dd6b7dce7f4d6a4f933f98f843d5648685ed91d262d84d95cfbac3803f8314",
+      "representative_logical_request_id": "CP01/BASELINE/slot-1",
+      "logical_request_ids": [
+        "CP01/BASELINE/slot-1",
+        "CP01/INTERVENTION/slot-1",
+        "CP01/NO_OP/slot-1"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 987,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "a9f0b34d3bf49586ff9076853acadd2350a22961029e5ad4ee85e9de989a1b13",
+      "response_body_utf8_byte_length": 53,
+      "error": null
+    },
+    {
+      "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+      "representative_logical_request_id": "CP06/BASELINE/slot-2",
+      "logical_request_ids": [
+        "CP06/BASELINE/slot-2",
+        "CP06/INTERVENTION/slot-2",
+        "CP06/NO_OP/slot-2"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1655,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "d8afc6472dcdadf3bd1decfbf216e3389182d23b1f4c7a94f1c4081e3c5ad925",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+      "representative_logical_request_id": "CP02/BASELINE/slot-2",
+      "logical_request_ids": [
+        "CP02/BASELINE/slot-2",
+        "CP02/INTERVENTION/slot-2",
+        "CP02/NO_OP/slot-2"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1440,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "c9d88b11c59ebf5bf523f58634dab9548958ac7361bfde3af2e9a2099ee00d8c",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+      "representative_logical_request_id": "CP03/BASELINE/slot-2",
+      "logical_request_ids": [
+        "CP03/BASELINE/slot-2",
+        "CP03/INTERVENTION/slot-2",
+        "CP03/NO_OP/slot-2"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1305,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "38a7174753795c005354dd4f076a8bfac9731c03d59c467dfdb64f597c3bbec6",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "7b01b5a5ea6b6c60938d890c2ed51f1fa9ecf906e3f2c5e4c00ed360eac7e21e",
+      "representative_logical_request_id": "CP01/BASELINE/slot-2",
+      "logical_request_ids": [
+        "CP01/BASELINE/slot-2",
+        "CP01/INTERVENTION/slot-2",
+        "CP01/NO_OP/slot-2"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1126,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "9a21353142964bf2f7772d15de5ccf8571bd95206c877fcc75d783ae5dce954b",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+      "representative_logical_request_id": "CP03/BASELINE/slot-1",
+      "logical_request_ids": [
+        "CP03/BASELINE/slot-1",
+        "CP03/INTERVENTION/slot-1",
+        "CP03/NO_OP/slot-1"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 249,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "99fc3bd0bd42ff2f25668e3b4a74f73451a6ef7a26d86f4d5223b2e9708a1fbc",
+      "response_body_utf8_byte_length": 53,
+      "error": null
+    },
+    {
+      "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+      "representative_logical_request_id": "CP06/BASELINE/slot-3",
+      "logical_request_ids": [
+        "CP06/BASELINE/slot-3",
+        "CP06/INTERVENTION/slot-3",
+        "CP06/NO_OP/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 3167,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "8c6311df9262c3b0402f45db394bcff81779033859201e93c268cfe6b3465880",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "ad2f0e08f54d4be72dcfda69de61e3ed843501c80fe899064b23176fdcf8c81a",
+      "representative_logical_request_id": "CP04/BASELINE/slot-2",
+      "logical_request_ids": [
+        "CP04/BASELINE/slot-2",
+        "CP04/INTERVENTION/slot-2",
+        "CP04/NO_OP/slot-2"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1171,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "fad0072e39b5651752fa91b59c6d87685c607f4e376f8a124db3f42976f2af7c",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+      "representative_logical_request_id": "CP06/BASELINE/slot-1",
+      "logical_request_ids": [
+        "CP06/BASELINE/slot-1",
+        "CP06/INTERVENTION/slot-1",
+        "CP06/NO_OP/slot-1"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1443,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "c72c116a526e9229aa3be2f6f7ae13ee017ef4d8f88d58491fbb2f765132103b",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "bf451be17a2d5f395c1e3724c81e95848a3f55553b2d771dfe2a56d1459275a9",
+      "representative_logical_request_id": "CP01/BASELINE/slot-3",
+      "logical_request_ids": [
+        "CP01/BASELINE/slot-3",
+        "CP01/NO_OP/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 2152,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "86ec261c50420533aa81e97af8b55aec251c67f73466608865def48642d3c4f9",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+      "representative_logical_request_id": "CP05/BASELINE/slot-3",
+      "logical_request_ids": [
+        "CP05/BASELINE/slot-3",
+        "CP05/INTERVENTION/slot-3",
+        "CP05/NO_OP/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 3101,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "bc73f83f1e09a5c8278d436aed3e58735da6b6ad3612bb35713ea3f6a9b173bb",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+      "representative_logical_request_id": "CP05/BASELINE/slot-1",
+      "logical_request_ids": [
+        "CP05/BASELINE/slot-1",
+        "CP05/INTERVENTION/slot-1",
+        "CP05/NO_OP/slot-1"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1390,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "bd0051886f289a9c08403d907a74c7045d9688030735234a57bd6893f6a3a7cd",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+      "representative_logical_request_id": "CP03/INTERVENTION/slot-3",
+      "logical_request_ids": [
+        "CP03/INTERVENTION/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1590,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "18a3b1ed3ea43d50252c096de908ed73739e3b926cfdd78ecddbdaba122ca02b",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+      "representative_logical_request_id": "CP02/BASELINE/slot-3",
+      "logical_request_ids": [
+        "CP02/BASELINE/slot-3",
+        "CP02/NO_OP/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 4078,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "a2de35975717b6bb87facde72f338de586c17942ed497874a7d7223aca64092f",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "e3f63f2eb75fc1d0a5acf50e48000bdf5556dd6c58470438716e2d89dd554b49",
+      "representative_logical_request_id": "CP04/INTERVENTION/slot-3",
+      "logical_request_ids": [
+        "CP04/INTERVENTION/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1364,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "21f42f67aeba6e9cbf6afb63c2d43df4f544cddfdb7a50a739a961abbbeb3ae6",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+      "representative_logical_request_id": "CP02/INTERVENTION/slot-3",
+      "logical_request_ids": [
+        "CP02/INTERVENTION/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 3093,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "203c3b4b38ad29ec70aa6c354142bc0dd838e204b69b022f4411bcc7875f932d",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+      "representative_logical_request_id": "CP03/BASELINE/slot-3",
+      "logical_request_ids": [
+        "CP03/BASELINE/slot-3",
+        "CP03/NO_OP/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 2488,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "7c6c18fcfe049c70f4a0efbd9a72a54c5da1dcc077f05fa76573ca7445465547",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "ec475ae1d1aea5fc31e90d5d3432be4e74799a20b8431dd22fc0a8054098f80d",
+      "representative_logical_request_id": "CP01/INTERVENTION/slot-3",
+      "logical_request_ids": [
+        "CP01/INTERVENTION/slot-3"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1377,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "78df7ca8a4eabd07087e480a095718439947a086146316267fe288466d676758",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    },
+    {
+      "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+      "representative_logical_request_id": "CP02/BASELINE/slot-1",
+      "logical_request_ids": [
+        "CP02/BASELINE/slot-1",
+        "CP02/INTERVENTION/slot-1",
+        "CP02/NO_OP/slot-1"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 241,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "b805c943190c809e894c3d704b2dc084f6af12718b9b911d7419b9de8245c795",
+      "response_body_utf8_byte_length": 53,
+      "error": null
+    },
+    {
+      "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+      "representative_logical_request_id": "CP05/BASELINE/slot-2",
+      "logical_request_ids": [
+        "CP05/BASELINE/slot-2",
+        "CP05/INTERVENTION/slot-2",
+        "CP05/NO_OP/slot-2"
+      ],
+      "status": "COUNTED",
+      "http_status": 200,
+      "input_tokens": 1608,
+      "response_count_field": "input_tokens",
+      "response_body_sha256": "26916aec806ec1fbd6b76267d0d473f8f95efd6542114b20f51a2eb4de1eed37",
+      "response_body_utf8_byte_length": 54,
+      "error": null
+    }
+  ],
+  "admission_outcomes": {
+    "context_fit": null,
+    "control_zero_mutation": null,
+    "cpu_practicality": null,
+    "cumulative_reduction_8_percent": null,
+    "materiality_800_tokens": null,
+    "positive_reduction": null,
+    "request3_reduction_20_percent": null
+  }
+}
