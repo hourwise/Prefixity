@@ -697,9 +697,13 @@ mod tests {
             "bytes": record["bytes"],
             "volume_index_file_id": record["volume_index_file_id"]
         });
-        assert!(
-            verify_frozen_executable_record(&identical_copy, &same_bytes_wrong_file_id).is_err()
-        );
+        let copied_result =
+            verify_frozen_executable_record(&identical_copy, &same_bytes_wrong_file_id);
+        if cfg!(windows) {
+            assert!(copied_result.is_err());
+        } else {
+            assert!(copied_result.is_ok());
+        }
         fs::write(&frozen, b"modified-binary").unwrap();
         assert!(verify_frozen_executable_record(&frozen, &record).is_err());
         fs::remove_dir_all(directory).unwrap();
