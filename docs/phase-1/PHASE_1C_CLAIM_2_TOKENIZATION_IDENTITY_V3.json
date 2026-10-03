@@ -1,0 +1,507 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-tokenization-v3-identity",
+  "schema_version": 3,
+  "experiment_id": "claim2-tokenization-v3-5ef8665ed781aa967d2f56ba2a78e74761827d86c7e6a16547835d8417bfbc84",
+  "classification": "OFFLINE_NON_INFERENCE_TOKENIZATION_PREPARATION",
+  "bindings": {
+    "materialization_commit": "64d732dad2448e768ce12bc13a15bf3081f63205",
+    "artifact_hashes": {
+      "v3_contract_sha256": "28d48448719433a9baa28c0b668cafade63c7858655be00a1fd9effbb638ac5e",
+      "v3_ledger_sha256": "406586d71839d91bc565b9db5da69a3d4152193c4109f7876e6a1dc56d89dce2",
+      "v3_advancing_domain_sha256": "d9f2de3056734026e364f0b2b89af8af8bf3cfbba78ded8e06533d9fc20c4186",
+      "v3_inheritance_map_sha256": "6a53ea43c74d20d8c5bf99483ffdf79e6706656076014fd4eb7728198bcb7aa2",
+      "v4_materialization_successor_sha256": "dbf40e192c60b6f27b3e0112eb639be29a91e71b59d369b4f43ad682337c1e03"
+    },
+    "logical_request_identities": [
+      {
+        "logical_request_id": "CP02/BASELINE/slot-1",
+        "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/BASELINE/slot-2",
+        "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/BASELINE/slot-3",
+        "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/NO_OP/slot-1",
+        "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/NO_OP/slot-2",
+        "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/NO_OP/slot-3",
+        "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/INTERVENTION/slot-1",
+        "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/INTERVENTION/slot-2",
+        "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/INTERVENTION/slot-3",
+        "request_body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/BASELINE/slot-1",
+        "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/BASELINE/slot-2",
+        "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/BASELINE/slot-3",
+        "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/NO_OP/slot-1",
+        "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/NO_OP/slot-2",
+        "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/NO_OP/slot-3",
+        "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/INTERVENTION/slot-1",
+        "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/INTERVENTION/slot-2",
+        "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/INTERVENTION/slot-3",
+        "request_body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP09/BASELINE/slot-1",
+        "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP09/BASELINE/slot-2",
+        "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP09/BASELINE/slot-3",
+        "request_body_sha256": "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP09/NO_OP/slot-1",
+        "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP09/NO_OP/slot-2",
+        "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP09/NO_OP/slot-3",
+        "request_body_sha256": "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP09/INTERVENTION/slot-1",
+        "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP09/INTERVENTION/slot-2",
+        "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP09/INTERVENTION/slot-3",
+        "request_body_sha256": "072acb8f7b44dd5d1bba2adec8ab22e4e71c8e01634e8359ea75078bb077e124",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/BASELINE/slot-1",
+        "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/BASELINE/slot-2",
+        "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/BASELINE/slot-3",
+        "request_body_sha256": "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/NO_OP/slot-1",
+        "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/NO_OP/slot-2",
+        "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/NO_OP/slot-3",
+        "request_body_sha256": "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/INTERVENTION/slot-1",
+        "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/INTERVENTION/slot-2",
+        "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP10/INTERVENTION/slot-3",
+        "request_body_sha256": "dca48d2c34206984ed13ac9b2fb1ed0d83a882f1882cf25b3623da2cdf819b76",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP05/BASELINE/slot-1",
+        "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/BASELINE/slot-2",
+        "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/BASELINE/slot-3",
+        "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/NO_OP/slot-1",
+        "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/NO_OP/slot-2",
+        "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/NO_OP/slot-3",
+        "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/INTERVENTION/slot-1",
+        "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/INTERVENTION/slot-2",
+        "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/INTERVENTION/slot-3",
+        "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/BASELINE/slot-1",
+        "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/BASELINE/slot-2",
+        "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/BASELINE/slot-3",
+        "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/NO_OP/slot-1",
+        "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/NO_OP/slot-2",
+        "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/NO_OP/slot-3",
+        "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/INTERVENTION/slot-1",
+        "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/INTERVENTION/slot-2",
+        "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/INTERVENTION/slot-3",
+        "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      }
+    ],
+    "unique_request_body_hashes": [
+      "072acb8f7b44dd5d1bba2adec8ab22e4e71c8e01634e8359ea75078bb077e124",
+      "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+      "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+      "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+      "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+      "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+      "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+      "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+      "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+      "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+      "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+      "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+      "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+      "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+      "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+      "dca48d2c34206984ed13ac9b2fb1ed0d83a882f1882cf25b3623da2cdf819b76",
+      "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+      "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+      "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+      "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+      "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+      "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772"
+    ],
+    "new_request_body_hashes": [
+      "072acb8f7b44dd5d1bba2adec8ab22e4e71c8e01634e8359ea75078bb077e124",
+      "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+      "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+      "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+      "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+      "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+      "dca48d2c34206984ed13ac9b2fb1ed0d83a882f1882cf25b3623da2cdf819b76",
+      "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772"
+    ],
+    "inherited_count_mappings": [
+      {
+        "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+        "input_tokens": 1655,
+        "v3_logical_request_ids": [
+          "CP06/BASELINE/slot-2",
+          "CP06/NO_OP/slot-2",
+          "CP06/INTERVENTION/slot-2"
+        ]
+      },
+      {
+        "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+        "input_tokens": 1440,
+        "v3_logical_request_ids": [
+          "CP02/BASELINE/slot-2",
+          "CP02/NO_OP/slot-2",
+          "CP02/INTERVENTION/slot-2"
+        ]
+      },
+      {
+        "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+        "input_tokens": 1305,
+        "v3_logical_request_ids": [
+          "CP03/BASELINE/slot-2",
+          "CP03/NO_OP/slot-2",
+          "CP03/INTERVENTION/slot-2"
+        ]
+      },
+      {
+        "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+        "input_tokens": 249,
+        "v3_logical_request_ids": [
+          "CP03/BASELINE/slot-1",
+          "CP03/NO_OP/slot-1",
+          "CP03/INTERVENTION/slot-1"
+        ]
+      },
+      {
+        "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+        "input_tokens": 3167,
+        "v3_logical_request_ids": [
+          "CP06/BASELINE/slot-3",
+          "CP06/NO_OP/slot-3",
+          "CP06/INTERVENTION/slot-3"
+        ]
+      },
+      {
+        "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+        "input_tokens": 1443,
+        "v3_logical_request_ids": [
+          "CP06/BASELINE/slot-1",
+          "CP06/NO_OP/slot-1",
+          "CP06/INTERVENTION/slot-1"
+        ]
+      },
+      {
+        "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+        "input_tokens": 3101,
+        "v3_logical_request_ids": [
+          "CP05/BASELINE/slot-3",
+          "CP05/NO_OP/slot-3",
+          "CP05/INTERVENTION/slot-3"
+        ]
+      },
+      {
+        "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+        "input_tokens": 1390,
+        "v3_logical_request_ids": [
+          "CP05/BASELINE/slot-1",
+          "CP05/NO_OP/slot-1",
+          "CP05/INTERVENTION/slot-1"
+        ]
+      },
+      {
+        "request_body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+        "input_tokens": 1590,
+        "v3_logical_request_ids": [
+          "CP03/INTERVENTION/slot-3"
+        ]
+      },
+      {
+        "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+        "input_tokens": 4078,
+        "v3_logical_request_ids": [
+          "CP02/BASELINE/slot-3",
+          "CP02/NO_OP/slot-3"
+        ]
+      },
+      {
+        "request_body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+        "input_tokens": 3093,
+        "v3_logical_request_ids": [
+          "CP02/INTERVENTION/slot-3"
+        ]
+      },
+      {
+        "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+        "input_tokens": 2488,
+        "v3_logical_request_ids": [
+          "CP03/BASELINE/slot-3",
+          "CP03/NO_OP/slot-3"
+        ]
+      },
+      {
+        "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+        "input_tokens": 241,
+        "v3_logical_request_ids": [
+          "CP02/BASELINE/slot-1",
+          "CP02/NO_OP/slot-1",
+          "CP02/INTERVENTION/slot-1"
+        ]
+      },
+      {
+        "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+        "input_tokens": 1608,
+        "v3_logical_request_ids": [
+          "CP05/BASELINE/slot-2",
+          "CP05/NO_OP/slot-2",
+          "CP05/INTERVENTION/slot-2"
+        ]
+      }
+    ],
+    "v1_seals": {
+      "identity": "4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16",
+      "raw": "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264",
+      "result": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+    },
+    "plans": {
+      "hybrid_sha256": "7897b44d1c6e3c43d387f760fe4994ff5ee94ca1d258e86a3bc2c91b6033ce7e",
+      "full_fresh_sha256": "acb927d97df1a00f2e9a33d4fb7569ba1fc3eca89a0bd720042a28337b06fe5e"
+    },
+    "instrument_identity": {
+      "gguf_path": "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+      "gguf_sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+      "llama_path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "llama_sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+      "llama_build": "b10217-ddd4ec142",
+      "runtime_contract": {
+        "context_tokens": 8192,
+        "slots": 1,
+        "reasoning": "off",
+        "offline": true,
+        "host": "127.0.0.1",
+        "port": 8080,
+        "max_tokens": 1024,
+        "temperature": 0,
+        "top_p": 1,
+        "seed": 1,
+        "stream": false,
+        "chat_template_kwargs": "ABSENT"
+      },
+      "endpoint_allowlist": {
+        "readiness": {
+          "method": "GET",
+          "path": "/health"
+        },
+        "token_count": {
+          "method": "POST",
+          "path": "/v1/chat/completions/input_tokens"
+        }
+      }
+    },
+    "source_provenance": {
+      "commit": "d7d6af170748e570e03326835916266efc90b531",
+      "v3_module_sha256": "7d1ed24a3c40091b82791c4d1cc37946d1fe4c6501f98140efb182319672410c",
+      "v3_binary_source_sha256": "8ba83adb08baa12e663ec447da1a6336eb476f63311703b7363d5cc9cab95f5e",
+      "v3_renderer_sha256": "7626397346c562f8470e9e2bf6b11c06ad76a636c38844a90feb9f0d8c7c39ff"
+    },
+    "client_executable": {
+      "path": "D:\\Users\\fleur\\Prefixity\\target\\claim2-v3-tokenization-freeze\\d7d6af170748e570e03326835916266efc90b531\\prefixity-phase1c-claim2-v3-tokenization.exe",
+      "sha256": "fd351fdd32845dddc1922a817ea1528a1acf384c1dfffcd4a05c79796e6e9eff",
+      "bytes": 4984832,
+      "windows_file_id": "0x0000000000000000000700000045d923",
+      "volume_index_file_id": "volume=ba2f80f4;index=000700000045d923"
+    },
+    "zero_inference_rule": {
+      "inference_allowance": 0
+    },
+    "plan_selection_rule": {
+      "before_first_contact": true,
+      "immutable_after_first_contact": true,
+      "eligible_inheritance": "HYBRID_8_NEW",
+      "unverifiable_inheritance_with_matching_instrument": "FULL_FRESH_22",
+      "instrument_drift": "ABORT_AND_REFREEZE"
+    }
+  }
+}

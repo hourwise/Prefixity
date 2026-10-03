@@ -4567,3 +4567,33 @@ closeout records their final outcomes and promoted SHA. No server,
 tokenizer, input-token endpoint, inference, or scored-pilot preparation was
 used. The next authorized task is only
 `CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION`; do not start it here.
+
+## Claim 2 V3 non-inference tokenization preparation
+
+Status: `CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION_READY_FOR_OPERATOR_SERVER`.
+The [preparation record](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION.md)
+binds the accepted V3 materialization at
+`64d732dad2448e768ce12bc13a15bf3081f63205`, final source-provenance
+commit `d7d6af170748e570e03326835916266efc90b531`, frozen V3 client,
+new experiment identity and seal, exact inherited V1 measurements, and two
+deterministic contact plans. The primary HYBRID_8_NEW plan has eight new
+unique bodies over 18 CP09/CP10 logical requests; the separate FULL_FRESH_22
+contingency covers every unique body if inheritance fails before contact
+under the same registered instrument. Both fix one maximum readiness contact,
+zero inference, and immutable pre-contact mode selection.
+
+Acceptance verified offline: the exact 54 logical requests form 22 unique
+bodies. CP02/03/05/06 reuse 14 sealed V1 unique counts across 36 exact
+requests; CP09/CP10 have eight new hashes and no token counts. The final
+frozen-binary preflight reproduced both plans and V3 domain/ledger/successor,
+verified current GGUF/llama and executable identities, and reported zero
+server contacts. Full locked/offline workspace tests, formatting,
+warnings-denied all-features Clippy, Rust 1.86 check, plan/identity
+regeneration, and focused denial/tamper tests passed. Candidate CI must pass
+before exact-SHA promotion; the supervisor closeout records final CI and
+promoted SHA. Historical V1/V2 evidence and failures remain unchanged.
+
+No llama server startup, `/health`, `/input_tokens`, tokenizer, inference,
+token-admission decision, or scored-pilot work occurred. Stop after
+promotion. Any live non-inference V3 tokenization pass requires a separately
+authorized operator-started server; this preparation does not authorize it.
