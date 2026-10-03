@@ -1,0 +1,1 @@
+Intake completeness check INTAKE-CP07-041-01: case=BEN-CP07-041; snapshot_sha256=471b098d377b813f3d3a5d000ac23e90e9e6dabbb79dff3396b8f16fc27d42cc; received_fields=member,product,service_date,service_code,facility,referral,submitted_charge,allowed_charge; missing_required_fields=0; coverage_and_payment_not_adjudicated.

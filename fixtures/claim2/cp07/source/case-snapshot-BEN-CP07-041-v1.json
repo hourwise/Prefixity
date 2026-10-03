@@ -1,0 +1,49 @@
+{
+  "accounting_before_claim": {
+    "annual_individual_imaging_benefit_limit_cents": 1000000,
+    "prior_plan_payments_applied_to_imaging_limit_cents": 820000,
+    "remaining_individual_imaging_deductible_cents": 50000
+  },
+  "case_id": "BEN-CP07-041",
+  "claim": {
+    "claim_id": "BEN-CP07-041",
+    "facility_id": "FAC-SYN-019",
+    "network_status_on_service_date": "in_network",
+    "referral": {
+      "member_id": "MEM-SYN-071",
+      "recorded_before_service": true,
+      "referral_id": "REF-CP07-081",
+      "service_class": "IMG-CT-04",
+      "valid_from": "2026-02-01",
+      "valid_through": "2026-03-31"
+    },
+    "service_code": "IMG-CT-04",
+    "service_date": "2026-02-24",
+    "service_description": "standard outpatient computed tomography",
+    "submitted_charge_cents": 612000,
+    "verified_allowed_charge_cents": 420000
+  },
+  "exclusion_facts": {
+    "method_or_device_is_experimental": false,
+    "out_of_network": false,
+    "referral_present_and_valid": true,
+    "service_is_listed_in_published_schedule": true
+  },
+  "member": {
+    "enrollment_status_on_service_date": "active",
+    "plan_year": 2026,
+    "product_id": "NS-WB-2026",
+    "synthetic_member_id": "MEM-SYN-071"
+  },
+  "plan_document_id": "NS-WB-IMG-POLICY",
+  "plan_document_sha256": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee",
+  "plan_source_revision": "northstar-benefit-plan@2026.1",
+  "plan_version": "2026.1",
+  "schema_id": "prefixity.claim2.synthetic-benefits-case-snapshot",
+  "schema_version": 1,
+  "snapshot_id": "benefits-source-snapshot-CP07-041-v1",
+  "source_record_state": "frozen_read_only",
+  "source_revision": "benefits-case@BEN-CP07-041-v1",
+  "synthetic_only": true,
+  "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+}

@@ -1,0 +1,1 @@
+Check member, product, service, network, and referral eligibility against the versioned plan and frozen claim source. Choose one read-only action: {"action_id":"inspect_coverage_eligibility"} or {"action_id":"verify_intake_completeness"}.

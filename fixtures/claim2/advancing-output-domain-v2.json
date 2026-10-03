@@ -1,0 +1,229 @@
+{
+  "advancing_raw_language_cardinality_per_transition": 1,
+  "arm_scope": [
+    "BASELINE",
+    "NO_OP",
+    "INTERVENTION"
+  ],
+  "cohort_order": [
+    "CP02",
+    "CP03",
+    "CP07",
+    "CP08",
+    "CP05",
+    "CP06"
+  ],
+  "historical_domain": {
+    "path": "fixtures/claim2/advancing-output-domain-v1.json",
+    "sha256": "b4689157548864c819945dd8260478dc0ba6a5811dd96626768f3f5b83a09fc8"
+  },
+  "protocol_id": "prefixity.phase1c.claim2-canonical-advancing-output.v1",
+  "schema_id": "prefixity.phase1c.claim2-v2-advancing-output-domain-ledger",
+  "schema_version": 2,
+  "transitions": [
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"build_symbol_inventory\"}",
+      "canonical_response_sha256": "0885393d691f49d7ffdac93a029cd069b53fece50f200362dba696f29ab230fe",
+      "case_id": "CP02",
+      "deterministic_receipt_identity": "e-result-inventory",
+      "deterministic_receipt_path": "fixtures/claim2/cp02/bodies/receipt1.txt",
+      "deterministic_receipt_sha256": "e62dea11ce37d189ac0aaa84cb6a1510ebc3845294c10875952ad8c755ee3afa",
+      "expected_action_id": "build_symbol_inventory",
+      "next_state": "inventory_ready",
+      "request_slot": 1
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"inspect_resolution_chain\"}",
+      "canonical_response_sha256": "b342853edb38641b8c5436d6d3647d2a2a8e766304bba1fd549ea9710dce5f2c",
+      "case_id": "CP02",
+      "deterministic_receipt_identity": "e-result-callsite",
+      "deterministic_receipt_path": "fixtures/claim2/cp02/bodies/receipt2.txt",
+      "deterministic_receipt_sha256": "4e81fd820ed9740b04bea9111f95317130ceb193b16efb6ba7d8089cf4481777",
+      "expected_action_id": "inspect_resolution_chain",
+      "next_state": "callsites_opened",
+      "request_slot": 2
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"collect_dependency_inventory\"}",
+      "canonical_response_sha256": "d8e934c761601d55b6ef45d85968c8d7315bd003cda1b25190f38351d06dfc5b",
+      "case_id": "CP03",
+      "deterministic_receipt_identity": "e-result-inventory",
+      "deterministic_receipt_path": "fixtures/claim2/cp03/bodies/receipt1.txt",
+      "deterministic_receipt_sha256": "df82948814e3851a98709fb122964ba7f3274becb87c2afb0c6c8909411123e9",
+      "expected_action_id": "collect_dependency_inventory",
+      "next_state": "inventory_ready",
+      "request_slot": 1
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"verify_snapshot_and_constraints\"}",
+      "canonical_response_sha256": "d5bafc1765e8ed215fa9bda242f2cebcf00519ac788695e8df0672da88ed2c48",
+      "case_id": "CP03",
+      "deterministic_receipt_identity": "e-result-verify",
+      "deterministic_receipt_path": "fixtures/claim2/cp03/bodies/receipt2.txt",
+      "deterministic_receipt_sha256": "d832c457e33ba7cc109116f2510b8980b08b09ca3431ad4add0a426d9340ab67",
+      "expected_action_id": "verify_snapshot_and_constraints",
+      "next_state": "snapshot_verified",
+      "request_slot": 2
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"inspect_coverage_eligibility\"}",
+      "canonical_response_sha256": "3c324f5a7413b3b0041cb829bd77aec221e6ad30ecd44f2cb815bbb187585e7c",
+      "case_id": "CP07",
+      "deterministic_receipt_identity": "e-eligibility-result",
+      "deterministic_receipt_path": "fixtures/claim2/cp07/bodies/receipt-eligibility.txt",
+      "deterministic_receipt_sha256": "36ddc13ec941fe3d821b474880e818bf7637b3d0bb6f47548f3e1c4efe4fd79f",
+      "expected_action_id": "inspect_coverage_eligibility",
+      "next_state": "coverage_eligibility_checked",
+      "request_slot": 1
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"calculate_benefit_breakdown\"}",
+      "canonical_response_sha256": "e566f428d4ca4a776604b58023080ef932ccb98583a5d13627b9ed1aa2e5a753",
+      "case_id": "CP07",
+      "deterministic_receipt_identity": "e-benefit-result",
+      "deterministic_receipt_path": "fixtures/claim2/cp07/bodies/receipt-benefit-check.txt",
+      "deterministic_receipt_sha256": "3410bfb7e4c0a3984ddbf26f5c62a99e1647f9bf4042f46751f82b88354eb2a9",
+      "expected_action_id": "calculate_benefit_breakdown",
+      "next_state": "benefit_arithmetic_verified",
+      "request_slot": 2
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"inspect_lot_logger_state\"}",
+      "canonical_response_sha256": "e70eef1974f48fb9083560996379f643ff35eaa3b4d551805c772db0bc80d839",
+      "case_id": "CP08",
+      "deterministic_receipt_identity": "e-inspect-result",
+      "deterministic_receipt_path": "fixtures/claim2/cp08/bodies/receipt-inspection.txt",
+      "deterministic_receipt_sha256": "128e171eac1313aa0b00825933df8d335b4f99f45b1d874a5fe2ca489095f2a3",
+      "expected_action_id": "inspect_lot_logger_state",
+      "next_state": "lot_logger_state_inspected",
+      "request_slot": 1
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"calculate_calibration_and_exposure\"}",
+      "canonical_response_sha256": "87c9328255c33b2c504a89f93c1b5416e34a136ac833e98a14d4ba552047ae68",
+      "case_id": "CP08",
+      "deterministic_receipt_identity": "e-exposure-result",
+      "deterministic_receipt_path": "fixtures/claim2/cp08/bodies/receipt-exposure-check.txt",
+      "deterministic_receipt_sha256": "a483e2d48a822adf795a55ec891e0d68893d65c3d3bbed7471592dadccced7ca",
+      "expected_action_id": "calculate_calibration_and_exposure",
+      "next_state": "calibration_exposure_verified",
+      "request_slot": 2
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"inspect_initial_catalog\"}",
+      "canonical_response_sha256": "2d825a5710f0926419b09a77d1c89deb032b87911a9dbae81369fd2ca01ad6c0",
+      "case_id": "CP05",
+      "deterministic_receipt_identity": "e-inspect-result",
+      "deterministic_receipt_path": "fixtures/claim2/cp05/bodies/receipt-inspect.txt",
+      "deterministic_receipt_sha256": "2b424ac040d25e4eed01bff4ab4407b0ddabd95435811f89ef7dd1e8002dd53a",
+      "expected_action_id": "inspect_initial_catalog",
+      "next_state": "route_registry_r17_inspected",
+      "request_slot": 1
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"rebuild_route_index_and_export\"}",
+      "canonical_response_sha256": "b4e1375372aca21a660281104c7602ecbc03ee05f35fcf9dd80cffc2fa1b42d1",
+      "case_id": "CP05",
+      "deterministic_receipt_identity": "e-reindex-result",
+      "deterministic_receipt_path": "fixtures/claim2/cp05/bodies/receipt-reindex.txt",
+      "deterministic_receipt_sha256": "588976b08d47a5b9d899502a41a85a6d231c7aea002ef85354bb0be76010f747",
+      "expected_action_id": "rebuild_route_index_and_export",
+      "next_state": "route_registry_r18_reindexed",
+      "request_slot": 2
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"inspect_policy_index\"}",
+      "canonical_response_sha256": "a316002641d343e0c5c123b1ad621425f8ebb06a3f9ea23731a1ec15445083dc",
+      "case_id": "CP06",
+      "deterministic_receipt_identity": "e-policy-inspect-result",
+      "deterministic_receipt_path": "fixtures/claim2/cp06/bodies/receipt-policy-inspect.txt",
+      "deterministic_receipt_sha256": "c8500e2bdaea68ec5275f0c8f55e1de332fd4433734b88d1b4135afcecc89694",
+      "expected_action_id": "inspect_policy_index",
+      "next_state": "policy_index_s84_inspected",
+      "request_slot": 1
+    },
+    {
+      "advancing_raw_language_cardinality": 1,
+      "arm_scope": [
+        "BASELINE",
+        "NO_OP",
+        "INTERVENTION"
+      ],
+      "canonical_raw_response": "{\"action_id\":\"verify_audit_receipt\"}",
+      "canonical_response_sha256": "b26a09e02d258006cff404d74b115cd2a91ed869aa6a1c43a3e4eaba2dac4762",
+      "case_id": "CP06",
+      "deterministic_receipt_identity": "e-audit-result",
+      "deterministic_receipt_path": "fixtures/claim2/cp06/bodies/receipt-audit-2081.txt",
+      "deterministic_receipt_sha256": "f1711d4e3232120b0a53306bba96cc3e601ff04d456c6690908b90bd46f476eb",
+      "expected_action_id": "verify_audit_receipt",
+      "next_state": "audit_receipt_AUD_2081_verified",
+      "request_slot": 2
+    }
+  ]
+}

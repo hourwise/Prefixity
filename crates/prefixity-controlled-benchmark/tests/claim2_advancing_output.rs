@@ -1,4 +1,5 @@
 #[path = "../examples/support/claim2_domain_report.rs"]
+#[allow(dead_code)]
 mod report;
 
 use prefixity_controlled_benchmark::{
@@ -375,12 +376,28 @@ fn finite_domain_ledger_and_materialization_successor_are_reproducible_and_pinne
         digest(&predecessor),
         "3d9571ddd4e17096b55971040531aac6197b6b9b7bc3d01afefd8992c28f6c65"
     );
-    let successor = report::successor_report_bytes(&repository).unwrap();
+    // Version 2 is a frozen six-case historical report. CP07 extends the
+    // shared adapter after that report was accepted, so its old source hash
+    // must remain a historical pin rather than being silently regenerated.
+    // The exact artifact digest preserves every byte and its semantic claims;
+    // CP07's versioned case-domain artifact is regenerated and replayed in
+    // `claim2_cp07_materialization`.
+    let successor =
+        fs::read(repository.join("fixtures/claim2/materialization-report-v2.json")).unwrap();
     assert_eq!(
-        successor,
-        fs::read(repository.join("fixtures/claim2/materialization-report-v2.json")).unwrap()
+        digest(&successor),
+        "30ecb777b52d201765ca7cba83ed9692519e63bb8e318ff515e93280e27b3dab"
     );
     let successor_value: Value = serde_json::from_slice(&successor).unwrap();
+    assert_eq!(successor_value["schema_version"], 2);
+    assert_eq!(
+        successor_value["protocol_provenance"]["implementation_source_sha256_normalized_lf"],
+        "b20499f2ac20113deddf8a1c97c0120618ea788f588cf6364e96454648750f06"
+    );
+    assert_eq!(
+        successor_value["protocol_provenance"]["successor_generator_source_sha256_normalized_lf"],
+        "4467f4a2777c89ef516f7a27a019d92bec58c83d1614693f791daa04aefc582c"
+    );
     assert_eq!(
         successor_value["predecessor"]["sha256"],
         digest(&predecessor)

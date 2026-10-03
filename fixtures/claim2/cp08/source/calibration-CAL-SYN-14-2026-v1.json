@@ -1,0 +1,20 @@
+{
+  "as_found": {
+    "absolute_error_celsius_tenths": 2,
+    "adjustment_before_as_found": false,
+    "indicated_celsius_tenths": 48,
+    "maximum_allowed_error_celsius_tenths": 5,
+    "reference_celsius_tenths": 50,
+    "signed_correction_celsius_tenths": 2
+  },
+  "calibration_id": "CAL-SYN-14-2026",
+  "certificate_state": "immutable_captured_record",
+  "issued_at": "2026-01-10T12:00:00Z",
+  "logger_serial": "LOGGER-SYN-14",
+  "schema_id": "prefixity.claim2.synthetic-logger-calibration-record",
+  "schema_version": 1,
+  "source_revision": "logger-calibration@CAL-SYN-14-2026-v1",
+  "synthetic_only": true,
+  "valid_through": "2027-01-10",
+  "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+}

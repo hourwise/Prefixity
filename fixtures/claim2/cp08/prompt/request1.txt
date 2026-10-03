@@ -1,0 +1,1 @@
+Inspect the lot and logger state under the SOP. Verify source identity, logger interval continuity, and the raw temperature extrema. Choose one read-only action: {"action_id":"inspect_lot_logger_state"} or {"action_id":"verify_receiving_record_completeness"}.

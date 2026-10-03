@@ -1,0 +1,1 @@
+Publication verification PUB-CP07-041-01: document=NS-WB-IMG-POLICY; version=2026.1; source_revision=northstar-benefit-plan@2026.1; body_sha256=d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee; status=published_for_2026_plan_year; arithmetic_not_performed.

@@ -1,0 +1,1 @@
+Perform the required allowed-charge, remaining-deductible, coinsurance, annual benefit-limit, and exclusion verification using the same unchanged source snapshot. Choose one read-only action: {"action_id":"calculate_benefit_breakdown"} or {"action_id":"verify_plan_publication"}.

@@ -1,0 +1,39 @@
+{
+  "case_id": "LOT-SYN-CC08-117",
+  "logger": {
+    "calibration_id": "CAL-SYN-14-2026",
+    "calibration_record_sha256": "3df5738fe9cea78cc888db58b9bd11891450429673924690c7bbbf1eece90f98",
+    "calibration_source_revision": "logger-calibration@CAL-SYN-14-2026-v1",
+    "logger_record_sha256": "38ff51a999dd1a7b4bd7d7cf7d06c216309712660fa7c6d3dbd876e4394e3244",
+    "logger_serial": "LOGGER-SYN-14",
+    "logger_source_revision": "cold-chain-logger@LOGGER-SYN-14-v1",
+    "required_interval_minutes": 15
+  },
+  "lot_id": "LOT-SYN-CC08-117",
+  "procedure": {
+    "body_sha256": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e",
+    "document_id": "CC-SOP-04",
+    "revision": "3.2.1",
+    "source_revision": "CC-SOP-04@3.2.1"
+  },
+  "product": {
+    "description": "temperature-controlled assay reagent kit",
+    "product_revision": "PRD-SYN-RX-44@6",
+    "synthetic_product_id": "PRD-SYN-RX-44"
+  },
+  "record_state": "frozen_read_only",
+  "schema_id": "prefixity.claim2.synthetic-cold-chain-lot-snapshot",
+  "schema_version": 1,
+  "shipment": {
+    "receipt_end": "2026-03-14T09:00:00Z",
+    "receipt_start": "2026-03-14T08:00:00Z",
+    "seal_condition": "intact",
+    "seal_id": "SEAL-SYN-CC08-117",
+    "storage_unit_id": "REF-SYN-03",
+    "synthetic_shipment_id": "SHP-SYN-CC08-117-A"
+  },
+  "snapshot_id": "cold-chain-source-CC08-117-v1",
+  "source_revision": "cold-chain-lot@LOT-SYN-CC08-117-v1",
+  "synthetic_only": true,
+  "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+}

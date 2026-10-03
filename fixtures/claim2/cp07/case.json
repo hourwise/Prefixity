@@ -1,0 +1,823 @@
+{
+  "action_menu": [
+    {
+      "action_event_id": "e-eligibility-action",
+      "action_id": "inspect_coverage_eligibility",
+      "action_slot": 1,
+      "result_asset_id": "receipt_eligibility",
+      "result_event_id": "e-eligibility-result",
+      "state_after": "coverage_eligibility_checked"
+    },
+    {
+      "action_event_id": "e-intake-action",
+      "action_id": "verify_intake_completeness",
+      "action_slot": 1,
+      "result_asset_id": "receipt_intake",
+      "result_event_id": "e-intake-result",
+      "state_after": "intake_completeness_verified"
+    },
+    {
+      "action_event_id": "e-benefit-action",
+      "action_id": "calculate_benefit_breakdown",
+      "action_slot": 2,
+      "result_asset_id": "receipt_benefit",
+      "result_event_id": "e-benefit-result",
+      "state_after": "benefit_arithmetic_verified"
+    },
+    {
+      "action_event_id": "e-publication-action",
+      "action_id": "verify_plan_publication",
+      "action_slot": 2,
+      "result_asset_id": "receipt_publication",
+      "result_event_id": "e-publication-result",
+      "state_after": "plan_publication_verified"
+    }
+  ],
+  "assets": [
+    {
+      "asset_id": "system",
+      "kind": "prompt_text",
+      "relative_path": "prompt/system.txt",
+      "sha256": "2716cf0a6d5762b07baa65e4e480bfdc4dc6d40ef9f9ec889df9a6f800ded9fb"
+    },
+    {
+      "asset_id": "task",
+      "kind": "prompt_text",
+      "relative_path": "prompt/task.txt",
+      "sha256": "b75b645628330edefa86165247db498272a77e7980b43276be56831695648503"
+    },
+    {
+      "asset_id": "request1",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request1.txt",
+      "sha256": "6104cfa9fbaeb98d530123eaf21e55eeb35dceca25a8353f8fc7dd8fd57bc71c"
+    },
+    {
+      "asset_id": "request2",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request2.txt",
+      "sha256": "8c7d02890105008bbeff4273dd9c804e31952e8635743e57ce6b61e4e40f97b4"
+    },
+    {
+      "asset_id": "request3",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request3.txt",
+      "sha256": "785f5c69be9c096410703fdce578440ed1468be2a882b0ad293c975e54929d16"
+    },
+    {
+      "asset_id": "plan_original",
+      "event_id": "e-plan-original",
+      "kind": "context_attachment",
+      "relative_path": "bodies/northstar-plan-original.md",
+      "revision_id": "northstar-benefit-plan@2026.1",
+      "sha256": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee"
+    },
+    {
+      "asset_id": "case_snapshot",
+      "event_id": "e-case-source",
+      "kind": "context_attachment",
+      "relative_path": "bodies/case-snapshot-BEN-CP07-041-v1.json",
+      "revision_id": "benefits-case@BEN-CP07-041-v1",
+      "sha256": "471b098d377b813f3d3a5d000ac23e90e9e6dabbb79dff3396b8f16fc27d42cc"
+    },
+    {
+      "asset_id": "plan_final_packet",
+      "event_id": "e-plan-final-reattachment",
+      "kind": "context_attachment",
+      "relative_path": "bodies/northstar-plan-final-packet.md",
+      "revision_id": "northstar-benefit-plan@2026.1",
+      "sha256": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee"
+    },
+    {
+      "asset_id": "receipt_eligibility",
+      "event_id": "e-eligibility-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-eligibility.txt",
+      "revision_id": "eligibility-check-CP07-041-v1",
+      "sha256": "36ddc13ec941fe3d821b474880e818bf7637b3d0bb6f47548f3e1c4efe4fd79f"
+    },
+    {
+      "asset_id": "receipt_intake",
+      "event_id": "e-intake-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-intake.txt",
+      "revision_id": "intake-check-CP07-041-v1",
+      "sha256": "f183d9a03da70d4d26bb23fa7e6aa553a4faa9ef7d5130af29677b9dd9892a74"
+    },
+    {
+      "asset_id": "receipt_benefit",
+      "event_id": "e-benefit-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-benefit-check.txt",
+      "revision_id": "benefit-check-CP07-041-v1",
+      "sha256": "3410bfb7e4c0a3984ddbf26f5c62a99e1647f9bf4042f46751f82b88354eb2a9"
+    },
+    {
+      "asset_id": "receipt_publication",
+      "event_id": "e-publication-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-publication.txt",
+      "revision_id": "publication-check-CP07-041-v1",
+      "sha256": "f5664192226aaa05383cbe04366647fd89202d7a37911be39eeaa75062af4a1f"
+    }
+  ],
+  "assistant_output_planning_bytes": 4096,
+  "case_id": "CP07",
+  "evaluation_key_path": "evaluation/key.json",
+  "evaluation_key_sha256": "2664e0aaa62b9a967d017b0bffae00f25d58c24071d07c1b5b67f39796217928",
+  "kind": "positive",
+  "planner_input": {
+    "events": [
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee",
+        "context_block_id": "ctx-plan-original",
+        "event_id": "e-plan-original",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 0,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee",
+            "source_kind": "self_authored",
+            "source_locator": "source/northstar-benefit-plan-2026.1.md#document",
+            "source_revision": "northstar-benefit-plan@2026.1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d7d4c34cb8a4a6d95fed62583ab50c67a71711081189fba7d00bed5d06618c12",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/workflow.md#ordinary-packet-provenance",
+            "source_revision": "cp07-benefit-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [],
+        "result": null,
+        "sequence_index": 0,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "471b098d377b813f3d3a5d000ac23e90e9e6dabbb79dff3396b8f16fc27d42cc",
+        "context_block_id": "ctx-case-snapshot",
+        "event_id": "e-case-source",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 1,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "471b098d377b813f3d3a5d000ac23e90e9e6dabbb79dff3396b8f16fc27d42cc",
+            "source_kind": "self_authored",
+            "source_locator": "source/case-snapshot-BEN-CP07-041-v1.json#frozen-snapshot",
+            "source_revision": "benefits-case@BEN-CP07-041-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d7d4c34cb8a4a6d95fed62583ab50c67a71711081189fba7d00bed5d06618c12",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/workflow.md#ordinary-packet-provenance",
+            "source_revision": "cp07-benefit-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [],
+        "result": null,
+        "sequence_index": 1,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": {
+          "action_id": "inspect_coverage_eligibility",
+          "argument_hash": "cff5d86aeef09ad8101757b66360f29f32d1ca4b823a2ddabe0bfce906b32e98",
+          "tool_name": "inspect_coverage_eligibility"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-eligibility-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 2,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d7d4c34cb8a4a6d95fed62583ab50c67a71711081189fba7d00bed5d06618c12",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/workflow.md#read-only-action-menu",
+            "source_revision": "cp07-benefit-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-plan-original",
+          "e-case-source"
+        ],
+        "result": null,
+        "sequence_index": 2,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-eligibility-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 3,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "36ddc13ec941fe3d821b474880e818bf7637b3d0bb6f47548f3e1c4efe4fd79f",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-eligibility.txt",
+            "source_revision": "eligibility-check-CP07-041-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-plan-original",
+          "e-case-source"
+        ],
+        "result": {
+          "observation_hash": "36ddc13ec941fe3d821b474880e818bf7637b3d0bb6f47548f3e1c4efe4fd79f",
+          "originating_action_id": "inspect_coverage_eligibility",
+          "result_id": "r-eligibility-CP07-041",
+          "status": "success"
+        },
+        "sequence_index": 3,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": {
+          "action_id": "verify_intake_completeness",
+          "argument_hash": "cff5d86aeef09ad8101757b66360f29f32d1ca4b823a2ddabe0bfce906b32e98",
+          "tool_name": "verify_intake_completeness"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-intake-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 4,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d7d4c34cb8a4a6d95fed62583ab50c67a71711081189fba7d00bed5d06618c12",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/workflow.md#read-only-action-menu",
+            "source_revision": "cp07-benefit-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-case-source"
+        ],
+        "result": null,
+        "sequence_index": 4,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-intake-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 5,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "f183d9a03da70d4d26bb23fa7e6aa553a4faa9ef7d5130af29677b9dd9892a74",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-intake.txt",
+            "source_revision": "intake-check-CP07-041-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-case-source"
+        ],
+        "result": {
+          "observation_hash": "f183d9a03da70d4d26bb23fa7e6aa553a4faa9ef7d5130af29677b9dd9892a74",
+          "originating_action_id": "verify_intake_completeness",
+          "result_id": "r-intake-CP07-041",
+          "status": "success"
+        },
+        "sequence_index": 5,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": {
+          "action_id": "calculate_benefit_breakdown",
+          "argument_hash": "cff5d86aeef09ad8101757b66360f29f32d1ca4b823a2ddabe0bfce906b32e98",
+          "tool_name": "calculate_benefit_breakdown"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-benefit-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 6,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d7d4c34cb8a4a6d95fed62583ab50c67a71711081189fba7d00bed5d06618c12",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/workflow.md#read-only-action-menu",
+            "source_revision": "cp07-benefit-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-plan-original",
+          "e-case-source"
+        ],
+        "result": null,
+        "sequence_index": 6,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-benefit-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 7,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "3410bfb7e4c0a3984ddbf26f5c62a99e1647f9bf4042f46751f82b88354eb2a9",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-benefit-check.txt",
+            "source_revision": "benefit-check-CP07-041-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-plan-original",
+          "e-case-source"
+        ],
+        "result": {
+          "observation_hash": "3410bfb7e4c0a3984ddbf26f5c62a99e1647f9bf4042f46751f82b88354eb2a9",
+          "originating_action_id": "calculate_benefit_breakdown",
+          "result_id": "r-benefit-CP07-041",
+          "status": "success"
+        },
+        "sequence_index": 7,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": {
+          "action_id": "verify_plan_publication",
+          "argument_hash": "cff5d86aeef09ad8101757b66360f29f32d1ca4b823a2ddabe0bfce906b32e98",
+          "tool_name": "verify_plan_publication"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-publication-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 8,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d7d4c34cb8a4a6d95fed62583ab50c67a71711081189fba7d00bed5d06618c12",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/workflow.md#read-only-action-menu",
+            "source_revision": "cp07-benefit-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-plan-original"
+        ],
+        "result": null,
+        "sequence_index": 8,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-publication-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 9,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "f5664192226aaa05383cbe04366647fd89202d7a37911be39eeaa75062af4a1f",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-publication.txt",
+            "source_revision": "publication-check-CP07-041-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-plan-original"
+        ],
+        "result": {
+          "observation_hash": "f5664192226aaa05383cbe04366647fd89202d7a37911be39eeaa75062af4a1f",
+          "originating_action_id": "verify_plan_publication",
+          "result_id": "r-publication-CP07-041",
+          "status": "success"
+        },
+        "sequence_index": 9,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee",
+        "context_block_id": "ctx-plan-final-review",
+        "event_id": "e-plan-final-reattachment",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 10,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee",
+            "source_kind": "self_authored",
+            "source_locator": "source/northstar-benefit-plan-2026.1.md#document",
+            "source_revision": "northstar-benefit-plan@2026.1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d7d4c34cb8a4a6d95fed62583ab50c67a71711081189fba7d00bed5d06618c12",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/workflow.md#ordinary-packet-provenance",
+            "source_revision": "cp07-benefit-workflow-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "36cd99a4342d1857f59c4188f2736095b332ef61f19be1e378ffccec4ed2025e",
+            "source_kind": "self_authored",
+            "source_locator": "source/benefit-final-review-recipe-v1.json#controlling-plan-occurrence",
+            "source_revision": "benefit-final-review@1.0"
+          }
+        ],
+        "reference_event_ids": [
+          "e-plan-original",
+          "e-case-source"
+        ],
+        "result": null,
+        "sequence_index": 10,
+        "world_state_revision": "benefits-adjudication@BEN-CP07-041-v1"
+      }
+    ],
+    "provenance": [
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "d7d4c34cb8a4a6d95fed62583ab50c67a71711081189fba7d00bed5d06618c12",
+        "source_kind": "self_authored",
+        "source_locator": "cp07/workflow.md",
+        "source_revision": "cp07-benefit-workflow-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "471b098d377b813f3d3a5d000ac23e90e9e6dabbb79dff3396b8f16fc27d42cc",
+        "source_kind": "self_authored",
+        "source_locator": "cp07/source/case-snapshot-BEN-CP07-041-v1.json",
+        "source_revision": "benefits-case@BEN-CP07-041-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee",
+        "source_kind": "self_authored",
+        "source_locator": "cp07/source/northstar-benefit-plan-2026.1.md",
+        "source_revision": "northstar-benefit-plan@2026.1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "36cd99a4342d1857f59c4188f2736095b332ef61f19be1e378ffccec4ed2025e",
+        "source_kind": "self_authored",
+        "source_locator": "cp07/source/benefit-final-review-recipe-v1.json",
+        "source_revision": "benefit-final-review@1.0"
+      }
+    ],
+    "relations": [
+      {
+        "from_id": "inspect_coverage_eligibility",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "36ddc13ec941fe3d821b474880e818bf7637b3d0bb6f47548f3e1c4efe4fd79f",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/bodies/receipt-eligibility.txt",
+            "source_revision": "eligibility-check-CP07-041-v1"
+          }
+        ],
+        "relation_id": "produce-eligibility",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-eligibility-CP07-041"
+      },
+      {
+        "from_id": "verify_intake_completeness",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "f183d9a03da70d4d26bb23fa7e6aa553a4faa9ef7d5130af29677b9dd9892a74",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/bodies/receipt-intake.txt",
+            "source_revision": "intake-check-CP07-041-v1"
+          }
+        ],
+        "relation_id": "produce-intake",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-intake-CP07-041"
+      },
+      {
+        "from_id": "calculate_benefit_breakdown",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "3410bfb7e4c0a3984ddbf26f5c62a99e1647f9bf4042f46751f82b88354eb2a9",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/bodies/receipt-benefit-check.txt",
+            "source_revision": "benefit-check-CP07-041-v1"
+          }
+        ],
+        "relation_id": "produce-benefit-check",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-benefit-CP07-041"
+      },
+      {
+        "from_id": "verify_plan_publication",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "f5664192226aaa05383cbe04366647fd89202d7a37911be39eeaa75062af4a1f",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/bodies/receipt-publication.txt",
+            "source_revision": "publication-check-CP07-041-v1"
+          }
+        ],
+        "relation_id": "produce-publication-check",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-publication-CP07-041"
+      },
+      {
+        "from_id": "e-plan-original",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee",
+            "source_kind": "self_authored",
+            "source_locator": "cp07/source/northstar-benefit-plan-2026.1.md#document",
+            "source_revision": "northstar-benefit-plan@2026.1"
+          }
+        ],
+        "relation_id": "same-state-plan-reattachment",
+        "relation_type": "same_state_revision",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "e-plan-final-reattachment"
+      }
+    ]
+  },
+  "request_templates": [
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-plan-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-case-source",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 1
+    },
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-plan-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-case-source",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request2",
+              "kind": "asset"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 2
+    },
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-plan-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-case-source",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request2",
+              "kind": "asset"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 2
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 2
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request3",
+              "kind": "asset"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "event_id": "e-plan-final-reattachment",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 3
+    }
+  ],
+  "schema_id": "prefixity.phase1c.claim2-workload-case",
+  "schema_version": 1,
+  "token_proof_inputs": null
+}

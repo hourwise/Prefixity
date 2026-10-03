@@ -4386,3 +4386,51 @@ task. Publication remains gated on exact-commit CI and promotion.
 Next authorized task: `CLAIM_2_WORKLOAD_V2_MATERIALIZATION_PREPARATION`.
 Do not begin tokenization, scored-pilot preparation, or inference from this
 record.
+
+## Phase 1C Claim-2 V2 workload materialization preparation
+
+Current status: `CLAIM_2_WORKLOAD_V2_MATERIALIZATION_READY_FOR_TOKENIZATION_PREPARATION`.
+The work started from accepted `main` at
+`baeead2d1ca9710f50dafae0e02b4e5c2ed1515e` on branch
+`codex/phase1c-claim2-v2-materialization`. The V1
+`WORKLOAD_TOKEN_ADMISSION_FAILED` result and CP01/CP04 failures are unchanged.
+No server, health/input-token endpoint, tokenizer, or model inference was
+used in this task.
+
+Work completed: added a versioned V2 authoring contract alongside the V1
+contract. A reproducible inheritance map verifies sealed V1 identity,
+evidence, result, plan, ledger, and retained fixture/rendered-body identity.
+CP02, CP03, CP05, and CP06 remain byte-exact, yielding 14 inherited V1 unique
+hashes over 36 V2 logical requests. CP07 synthetic coverage adjudication and
+CP08 synthetic cold-chain lot disposition each have a complete versioned
+policy/SOP, frozen read-only records, finite actions and pinned receipts,
+closed dependency graph, hidden exact evaluator, ordinary same-state native
+reattachment, and exactly one eligible latest `EXACT_DUPLICATE_PRUNE` target
+under the unchanged policy. Their case domains and the cohort V2 domain fix
+one exact raw advancing response and receipt per transition.
+
+The exact offline V2 ledger contains CP02/CP03/CP07/CP08/CP05/CP06 in that
+order, 18 independently replayed arm trajectories, and 54 rendered request
+bodies. Those form 22 unique hashes: 14 sealed V1 hashes covering 36 logical
+requests and eight new hashes covering the 18 CP07/CP08 logical requests.
+Every request is labeled `INHERITED_V1_TOKEN_COUNT` or
+`NEW_TOKEN_COUNT_REQUIRED`. Inherited counts remain V1 measurements. The
+new cases' token counts, reduction gates, context fit, and CPU practicality
+remain unknown. Exact new-case UTF-8 sizes and the descriptive design-margin
+comparison are in
+[`PHASE_1C_CLAIM_2_WORKLOAD_V2_MATERIALIZATION.md`](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_MATERIALIZATION.md).
+The version-3 materialization successor binds the historical version-2 report,
+V2 finite domain, exact ledger, fixtures, and source identities without
+altering V1 evidence.
+
+Validation: new-case fixture regeneration and offline all-arm replay, retained
+request regeneration and drift rejection, cohort ledger/domain/successor
+regeneration, full locked/offline workspace tests, formatting, warnings-denied
+workspace Clippy, Rust 1.86 locked/offline workspace check, and staged diff
+whitespace review. The final publication requires the exact candidate's CI
+jobs to pass before promotion; the promoted SHA and CI run are reported in
+the supervisor closeout. No V2 tokenizer plan, token contacts, or scored
+pilot was started.
+
+Next authorized task: `CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION` only.
+Do not tokenize or infer from this materialization record.

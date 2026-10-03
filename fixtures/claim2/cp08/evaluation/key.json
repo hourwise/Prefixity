@@ -1,0 +1,102 @@
+{
+  "critical_event_ids": [
+    "e-sop-original",
+    "e-lot-source",
+    "e-logger-evidence",
+    "e-calibration-evidence",
+    "e-exposure-result"
+  ],
+  "expected_action_ids": [
+    "inspect_lot_logger_state",
+    "calculate_calibration_and_exposure"
+  ],
+  "expected_final_answer": {
+    "calibration": {
+      "absolute_error_celsius_tenths": 2,
+      "applied_correction_celsius_tenths": 2,
+      "calibration_id": "CAL-SYN-14-2026",
+      "correction_celsius_tenths": 2,
+      "indicated_celsius_tenths": 48,
+      "maximum_allowed_error_celsius_tenths": 5,
+      "reference_celsius_tenths": 50,
+      "status": "VALID",
+      "valid_through": "2027-01-10"
+    },
+    "cumulative_exposure_calculation": {
+      "high_degree_minutes_celsius_tenths": 75,
+      "high_minutes": 15,
+      "low_degree_minutes_celsius_tenths": 0,
+      "low_minutes": 0,
+      "total_degree_minutes_celsius_tenths": 75,
+      "total_excursion_minutes": 15
+    },
+    "disposition": "HOLD",
+    "governing_rule_ids": [
+      "CC-04",
+      "CC-05",
+      "CC-06",
+      "CC-08"
+    ],
+    "required_hold_or_escalation_reason": "One corrected high excursion lasted 15 minutes and totals 75 tenths of C-minute. Identity, calibration, and logger continuity pass; the exposure is within CC-08 review boundaries, so segregate the lot on HOLD pending quality review before use.",
+    "time_temperature_calculation": {
+      "compliant_interval_count": 3,
+      "corrected_interval_extrema": [
+        {
+          "end": "2026-03-14T08:15:00Z",
+          "maximum_celsius_tenths": 53,
+          "minimum_celsius_tenths": 48,
+          "start": "2026-03-14T08:00:00Z",
+          "status": "COMPLIANT"
+        },
+        {
+          "end": "2026-03-14T08:30:00Z",
+          "maximum_celsius_tenths": 85,
+          "minimum_celsius_tenths": 79,
+          "start": "2026-03-14T08:15:00Z",
+          "status": "HIGH_EXCURSION"
+        },
+        {
+          "end": "2026-03-14T08:45:00Z",
+          "maximum_celsius_tenths": 74,
+          "minimum_celsius_tenths": 66,
+          "start": "2026-03-14T08:30:00Z",
+          "status": "COMPLIANT"
+        },
+        {
+          "end": "2026-03-14T09:00:00Z",
+          "maximum_celsius_tenths": 63,
+          "minimum_celsius_tenths": 55,
+          "start": "2026-03-14T08:45:00Z",
+          "status": "COMPLIANT"
+        }
+      ],
+      "high_excursion_interval_count": 1,
+      "interval_minutes": 15,
+      "low_excursion_interval_count": 0,
+      "storage_range_celsius_tenths": {
+        "maximum_inclusive": 80,
+        "minimum_inclusive": 20
+      }
+    }
+  },
+  "expected_result_event_ids": [
+    "e-inspect-result",
+    "e-exposure-result"
+  ],
+  "expected_states_after_action": [
+    "lot_logger_state_inspected",
+    "calibration_exposure_verified"
+  ],
+  "required_event_ids": [
+    "e-sop-original",
+    "e-lot-source",
+    "e-logger-evidence",
+    "e-calibration-evidence",
+    "e-inspect-result",
+    "e-exposure-result"
+  ],
+  "required_relation_ids": [
+    "produce-inspection",
+    "produce-exposure-check"
+  ]
+}

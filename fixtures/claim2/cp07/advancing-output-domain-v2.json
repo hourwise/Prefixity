@@ -1,0 +1,35 @@
+{
+  "case_id": "CP07",
+  "offline_only": true,
+  "points": [
+    {
+      "canonical_raw_sha256": "3c324f5a7413b3b0041cb829bd77aec221e6ad30ecd44f2cb815bbb187585e7c",
+      "canonical_raw_utf8": "{\"action_id\":\"inspect_coverage_eligibility\"}",
+      "expected_action_id": "inspect_coverage_eligibility",
+      "raw_language_cardinality": 1,
+      "receipt_event_id": "e-eligibility-result",
+      "receipt_id": "r-eligibility-CP07-041",
+      "receipt_path": "bodies/receipt-eligibility.txt",
+      "receipt_revision": "eligibility-check-CP07-041-v1",
+      "receipt_sha256": "36ddc13ec941fe3d821b474880e818bf7637b3d0bb6f47548f3e1c4efe4fd79f",
+      "request_slot": 1,
+      "state_after": "coverage_eligibility_checked"
+    },
+    {
+      "canonical_raw_sha256": "e566f428d4ca4a776604b58023080ef932ccb98583a5d13627b9ed1aa2e5a753",
+      "canonical_raw_utf8": "{\"action_id\":\"calculate_benefit_breakdown\"}",
+      "expected_action_id": "calculate_benefit_breakdown",
+      "raw_language_cardinality": 1,
+      "receipt_event_id": "e-benefit-result",
+      "receipt_id": "r-benefit-CP07-041",
+      "receipt_path": "bodies/receipt-benefit-check.txt",
+      "receipt_revision": "benefit-check-CP07-041-v1",
+      "receipt_sha256": "3410bfb7e4c0a3984ddbf26f5c62a99e1647f9bf4042f46751f82b88354eb2a9",
+      "request_slot": 2,
+      "state_after": "benefit_arithmetic_verified"
+    }
+  ],
+  "protocol_id": "prefixity.phase1c.claim2-canonical-advancing-output.v1",
+  "schema_id": "prefixity.phase1c.claim2-advancing-output-domain-v2-case",
+  "schema_version": 2
+}

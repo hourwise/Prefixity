@@ -1,0 +1,75 @@
+{
+  "critical_event_ids": [
+    "e-plan-original",
+    "e-case-source",
+    "e-benefit-result"
+  ],
+  "expected_action_ids": [
+    "inspect_coverage_eligibility",
+    "calculate_benefit_breakdown"
+  ],
+  "expected_final_answer": {
+    "benefit_limit": {
+      "annual_cap_cents": 1000000,
+      "limit_reduction_cents": 116000,
+      "paid_before_cents": 820000,
+      "plan_payment_cents": 180000,
+      "remaining_cents": 180000
+    },
+    "coinsurance": {
+      "member_rate_basis_points": 2000,
+      "member_share_cents": 74000,
+      "plan_before_limit_cents": 296000
+    },
+    "coverage_status": "COVERED",
+    "deductible": {
+      "after_deductible_cents": 370000,
+      "allowed_charge_cents": 420000,
+      "applied_cents": 50000,
+      "remaining_before_cents": 50000
+    },
+    "exclusion": {
+      "clause_id": "EXCL-8.4",
+      "triggered": false
+    },
+    "final_disposition": "COVERED_WITH_CAP_LIMIT",
+    "governing_clause_ids": [
+      "DEF-2.5",
+      "ELIG-3.1",
+      "COV-3.2",
+      "COV-3.3",
+      "NET-4.1",
+      "CHARGE-4.2",
+      "COST-6.1",
+      "COST-6.2",
+      "LIMIT-7.1",
+      "LIMIT-7.2",
+      "LIMIT-7.3",
+      "EXCL-8.4",
+      "ADJ-9.1",
+      "ADJ-9.2",
+      "ADJ-9.3",
+      "ADJ-9.4"
+    ],
+    "member_responsibility_cents": 240000,
+    "plan_benefit_cents": 180000
+  },
+  "expected_result_event_ids": [
+    "e-eligibility-result",
+    "e-benefit-result"
+  ],
+  "expected_states_after_action": [
+    "coverage_eligibility_checked",
+    "benefit_arithmetic_verified"
+  ],
+  "required_event_ids": [
+    "e-plan-original",
+    "e-case-source",
+    "e-eligibility-result",
+    "e-benefit-result"
+  ],
+  "required_relation_ids": [
+    "produce-eligibility",
+    "produce-benefit-check"
+  ]
+}

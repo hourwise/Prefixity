@@ -1,0 +1,35 @@
+{
+  "case_id": "CP08",
+  "offline_only": true,
+  "points": [
+    {
+      "canonical_raw_sha256": "e70eef1974f48fb9083560996379f643ff35eaa3b4d551805c772db0bc80d839",
+      "canonical_raw_utf8": "{\"action_id\":\"inspect_lot_logger_state\"}",
+      "expected_action_id": "inspect_lot_logger_state",
+      "raw_language_cardinality": 1,
+      "receipt_event_id": "e-inspect-result",
+      "receipt_id": "r-inspect-CC08-117",
+      "receipt_path": "bodies/receipt-inspection.txt",
+      "receipt_revision": "lot-logger-inspection-CC08-v1",
+      "receipt_sha256": "128e171eac1313aa0b00825933df8d335b4f99f45b1d874a5fe2ca489095f2a3",
+      "request_slot": 1,
+      "state_after": "lot_logger_state_inspected"
+    },
+    {
+      "canonical_raw_sha256": "87c9328255c33b2c504a89f93c1b5416e34a136ac833e98a14d4ba552047ae68",
+      "canonical_raw_utf8": "{\"action_id\":\"calculate_calibration_and_exposure\"}",
+      "expected_action_id": "calculate_calibration_and_exposure",
+      "raw_language_cardinality": 1,
+      "receipt_event_id": "e-exposure-result",
+      "receipt_id": "r-exposure-CC08-117",
+      "receipt_path": "bodies/receipt-exposure-check.txt",
+      "receipt_revision": "exposure-check-CC08-v1",
+      "receipt_sha256": "a483e2d48a822adf795a55ec891e0d68893d65c3d3bbed7471592dadccced7ca",
+      "request_slot": 2,
+      "state_after": "calibration_exposure_verified"
+    }
+  ],
+  "protocol_id": "prefixity.phase1c.claim2-canonical-advancing-output.v1",
+  "schema_id": "prefixity.phase1c.claim2-advancing-output-domain-v2-case",
+  "schema_version": 2
+}

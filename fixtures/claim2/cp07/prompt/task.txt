@@ -1,0 +1,1 @@
+CP07 synthetic benefits coverage adjudication. Use the pinned case snapshot, the published Northstar plan, and the deterministic verification receipts to decide the claim under the cited plan revision. The claim snapshot and plan are read-only.

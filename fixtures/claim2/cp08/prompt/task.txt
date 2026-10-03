@@ -1,0 +1,1 @@
+CP08 synthetic cold-chain lot disposition. Review the frozen receiving record, logger export, calibration evidence, and versioned quality SOP. All source evidence is read-only. Apply only the specified procedure revision.

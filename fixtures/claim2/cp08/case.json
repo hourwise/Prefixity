@@ -1,0 +1,953 @@
+{
+  "action_menu": [
+    {
+      "action_event_id": "e-inspect-action",
+      "action_id": "inspect_lot_logger_state",
+      "action_slot": 1,
+      "result_asset_id": "receipt_inspection",
+      "result_event_id": "e-inspect-result",
+      "state_after": "lot_logger_state_inspected"
+    },
+    {
+      "action_event_id": "e-completeness-action",
+      "action_id": "verify_receiving_record_completeness",
+      "action_slot": 1,
+      "result_asset_id": "receipt_completeness",
+      "result_event_id": "e-completeness-result",
+      "state_after": "receiving_record_completeness_verified"
+    },
+    {
+      "action_event_id": "e-exposure-action",
+      "action_id": "calculate_calibration_and_exposure",
+      "action_slot": 2,
+      "result_asset_id": "receipt_exposure",
+      "result_event_id": "e-exposure-result",
+      "state_after": "calibration_exposure_verified"
+    },
+    {
+      "action_event_id": "e-calibration-action",
+      "action_id": "verify_calibration_certificate",
+      "action_slot": 2,
+      "result_asset_id": "receipt_calibration",
+      "result_event_id": "e-calibration-result",
+      "state_after": "calibration_certificate_verified"
+    }
+  ],
+  "assets": [
+    {
+      "asset_id": "system",
+      "kind": "prompt_text",
+      "relative_path": "prompt/system.txt",
+      "sha256": "c764d04295fd830ccb506a45570ee095fa813571b8ee3ff002dbb80bc3d9cd27"
+    },
+    {
+      "asset_id": "task",
+      "kind": "prompt_text",
+      "relative_path": "prompt/task.txt",
+      "sha256": "913d535496e20b9b8c4157b6073df790309ba6c66a48832174dbccd0f2d9f973"
+    },
+    {
+      "asset_id": "request1",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request1.txt",
+      "sha256": "93a672d7ae322a65343ad5993c45064808d7bd73a03e989fa4c020f0beba4145"
+    },
+    {
+      "asset_id": "request2",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request2.txt",
+      "sha256": "5f57c9ee14115156a4e4baeb2bd495b253654a0071cf86291ab145a348840696"
+    },
+    {
+      "asset_id": "request3",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request3.txt",
+      "sha256": "8f84e1f8b1b8cd57070fa96550579aa0c5f6641bff8119309d0a5d5bb248d1fb"
+    },
+    {
+      "asset_id": "sop_original",
+      "event_id": "e-sop-original",
+      "kind": "context_attachment",
+      "relative_path": "bodies/CC-SOP-04-original.md",
+      "revision_id": "CC-SOP-04@3.2.1",
+      "sha256": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e"
+    },
+    {
+      "asset_id": "lot_snapshot",
+      "event_id": "e-lot-source",
+      "kind": "context_attachment",
+      "relative_path": "bodies/lot-snapshot-LOT-SYN-CC08-117-v1.json",
+      "revision_id": "cold-chain-lot@LOT-SYN-CC08-117-v1",
+      "sha256": "42834d6aa1af79c857ee07bc5b643bfd8b0df15a18c23b0652e77055a58ebc29"
+    },
+    {
+      "asset_id": "logger_evidence",
+      "event_id": "e-logger-evidence",
+      "kind": "context_attachment",
+      "relative_path": "bodies/logger-record-LOGGER-SYN-14-v1.json",
+      "revision_id": "cold-chain-logger@LOGGER-SYN-14-v1",
+      "sha256": "38ff51a999dd1a7b4bd7d7cf7d06c216309712660fa7c6d3dbd876e4394e3244"
+    },
+    {
+      "asset_id": "calibration_evidence",
+      "event_id": "e-calibration-evidence",
+      "kind": "context_attachment",
+      "relative_path": "bodies/calibration-CAL-SYN-14-2026-v1.json",
+      "revision_id": "logger-calibration@CAL-SYN-14-2026-v1",
+      "sha256": "3df5738fe9cea78cc888db58b9bd11891450429673924690c7bbbf1eece90f98"
+    },
+    {
+      "asset_id": "sop_final_packet",
+      "event_id": "e-sop-final-reattachment",
+      "kind": "context_attachment",
+      "relative_path": "bodies/CC-SOP-04-final-packet.md",
+      "revision_id": "CC-SOP-04@3.2.1",
+      "sha256": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e"
+    },
+    {
+      "asset_id": "receipt_inspection",
+      "event_id": "e-inspect-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-inspection.txt",
+      "revision_id": "lot-logger-inspection-CC08-v1",
+      "sha256": "128e171eac1313aa0b00825933df8d335b4f99f45b1d874a5fe2ca489095f2a3"
+    },
+    {
+      "asset_id": "receipt_completeness",
+      "event_id": "e-completeness-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-completeness.txt",
+      "revision_id": "receiving-completeness-CC08-v1",
+      "sha256": "769c384f7ab496b858a8abccdde922973dc2cb415a3a8e7a7c445ea6e0884c77"
+    },
+    {
+      "asset_id": "receipt_exposure",
+      "event_id": "e-exposure-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-exposure-check.txt",
+      "revision_id": "exposure-check-CC08-v1",
+      "sha256": "a483e2d48a822adf795a55ec891e0d68893d65c3d3bbed7471592dadccced7ca"
+    },
+    {
+      "asset_id": "receipt_calibration",
+      "event_id": "e-calibration-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-calibration-check.txt",
+      "revision_id": "calibration-check-CC08-v1",
+      "sha256": "2306ace66baccdc05f660889365ff610edd768f840564de62e0402450741ff4c"
+    }
+  ],
+  "assistant_output_planning_bytes": 4096,
+  "case_id": "CP08",
+  "evaluation_key_path": "evaluation/key.json",
+  "evaluation_key_sha256": "897cde246e4d7622e129b68070a2de050fc0ff93a238529d813c476787d55686",
+  "kind": "positive",
+  "planner_input": {
+    "events": [
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e",
+        "context_block_id": "ctx-sop-original",
+        "event_id": "e-sop-original",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 0,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e",
+            "source_kind": "self_authored",
+            "source_locator": "source/CC-SOP-04-revision-3.2.1.md#controlled-procedure",
+            "source_revision": "CC-SOP-04@3.2.1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#ordinary-final-packet-provenance",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [],
+        "result": null,
+        "sequence_index": 0,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "42834d6aa1af79c857ee07bc5b643bfd8b0df15a18c23b0652e77055a58ebc29",
+        "context_block_id": "ctx-lot-source",
+        "event_id": "e-lot-source",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 1,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "42834d6aa1af79c857ee07bc5b643bfd8b0df15a18c23b0652e77055a58ebc29",
+            "source_kind": "self_authored",
+            "source_locator": "source/lot-snapshot-LOT-SYN-CC08-117-v1.json#frozen-record",
+            "source_revision": "cold-chain-lot@LOT-SYN-CC08-117-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#ordinary-final-packet-provenance",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [],
+        "result": null,
+        "sequence_index": 1,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "38ff51a999dd1a7b4bd7d7cf7d06c216309712660fa7c6d3dbd876e4394e3244",
+        "context_block_id": "ctx-logger-evidence",
+        "event_id": "e-logger-evidence",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 2,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "38ff51a999dd1a7b4bd7d7cf7d06c216309712660fa7c6d3dbd876e4394e3244",
+            "source_kind": "self_authored",
+            "source_locator": "source/logger-record-LOGGER-SYN-14-v1.json#logger-export",
+            "source_revision": "cold-chain-logger@LOGGER-SYN-14-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#ordinary-final-packet-provenance",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-lot-source"
+        ],
+        "result": null,
+        "sequence_index": 2,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "3df5738fe9cea78cc888db58b9bd11891450429673924690c7bbbf1eece90f98",
+        "context_block_id": "ctx-calibration-evidence",
+        "event_id": "e-calibration-evidence",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 3,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "3df5738fe9cea78cc888db58b9bd11891450429673924690c7bbbf1eece90f98",
+            "source_kind": "self_authored",
+            "source_locator": "source/calibration-CAL-SYN-14-2026-v1.json#as-found-certificate",
+            "source_revision": "logger-calibration@CAL-SYN-14-2026-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#ordinary-final-packet-provenance",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-lot-source"
+        ],
+        "result": null,
+        "sequence_index": 3,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": {
+          "action_id": "inspect_lot_logger_state",
+          "argument_hash": "b073f85b083c63774ac6cacfbe38aa11032f203f8f08f15c86caf584716ae21b",
+          "tool_name": "inspect_lot_logger_state"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-inspect-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 4,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#read-only-action-menu",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-sop-original",
+          "e-lot-source",
+          "e-logger-evidence"
+        ],
+        "result": null,
+        "sequence_index": 4,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-inspect-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 5,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "128e171eac1313aa0b00825933df8d335b4f99f45b1d874a5fe2ca489095f2a3",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-inspection.txt",
+            "source_revision": "lot-logger-inspection-CC08-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-inspect-action",
+          "e-lot-source",
+          "e-logger-evidence"
+        ],
+        "result": {
+          "observation_hash": "128e171eac1313aa0b00825933df8d335b4f99f45b1d874a5fe2ca489095f2a3",
+          "originating_action_id": "inspect_lot_logger_state",
+          "result_id": "r-inspect-CC08-117",
+          "status": "success"
+        },
+        "sequence_index": 5,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": {
+          "action_id": "verify_receiving_record_completeness",
+          "argument_hash": "b073f85b083c63774ac6cacfbe38aa11032f203f8f08f15c86caf584716ae21b",
+          "tool_name": "verify_receiving_record_completeness"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-completeness-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 6,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#read-only-action-menu",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-lot-source"
+        ],
+        "result": null,
+        "sequence_index": 6,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-completeness-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 7,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "769c384f7ab496b858a8abccdde922973dc2cb415a3a8e7a7c445ea6e0884c77",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-completeness.txt",
+            "source_revision": "receiving-completeness-CC08-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-completeness-action",
+          "e-lot-source"
+        ],
+        "result": {
+          "observation_hash": "769c384f7ab496b858a8abccdde922973dc2cb415a3a8e7a7c445ea6e0884c77",
+          "originating_action_id": "verify_receiving_record_completeness",
+          "result_id": "r-completeness-CC08-117",
+          "status": "success"
+        },
+        "sequence_index": 7,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": {
+          "action_id": "calculate_calibration_and_exposure",
+          "argument_hash": "b073f85b083c63774ac6cacfbe38aa11032f203f8f08f15c86caf584716ae21b",
+          "tool_name": "calculate_calibration_and_exposure"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-exposure-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 8,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#read-only-action-menu",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-sop-original",
+          "e-lot-source",
+          "e-logger-evidence",
+          "e-calibration-evidence"
+        ],
+        "result": null,
+        "sequence_index": 8,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-exposure-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 9,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "a483e2d48a822adf795a55ec891e0d68893d65c3d3bbed7471592dadccced7ca",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-exposure-check.txt",
+            "source_revision": "exposure-check-CC08-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-exposure-action",
+          "e-lot-source",
+          "e-logger-evidence",
+          "e-calibration-evidence"
+        ],
+        "result": {
+          "observation_hash": "a483e2d48a822adf795a55ec891e0d68893d65c3d3bbed7471592dadccced7ca",
+          "originating_action_id": "calculate_calibration_and_exposure",
+          "result_id": "r-exposure-CC08-117",
+          "status": "success"
+        },
+        "sequence_index": 9,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": {
+          "action_id": "verify_calibration_certificate",
+          "argument_hash": "b073f85b083c63774ac6cacfbe38aa11032f203f8f08f15c86caf584716ae21b",
+          "tool_name": "verify_calibration_certificate"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-calibration-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 10,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#read-only-action-menu",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-calibration-evidence"
+        ],
+        "result": null,
+        "sequence_index": 10,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-calibration-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 11,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "2306ace66baccdc05f660889365ff610edd768f840564de62e0402450741ff4c",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-calibration-check.txt",
+            "source_revision": "calibration-check-CC08-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-calibration-action",
+          "e-calibration-evidence"
+        ],
+        "result": {
+          "observation_hash": "2306ace66baccdc05f660889365ff610edd768f840564de62e0402450741ff4c",
+          "originating_action_id": "verify_calibration_certificate",
+          "result_id": "r-calibration-CC08-117",
+          "status": "success"
+        },
+        "sequence_index": 11,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e",
+        "context_block_id": "ctx-sop-final-review",
+        "event_id": "e-sop-final-reattachment",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 12,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e",
+            "source_kind": "self_authored",
+            "source_locator": "source/CC-SOP-04-revision-3.2.1.md#controlled-procedure",
+            "source_revision": "CC-SOP-04@3.2.1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/workflow.md#ordinary-final-packet-provenance",
+            "source_revision": "cp08-cold-chain-workflow-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "d4617727f9c10ae9e60a7d8a379d22642f47c76eca689e11c05d2d64401c88e9",
+            "source_kind": "self_authored",
+            "source_locator": "source/quality-review-packet-recipe-v1.json#procedure-occurrence",
+            "source_revision": "cold-chain-final-quality-review@1.0"
+          }
+        ],
+        "reference_event_ids": [
+          "e-sop-original",
+          "e-lot-source",
+          "e-logger-evidence",
+          "e-calibration-evidence"
+        ],
+        "result": null,
+        "sequence_index": 12,
+        "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+      }
+    ],
+    "provenance": [
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "e5e24bdc6ce85c31b95a1dc5fa2ac7fca87d7bfef5fb5c269793baff91b8cb62",
+        "source_kind": "self_authored",
+        "source_locator": "cp08/workflow.md",
+        "source_revision": "cp08-cold-chain-workflow-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e",
+        "source_kind": "self_authored",
+        "source_locator": "cp08/source/CC-SOP-04-revision-3.2.1.md",
+        "source_revision": "CC-SOP-04@3.2.1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "42834d6aa1af79c857ee07bc5b643bfd8b0df15a18c23b0652e77055a58ebc29",
+        "source_kind": "self_authored",
+        "source_locator": "cp08/source/lot-snapshot-LOT-SYN-CC08-117-v1.json",
+        "source_revision": "cold-chain-lot@LOT-SYN-CC08-117-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "38ff51a999dd1a7b4bd7d7cf7d06c216309712660fa7c6d3dbd876e4394e3244",
+        "source_kind": "self_authored",
+        "source_locator": "cp08/source/logger-record-LOGGER-SYN-14-v1.json",
+        "source_revision": "cold-chain-logger@LOGGER-SYN-14-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "3df5738fe9cea78cc888db58b9bd11891450429673924690c7bbbf1eece90f98",
+        "source_kind": "self_authored",
+        "source_locator": "cp08/source/calibration-CAL-SYN-14-2026-v1.json",
+        "source_revision": "logger-calibration@CAL-SYN-14-2026-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "d4617727f9c10ae9e60a7d8a379d22642f47c76eca689e11c05d2d64401c88e9",
+        "source_kind": "self_authored",
+        "source_locator": "cp08/source/quality-review-packet-recipe-v1.json",
+        "source_revision": "cold-chain-final-quality-review@1.0"
+      }
+    ],
+    "relations": [
+      {
+        "from_id": "inspect_lot_logger_state",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "128e171eac1313aa0b00825933df8d335b4f99f45b1d874a5fe2ca489095f2a3",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-inspection.txt",
+            "source_revision": "lot-logger-inspection-CC08-v1"
+          }
+        ],
+        "relation_id": "produce-inspection",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-inspect-CC08-117"
+      },
+      {
+        "from_id": "verify_receiving_record_completeness",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "769c384f7ab496b858a8abccdde922973dc2cb415a3a8e7a7c445ea6e0884c77",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-completeness.txt",
+            "source_revision": "receiving-completeness-CC08-v1"
+          }
+        ],
+        "relation_id": "produce-completeness",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-completeness-CC08-117"
+      },
+      {
+        "from_id": "calculate_calibration_and_exposure",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "a483e2d48a822adf795a55ec891e0d68893d65c3d3bbed7471592dadccced7ca",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-exposure-check.txt",
+            "source_revision": "exposure-check-CC08-v1"
+          }
+        ],
+        "relation_id": "produce-exposure-check",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-exposure-CC08-117"
+      },
+      {
+        "from_id": "verify_calibration_certificate",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "2306ace66baccdc05f660889365ff610edd768f840564de62e0402450741ff4c",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-calibration-check.txt",
+            "source_revision": "calibration-check-CC08-v1"
+          }
+        ],
+        "relation_id": "produce-calibration-check",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-calibration-CC08-117"
+      },
+      {
+        "from_id": "e-sop-original",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "eb5605ad1cc8253b6c04ee8ff35e1289f8b9620dc35bee2eeffb1dee9e7b8e8e",
+            "source_kind": "self_authored",
+            "source_locator": "cp08/source/CC-SOP-04-revision-3.2.1.md#controlled-procedure",
+            "source_revision": "CC-SOP-04@3.2.1"
+          }
+        ],
+        "relation_id": "same-state-sop-reattachment",
+        "relation_type": "same_state_revision",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "e-sop-final-reattachment"
+      }
+    ]
+  },
+  "request_templates": [
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-sop-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-lot-source",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-logger-evidence",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 1
+    },
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-sop-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-lot-source",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-logger-evidence",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request2",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-calibration-evidence",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 2
+    },
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-sop-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-lot-source",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-logger-evidence",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request2",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-calibration-evidence",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 2
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 2
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request3",
+              "kind": "asset"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "event_id": "e-sop-final-reattachment",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 3
+    }
+  ],
+  "schema_id": "prefixity.phase1c.claim2-workload-case",
+  "schema_version": 1,
+  "token_proof_inputs": null
+}

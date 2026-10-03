@@ -1,0 +1,39 @@
+{
+  "export_state": "immutable_captured_record",
+  "intervals": [
+    {
+      "end": "2026-03-14T08:15:00Z",
+      "maximum_indicated_celsius_tenths": 51,
+      "minimum_indicated_celsius_tenths": 46,
+      "start": "2026-03-14T08:00:00Z"
+    },
+    {
+      "end": "2026-03-14T08:30:00Z",
+      "maximum_indicated_celsius_tenths": 83,
+      "minimum_indicated_celsius_tenths": 77,
+      "start": "2026-03-14T08:15:00Z"
+    },
+    {
+      "end": "2026-03-14T08:45:00Z",
+      "maximum_indicated_celsius_tenths": 72,
+      "minimum_indicated_celsius_tenths": 64,
+      "start": "2026-03-14T08:30:00Z"
+    },
+    {
+      "end": "2026-03-14T09:00:00Z",
+      "maximum_indicated_celsius_tenths": 61,
+      "minimum_indicated_celsius_tenths": 53,
+      "start": "2026-03-14T08:45:00Z"
+    }
+  ],
+  "logger_serial": "LOGGER-SYN-14",
+  "record_id": "LOGGER-SYN-14-EXPORT-2026-03-14-A",
+  "sampling_interval_minutes": 15,
+  "schema_id": "prefixity.claim2.synthetic-cold-chain-logger-record",
+  "schema_version": 1,
+  "source_revision": "cold-chain-logger@LOGGER-SYN-14-v1",
+  "synthetic_only": true,
+  "temperature_unit": "celsius",
+  "time_zone": "UTC",
+  "world_state_revision": "cold-chain-disposition@LOT-SYN-CC08-117-v1"
+}

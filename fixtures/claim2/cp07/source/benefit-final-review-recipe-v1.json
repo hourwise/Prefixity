@@ -1,0 +1,22 @@
+{
+  "attachment_behavior": "emit_one_native_plan_message_for_each_final_packet",
+  "benchmark_condition_used": false,
+  "case_snapshot_behavior": "carry_forward_existing_native_occurrence_without_copy",
+  "ordinary_trigger": "final_adjudication_requested",
+  "plan_resolution": {
+    "body_sha256": "d171809f32419b8a978f8264204f9b224e41d2db3d626f5bc28898f06a2a12ee",
+    "document_id": "NS-WB-IMG-POLICY",
+    "source_revision": "northstar-benefit-plan@2026.1",
+    "version": "2026.1"
+  },
+  "purpose": "Keep the authority document with the final decision record for clause-level review.",
+  "read_only": true,
+  "required_packet_material": [
+    "existing_frozen_case_source_snapshot_occurrence:e-case-source",
+    "complete_controlling_plan_document"
+  ],
+  "schema_id": "prefixity.claim2.synthetic-benefits-packet-recipe",
+  "schema_version": 1,
+  "template_id": "benefit-final-review",
+  "template_version": "1.0"
+}

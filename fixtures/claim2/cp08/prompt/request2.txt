@@ -1,0 +1,1 @@
+Verify the calibration certificate and calculate corrected time-temperature and cumulative exposure from the same frozen logger record. Choose one read-only action: {"action_id":"calculate_calibration_and_exposure"} or {"action_id":"verify_calibration_certificate"}.
