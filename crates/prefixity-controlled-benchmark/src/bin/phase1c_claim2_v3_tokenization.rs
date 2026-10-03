@@ -1,3 +1,4 @@
+use prefixity_controlled_benchmark::inspect_executable_identity;
 use prefixity_controlled_benchmark::phase1c_claim2_tokenization::{
     execute_plan_with_transport, new_pass_evidence, plan_summary, PassEvidence, RawHttpResponse,
     TokenizationTransport,
@@ -175,6 +176,8 @@ fn verify_frozen_executable_record(
         != executable.canonicalize().map_err(|e| e.to_string())?
         || record["sha256"] != sha256_file(executable)?
         || record["bytes"] != fs::metadata(executable).map_err(|e| e.to_string())?.len()
+        || record["volume_index_file_id"].as_str()
+            != inspect_executable_identity(executable)?.file_id.as_deref()
     {
         return Err("V3 frozen executable identity mismatch".into());
     }
@@ -583,9 +586,9 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::{
-        parse_execute_confirmation, selected_mode, sha256_file, sha256_source_file,
-        verify_frozen_executable_record, LLAMA_BUILD, LLAMA_PATH, LLAMA_SHA256, MODEL_PATH,
-        MODEL_SHA256,
+        inspect_executable_identity, parse_execute_confirmation, selected_mode, sha256_file,
+        sha256_source_file, verify_frozen_executable_record, LLAMA_BUILD, LLAMA_PATH, LLAMA_SHA256,
+        MODEL_PATH, MODEL_SHA256,
     };
     use serde_json::json;
     use std::fs;
@@ -681,10 +684,22 @@ mod tests {
         let record = json!({
             "path": frozen,
             "sha256": sha256_file(&frozen).unwrap(),
-            "bytes": fs::metadata(&frozen).unwrap().len()
+            "bytes": fs::metadata(&frozen).unwrap().len(),
+            "volume_index_file_id": inspect_executable_identity(&frozen).unwrap().file_id
         });
         assert!(verify_frozen_executable_record(&frozen, &record).is_ok());
         assert!(verify_frozen_executable_record(&substituted, &record).is_err());
+        let identical_copy = directory.join("identical-copy.exe");
+        fs::copy(&frozen, &identical_copy).unwrap();
+        let same_bytes_wrong_file_id = json!({
+            "path": identical_copy,
+            "sha256": record["sha256"],
+            "bytes": record["bytes"],
+            "volume_index_file_id": record["volume_index_file_id"]
+        });
+        assert!(
+            verify_frozen_executable_record(&identical_copy, &same_bytes_wrong_file_id).is_err()
+        );
         fs::write(&frozen, b"modified-binary").unwrap();
         assert!(verify_frozen_executable_record(&frozen, &record).is_err());
         fs::remove_dir_all(directory).unwrap();
