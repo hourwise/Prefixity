@@ -80,6 +80,7 @@
 | [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION.md), [`PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V2.json`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V2.json), [`../fixtures/claim2/tokenization-contact-plan-v2-hybrid.json`](../fixtures/claim2/tokenization-contact-plan-v2-hybrid.json), and [`../fixtures/claim2/tokenization-contact-plan-v2-full-fresh.json`](../fixtures/claim2/tokenization-contact-plan-v2-full-fresh.json) | Distinct V2 token-only source/executable identity, sealed V1 count inheritance, eight-new-body primary plan, 22-body pre-contact contingency, frozen client and zero-contact offline preflight. | Reviewing preparation before a separately authorized operator-started server and tokenization pass. |
 | [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_TOKENIZATION_EXECUTION_RESULT.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_TOKENIZATION_EXECUTION_RESULT.md), [`PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V2.json`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V2.json), and [`../claim2-v2-hybrid-tokenization-pass-evidence.json`](../claim2-v2-hybrid-tokenization-pass-evidence.json) | Single hybrid non-inference pass, eight fresh plus 14 sealed inherited unique counts mapped to 54 requests, context-gate failure, sealed result, and exact-server shutdown. | Reviewing `WORKLOAD_V2_TOKEN_ADMISSION_FAILED`; next work is a separate V2 design review, not scored-pilot preparation. |
 | [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_DESIGN_REVIEW.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_DESIGN_REVIEW.md) | Documentation-only cross-version failure analysis, immutable V1/V2 archives, conditional retained-case reuse, CP09 release-promotion and CP10 observation-publication families, frozen gates, and V3 design boundary. | Reviewing `CLAIM_2_WORKLOAD_V3_DESIGN_READY`; only offline V3 materialization preparation is next. |
+| [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_MATERIALIZATION.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_MATERIALIZATION.md), [`../fixtures/claim2/workload-contract-v3.md`](../fixtures/claim2/workload-contract-v3.md), [`../fixtures/claim2/workload-request-ledger-v3.json`](../fixtures/claim2/workload-request-ledger-v3.json), and [`../fixtures/claim2/materialization-report-v4.json`](../fixtures/claim2/materialization-report-v4.json) | Offline CP02/03/09/10/05/06 materialization, exact 54-request ledger, V3 finite domain, conditional sealed V1 inheritance, new CP09/CP10 fixtures, and version-4 successor. | Reviewing `CLAIM_2_WORKLOAD_V3_MATERIALIZATION_READY_FOR_TOKENIZATION_PREPARATION`; new-case token admission remains unknown and only offline V3 tokenization preparation is next. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
@@ -148,10 +149,12 @@ of reduction against the 800-token gate; CP02 and CP03 passed, and CP05/CP06
 remained zero-mutation controls. V2 was materialized and its single
 non-inference hybrid pass completed as `WORKLOAD_V2_TOKEN_ADMISSION_FAILED`:
 CP07 and CP08 passed reduction gates but exceeded the frozen input ceiling.
-The separate offline V3 design review is `CLAIM_2_WORKLOAD_V3_DESIGN_READY`,
-with proposed roster CP02/CP03/CP09/CP10/CP05/CP06 and conditional reuse of
-exact sealed V1 counts. The next task is only offline
-`CLAIM_2_WORKLOAD_V3_MATERIALIZATION_PREPARATION`; CP09/CP10 fixtures, counts,
+The separate offline V3 design review accepted roster
+CP02/CP03/CP09/CP10/CP05/CP06. V3 is now materialized offline as
+`CLAIM_2_WORKLOAD_V3_MATERIALIZATION_READY_FOR_TOKENIZATION_PREPARATION`:
+54 exact rendered requests, 14 inherited V1 hashes and eight uncounted new
+hashes. The next task is only offline
+`CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION`; CP09/CP10 token counts,
 scored-pilot preparation, server startup, and inference have not begun.
 The Phase 1A corpus/import evidence and later Phase 1B/1C results remain in
 the linked closeouts and gates above.

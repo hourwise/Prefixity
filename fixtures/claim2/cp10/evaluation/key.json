@@ -1,0 +1,97 @@
+{
+  "critical_event_ids": [
+    "e-spec-original",
+    "e-shard-01",
+    "e-shard-02",
+    "e-shard-03",
+    "e-quality-result"
+  ],
+  "expected_action_ids": [
+    "inspect_observation_catalog",
+    "inspect_quality_and_coverage"
+  ],
+  "expected_final_answer": {
+    "dataset_id": "OBS-SYN-CP10",
+    "flagged_observations": [
+      {
+        "disposition": "EXCLUDED_NON_VALID_SOURCE_QUALITY",
+        "normalized_utc": "2026-01-14T07:30:00Z",
+        "observation_id": "OBS-CP10-A-003",
+        "quality_flag": "SUSPECT",
+        "rule_id": "QF-02"
+      },
+      {
+        "disposition": "EXCLUDED_NULL_MEASUREMENT",
+        "normalized_utc": "2026-01-14T07:45:00Z",
+        "observation_id": "OBS-CP10-A-004",
+        "quality_flag": "VALID",
+        "rule_id": "QF-01"
+      }
+    ],
+    "output_rows": [
+      {
+        "instrument_id": "LAB-SYN-CHAMBER-A",
+        "maximum_value_celsius_tenths": 218,
+        "mean_value_celsius_tenths": 215,
+        "minimum_value_celsius_tenths": 212,
+        "source_observation_ids": [
+          "OBS-CP10-A-001",
+          "OBS-CP10-A-002",
+          "OBS-CP10-A-005",
+          "OBS-CP10-A-006"
+        ],
+        "unit": "0.1 degree Celsius",
+        "utc_date": "2026-01-14",
+        "valid_observation_count": 4
+      },
+      {
+        "instrument_id": "LAB-SYN-CHAMBER-B",
+        "maximum_value_celsius_tenths": 206,
+        "mean_value_celsius_tenths": 201,
+        "minimum_value_celsius_tenths": 196,
+        "source_observation_ids": [
+          "OBS-CP10-B-001",
+          "OBS-CP10-B-002",
+          "OBS-CP10-B-003",
+          "OBS-CP10-B-004",
+          "OBS-CP10-B-005",
+          "OBS-CP10-B-006"
+        ],
+        "unit": "0.1 degree Celsius",
+        "utc_date": "2026-01-14",
+        "valid_observation_count": 6
+      }
+    ],
+    "publication_reason": "Publish ten valid observations in two instrument-day rows. Exclude the one SUSPECT measurement under QF-02 and report the one null measurement under QF-01; preserve both flags in the publication record.",
+    "publication_status": "PUBLISHED_WITH_FLAGS",
+    "quality_rule_ids": [
+      "QF-01",
+      "QF-02"
+    ],
+    "source_ids": [
+      "OBS-SYN-CP10-S01",
+      "OBS-SYN-CP10-S02",
+      "OBS-SYN-CP10-S03"
+    ]
+  },
+  "expected_result_event_ids": [
+    "e-catalog-result",
+    "e-quality-result"
+  ],
+  "expected_states_after_action": [
+    "source_catalog_verified",
+    "quality_gaps_verified"
+  ],
+  "required_event_ids": [
+    "e-spec-original",
+    "e-shard-01",
+    "e-shard-02",
+    "e-shard-03",
+    "e-catalog-result",
+    "e-quality-result"
+  ],
+  "required_relation_ids": [
+    "produce-source-catalog",
+    "produce-quality-gaps"
+  ]
+}

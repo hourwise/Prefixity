@@ -1,0 +1,26 @@
+{
+  "action_id": "inspect_observation_catalog",
+  "catalog_state": "complete_closed_and_hash_verified",
+  "collection_manifest_sha256": "f607051e928ff3bde50cfb0875e4b5620752dbcde6d824a8f6d6ba3f41406b42",
+  "dataset_id": "OBS-SYN-CP10",
+  "receipt_id": "r-catalog-OBS-SYN-CP10",
+  "shard_ids": [
+    "OBS-SYN-CP10-S01",
+    "OBS-SYN-CP10-S02",
+    "OBS-SYN-CP10-S03"
+  ],
+  "shard_observation_counts": [
+    4,
+    4,
+    4
+  ],
+  "shard_sha256": [
+    "e34d45a970c8cb0f90c0ea1ede103f9cbf774803c7b21873854f7e215749a67d",
+    "2442f95b2bfd863555db3617bdd426d40ebad139f7dde946ad24e5ca948d4077",
+    "12a83ab5d47ab7025240d68c0420f72dcb12423ce79d9999b4fdd63077c9bc20"
+  ],
+  "specification_sha256": "ddbdbecf474690bb928871faaaeb22bce58a02ae04a629639d61f9471ef06de5",
+  "status": "success",
+  "total_observation_count": 12,
+  "world_state_revision": "observation-publication@OBS-SYN-CP10-v1"
+}

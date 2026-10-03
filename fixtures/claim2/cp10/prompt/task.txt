@@ -1,0 +1,1 @@
+CP10 synthetic observation-data publication. Normalize the frozen instrument readings, apply the versioned field dictionary and quality rules, and prepare the UTC daily publication. All source records are synthetic, immutable, and read-only.

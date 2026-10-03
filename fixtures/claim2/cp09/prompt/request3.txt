@@ -1,0 +1,1 @@
+Return only exact JSON with fields: decision (PROMOTE, HOLD, or ROLLBACK); release_id; build_digest; image_digest; governing_gate_ids (all required IDs in manifest order); environment_cohort (environment, cohort_id, deployment_unit_ids); required_rollback_artifact_id; reason_code. Do not add prose or fields.

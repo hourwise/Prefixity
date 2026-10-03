@@ -1440,7 +1440,7 @@ fn validate_manifest(
         || manifest.schema_version != CLAIM2_CASE_SCHEMA_VERSION
         || !matches!(
             manifest.case_id.as_str(),
-            "CP01" | "CP02" | "CP03" | "CP04" | "CP05" | "CP06" | "CP07" | "CP08"
+            "CP01" | "CP02" | "CP03" | "CP04" | "CP05" | "CP06" | "CP07" | "CP08" | "CP09" | "CP10"
         )
     {
         return Err(BenchmarkError::validation(
@@ -1448,7 +1448,9 @@ fn validate_manifest(
         ));
     }
     let expected_kind = match manifest.case_id.as_str() {
-        "CP01" | "CP02" | "CP03" | "CP04" | "CP07" | "CP08" => Claim2CaseKind::Positive,
+        "CP01" | "CP02" | "CP03" | "CP04" | "CP07" | "CP08" | "CP09" | "CP10" => {
+            Claim2CaseKind::Positive
+        }
         "CP05" | "CP06" => Claim2CaseKind::Control,
         _ => unreachable!("case ID was constrained above"),
     };

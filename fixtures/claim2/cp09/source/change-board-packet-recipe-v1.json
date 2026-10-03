@@ -1,0 +1,23 @@
+{
+  "attachment_behavior": "emit_one_native_complete_manifest_message_for_every_release_promotion_board_packet",
+  "benchmark_condition_used": false,
+  "manifest_resolution": {
+    "body_sha256": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b",
+    "manifest_id": "MAN-SYN-REL-2026-10-03-04",
+    "revision": "1.0",
+    "source_revision": "deployment-cohort@REL-SYN-2026-10-03-04-v1"
+  },
+  "ordinary_trigger": "production_promotion_review_opened",
+  "read_only": true,
+  "required_packet_material": [
+    "frozen_release_state:e-release-state",
+    "provenance_check_receipt:e-build-provenance-result",
+    "rollout_gate_receipt:e-rollout-gates-result",
+    "complete_governing_manifest"
+  ],
+  "schema_id": "prefixity.claim2.synthetic-change-board-packet-recipe",
+  "schema_version": 1,
+  "state_behavior": "carry_forward_existing_frozen_source_and_unique_receipts_without_copy",
+  "template_id": "release-promotion-change-board",
+  "template_version": "1.0"
+}

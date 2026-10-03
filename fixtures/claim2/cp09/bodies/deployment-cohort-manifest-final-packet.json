@@ -1,0 +1,176 @@
+{
+  "board_rule": {
+    "identity_mismatch_or_blocking_security": "ROLLBACK",
+    "promote_requires_all_gates_pass": true,
+    "requested_target_id": "production-wave-eu1",
+    "unknown_or_missing_evidence": "HOLD"
+  },
+  "bounded_deployment_units": [
+    {
+      "deployment_unit_id": "ledger-edge-eu1-a",
+      "image_digest": "sha256:8f7b136c48d7721be30ca7d3f26fcb82578af930a15d4e296e7c113a2f1a4b80",
+      "region": "EU1",
+      "service": "ledger-edge-api",
+      "shard": "a"
+    },
+    {
+      "deployment_unit_id": "ledger-edge-eu1-b",
+      "image_digest": "sha256:8f7b136c48d7721be30ca7d3f26fcb82578af930a15d4e296e7c113a2f1a4b80",
+      "region": "EU1",
+      "service": "ledger-edge-api",
+      "shard": "b"
+    },
+    {
+      "deployment_unit_id": "ledger-edge-eu1-c",
+      "image_digest": "sha256:8f7b136c48d7721be30ca7d3f26fcb82578af930a15d4e296e7c113a2f1a4b80",
+      "region": "EU1",
+      "service": "ledger-edge-api",
+      "shard": "c"
+    },
+    {
+      "deployment_unit_id": "ledger-edge-eu1-d",
+      "image_digest": "sha256:8f7b136c48d7721be30ca7d3f26fcb82578af930a15d4e296e7c113a2f1a4b80",
+      "region": "EU1",
+      "service": "ledger-edge-api",
+      "shard": "d"
+    }
+  ],
+  "canary_limits": {
+    "availability_minimum_basis_points": 9990,
+    "error_rate_maximum_basis_points": 50,
+    "observation_minutes": 30,
+    "p95_latency_maximum_milliseconds": 250
+  },
+  "completeness_contract": {
+    "cohort_membership_is_closed_world": true,
+    "filler_entries_permitted": false,
+    "required_fields": [
+      "release_identity",
+      "source_build_image_digests",
+      "environment_targets",
+      "rollout_cohort_membership",
+      "required_gate_ids_and_owners",
+      "rollback_artifact_ids"
+    ]
+  },
+  "environment_targets": [
+    {
+      "environment": "staging",
+      "purpose": "pre-promotion validation",
+      "required_before_board": true,
+      "target_id": "staging-eu1"
+    },
+    {
+      "cohort_id": "prod-canary-10pct",
+      "environment": "production",
+      "purpose": "30-minute canary observation",
+      "required_before_wave": true,
+      "target_id": "production-canary-eu1"
+    },
+    {
+      "cohort_id": "prod-wave-02",
+      "environment": "production",
+      "purpose": "requested production promotion",
+      "required_before_wave": true,
+      "target_id": "production-wave-eu1"
+    }
+  ],
+  "manifest_id": "MAN-SYN-REL-2026-10-03-04",
+  "record_state": "immutable_governing_record",
+  "release": {
+    "build_attestation_id": "att-SYN-BLD-2026-1003-044",
+    "build_digest": "sha256:57b037a26c588ad19e8479d14fcb839669841ee416fd16e8a6c66aec6e004c1d",
+    "image_digest": "sha256:8f7b136c48d7721be30ca7d3f26fcb82578af930a15d4e296e7c113a2f1a4b80",
+    "image_ref": "registry.synthetic.invalid/ledger-edge-api:2026.10.3-4",
+    "release_id": "REL-SYN-2026-10-03-04",
+    "release_revision": 4,
+    "release_train": "2026.10",
+    "service": "ledger-edge-api",
+    "source_commit": "8a64e97d32f5c0146bc9d1087254ce219a76d331",
+    "source_tree_digest": "sha256:ac7c6ec3d3143b9af3273f014cb9308fe7c82c69a4b6f82d7c0ecde3b03a9c17"
+  },
+  "required_gates": [
+    {
+      "evidence": "source revision and builder attestation bind to image digest",
+      "gate_id": "G-BUILD-01",
+      "owner": "Build Engineering"
+    },
+    {
+      "evidence": "release validation suite passes",
+      "gate_id": "G-TEST-02",
+      "owner": "Release Quality"
+    },
+    {
+      "evidence": "signed synthetic component inventory has no blocking finding",
+      "gate_id": "G-SUPPLY-03",
+      "owner": "Product Security"
+    },
+    {
+      "evidence": "canary availability and error rate meet frozen limits",
+      "gate_id": "G-CANARY-04",
+      "owner": "Runtime Operations"
+    },
+    {
+      "evidence": "canary p95 latency stays below release ceiling",
+      "gate_id": "G-CAPACITY-05",
+      "owner": "Runtime Operations"
+    },
+    {
+      "evidence": "exact previous stable image and rollback bundle are retrievable",
+      "gate_id": "G-ROLLBACK-06",
+      "owner": "Release Engineering"
+    }
+  ],
+  "revision": "1.0",
+  "rollback_by_production_target": [
+    {
+      "image_digest": "sha256:2c88e74118de02583d908f90e9b94a46d31a29fa59e5f08c76d113f0b741ce62",
+      "previous_release_id": "REL-SYN-2026-10-03-03",
+      "rollback_artifact_id": "RB-SYN-REL-2026-10-03-04-PREV3",
+      "target_id": "production-canary-eu1"
+    },
+    {
+      "image_digest": "sha256:2c88e74118de02583d908f90e9b94a46d31a29fa59e5f08c76d113f0b741ce62",
+      "previous_release_id": "REL-SYN-2026-10-03-03",
+      "rollback_artifact_id": "RB-SYN-REL-2026-10-03-04-PREV3",
+      "target_id": "production-wave-eu1"
+    }
+  ],
+  "rollout_cohorts": [
+    {
+      "cohort_id": "staging-validation-01",
+      "deployment_unit_ids": [
+        "ledger-edge-eu1-a",
+        "ledger-edge-eu1-b",
+        "ledger-edge-eu1-c",
+        "ledger-edge-eu1-d"
+      ],
+      "environment": "staging",
+      "target_id": "staging-eu1"
+    },
+    {
+      "cohort_id": "prod-canary-10pct",
+      "deployment_unit_ids": [
+        "ledger-edge-eu1-a"
+      ],
+      "environment": "production",
+      "target_id": "production-canary-eu1",
+      "traffic_share_basis_points": 1000
+    },
+    {
+      "cohort_id": "prod-wave-02",
+      "deployment_unit_ids": [
+        "ledger-edge-eu1-b",
+        "ledger-edge-eu1-c",
+        "ledger-edge-eu1-d"
+      ],
+      "environment": "production",
+      "target_id": "production-wave-eu1"
+    }
+  ],
+  "schema_id": "prefixity.claim2.synthetic-deployment-cohort-manifest",
+  "schema_version": 1,
+  "source_revision": "deployment-cohort@REL-SYN-2026-10-03-04-v1",
+  "synthetic_only": true,
+  "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+}

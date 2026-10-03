@@ -1,0 +1,111 @@
+{
+  "aggregation": {
+    "eligible": "non-null value_celsius_tenths and quality_flag VALID",
+    "group_by": [
+      "instrument_id",
+      "UTC calendar date of observed_at"
+    ],
+    "maximum": "maximum eligible value_celsius_tenths",
+    "mean": "sum integer tenths divided by count, rounded to nearest integer with exact halves away from zero (round-half-up for nonnegative observations)",
+    "minimum": "minimum eligible value_celsius_tenths",
+    "output_unit": "0.1 degree Celsius",
+    "source_observation_ids": "lexicographically sorted eligible observations in each group"
+  },
+  "collection": {
+    "closed_world": true,
+    "expected_observation_count": 12,
+    "shard_count": 3,
+    "shard_ids": [
+      "OBS-SYN-CP10-S01",
+      "OBS-SYN-CP10-S02",
+      "OBS-SYN-CP10-S03"
+    ]
+  },
+  "dataset_id": "OBS-SYN-CP10",
+  "fields": [
+    {
+      "constraints": "unique within dataset",
+      "field_id": "observation_id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "allowed_values": [
+        "LAB-SYN-CHAMBER-A",
+        "LAB-SYN-CHAMBER-B"
+      ],
+      "field_id": "instrument_id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "field_id": "observed_at",
+      "required": true,
+      "timezone_rule": "offset is mandatory; normalize the represented instant to UTC before grouping or flag reporting",
+      "type": "RFC3339 timestamp"
+    },
+    {
+      "field_id": "value_celsius_tenths",
+      "null_rule": "exclude and flag under QF-01",
+      "required": true,
+      "type": "integer or null",
+      "unit": "0.1 degree Celsius"
+    },
+    {
+      "allowed_values": [
+        "VALID",
+        "SUSPECT"
+      ],
+      "field_id": "quality_flag",
+      "required": true,
+      "type": "enum"
+    }
+  ],
+  "output_schema": {
+    "flag_fields": [
+      "observation_id",
+      "normalized_utc",
+      "quality_flag",
+      "rule_id",
+      "disposition"
+    ],
+    "publication_status": [
+      "PUBLISHED",
+      "PUBLISHED_WITH_FLAGS",
+      "HELD_NO_ELIGIBLE_ROWS"
+    ],
+    "row_fields": [
+      "instrument_id",
+      "utc_date",
+      "unit",
+      "valid_observation_count",
+      "mean_value_celsius_tenths",
+      "minimum_value_celsius_tenths",
+      "maximum_value_celsius_tenths",
+      "source_observation_ids"
+    ]
+  },
+  "quality_rules": [
+    {
+      "disposition": "exclude; flag NULL_MEASUREMENT",
+      "rule_id": "QF-01",
+      "when": "value_celsius_tenths is null"
+    },
+    {
+      "disposition": "exclude; flag NON_VALID_SOURCE_QUALITY",
+      "rule_id": "QF-02",
+      "when": "quality_flag is not VALID and value_celsius_tenths is not null"
+    }
+  ],
+  "revision": "field-dictionary-aggregation@1.0.0",
+  "rounding": {
+    "aggregation_intermediate": "integer sum and count",
+    "mean_tie_rule": "round-half-up; no binary floating point",
+    "representation": "integer Celsius tenths"
+  },
+  "schema_id": "prefixity.claim2.synthetic-observation-field-dictionary-aggregation-specification",
+  "schema_version": 1,
+  "specification_id": "FIELD-DICT-SYN-CP10-1.0.0",
+  "synthetic_only": true,
+  "world_state_revision": "observation-publication@OBS-SYN-CP10-v1"
+}

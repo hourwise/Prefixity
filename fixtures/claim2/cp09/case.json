@@ -1,0 +1,851 @@
+{
+  "action_menu": [
+    {
+      "action_event_id": "e-build-provenance-action",
+      "action_id": "verify_build_provenance",
+      "action_slot": 1,
+      "result_asset_id": "receipt_build_provenance",
+      "result_event_id": "e-build-provenance-result",
+      "state_after": "release_build_provenance_verified"
+    },
+    {
+      "action_event_id": "e-cohort-inspection-action",
+      "action_id": "inspect_release_cohort_membership",
+      "action_slot": 1,
+      "result_asset_id": "receipt_cohort_inspection",
+      "result_event_id": "e-cohort-inspection-result",
+      "state_after": "release_cohort_membership_inspected"
+    },
+    {
+      "action_event_id": "e-rollout-gates-action",
+      "action_id": "verify_required_rollout_gates",
+      "action_slot": 2,
+      "result_asset_id": "receipt_rollout_gates",
+      "result_event_id": "e-rollout-gates-result",
+      "state_after": "rollout_gates_and_rollback_verified"
+    },
+    {
+      "action_event_id": "e-rollback-verification-action",
+      "action_id": "verify_rollback_artifact",
+      "action_slot": 2,
+      "result_asset_id": "receipt_rollback_verification",
+      "result_event_id": "e-rollback-verification-result",
+      "state_after": "rollback_artifact_verified"
+    }
+  ],
+  "assets": [
+    {
+      "asset_id": "system",
+      "kind": "prompt_text",
+      "relative_path": "prompt/system.txt",
+      "sha256": "d7e9110ab9e29417add0dca3294703475645960d6f01660ee11c5e46ada304b4"
+    },
+    {
+      "asset_id": "task",
+      "kind": "prompt_text",
+      "relative_path": "prompt/task.txt",
+      "sha256": "bb9b50f4b4912434d225ffbee0c628e8e002bd6d91d5670aa887581e4a4c21e2"
+    },
+    {
+      "asset_id": "request1",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request1.txt",
+      "sha256": "4437c00a22e954d0c69ea40405be31d96c01dd6b70eb0a071ae7cb9c4c7c29b4"
+    },
+    {
+      "asset_id": "request2",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request2.txt",
+      "sha256": "06269f88b68aa91deeba65f58693427725d76bb1a5c1fbf42dedd18c9fc9a0fe"
+    },
+    {
+      "asset_id": "request3",
+      "kind": "prompt_text",
+      "relative_path": "prompt/request3.txt",
+      "sha256": "746d3ee9e557a1c0bf35bd9532753f50e59326e16986a4831be1feb9b5bdd635"
+    },
+    {
+      "asset_id": "release_manifest_original",
+      "event_id": "e-release-manifest-original",
+      "kind": "context_attachment",
+      "relative_path": "bodies/deployment-cohort-manifest-original.json",
+      "revision_id": "deployment-cohort@REL-SYN-2026-10-03-04-v1",
+      "sha256": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b"
+    },
+    {
+      "asset_id": "release_state",
+      "event_id": "e-release-state",
+      "kind": "context_attachment",
+      "relative_path": "bodies/frozen-release-state-v1.json",
+      "revision_id": "release-state@REL-SYN-2026-10-03-04-v1",
+      "sha256": "1f6eb43396023fb23e13e3f6113ce4c2853a88d0e01b0a6541985224b426300a"
+    },
+    {
+      "asset_id": "release_manifest_final_packet",
+      "event_id": "e-release-manifest-final-reattachment",
+      "kind": "context_attachment",
+      "relative_path": "bodies/deployment-cohort-manifest-final-packet.json",
+      "revision_id": "deployment-cohort@REL-SYN-2026-10-03-04-v1",
+      "sha256": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b"
+    },
+    {
+      "asset_id": "receipt_build_provenance",
+      "event_id": "e-build-provenance-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-build-provenance.txt",
+      "revision_id": "release-provenance-REL-SYN-044-v1",
+      "sha256": "19c91025dfddbf012fc79624428c11f917bd93c7a635587e300590f98cb331f5"
+    },
+    {
+      "asset_id": "receipt_cohort_inspection",
+      "event_id": "e-cohort-inspection-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-cohort-inspection.txt",
+      "revision_id": "cohort-inspection-REL-SYN-044-v1",
+      "sha256": "994936849f2f52de006ae3d9c1977346961c69fa0ea85287dcee30cdd93cb13d"
+    },
+    {
+      "asset_id": "receipt_rollout_gates",
+      "event_id": "e-rollout-gates-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-rollout-gates.txt",
+      "revision_id": "rollout-gates-REL-SYN-044-v1",
+      "sha256": "c67d5d685619da6b6e8b90c2c79b50e5443cd198a987f2defa88face439ca925"
+    },
+    {
+      "asset_id": "receipt_rollback_verification",
+      "event_id": "e-rollback-verification-result",
+      "kind": "environment_receipt",
+      "relative_path": "bodies/receipt-rollback-verification.txt",
+      "revision_id": "rollback-verification-REL-SYN-044-v1",
+      "sha256": "1cfee047138faab6e73790c8b94abf128bb2809005fe68010f76784d55c10193"
+    }
+  ],
+  "assistant_output_planning_bytes": 4096,
+  "case_id": "CP09",
+  "evaluation_key_path": "evaluation/key.json",
+  "evaluation_key_sha256": "7e3ee07a73dd4b3b71927b7aa828eb4df14bb897459975deab36fc2cee00c3c0",
+  "kind": "positive",
+  "planner_input": {
+    "events": [
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b",
+        "context_block_id": "ctx-release-manifest-original",
+        "event_id": "e-release-manifest-original",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 0,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b",
+            "source_kind": "self_authored",
+            "source_locator": "source/deployment-cohort-manifest-v1.json#complete-deployment-cohort",
+            "source_revision": "deployment-cohort@REL-SYN-2026-10-03-04-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "84ab8cccf64882aa4c34739807961421ba4c9a5a0ed8d9b4a563451f352f0fe5",
+            "source_kind": "self_authored",
+            "source_locator": "cp09/workflow.md#ordinary-change-board-packet-provenance",
+            "source_revision": "cp09-software-release-promotion-v1"
+          }
+        ],
+        "reference_event_ids": [],
+        "result": null,
+        "sequence_index": 0,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "1f6eb43396023fb23e13e3f6113ce4c2853a88d0e01b0a6541985224b426300a",
+        "context_block_id": "ctx-frozen-release-state",
+        "event_id": "e-release-state",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 1,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "1f6eb43396023fb23e13e3f6113ce4c2853a88d0e01b0a6541985224b426300a",
+            "source_kind": "self_authored",
+            "source_locator": "source/frozen-release-state-v1.json#frozen-state",
+            "source_revision": "release-state@REL-SYN-2026-10-03-04-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "84ab8cccf64882aa4c34739807961421ba4c9a5a0ed8d9b4a563451f352f0fe5",
+            "source_kind": "self_authored",
+            "source_locator": "cp09/workflow.md#ordinary-change-board-packet-provenance",
+            "source_revision": "cp09-software-release-promotion-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b",
+            "source_kind": "self_authored",
+            "source_locator": "source/deployment-cohort-manifest-v1.json#release-identity",
+            "source_revision": "deployment-cohort@REL-SYN-2026-10-03-04-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-release-manifest-original"
+        ],
+        "result": null,
+        "sequence_index": 1,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": {
+          "action_id": "verify_build_provenance",
+          "argument_hash": "c119434515076c1cbe427d03ce27e6b11de8185031eed29d62bcce3f524cae9d",
+          "tool_name": "verify_build_provenance"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-build-provenance-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 2,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "84ab8cccf64882aa4c34739807961421ba4c9a5a0ed8d9b4a563451f352f0fe5",
+            "source_kind": "self_authored",
+            "source_locator": "cp09/workflow.md#finite-read-only-action-menu",
+            "source_revision": "cp09-software-release-promotion-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-release-manifest-original",
+          "e-release-state"
+        ],
+        "result": null,
+        "sequence_index": 2,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-build-provenance-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 3,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "19c91025dfddbf012fc79624428c11f917bd93c7a635587e300590f98cb331f5",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-build-provenance.txt",
+            "source_revision": "release-provenance-REL-SYN-044-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-build-provenance-action",
+          "e-release-manifest-original",
+          "e-release-state"
+        ],
+        "result": {
+          "observation_hash": "19c91025dfddbf012fc79624428c11f917bd93c7a635587e300590f98cb331f5",
+          "originating_action_id": "verify_build_provenance",
+          "result_id": "r-build-provenance-044",
+          "status": "success"
+        },
+        "sequence_index": 3,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": {
+          "action_id": "inspect_release_cohort_membership",
+          "argument_hash": "c119434515076c1cbe427d03ce27e6b11de8185031eed29d62bcce3f524cae9d",
+          "tool_name": "inspect_release_cohort_membership"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-cohort-inspection-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 4,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "84ab8cccf64882aa4c34739807961421ba4c9a5a0ed8d9b4a563451f352f0fe5",
+            "source_kind": "self_authored",
+            "source_locator": "cp09/workflow.md#finite-read-only-action-menu",
+            "source_revision": "cp09-software-release-promotion-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-release-manifest-original",
+          "e-release-state"
+        ],
+        "result": null,
+        "sequence_index": 4,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-cohort-inspection-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 5,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "994936849f2f52de006ae3d9c1977346961c69fa0ea85287dcee30cdd93cb13d",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-cohort-inspection.txt",
+            "source_revision": "cohort-inspection-REL-SYN-044-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-cohort-inspection-action",
+          "e-release-manifest-original",
+          "e-release-state"
+        ],
+        "result": {
+          "observation_hash": "994936849f2f52de006ae3d9c1977346961c69fa0ea85287dcee30cdd93cb13d",
+          "originating_action_id": "inspect_release_cohort_membership",
+          "result_id": "r-cohort-inspection-044",
+          "status": "success"
+        },
+        "sequence_index": 5,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": {
+          "action_id": "verify_required_rollout_gates",
+          "argument_hash": "c119434515076c1cbe427d03ce27e6b11de8185031eed29d62bcce3f524cae9d",
+          "tool_name": "verify_required_rollout_gates"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-rollout-gates-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 6,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "84ab8cccf64882aa4c34739807961421ba4c9a5a0ed8d9b4a563451f352f0fe5",
+            "source_kind": "self_authored",
+            "source_locator": "cp09/workflow.md#finite-read-only-action-menu",
+            "source_revision": "cp09-software-release-promotion-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-release-state",
+          "e-build-provenance-result"
+        ],
+        "result": null,
+        "sequence_index": 6,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-rollout-gates-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 7,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "c67d5d685619da6b6e8b90c2c79b50e5443cd198a987f2defa88face439ca925",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-rollout-gates.txt",
+            "source_revision": "rollout-gates-REL-SYN-044-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-rollout-gates-action",
+          "e-release-state",
+          "e-build-provenance-result"
+        ],
+        "result": {
+          "observation_hash": "c67d5d685619da6b6e8b90c2c79b50e5443cd198a987f2defa88face439ca925",
+          "originating_action_id": "verify_required_rollout_gates",
+          "result_id": "r-rollout-gates-044",
+          "status": "success"
+        },
+        "sequence_index": 7,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": {
+          "action_id": "verify_rollback_artifact",
+          "argument_hash": "c119434515076c1cbe427d03ce27e6b11de8185031eed29d62bcce3f524cae9d",
+          "tool_name": "verify_rollback_artifact"
+        },
+        "actor_role": "agent",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-rollback-verification-action",
+        "event_type": "action",
+        "order": {
+          "logical_tick": 8,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "84ab8cccf64882aa4c34739807961421ba4c9a5a0ed8d9b4a563451f352f0fe5",
+            "source_kind": "self_authored",
+            "source_locator": "cp09/workflow.md#finite-read-only-action-menu",
+            "source_revision": "cp09-software-release-promotion-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-release-state",
+          "e-build-provenance-result"
+        ],
+        "result": null,
+        "sequence_index": 8,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "tool",
+        "content_hash": null,
+        "context_block_id": null,
+        "event_id": "e-rollback-verification-result",
+        "event_type": "result",
+        "order": {
+          "logical_tick": 9,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "1cfee047138faab6e73790c8b94abf128bb2809005fe68010f76784d55c10193",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-rollback-verification.txt",
+            "source_revision": "rollback-verification-REL-SYN-044-v1"
+          }
+        ],
+        "reference_event_ids": [
+          "e-rollback-verification-action",
+          "e-release-state",
+          "e-build-provenance-result"
+        ],
+        "result": {
+          "observation_hash": "1cfee047138faab6e73790c8b94abf128bb2809005fe68010f76784d55c10193",
+          "originating_action_id": "verify_rollback_artifact",
+          "result_id": "r-rollback-verification-044",
+          "status": "success"
+        },
+        "sequence_index": 9,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "action": null,
+        "actor_role": "user",
+        "content_hash": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b",
+        "context_block_id": "ctx-release-manifest-final-packet",
+        "event_id": "e-release-manifest-final-reattachment",
+        "event_type": "message",
+        "order": {
+          "logical_tick": 10,
+          "timestamp_origin": "derived_structural"
+        },
+        "parent_event_ids": [],
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b",
+            "source_kind": "self_authored",
+            "source_locator": "source/deployment-cohort-manifest-v1.json#complete-deployment-cohort",
+            "source_revision": "deployment-cohort@REL-SYN-2026-10-03-04-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "84ab8cccf64882aa4c34739807961421ba4c9a5a0ed8d9b4a563451f352f0fe5",
+            "source_kind": "self_authored",
+            "source_locator": "cp09/workflow.md#ordinary-change-board-packet-provenance",
+            "source_revision": "cp09-software-release-promotion-v1"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "751c475ec9f574a6eb0ad995c87bf311c290a60f856e453909ce5dc817ccd3fb",
+            "source_kind": "self_authored",
+            "source_locator": "source/change-board-packet-recipe-v1.json#manifest-occurrence",
+            "source_revision": "synthetic-change-board-packet@1.0"
+          },
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "751c475ec9f574a6eb0ad995c87bf311c290a60f856e453909ce5dc817ccd3fb",
+            "source_kind": "self_authored",
+            "source_locator": "source/change-board-packet-recipe-v1.json#ordinary-attachment-rule",
+            "source_revision": "synthetic-change-board-packet@1.0"
+          }
+        ],
+        "reference_event_ids": [
+          "e-release-manifest-original",
+          "e-release-state",
+          "e-build-provenance-result",
+          "e-rollout-gates-result"
+        ],
+        "result": null,
+        "sequence_index": 10,
+        "world_state_revision": "release-promotion@REL-SYN-2026-10-03-04-v1"
+      }
+    ],
+    "provenance": [
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "84ab8cccf64882aa4c34739807961421ba4c9a5a0ed8d9b4a563451f352f0fe5",
+        "source_kind": "self_authored",
+        "source_locator": "cp09/workflow.md",
+        "source_revision": "cp09-software-release-promotion-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b",
+        "source_kind": "self_authored",
+        "source_locator": "cp09/source/deployment-cohort-manifest-v1.json",
+        "source_revision": "deployment-cohort@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "37f91ada46eac28a0847b05b095fd2a9d10e827f9e14402598822a368efac43f",
+        "source_kind": "self_authored",
+        "source_locator": "cp09/source/release-promotion-manifest-governing-scope-v1.md",
+        "source_revision": "deployment-cohort-completeness@1.0"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "1f6eb43396023fb23e13e3f6113ce4c2853a88d0e01b0a6541985224b426300a",
+        "source_kind": "self_authored",
+        "source_locator": "cp09/source/frozen-release-state-v1.json",
+        "source_revision": "release-state@REL-SYN-2026-10-03-04-v1"
+      },
+      {
+        "classification": "CAPTURED_EXPLICIT",
+        "content_hash": "751c475ec9f574a6eb0ad995c87bf311c290a60f856e453909ce5dc817ccd3fb",
+        "source_kind": "self_authored",
+        "source_locator": "cp09/source/change-board-packet-recipe-v1.json",
+        "source_revision": "synthetic-change-board-packet@1.0"
+      }
+    ],
+    "relations": [
+      {
+        "from_id": "verify_build_provenance",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "19c91025dfddbf012fc79624428c11f917bd93c7a635587e300590f98cb331f5",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-build-provenance.txt",
+            "source_revision": "release-provenance-REL-SYN-044-v1"
+          }
+        ],
+        "relation_id": "produce-build-provenance",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-build-provenance-044"
+      },
+      {
+        "from_id": "inspect_release_cohort_membership",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "994936849f2f52de006ae3d9c1977346961c69fa0ea85287dcee30cdd93cb13d",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-cohort-inspection.txt",
+            "source_revision": "cohort-inspection-REL-SYN-044-v1"
+          }
+        ],
+        "relation_id": "produce-cohort-inspection",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-cohort-inspection-044"
+      },
+      {
+        "from_id": "verify_required_rollout_gates",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "c67d5d685619da6b6e8b90c2c79b50e5443cd198a987f2defa88face439ca925",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-rollout-gates.txt",
+            "source_revision": "rollout-gates-REL-SYN-044-v1"
+          }
+        ],
+        "relation_id": "produce-rollout-gates",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-rollout-gates-044"
+      },
+      {
+        "from_id": "verify_rollback_artifact",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "1cfee047138faab6e73790c8b94abf128bb2809005fe68010f76784d55c10193",
+            "source_kind": "self_authored",
+            "source_locator": "bodies/receipt-rollback-verification.txt",
+            "source_revision": "rollback-verification-REL-SYN-044-v1"
+          }
+        ],
+        "relation_id": "produce-rollback-verification",
+        "relation_type": "produces",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "r-rollback-verification-044"
+      },
+      {
+        "from_id": "e-release-manifest-original",
+        "provenance": [
+          {
+            "classification": "CAPTURED_EXPLICIT",
+            "content_hash": "b3f59db8d7a37791ff0dc2d33a4c74a43bf5032ba9fdd9593d58e490bf589c0b",
+            "source_kind": "self_authored",
+            "source_locator": "cp09/source/deployment-cohort-manifest-v1.json#complete-deployment-cohort",
+            "source_revision": "deployment-cohort@REL-SYN-2026-10-03-04-v1"
+          }
+        ],
+        "relation_id": "same-state-manifest-reattachment",
+        "relation_type": "same_state_revision",
+        "scope": "scenario_local",
+        "semantics_version": "controlled-benchmark-relations-v1",
+        "to_id": "e-release-manifest-final-reattachment"
+      }
+    ]
+  },
+  "request_templates": [
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-release-manifest-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-release-state",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 1
+    },
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-release-manifest-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-release-state",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request2",
+              "kind": "asset"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 2
+    },
+    {
+      "messages": [
+        {
+          "parts": [
+            {
+              "asset_id": "system",
+              "kind": "asset"
+            }
+          ],
+          "role": "system"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "task",
+              "kind": "asset"
+            },
+            {
+              "asset_id": "request1",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-release-manifest-original",
+              "kind": "event_body"
+            },
+            {
+              "event_id": "e-release-state",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 1
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 1
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request2",
+              "kind": "asset"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_assistant_output",
+              "request_slot": 2
+            }
+          ],
+          "role": "assistant"
+        },
+        {
+          "parts": [
+            {
+              "kind": "prior_environment_receipt",
+              "request_slot": 2
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "parts": [
+            {
+              "asset_id": "request3",
+              "kind": "asset"
+            },
+            {
+              "event_id": "e-release-manifest-final-reattachment",
+              "kind": "event_body"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "request_slot": 3
+    }
+  ],
+  "schema_id": "prefixity.phase1c.claim2-workload-case",
+  "schema_version": 1,
+  "token_proof_inputs": null
+}

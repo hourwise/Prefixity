@@ -1,0 +1,35 @@
+{
+  "case_id": "CP09",
+  "offline_only": true,
+  "points": [
+    {
+      "canonical_raw_sha256": "5a417af5b18e746beee3eb3299627bc4e095bf4dd9642c7c899f1866fcd61174",
+      "canonical_raw_utf8": "{\"action_id\":\"verify_build_provenance\"}",
+      "expected_action_id": "verify_build_provenance",
+      "raw_language_cardinality": 1,
+      "receipt_event_id": "e-build-provenance-result",
+      "receipt_id": "r-build-provenance-044",
+      "receipt_path": "bodies/receipt-build-provenance.txt",
+      "receipt_revision": "release-provenance-REL-SYN-044-v1",
+      "receipt_sha256": "19c91025dfddbf012fc79624428c11f917bd93c7a635587e300590f98cb331f5",
+      "request_slot": 1,
+      "state_after": "release_build_provenance_verified"
+    },
+    {
+      "canonical_raw_sha256": "e7f34235a32f1d7453b8252677012e34174aa21738c41e0715db9a33f2031a56",
+      "canonical_raw_utf8": "{\"action_id\":\"verify_required_rollout_gates\"}",
+      "expected_action_id": "verify_required_rollout_gates",
+      "raw_language_cardinality": 1,
+      "receipt_event_id": "e-rollout-gates-result",
+      "receipt_id": "r-rollout-gates-044",
+      "receipt_path": "bodies/receipt-rollout-gates.txt",
+      "receipt_revision": "rollout-gates-REL-SYN-044-v1",
+      "receipt_sha256": "c67d5d685619da6b6e8b90c2c79b50e5443cd198a987f2defa88face439ca925",
+      "request_slot": 2,
+      "state_after": "rollout_gates_and_rollback_verified"
+    }
+  ],
+  "protocol_id": "prefixity.phase1c.claim2-canonical-advancing-output.v1",
+  "schema_id": "prefixity.phase1c.claim2-advancing-output-domain-v3-case",
+  "schema_version": 3
+}

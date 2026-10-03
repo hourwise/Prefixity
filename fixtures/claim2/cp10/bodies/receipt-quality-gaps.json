@@ -1,0 +1,47 @@
+{
+  "action_id": "inspect_quality_and_coverage",
+  "collection_manifest_sha256": "f607051e928ff3bde50cfb0875e4b5620752dbcde6d824a8f6d6ba3f41406b42",
+  "dataset_id": "OBS-SYN-CP10",
+  "eligible_observation_ids": [
+    "OBS-CP10-A-001",
+    "OBS-CP10-A-002",
+    "OBS-CP10-A-005",
+    "OBS-CP10-A-006",
+    "OBS-CP10-B-001",
+    "OBS-CP10-B-002",
+    "OBS-CP10-B-003",
+    "OBS-CP10-B-004",
+    "OBS-CP10-B-005",
+    "OBS-CP10-B-006"
+  ],
+  "flagged_observations": [
+    {
+      "disposition": "EXCLUDED_NON_VALID_SOURCE_QUALITY",
+      "normalized_utc": "2026-01-14T07:30:00Z",
+      "observation_id": "OBS-CP10-A-003",
+      "quality_flag": "SUSPECT",
+      "rule_id": "QF-02"
+    },
+    {
+      "disposition": "EXCLUDED_NULL_MEASUREMENT",
+      "normalized_utc": "2026-01-14T07:45:00Z",
+      "observation_id": "OBS-CP10-A-004",
+      "quality_flag": "VALID",
+      "rule_id": "QF-01"
+    }
+  ],
+  "normalized_observation_count": 12,
+  "quality_state": "ten_eligible_two_flagged_no_unresolved_gap",
+  "receipt_id": "r-quality-OBS-SYN-CP10",
+  "specification_sha256": "ddbdbecf474690bb928871faaaeb22bce58a02ae04a629639d61f9471ef06de5",
+  "status": "success",
+  "utc_date_coverage": {
+    "LAB-SYN-CHAMBER-A": [
+      "2026-01-14"
+    ],
+    "LAB-SYN-CHAMBER-B": [
+      "2026-01-14"
+    ]
+  },
+  "world_state_revision": "observation-publication@OBS-SYN-CP10-v1"
+}

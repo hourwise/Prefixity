@@ -1,0 +1,189 @@
+{
+  "case_order": [
+    "CP02",
+    "CP03",
+    "CP09",
+    "CP10",
+    "CP05",
+    "CP06"
+  ],
+  "classification": "OFFLINE_V3_WORKLOAD_MATERIALIZATION",
+  "fixture_identities": [
+    {
+      "case_id": "CP02",
+      "evaluation_key_path": "evaluation/key.json",
+      "evaluation_key_sha256": "dbb16cdb9869a4068374ad7059a958131e85ef76f6b806314700af9bd222e826",
+      "manifest_path": "fixtures/claim2/cp02/case.json",
+      "manifest_sha256": "93ecf6581bf6a0c436710526d5f8c7b53f971470c99db0578509f5b2cda0913d"
+    },
+    {
+      "case_id": "CP03",
+      "evaluation_key_path": "evaluation/key.json",
+      "evaluation_key_sha256": "f568dbc069bc96e2897f57e70c632116dcbc16fdaa51fca380549f5be0b177a5",
+      "manifest_path": "fixtures/claim2/cp03/case.json",
+      "manifest_sha256": "f740e754a28fb17bbdac756bff01f4ca166edd7edd89484668e393a98814f47d"
+    },
+    {
+      "case_id": "CP09",
+      "evaluation_key_path": "evaluation/key.json",
+      "evaluation_key_sha256": "7e3ee07a73dd4b3b71927b7aa828eb4df14bb897459975deab36fc2cee00c3c0",
+      "manifest_path": "fixtures/claim2/cp09/case.json",
+      "manifest_sha256": "e9901ea2f23bed39ffcac31bd7f3074f8836483ed6893536365b39f221d5c708"
+    },
+    {
+      "case_id": "CP10",
+      "evaluation_key_path": "evaluation/key.json",
+      "evaluation_key_sha256": "615fe03f4d04a2cbc47f1170de0768efdbd4a63c8fbd593d11e3fab46fd63afe",
+      "manifest_path": "fixtures/claim2/cp10/case.json",
+      "manifest_sha256": "56197ec30757e6d983225abc35edadc830b062074b0a67f87753b4493a107ca3"
+    },
+    {
+      "case_id": "CP05",
+      "evaluation_key_path": "evaluation/key.json",
+      "evaluation_key_sha256": "6cf63794c4ca309ff480f7260a7f5f64b04de85d1bd45ad5923534d13e324c9a",
+      "manifest_path": "fixtures/claim2/cp05/case.json",
+      "manifest_sha256": "beef5f855323e7cfbe5e48fc82c74f4ed987d12c7016862efcdfecb8669a6ed2"
+    },
+    {
+      "case_id": "CP06",
+      "evaluation_key_path": "evaluation/key.json",
+      "evaluation_key_sha256": "d08c1e750118ae28210aef4e058722e8e9e2bac89d88fe51e1fb32872e5350e6",
+      "manifest_path": "fixtures/claim2/cp06/case.json",
+      "manifest_sha256": "bc1d91824c7d88fa79bcc406e1d0a8cfc1f8b90da8c1ba32b2ff43761303a741"
+    }
+  ],
+  "historical_predecessor": {
+    "path": "fixtures/claim2/materialization-report-v3.json",
+    "sha256": "a24c37cb879b658736d06680425d4e0dec036cf4ff85ef63eba1206ed7ff4732"
+  },
+  "inheritance_map": {
+    "path": "fixtures/claim2/token-evidence-inheritance-map-v3.json",
+    "sha256": "6a53ea43c74d20d8c5bf99483ffdf79e6706656076014fd4eb7728198bcb7aa2"
+  },
+  "new_case_advancing_domains": [
+    {
+      "case_id": "CP09",
+      "path": "fixtures/claim2/cp09/advancing-output-domain-v3.json",
+      "sha256": "c55092b1002467b39f44f080930ac9138ef526a8b23d34d050e9f5abb8c7f5bd"
+    },
+    {
+      "case_id": "CP10",
+      "path": "fixtures/claim2/cp10/advancing-output-domain-v3.json",
+      "sha256": "c13ab2bbee93a032df8a815cbd9162fd44b1ca1001b3a4c19c7b03ac0abc7f39"
+    }
+  ],
+  "next_authorized_task": "CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION",
+  "offline_boundary": {
+    "arm_trajectories": 18,
+    "inference_requests": 0,
+    "logical_requests": 54,
+    "request_three_final_output_constructed": false,
+    "server_contacts": 0,
+    "tokenization_performed": false
+  },
+  "policy_decisions": [
+    {
+      "case_id": "CP02",
+      "decision": {
+        "class": "PRUNE",
+        "eligible_defer_candidates": 0,
+        "eligible_prune_candidates": 1,
+        "eligible_relocate_candidates": 0,
+        "policy_id": "controlled-evidence-policy-v1",
+        "rule": "EXACT_DUPLICATE_PRUNE",
+        "target_event_id": "e-inventory-copy"
+      }
+    },
+    {
+      "case_id": "CP03",
+      "decision": {
+        "class": "PRUNE",
+        "eligible_defer_candidates": 0,
+        "eligible_prune_candidates": 1,
+        "eligible_relocate_candidates": 0,
+        "policy_id": "controlled-evidence-policy-v1",
+        "rule": "EXACT_DUPLICATE_PRUNE",
+        "target_event_id": "e-inventory-copy"
+      }
+    },
+    {
+      "case_id": "CP09",
+      "decision": {
+        "class": "PRUNE",
+        "eligible_defer_candidates": 0,
+        "eligible_prune_candidates": 1,
+        "eligible_relocate_candidates": 0,
+        "policy_id": "controlled-evidence-policy-v1",
+        "rule": "EXACT_DUPLICATE_PRUNE",
+        "target_event_id": "e-release-manifest-final-reattachment"
+      }
+    },
+    {
+      "case_id": "CP10",
+      "decision": {
+        "class": "PRUNE",
+        "eligible_defer_candidates": 0,
+        "eligible_prune_candidates": 1,
+        "eligible_relocate_candidates": 0,
+        "policy_id": "controlled-evidence-policy-v1",
+        "rule": "EXACT_DUPLICATE_PRUNE",
+        "target_event_id": "e-spec-final-reattachment"
+      }
+    },
+    {
+      "case_id": "CP05",
+      "decision": {
+        "class": "DO_NOTHING",
+        "eligible_defer_candidates": 0,
+        "eligible_prune_candidates": 0,
+        "eligible_relocate_candidates": 0,
+        "policy_id": "controlled-evidence-policy-v1",
+        "rule": "FAIL_OPEN",
+        "target_event_id": null
+      }
+    },
+    {
+      "case_id": "CP06",
+      "decision": {
+        "class": "DO_NOTHING",
+        "eligible_defer_candidates": 0,
+        "eligible_prune_candidates": 0,
+        "eligible_relocate_candidates": 0,
+        "policy_id": "controlled-evidence-policy-v1",
+        "rule": "FAIL_OPEN",
+        "target_event_id": null
+      }
+    }
+  ],
+  "rendering_revalidation": {
+    "arm_trajectories": 18,
+    "canonical_advancing_transitions": 36,
+    "cases": 6,
+    "inherited_v1_logical_requests": 36,
+    "new_logical_requests": 18,
+    "request_renderings": 54
+  },
+  "request_ledger": {
+    "logical_requests": 54,
+    "path": "fixtures/claim2/workload-request-ledger-v3.json",
+    "sha256": "406586d71839d91bc565b9db5da69a3d4152193c4109f7876e6a1dc56d89dce2",
+    "unique_bodies": 22
+  },
+  "schema_id": "prefixity.phase1c.claim2-v3-offline-materialization-successor",
+  "schema_version": 4,
+  "source_provenance": {
+    "generator_path": "crates/prefixity-controlled-benchmark/examples/support/claim2_v3_workload.rs",
+    "generator_sha256_normalized_lf": "7626397346c562f8470e9e2bf6b11c06ad76a636c38844a90feb9f0d8c7c39ff",
+    "renderer_path": "crates/prefixity-controlled-benchmark/src/phase1c_claim2_workload.rs",
+    "renderer_sha256_normalized_lf": "f9cf47279c80913bc8232ff635a2e53c7b1511edde1a733232d5de900c76f4a2"
+  },
+  "status": "CLAIM_2_WORKLOAD_V3_MATERIALIZED_UNTOKENIZED",
+  "v3_advancing_domain": {
+    "path": "fixtures/claim2/advancing-output-domain-v3.json",
+    "sha256": "d9f2de3056734026e364f0b2b89af8af8bf3cfbba78ded8e06533d9fc20c4186"
+  },
+  "workload_contract": {
+    "path": "fixtures/claim2/workload-contract-v3.md",
+    "sha256": "28d48448719433a9baa28c0b668cafade63c7858655be00a1fd9effbb638ac5e"
+  }
+}

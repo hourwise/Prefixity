@@ -1,0 +1,34 @@
+{
+  "closed_world": true,
+  "collection_state": "immutable_frozen",
+  "dataset_id": "OBS-SYN-CP10",
+  "schema_id": "prefixity.claim2.synthetic-observation-collection-manifest",
+  "schema_version": 1,
+  "shards": [
+    {
+      "observation_count": 4,
+      "relative_path": "source/shard-OBS-SYN-CP10-S01-v1.json",
+      "sha256": "e34d45a970c8cb0f90c0ea1ede103f9cbf774803c7b21873854f7e215749a67d",
+      "shard_id": "OBS-SYN-CP10-S01",
+      "source_revision": "observation-shard@OBS-SYN-CP10-S01-v1"
+    },
+    {
+      "observation_count": 4,
+      "relative_path": "source/shard-OBS-SYN-CP10-S02-v1.json",
+      "sha256": "2442f95b2bfd863555db3617bdd426d40ebad139f7dde946ad24e5ca948d4077",
+      "shard_id": "OBS-SYN-CP10-S02",
+      "source_revision": "observation-shard@OBS-SYN-CP10-S02-v1"
+    },
+    {
+      "observation_count": 4,
+      "relative_path": "source/shard-OBS-SYN-CP10-S03-v1.json",
+      "sha256": "12a83ab5d47ab7025240d68c0420f72dcb12423ce79d9999b4fdd63077c9bc20",
+      "shard_id": "OBS-SYN-CP10-S03",
+      "source_revision": "observation-shard@OBS-SYN-CP10-S03-v1"
+    }
+  ],
+  "specification_sha256": "ddbdbecf474690bb928871faaaeb22bce58a02ae04a629639d61f9471ef06de5",
+  "synthetic_only": true,
+  "total_observations": 12,
+  "world_state_revision": "observation-publication@OBS-SYN-CP10-v1"
+}

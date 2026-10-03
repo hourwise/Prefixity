@@ -1,0 +1,1 @@
+CP09 synthetic release-board review. Decide whether the pinned ledger-edge-api release may be promoted to its exact production cohort. Source state is immutable and all checks are read-only. Apply the complete deployment-cohort manifest and frozen gate evidence.

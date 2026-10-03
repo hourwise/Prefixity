@@ -1,0 +1,1 @@
+Perform the intake provenance check against the deployment-cohort manifest and frozen release state. Choose one finite read-only action: {"action_id":"verify_build_provenance"} or {"action_id":"inspect_release_cohort_membership"}.

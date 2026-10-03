@@ -1,0 +1,55 @@
+{
+  "critical_event_ids": [
+    "e-release-manifest-original",
+    "e-release-state",
+    "e-build-provenance-result",
+    "e-rollout-gates-result"
+  ],
+  "expected_action_ids": [
+    "verify_build_provenance",
+    "verify_required_rollout_gates"
+  ],
+  "expected_final_answer": {
+    "build_digest": "sha256:57b037a26c588ad19e8479d14fcb839669841ee416fd16e8a6c66aec6e004c1d",
+    "decision": "PROMOTE",
+    "environment_cohort": {
+      "cohort_id": "prod-wave-02",
+      "deployment_unit_ids": [
+        "ledger-edge-eu1-b",
+        "ledger-edge-eu1-c",
+        "ledger-edge-eu1-d"
+      ],
+      "environment": "production"
+    },
+    "governing_gate_ids": [
+      "G-BUILD-01",
+      "G-TEST-02",
+      "G-SUPPLY-03",
+      "G-CANARY-04",
+      "G-CAPACITY-05",
+      "G-ROLLBACK-06"
+    ],
+    "image_digest": "sha256:8f7b136c48d7721be30ca7d3f26fcb82578af930a15d4e296e7c113a2f1a4b80",
+    "reason_code": "ALL_REQUIRED_GATES_PASS_ROLLBACK_READY",
+    "release_id": "REL-SYN-2026-10-03-04",
+    "required_rollback_artifact_id": "RB-SYN-REL-2026-10-03-04-PREV3"
+  },
+  "expected_result_event_ids": [
+    "e-build-provenance-result",
+    "e-rollout-gates-result"
+  ],
+  "expected_states_after_action": [
+    "release_build_provenance_verified",
+    "rollout_gates_and_rollback_verified"
+  ],
+  "required_event_ids": [
+    "e-release-manifest-original",
+    "e-release-state",
+    "e-build-provenance-result",
+    "e-rollout-gates-result"
+  ],
+  "required_relation_ids": [
+    "produce-build-provenance",
+    "produce-rollout-gates"
+  ]
+}

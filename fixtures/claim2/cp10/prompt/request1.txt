@@ -1,0 +1,1 @@
+Inspect the complete publication source catalog against the governing specification. Choose one read-only action: {"action_id":"inspect_observation_catalog"} or {"action_id":"verify_shard_inventory"}.

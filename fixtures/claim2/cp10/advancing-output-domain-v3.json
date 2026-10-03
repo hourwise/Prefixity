@@ -1,0 +1,35 @@
+{
+  "case_id": "CP10",
+  "offline_only": true,
+  "points": [
+    {
+      "canonical_raw_sha256": "1a1a248cb606bfb72b6d8c00020a32d45bf84db8bd107df7524b8d7b7b0206c5",
+      "canonical_raw_utf8": "{\"action_id\":\"inspect_observation_catalog\"}",
+      "expected_action_id": "inspect_observation_catalog",
+      "raw_language_cardinality": 1,
+      "receipt_event_id": "e-catalog-result",
+      "receipt_id": "r-catalog-OBS-SYN-CP10",
+      "receipt_path": "bodies/receipt-source-catalog.json",
+      "receipt_revision": "observation-catalog-check@OBS-SYN-CP10-v1",
+      "receipt_sha256": "bf6dbd404683541eb579ded5063076757129de046ac7abbaf6db24bd07300830",
+      "request_slot": 1,
+      "state_after": "source_catalog_verified"
+    },
+    {
+      "canonical_raw_sha256": "bba28ea63ac927d514bd0b1c6d6e23cd349d6d535a7202165457f7595c4e9d23",
+      "canonical_raw_utf8": "{\"action_id\":\"inspect_quality_and_coverage\"}",
+      "expected_action_id": "inspect_quality_and_coverage",
+      "raw_language_cardinality": 1,
+      "receipt_event_id": "e-quality-result",
+      "receipt_id": "r-quality-OBS-SYN-CP10",
+      "receipt_path": "bodies/receipt-quality-gaps.json",
+      "receipt_revision": "observation-quality-check@OBS-SYN-CP10-v1",
+      "receipt_sha256": "3a37a95e8a79167e1c5f3a448209eb3b55c01eab7953a38be521d92e180d1e08",
+      "request_slot": 2,
+      "state_after": "quality_gaps_verified"
+    }
+  ],
+  "protocol_id": "prefixity.phase1c.claim2-canonical-advancing-output.v1",
+  "schema_id": "prefixity.phase1c.claim2-advancing-output-domain-v3-case",
+  "schema_version": 3
+}

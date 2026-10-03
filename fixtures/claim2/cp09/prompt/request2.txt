@@ -1,0 +1,1 @@
+Check the required promotion gates, canary bounds, requested cohort, and rollback identity against the same frozen release state. Choose one finite read-only action: {"action_id":"verify_required_rollout_gates"} or {"action_id":"verify_rollback_artifact"}.

@@ -1,0 +1,40 @@
+{
+  "dataset_id": "OBS-SYN-CP10",
+  "observations": [
+    {
+      "instrument_id": "LAB-SYN-CHAMBER-A",
+      "observation_id": "OBS-CP10-A-003",
+      "observed_at": "2026-01-14T08:30:00+01:00",
+      "quality_flag": "SUSPECT",
+      "value_celsius_tenths": 299
+    },
+    {
+      "instrument_id": "LAB-SYN-CHAMBER-A",
+      "observation_id": "OBS-CP10-A-004",
+      "observed_at": "2026-01-14T08:45:00+01:00",
+      "quality_flag": "VALID",
+      "value_celsius_tenths": null
+    },
+    {
+      "instrument_id": "LAB-SYN-CHAMBER-B",
+      "observation_id": "OBS-CP10-B-003",
+      "observed_at": "2026-01-14T08:30:00Z",
+      "quality_flag": "VALID",
+      "value_celsius_tenths": 200
+    },
+    {
+      "instrument_id": "LAB-SYN-CHAMBER-B",
+      "observation_id": "OBS-CP10-B-004",
+      "observed_at": "2026-01-14T08:45:00Z",
+      "quality_flag": "VALID",
+      "value_celsius_tenths": 202
+    }
+  ],
+  "record_state": "immutable_frozen",
+  "schema_id": "prefixity.claim2.synthetic-observation-shard",
+  "schema_version": 1,
+  "shard_id": "OBS-SYN-CP10-S02",
+  "source_revision": "observation-shard@OBS-SYN-CP10-S02-v1",
+  "synthetic_only": true,
+  "world_state_revision": "observation-publication@OBS-SYN-CP10-v1"
+}

@@ -19,21 +19,29 @@ mod inheritance;
 #[allow(dead_code)]
 mod v1_renderer;
 
-const CASE_IDS: [&str; 6] = ["CP02", "CP03", "CP07", "CP08", "CP05", "CP06"];
+const CASE_IDS: [&str; 6] = ["CP02", "CP03", "CP09", "CP10", "CP05", "CP06"];
 const ARMS: [(Claim2ProjectionMode, &str); 3] = [
     (Claim2ProjectionMode::Baseline, "BASELINE"),
     (Claim2ProjectionMode::NoOp, "NO_OP"),
     (Claim2ProjectionMode::Intervention, "INTERVENTION"),
 ];
-pub const LEDGER_PATH: &str = "fixtures/claim2/workload-request-ledger-v2.json";
-pub const SUCCESSOR_PATH: &str = "fixtures/claim2/materialization-report-v3.json";
-pub const DOMAIN_PATH: &str = "fixtures/claim2/advancing-output-domain-v2.json";
+pub const LEDGER_PATH: &str = "fixtures/claim2/workload-request-ledger-v3.json";
+pub const SUCCESSOR_PATH: &str = "fixtures/claim2/materialization-report-v4.json";
+pub const DOMAIN_PATH: &str = "fixtures/claim2/advancing-output-domain-v3.json";
 const V1_LEDGER_PATH: &str = "fixtures/claim2/tokenization-request-ledger-v1.json";
 const V1_RESULT_PATH: &str = "docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V1.json";
 const V1_SUCCESSOR_PATH: &str = "fixtures/claim2/materialization-report-v2.json";
 const V1_SUCCESSOR_SHA: &str = "30ecb777b52d201765ca7cba83ed9692519e63bb8e318ff515e93280e27b3dab";
 const V1_DOMAIN_PATH: &str = "fixtures/claim2/advancing-output-domain-v1.json";
 const V1_DOMAIN_SHA: &str = "b4689157548864c819945dd8260478dc0ba6a5811dd96626768f3f5b83a09fc8";
+const V2_LEDGER_PATH: &str = "fixtures/claim2/workload-request-ledger-v2.json";
+const V2_LEDGER_SHA: &str = "a539c33355827ef574912ee72e235bf6301bd0acdc6666fa30effebed242a5eb";
+const V2_SUCCESSOR_PATH: &str = "fixtures/claim2/materialization-report-v3.json";
+const V2_SUCCESSOR_SHA: &str = "a24c37cb879b658736d06680425d4e0dec036cf4ff85ef63eba1206ed7ff4732";
+const V2_DOMAIN_PATH: &str = "fixtures/claim2/advancing-output-domain-v2.json";
+const V2_DOMAIN_SHA: &str = "d1439be00db6ff7a63e2646124008c05af6be715172ad64427c99f929aebf1c9";
+const V3_CONTRACT_PATH: &str = "fixtures/claim2/workload-contract-v3.md";
+const V3_INHERITANCE_PATH: &str = "fixtures/claim2/token-evidence-inheritance-map-v3.json";
 
 #[derive(Serialize)]
 struct WireMessage<'a> {
@@ -74,8 +82,8 @@ fn policy_decision(case: &LoadedClaim2Case) -> Result<Value, Box<dyn Error>> {
     let selection = select_claim2_decision(case)?;
     let positive = case.case_id() == "CP02"
         || case.case_id() == "CP03"
-        || case.case_id() == "CP07"
-        || case.case_id() == "CP08";
+        || case.case_id() == "CP09"
+        || case.case_id() == "CP10";
     if positive {
         if selection.decision.class != ResearchInterventionClass::Prune
             || selection.decision.rule != "EXACT_DUPLICATE_PRUNE"
@@ -151,7 +159,7 @@ fn render_new_case(
     decision: &Value,
 ) -> Result<Vec<Value>, Box<dyn Error>> {
     let domain_path = format!(
-        "fixtures/claim2/{}/advancing-output-domain-v2.json",
+        "fixtures/claim2/{}/advancing-output-domain-v3.json",
         case.case_id().to_ascii_lowercase()
     );
     let domain = read_json(root, &domain_path)?;
@@ -296,16 +304,16 @@ fn render_new_case(
 }
 
 pub fn domain_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
-    let historical_bytes = fs::read(root.join(V1_DOMAIN_PATH))?;
-    if digest(&historical_bytes) != V1_DOMAIN_SHA {
+    let historical_bytes = fs::read(root.join(V2_DOMAIN_PATH))?;
+    if digest(&historical_bytes) != V2_DOMAIN_SHA {
         return Err("historical advancing-output domain changed".into());
     }
     let historical: Value = serde_json::from_slice(&historical_bytes)?;
     let mut transitions = Vec::with_capacity(12);
     for case_id in CASE_IDS {
-        if case_id == "CP07" || case_id == "CP08" {
+        if case_id == "CP09" || case_id == "CP10" {
             let path = format!(
-                "fixtures/claim2/{}/advancing-output-domain-v2.json",
+                "fixtures/claim2/{}/advancing-output-domain-v3.json",
                 case_id.to_ascii_lowercase()
             );
             let domain = read_json(root, &path)?;
@@ -338,25 +346,25 @@ pub fn domain_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
             for slot in 1..=2 {
                 let point = historical["transitions"]
                     .as_array()
-                    .ok_or("V1 domain transitions missing")?
+                    .ok_or("V2 domain transitions missing")?
                     .iter()
                     .find(|point| point["case_id"] == case_id && point["request_slot"] == slot)
-                    .ok_or("retained V1 advancing point missing")?;
+                    .ok_or("retained V2 advancing point missing")?;
                 transitions.push(point.clone());
             }
         }
     }
     if transitions.len() != 12 {
-        return Err("V2 finite domain does not have 12 points".into());
+        return Err("V3 finite domain does not have 12 points".into());
     }
     encode(&json!({
-        "schema_id": "prefixity.phase1c.claim2-v2-advancing-output-domain-ledger",
-        "schema_version": 2,
+        "schema_id": "prefixity.phase1c.claim2-v3-advancing-output-domain-ledger",
+        "schema_version": 3,
         "protocol_id": "prefixity.phase1c.claim2-canonical-advancing-output.v1",
         "cohort_order": CASE_IDS,
         "advancing_raw_language_cardinality_per_transition": 1,
         "arm_scope": ["BASELINE", "NO_OP", "INTERVENTION"],
-        "historical_domain": {"path": V1_DOMAIN_PATH, "sha256": V1_DOMAIN_SHA},
+        "historical_domain": {"path": V2_DOMAIN_PATH, "sha256": V2_DOMAIN_SHA},
         "transitions": transitions
     }))
 }
@@ -364,7 +372,7 @@ pub fn domain_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
 pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
     let domain = domain_bytes(root)?;
     if fs::read(root.join(DOMAIN_PATH))? != domain {
-        return Err("checked-in V2 finite domain differs from regeneration".into());
+        return Err("checked-in V3 finite domain differs from regeneration".into());
     }
     let v1_regenerated = v1_renderer::report_bytes(root)?;
     let map_regenerated = inheritance::map_bytes(root, &v1_regenerated)?;
@@ -405,6 +413,25 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
             )
         })
         .collect::<BTreeMap<_, _>>();
+    let v2_bytes = fs::read(root.join(V2_LEDGER_PATH))?;
+    if digest(&v2_bytes) != V2_LEDGER_SHA {
+        return Err("historical V2 request ledger changed".into());
+    }
+    let v2: Value = serde_json::from_slice(&v2_bytes)?;
+    let v2_rows = v2["requests"]
+        .as_array()
+        .ok_or("V2 requests missing")?
+        .iter()
+        .map(|row| {
+            (
+                row["logical_request_id"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .to_owned(),
+                row,
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
     let v1_bodies = v1_rows
         .values()
         .map(|row| {
@@ -431,9 +458,9 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
         )))?;
         let identity = case_identity(root, &case)?;
         let decision = policy_decision(&case)?;
-        if case_id == "CP07" || case_id == "CP08" {
+        if case_id == "CP09" || case_id == "CP10" {
             let domain_path = format!(
-                "fixtures/claim2/{}/advancing-output-domain-v2.json",
+                "fixtures/claim2/{}/advancing-output-domain-v3.json",
                 case_id.to_ascii_lowercase()
             );
             domains.push(json!({"case_id": case_id, "path": domain_path, "sha256": digest(&fs::read(root.join(&domain_path))?)}));
@@ -451,6 +478,21 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
                             "V1_TOKEN_EVIDENCE_NOT_REUSABLE: retained fixture changed".into()
                         );
                     }
+                    let v2_row = v2_rows.get(&id).ok_or("retained V2 request missing")?;
+                    for field in [
+                        "future_token_counter_body",
+                        "request_body_sha256",
+                        "messages",
+                        "messages_sha256",
+                        "canonical_prior_output_identities",
+                        "pinned_prior_receipts",
+                    ] {
+                        if row[field] != v2_row[field] {
+                            return Err(
+                                "V1_TOKEN_EVIDENCE_NOT_REUSABLE: retained V2 request drift".into(),
+                            );
+                        }
+                    }
                     row["policy_decision"] = decision.clone();
                     rows.push(row);
                 }
@@ -460,7 +502,7 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
         decisions.push(json!({"case_id": case_id, "decision": decision}));
     }
     if rows.len() != 54 {
-        return Err("V2 cohort did not render 54 requests".into());
+        return Err("V3 cohort did not render 54 requests".into());
     }
     let mut groups: BTreeMap<String, (String, Vec<String>)> = BTreeMap::new();
     let mut inherited_logical = 0_usize;
@@ -477,12 +519,13 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
             .as_u64()
             .ok_or("body length missing")? as usize;
         if digest(body.as_bytes()) != hash || body.len() != length {
-            return Err("V2 request body/hash/byte length mismatch".into());
+            return Err("V3 request body/hash/byte length mismatch".into());
         }
         let id = row["logical_request_id"]
             .as_str()
             .ok_or("request ID missing")?
             .to_owned();
+        let is_new_case = row["case_id"] == "CP09" || row["case_id"] == "CP10";
         if let Some((old_body, members)) = groups.get_mut(&hash) {
             if old_body.as_bytes() != body.as_bytes() {
                 return Err("SHA collision or body drift".into());
@@ -492,6 +535,9 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
             groups.insert(hash.clone(), (body.clone(), vec![id]));
         }
         if let (Some(v1_body), Some(count)) = (v1_bodies.get(&hash), counts.get(&hash)) {
+            if is_new_case {
+                return Err("new case unexpectedly collides with V1 token evidence".into());
+            }
             if v1_body.as_bytes() != body.as_bytes() {
                 return Err("V1_TOKEN_EVIDENCE_NOT_REUSABLE: hash matches but bytes differ".into());
             }
@@ -499,6 +545,9 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
             row["inherited_v1_input_tokens"] = json!(count);
             inherited_logical += 1;
         } else {
+            if !is_new_case {
+                return Err("V1_TOKEN_EVIDENCE_NOT_REUSABLE: retained request lacks count".into());
+            }
             row["evidence_classification"] = json!("NEW_TOKEN_COUNT_REQUIRED");
             row["inherited_v1_input_tokens"] = Value::Null;
         }
@@ -536,22 +585,34 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
     if digest(&v1_successor) != V1_SUCCESSOR_SHA || digest(&v1_domain) != V1_DOMAIN_SHA {
         return Err("historical V1 materialization evidence changed".into());
     }
+    for (path, sha) in [
+        (V2_LEDGER_PATH, V2_LEDGER_SHA),
+        (V2_SUCCESSOR_PATH, V2_SUCCESSOR_SHA),
+        (V2_DOMAIN_PATH, V2_DOMAIN_SHA),
+    ] {
+        if digest(&fs::read(root.join(path))?) != sha {
+            return Err("historical V2 materialization evidence changed".into());
+        }
+    }
     encode(&json!({
-        "schema_id": "prefixity.phase1c.claim2-v2-workload-request-ledger",
-        "schema_version": 2,
-        "classification": "OFFLINE_V2_WORKLOAD_MATERIALIZATION",
+        "schema_id": "prefixity.phase1c.claim2-v3-workload-request-ledger",
+        "schema_version": 3,
+        "classification": "OFFLINE_V3_WORKLOAD_MATERIALIZATION",
         "status": "EXACT_REQUEST_BODIES_FROZEN_UNCOUNTED_FOR_NEW_CASES",
         "cohort_order": CASE_IDS,
         "case_roles": ["positive", "positive", "positive", "positive", "control", "control"],
         "fixture_identities": identities,
         "policy_decisions": decisions,
         "new_case_advancing_domains": domains,
-        "v2_advancing_domain": {"path": DOMAIN_PATH, "sha256": digest(&domain)},
+        "v3_advancing_domain": {"path": DOMAIN_PATH, "sha256": digest(&domain)},
         "historical_bindings": {
             "v1_request_ledger": {"path": V1_LEDGER_PATH, "sha256": digest(&v1_regenerated)},
             "v1_materialization_successor": {"path": V1_SUCCESSOR_PATH, "sha256": V1_SUCCESSOR_SHA},
             "v1_advancing_domain": {"path": V1_DOMAIN_PATH, "sha256": V1_DOMAIN_SHA},
             "v2_inheritance_map": {"path": inheritance::OUTPUT_PATH, "sha256": digest(&map_bytes)},
+            "v2_request_ledger": {"path": V2_LEDGER_PATH, "sha256": V2_LEDGER_SHA},
+            "v2_materialization_successor": {"path": V2_SUCCESSOR_PATH, "sha256": V2_SUCCESSOR_SHA},
+            "v2_advancing_domain": {"path": V2_DOMAIN_PATH, "sha256": V2_DOMAIN_SHA},
             "v1_tokenization_identity": "claim2-tokenization-v1-a5a6b896555db8296318f38010b7120dad8ad191e1329f030e0f738f31b90b91",
             "v1_identity_canonical_sha256": "4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16",
             "v1_raw_evidence_sha256": "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264",
@@ -582,30 +643,27 @@ pub fn ledger_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
 pub fn successor_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
     let ledger = ledger_bytes(root)?;
     if fs::read(root.join(LEDGER_PATH))? != ledger {
-        return Err("checked-in V2 request ledger differs from regeneration".into());
+        return Err("checked-in V3 request ledger differs from regeneration".into());
     }
     let value: Value = serde_json::from_slice(&ledger)?;
     let source_path = "crates/prefixity-controlled-benchmark/src/phase1c_claim2_workload.rs";
     let generator_path =
-        "crates/prefixity-controlled-benchmark/examples/support/claim2_v2_workload.rs";
-    // This successor records the accepted V2 source snapshot. The shared
-    // renderer and this generator may evolve for later, distinct cohorts;
-    // regenerating V2 evidence must retain its original provenance values.
-    const V2_RENDERER_SHA: &str =
-        "090a1a487714d3a08e3eb09318be9839c30bf04d225ec729a7cf32cf309751b5";
-    const V2_GENERATOR_SHA: &str =
-        "12c49d29767d984d26deee85af4b1294d90b0ebacb63939483cdbbca9d67cfae";
+        "crates/prefixity-controlled-benchmark/examples/support/claim2_v3_workload.rs";
+    let source = fs::read(root.join(source_path))?;
+    let generator = fs::read(root.join(generator_path))?;
+    let normalize = |bytes: &[u8]| String::from_utf8_lossy(bytes).replace("\r\n", "\n");
     encode(&json!({
-        "schema_id": "prefixity.phase1c.claim2-v2-offline-materialization-successor",
-        "schema_version": 3,
-        "classification": "OFFLINE_V2_WORKLOAD_MATERIALIZATION",
-        "status": "CLAIM_2_WORKLOAD_V2_MATERIALIZED_UNTOKENIZED",
-        "historical_predecessor": {"path": V1_SUCCESSOR_PATH, "sha256": V1_SUCCESSOR_SHA},
+        "schema_id": "prefixity.phase1c.claim2-v3-offline-materialization-successor",
+        "schema_version": 4,
+        "classification": "OFFLINE_V3_WORKLOAD_MATERIALIZATION",
+        "status": "CLAIM_2_WORKLOAD_V3_MATERIALIZED_UNTOKENIZED",
+        "historical_predecessor": {"path": V2_SUCCESSOR_PATH, "sha256": V2_SUCCESSOR_SHA},
         "request_ledger": {"path": LEDGER_PATH, "sha256": digest(&ledger),
             "logical_requests": 54, "unique_bodies": value["deduplication"]["unique_request_body_count"]},
-        "inheritance_map": value["historical_bindings"]["v2_inheritance_map"],
+        "inheritance_map": {"path": V3_INHERITANCE_PATH, "sha256": digest(&fs::read(root.join(V3_INHERITANCE_PATH))?)},
         "new_case_advancing_domains": value["new_case_advancing_domains"],
-        "v2_advancing_domain": value["v2_advancing_domain"],
+        "v3_advancing_domain": value["v3_advancing_domain"],
+        "workload_contract": {"path": V3_CONTRACT_PATH, "sha256": digest(&fs::read(root.join(V3_CONTRACT_PATH))?)},
         "case_order": CASE_IDS,
         "fixture_identities": value["fixture_identities"],
         "policy_decisions": value["policy_decisions"],
@@ -614,10 +672,10 @@ pub fn successor_bytes(root: &Path) -> Result<Vec<u8>, Box<dyn Error>> {
             "inherited_v1_logical_requests": value["deduplication"]["inherited_v1_logical_requests"],
             "new_logical_requests": value["deduplication"]["new_logical_requests"]},
         "source_provenance": {
-            "renderer_path": source_path, "renderer_sha256_normalized_lf": V2_RENDERER_SHA,
-            "generator_path": generator_path, "generator_sha256_normalized_lf": V2_GENERATOR_SHA
+            "renderer_path": source_path, "renderer_sha256_normalized_lf": digest(normalize(&source).as_bytes()),
+            "generator_path": generator_path, "generator_sha256_normalized_lf": digest(normalize(&generator).as_bytes())
         },
         "offline_boundary": value["offline_boundary"],
-        "next_authorized_task": "CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION"
+        "next_authorized_task": "CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION"
     }))
 }

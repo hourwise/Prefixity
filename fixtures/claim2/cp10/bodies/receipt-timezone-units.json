@@ -1,0 +1,11 @@
+{
+  "action_id": "verify_timezone_and_units",
+  "all_timestamps_have_explicit_offset": true,
+  "all_values_use_integer_celsius_tenths_or_null": true,
+  "dataset_id": "OBS-SYN-CP10",
+  "receipt_id": "r-timezone-OBS-SYN-CP10",
+  "result": "TIMEZONE_AND_UNITS_VALID",
+  "specification_sha256": "ddbdbecf474690bb928871faaaeb22bce58a02ae04a629639d61f9471ef06de5",
+  "status": "success",
+  "world_state_revision": "observation-publication@OBS-SYN-CP10-v1"
+}

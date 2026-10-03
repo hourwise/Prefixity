@@ -4532,3 +4532,38 @@ fixture, code, evidence, identity, or seal changed. No server, tokenizer,
 inference, or scored-pilot preparation was started. Remaining work is only
 the separately authorized offline
 `CLAIM_2_WORKLOAD_V3_MATERIALIZATION_PREPARATION`; do not start it here.
+
+## Claim 2 V3 offline workload materialization
+
+Status: `CLAIM_2_WORKLOAD_V3_MATERIALIZATION_READY_FOR_TOKENIZATION_PREPARATION`.
+The [V3 materialization record](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_MATERIALIZATION.md)
+binds the version-3 contract, complete deterministic CP09/CP10 synthetic
+fixtures, 12-point aggregate advancing domain, exact 54-request ledger, V3
+inheritance map, and version-4 materialization successor. The frozen
+`controlled-evidence-policy-v1` selects one `EXACT_DUPLICATE_PRUNE` target
+and no DEFER/RELOCATE target in each new positive. Both new cases prove
+ordinary same-state native reattachment, zero consumer/protected edges on
+the later copy, closed dependencies, isolated hidden evaluator, canonical
+advancing outputs, and three passing offline arm replays. CP02/03/05/06
+retain exact request bytes and historical controls.
+
+The exact V3 ledger contains 22 unique request bodies: 14 sealed V1 hashes
+over 36 retained logical requests and eight new hashes over 18 CP09/CP10
+logical requests. Reused counts remain V1 measurements and depend on a
+future exact instrument/runtime match. The new cases' token counts and
+context/reduction admission are **unknown**; byte lengths are descriptive
+only. Historical V1/V2 fixtures, raw evidence, interpreted results,
+identities, and seals were not changed. The shared case loader admitted
+CP09/10 as positive IDs; the V2 successor generator now reproduces its
+frozen historical source-provenance hashes despite that additive current
+code change, leaving the archived successor bytes unchanged.
+
+Validation: deterministic new-case generation and focused tests, exact
+retained evidence joins, V3 domain/ledger/map/successor reproduction,
+historical V2 successor regression, full locked/offline workspace tests,
+formatting, warnings-denied Clippy, Rust 1.86 locked/offline check, staged
+diff review, and exact candidate CI before promotion. The supervisor
+closeout records their final outcomes and promoted SHA. No server,
+tokenizer, input-token endpoint, inference, or scored-pilot preparation was
+used. The next authorized task is only
+`CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION`; do not start it here.

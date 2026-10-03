@@ -1,0 +1,21 @@
+{
+  "attachment_behavior": "attach_the_effective_field_dictionary_and_aggregation_specification_as_one_native_message_to_every_final_publication_packet",
+  "benchmark_condition_used": false,
+  "ordinary_trigger": "publication_packet_opened_for_final_rollup",
+  "packet_contents": [
+    "source_catalog_result",
+    "quality_gap_result",
+    "their_pinned_receipts",
+    "final_publication_task",
+    "effective_field_dictionary_and_aggregation_specification"
+  ],
+  "recipe_id": "observation-publication-packet@1.0",
+  "schema_id": "prefixity.claim2.synthetic-observation-publication-packet-recipe",
+  "schema_version": 1,
+  "specification_resolution": {
+    "sha256": "ddbdbecf474690bb928871faaaeb22bce58a02ae04a629639d61f9471ef06de5",
+    "source_locator": "cp10/source/field-dictionary-aggregation-v1.json",
+    "source_revision": "field-dictionary-aggregation@1.0.0",
+    "transformation": "none"
+  }
+}

@@ -1,0 +1,555 @@
+{
+  "historical_v1_bindings": {
+    "contact_plan_path": "fixtures/claim2/tokenization-contact-plan-v1.json",
+    "contact_plan_sha256": "6b7634a3fc7a3d4b76289aea1772c1df686a6641309acc9e307e5f330dfefdf6",
+    "identity_canonical_sha256": "4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16",
+    "identity_file_sha256": "4696629b5e0f2ed87f80bd3c193bc457d5e374f570df258b35892e54372be902",
+    "identity_path": "docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V1.json",
+    "identity_seal_sidecar_sha256": "a0b247048f4d58f7dd5c1af8cd9a1a472e875156444273e2ea1724b3bb609102",
+    "instrument_identity": {
+      "accepted_gguf": {
+        "bytes": 5627044256,
+        "path": "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+        "sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+        "windows_file_id": "0x000000000000000000050000004555a6"
+      },
+      "accepted_llama_executable": {
+        "build": "b10217-ddd4ec142",
+        "bytes": 15277056,
+        "path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+        "sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+        "windows_file_id": "0x000000000000000000060000001ea970"
+      },
+      "endpoint_allowlist": {
+        "readiness": {
+          "method": "GET",
+          "path": "/health"
+        },
+        "token_count": {
+          "method": "POST",
+          "path": "/v1/chat/completions/input_tokens"
+        }
+      },
+      "frozen_client_executable": {
+        "bytes": 3792896,
+        "path": "D:\\Users\\fleur\\Prefixity\\target\\claim2-tokenization-freeze\\2945e3af7f059df643d0f15cca45b3ba9f343249\\phase1c_claim2_tokenization.exe",
+        "sha256": "113ba4d5c9e7b8e01efa451427679572481a6196fb14aac73863e30d36d96e81",
+        "windows_file_id": "0x00000000000000000006000000459c59"
+      },
+      "runtime_contract": {
+        "chat_template_kwargs": "ABSENT",
+        "context_tokens": 8192,
+        "host": "127.0.0.1",
+        "max_tokens": 1024,
+        "offline": true,
+        "port": 8080,
+        "reasoning": "off",
+        "seed": 1,
+        "slots": 1,
+        "stream": false,
+        "temperature": 0,
+        "text_only": true,
+        "top_p": 1
+      }
+    },
+    "interpreted_result_canonical_sha256": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040",
+    "interpreted_result_path": "docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V1.json",
+    "interpreted_result_seal_sidecar_sha256": "f92b8620cfb61612f281f98940fe7c15aa11444fb079edcec571d25a8573d881",
+    "raw_evidence_json_schema_id": "prefixity.phase1c.claim2-tokenization-pass-evidence",
+    "raw_evidence_path": "claim2-tokenization-pass-evidence-v1.json",
+    "raw_evidence_sha256": "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264",
+    "request_ledger_path": "fixtures/claim2/tokenization-request-ledger-v1.json",
+    "request_ledger_sha256": "739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45",
+    "retained_fixture_identities": [
+      {
+        "case_id": "CP02",
+        "evaluation_key_path": "evaluation/key.json",
+        "evaluation_key_sha256": "dbb16cdb9869a4068374ad7059a958131e85ef76f6b806314700af9bd222e826",
+        "manifest_path": "fixtures/claim2/cp02/case.json",
+        "manifest_sha256": "93ecf6581bf6a0c436710526d5f8c7b53f971470c99db0578509f5b2cda0913d"
+      },
+      {
+        "case_id": "CP03",
+        "evaluation_key_path": "evaluation/key.json",
+        "evaluation_key_sha256": "f568dbc069bc96e2897f57e70c632116dcbc16fdaa51fca380549f5be0b177a5",
+        "manifest_path": "fixtures/claim2/cp03/case.json",
+        "manifest_sha256": "f740e754a28fb17bbdac756bff01f4ca166edd7edd89484668e393a98814f47d"
+      },
+      {
+        "case_id": "CP05",
+        "evaluation_key_path": "evaluation/key.json",
+        "evaluation_key_sha256": "6cf63794c4ca309ff480f7260a7f5f64b04de85d1bd45ad5923534d13e324c9a",
+        "manifest_path": "fixtures/claim2/cp05/case.json",
+        "manifest_sha256": "beef5f855323e7cfbe5e48fc82c74f4ed987d12c7016862efcdfecb8669a6ed2"
+      },
+      {
+        "case_id": "CP06",
+        "evaluation_key_path": "evaluation/key.json",
+        "evaluation_key_sha256": "d08c1e750118ae28210aef4e058722e8e9e2bac89d88fe51e1fb32872e5350e6",
+        "manifest_path": "fixtures/claim2/cp06/case.json",
+        "manifest_sha256": "bc1d91824c7d88fa79bcc406e1d0a8cfc1f8b90da8c1ba32b2ff43761303a741"
+      }
+    ],
+    "terminal_classification": "WORKLOAD_TOKEN_ADMISSION_FAILED",
+    "token_result_file_sha256": "727b577ce044d11c9b69cca33f7e3d3b23eab9785875d7445dda028b9a2b1377",
+    "tokenization_identity": "claim2-tokenization-v1-a5a6b896555db8296318f38010b7120dad8ad191e1329f030e0f738f31b90b91"
+  },
+  "historical_v2_bindings": {
+    "inheritance_map_path": "fixtures/claim2/token-evidence-inheritance-map-v2.json",
+    "inheritance_map_sha256": "2d33c1bd253f586d0363620ae14379ee2de49e58429598eff8b5b1c780bd268d",
+    "materialization_successor_path": "fixtures/claim2/materialization-report-v3.json",
+    "materialization_successor_sha256": "a24c37cb879b658736d06680425d4e0dec036cf4ff85ef63eba1206ed7ff4732",
+    "request_ledger_path": "fixtures/claim2/workload-request-ledger-v2.json",
+    "request_ledger_sha256": "a539c33355827ef574912ee72e235bf6301bd0acdc6666fa30effebed242a5eb"
+  },
+  "inherited_unique_request_hashes": [
+    {
+      "input_tokens": 1655,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "ddf5a18d772530dae08c43ec9396baee0fcf79897537cf9211dbacc5e2d42301"
+      ],
+      "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+      "request_body_utf8_byte_length": 7791,
+      "v1_logical_request_ids": [
+        "CP06/BASELINE/slot-2",
+        "CP06/INTERVENTION/slot-2",
+        "CP06/NO_OP/slot-2"
+      ],
+      "v2_logical_request_ids": [
+        "CP06/BASELINE/slot-2",
+        "CP06/INTERVENTION/slot-2",
+        "CP06/NO_OP/slot-2"
+      ],
+      "v3_logical_request_ids": [
+        "CP06/BASELINE/slot-2",
+        "CP06/NO_OP/slot-2",
+        "CP06/INTERVENTION/slot-2"
+      ]
+    },
+    {
+      "input_tokens": 1440,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "1d6984e252ddd5afe409e41a4c2d09eb8cdbfdea15d32689d040ee2ec770ab87"
+      ],
+      "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+      "request_body_utf8_byte_length": 5641,
+      "v1_logical_request_ids": [
+        "CP02/BASELINE/slot-2",
+        "CP02/INTERVENTION/slot-2",
+        "CP02/NO_OP/slot-2"
+      ],
+      "v2_logical_request_ids": [
+        "CP02/BASELINE/slot-2",
+        "CP02/INTERVENTION/slot-2",
+        "CP02/NO_OP/slot-2"
+      ],
+      "v3_logical_request_ids": [
+        "CP02/BASELINE/slot-2",
+        "CP02/NO_OP/slot-2",
+        "CP02/INTERVENTION/slot-2"
+      ]
+    },
+    {
+      "input_tokens": 1305,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "4cad53f5f8de8351ed49f9fd4e43acabf099cbf1c9051921239a41bee76d4756"
+      ],
+      "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+      "request_body_utf8_byte_length": 5047,
+      "v1_logical_request_ids": [
+        "CP03/BASELINE/slot-2",
+        "CP03/INTERVENTION/slot-2",
+        "CP03/NO_OP/slot-2"
+      ],
+      "v2_logical_request_ids": [
+        "CP03/BASELINE/slot-2",
+        "CP03/INTERVENTION/slot-2",
+        "CP03/NO_OP/slot-2"
+      ],
+      "v3_logical_request_ids": [
+        "CP03/BASELINE/slot-2",
+        "CP03/NO_OP/slot-2",
+        "CP03/INTERVENTION/slot-2"
+      ]
+    },
+    {
+      "input_tokens": 249,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "f6ae6933e600c388bc4a2250292b6a44c136114ad50240b83e01f3f697ae16b4"
+      ],
+      "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+      "request_body_utf8_byte_length": 1487,
+      "v1_logical_request_ids": [
+        "CP03/BASELINE/slot-1",
+        "CP03/INTERVENTION/slot-1",
+        "CP03/NO_OP/slot-1"
+      ],
+      "v2_logical_request_ids": [
+        "CP03/BASELINE/slot-1",
+        "CP03/INTERVENTION/slot-1",
+        "CP03/NO_OP/slot-1"
+      ],
+      "v3_logical_request_ids": [
+        "CP03/BASELINE/slot-1",
+        "CP03/NO_OP/slot-1",
+        "CP03/INTERVENTION/slot-1"
+      ]
+    },
+    {
+      "input_tokens": 3167,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "74cabaeb943486b2ca2ed839e1e4091ea2c50bd438f5775b102b152dd9d7ef6e"
+      ],
+      "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+      "request_body_utf8_byte_length": 14663,
+      "v1_logical_request_ids": [
+        "CP06/BASELINE/slot-3",
+        "CP06/INTERVENTION/slot-3",
+        "CP06/NO_OP/slot-3"
+      ],
+      "v2_logical_request_ids": [
+        "CP06/BASELINE/slot-3",
+        "CP06/INTERVENTION/slot-3",
+        "CP06/NO_OP/slot-3"
+      ],
+      "v3_logical_request_ids": [
+        "CP06/BASELINE/slot-3",
+        "CP06/NO_OP/slot-3",
+        "CP06/INTERVENTION/slot-3"
+      ]
+    },
+    {
+      "input_tokens": 1443,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "6dd3224a80db629a61593dcea3a124e90e44b54dc371a23d3be77ffc693a46d6"
+      ],
+      "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+      "request_body_utf8_byte_length": 7024,
+      "v1_logical_request_ids": [
+        "CP06/BASELINE/slot-1",
+        "CP06/INTERVENTION/slot-1",
+        "CP06/NO_OP/slot-1"
+      ],
+      "v2_logical_request_ids": [
+        "CP06/BASELINE/slot-1",
+        "CP06/INTERVENTION/slot-1",
+        "CP06/NO_OP/slot-1"
+      ],
+      "v3_logical_request_ids": [
+        "CP06/BASELINE/slot-1",
+        "CP06/NO_OP/slot-1",
+        "CP06/INTERVENTION/slot-1"
+      ]
+    },
+    {
+      "input_tokens": 3101,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "72029a4ad18408bb15b1b74c7e116438d19386973cdcdf2f8201f366c83d1e3a"
+      ],
+      "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+      "request_body_utf8_byte_length": 14134,
+      "v1_logical_request_ids": [
+        "CP05/BASELINE/slot-3",
+        "CP05/INTERVENTION/slot-3",
+        "CP05/NO_OP/slot-3"
+      ],
+      "v2_logical_request_ids": [
+        "CP05/BASELINE/slot-3",
+        "CP05/INTERVENTION/slot-3",
+        "CP05/NO_OP/slot-3"
+      ],
+      "v3_logical_request_ids": [
+        "CP05/BASELINE/slot-3",
+        "CP05/NO_OP/slot-3",
+        "CP05/INTERVENTION/slot-3"
+      ]
+    },
+    {
+      "input_tokens": 1390,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "2701d28a518509adbc559ade97d42edc2d20e338e742d467e44a45b45c81e622"
+      ],
+      "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+      "request_body_utf8_byte_length": 6659,
+      "v1_logical_request_ids": [
+        "CP05/BASELINE/slot-1",
+        "CP05/INTERVENTION/slot-1",
+        "CP05/NO_OP/slot-1"
+      ],
+      "v2_logical_request_ids": [
+        "CP05/BASELINE/slot-1",
+        "CP05/INTERVENTION/slot-1",
+        "CP05/NO_OP/slot-1"
+      ],
+      "v3_logical_request_ids": [
+        "CP05/BASELINE/slot-1",
+        "CP05/NO_OP/slot-1",
+        "CP05/INTERVENTION/slot-1"
+      ]
+    },
+    {
+      "input_tokens": 1590,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "fc83b82dcf72cfccc2a63eabf107543c9dc9982e2a636beaedae97cbf220fb04"
+      ],
+      "request_body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+      "request_body_utf8_byte_length": 6318,
+      "v1_logical_request_ids": [
+        "CP03/INTERVENTION/slot-3"
+      ],
+      "v2_logical_request_ids": [
+        "CP03/INTERVENTION/slot-3"
+      ],
+      "v3_logical_request_ids": [
+        "CP03/INTERVENTION/slot-3"
+      ]
+    },
+    {
+      "input_tokens": 4078,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "a5572543f7e83c2c97eaa844b048ea7780b474ca6cfa36797af673c12d5999ce"
+      ],
+      "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+      "request_body_utf8_byte_length": 15754,
+      "v1_logical_request_ids": [
+        "CP02/BASELINE/slot-3",
+        "CP02/NO_OP/slot-3"
+      ],
+      "v2_logical_request_ids": [
+        "CP02/BASELINE/slot-3",
+        "CP02/NO_OP/slot-3"
+      ],
+      "v3_logical_request_ids": [
+        "CP02/BASELINE/slot-3",
+        "CP02/NO_OP/slot-3"
+      ]
+    },
+    {
+      "input_tokens": 3093,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "12d77e8b1111966392368ed4aa1085e68c4b79564a7e3f20b9d214cf72b86500"
+      ],
+      "request_body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+      "request_body_utf8_byte_length": 12317,
+      "v1_logical_request_ids": [
+        "CP02/INTERVENTION/slot-3"
+      ],
+      "v2_logical_request_ids": [
+        "CP02/INTERVENTION/slot-3"
+      ],
+      "v3_logical_request_ids": [
+        "CP02/INTERVENTION/slot-3"
+      ]
+    },
+    {
+      "input_tokens": 2488,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "c52112bec861dca5d0455bf897c277cbb3b0675be42026bde0fec23d35525748"
+      ],
+      "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+      "request_body_utf8_byte_length": 9042,
+      "v1_logical_request_ids": [
+        "CP03/BASELINE/slot-3",
+        "CP03/NO_OP/slot-3"
+      ],
+      "v2_logical_request_ids": [
+        "CP03/BASELINE/slot-3",
+        "CP03/NO_OP/slot-3"
+      ],
+      "v3_logical_request_ids": [
+        "CP03/BASELINE/slot-3",
+        "CP03/NO_OP/slot-3"
+      ]
+    },
+    {
+      "input_tokens": 241,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "1d307b0e223ae9de4a8ec8636352866d7f8ee3d66d275b4296b1efaacb266c3a"
+      ],
+      "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+      "request_body_utf8_byte_length": 1375,
+      "v1_logical_request_ids": [
+        "CP02/BASELINE/slot-1",
+        "CP02/INTERVENTION/slot-1",
+        "CP02/NO_OP/slot-1"
+      ],
+      "v2_logical_request_ids": [
+        "CP02/BASELINE/slot-1",
+        "CP02/INTERVENTION/slot-1",
+        "CP02/NO_OP/slot-1"
+      ],
+      "v3_logical_request_ids": [
+        "CP02/BASELINE/slot-1",
+        "CP02/NO_OP/slot-1",
+        "CP02/INTERVENTION/slot-1"
+      ]
+    },
+    {
+      "input_tokens": 1608,
+      "measurement_label": "V1_MEASUREMENT_REUSED_IN_V3",
+      "message_sequence_sha256_values": [
+        "76563ff2b4858d4df90ebd50ac4f14177c9b72d5d7fe75bd7303bba06c95c548"
+      ],
+      "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+      "request_body_utf8_byte_length": 7459,
+      "v1_logical_request_ids": [
+        "CP05/BASELINE/slot-2",
+        "CP05/INTERVENTION/slot-2",
+        "CP05/NO_OP/slot-2"
+      ],
+      "v2_logical_request_ids": [
+        "CP05/BASELINE/slot-2",
+        "CP05/INTERVENTION/slot-2",
+        "CP05/NO_OP/slot-2"
+      ],
+      "v3_logical_request_ids": [
+        "CP05/BASELINE/slot-2",
+        "CP05/NO_OP/slot-2",
+        "CP05/INTERVENTION/slot-2"
+      ]
+    }
+  ],
+  "new_unique_request_hashes": [
+    {
+      "message_sequence_sha256_values": [
+        "3841b21e39dbe47068be855ec8f7fea95f24e5fae594bd1e6606452bea179668"
+      ],
+      "request_body_sha256": "072acb8f7b44dd5d1bba2adec8ab22e4e71c8e01634e8359ea75078bb077e124",
+      "request_body_utf8_byte_length": 13732,
+      "v3_logical_request_ids": [
+        "CP09/INTERVENTION/slot-3"
+      ]
+    },
+    {
+      "message_sequence_sha256_values": [
+        "e2c5b0daf55f9efdfc6b04e2a610a6b74e94d3fe8becd91f492dd9af44a0b342"
+      ],
+      "request_body_sha256": "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+      "request_body_utf8_byte_length": 20032,
+      "v3_logical_request_ids": [
+        "CP09/BASELINE/slot-3",
+        "CP09/NO_OP/slot-3"
+      ]
+    },
+    {
+      "message_sequence_sha256_values": [
+        "0358720d0663d1ac1897f0b873f3ce7c9804c2fe115c3cd65391e120a5d1db55"
+      ],
+      "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+      "request_body_utf8_byte_length": 11692,
+      "v3_logical_request_ids": [
+        "CP09/BASELINE/slot-1",
+        "CP09/NO_OP/slot-1",
+        "CP09/INTERVENTION/slot-1"
+      ]
+    },
+    {
+      "message_sequence_sha256_values": [
+        "9745fa811c8f86b07774095f4d76b17d65505512dabcdb2fc6af830a6a19434c"
+      ],
+      "request_body_sha256": "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+      "request_body_utf8_byte_length": 15800,
+      "v3_logical_request_ids": [
+        "CP10/BASELINE/slot-3",
+        "CP10/NO_OP/slot-3"
+      ]
+    },
+    {
+      "message_sequence_sha256_values": [
+        "8212f481bb1d34135fe22a76d5d93227fe3ae375761915471067a16db4c03cb6"
+      ],
+      "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+      "request_body_utf8_byte_length": 8688,
+      "v3_logical_request_ids": [
+        "CP10/BASELINE/slot-1",
+        "CP10/NO_OP/slot-1",
+        "CP10/INTERVENTION/slot-1"
+      ]
+    },
+    {
+      "message_sequence_sha256_values": [
+        "08623eadef1c40c52cf007a30ed42e96347876ea06eb678a559a4b342e602766"
+      ],
+      "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+      "request_body_utf8_byte_length": 10069,
+      "v3_logical_request_ids": [
+        "CP10/BASELINE/slot-2",
+        "CP10/NO_OP/slot-2",
+        "CP10/INTERVENTION/slot-2"
+      ]
+    },
+    {
+      "message_sequence_sha256_values": [
+        "d3ddcc143938095d69389a3dbbccbcaf2b112b2f4474fe9c7a29b8d957144f09"
+      ],
+      "request_body_sha256": "dca48d2c34206984ed13ac9b2fb1ed0d83a882f1882cf25b3623da2cdf819b76",
+      "request_body_utf8_byte_length": 12304,
+      "v3_logical_request_ids": [
+        "CP10/INTERVENTION/slot-3"
+      ]
+    },
+    {
+      "message_sequence_sha256_values": [
+        "43b2621547b172c1517e00a6e16cf3614574d53536e08e0e0a112ab1b316b871"
+      ],
+      "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+      "request_body_utf8_byte_length": 12716,
+      "v3_logical_request_ids": [
+        "CP09/BASELINE/slot-2",
+        "CP09/NO_OP/slot-2",
+        "CP09/INTERVENTION/slot-2"
+      ]
+    }
+  ],
+  "reuse_conditions": [
+    "exact request-body UTF-8 bytes and SHA-256 match a V1 measured body",
+    "the exact rendered message sequence, tokenizer/model, llama build, reasoning setting, template behavior, endpoint, and relevant runtime conditions match the sealed V1 identity",
+    "all bound V1 identity, raw-evidence, interpreted-result, and V2 inheritance seals verify"
+  ],
+  "schema_id": "prefixity.phase1c.claim2-v3-token-evidence-inheritance-map",
+  "schema_version": 3,
+  "scope": {
+    "cohort_order": [
+      "CP02",
+      "CP03",
+      "CP09",
+      "CP10",
+      "CP05",
+      "CP06"
+    ],
+    "complete_v3_request_ledger_present": true,
+    "inference_performed_by_this_generator": false,
+    "inherited_v1_logical_requests": 36,
+    "inherited_v1_unique_request_hashes": 14,
+    "logical_requests_covered": 54,
+    "new_cases_not_yet_materialized": [],
+    "new_logical_requests": 18,
+    "new_unique_request_hashes_requiring_tokenization": 8,
+    "retained_cases_covered": [
+      "CP02",
+      "CP03",
+      "CP05",
+      "CP06"
+    ],
+    "retained_logical_requests_verified": 36,
+    "retained_unique_request_hashes_verified": 14,
+    "tokenization_performed_by_this_generator": false,
+    "unique_request_hashes": 22,
+    "v3_request_ledger_path": "fixtures/claim2/workload-request-ledger-v3.json",
+    "v3_request_ledger_sha256": "406586d71839d91bc565b9db5da69a3d4152193c4109f7876e6a1dc56d89dce2"
+  },
+  "status": "RETAINED_V1_REQUEST_IDENTITIES_VERIFIED_FOR_V3"
+}
