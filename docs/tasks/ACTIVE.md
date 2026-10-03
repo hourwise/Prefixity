@@ -4574,7 +4574,7 @@ Status: `CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION_READY_FOR_OPERATOR_SERVER`
 The [preparation record](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION.md)
 binds the accepted V3 materialization at
 `64d732dad2448e768ce12bc13a15bf3081f63205`, final source-provenance
-commit `d7d6af170748e570e03326835916266efc90b531`, frozen V3 client,
+commit `b0cc0e66544b5428a6c67a4e876d6b7302031675`, frozen V3 client,
 new experiment identity and seal, exact inherited V1 measurements, and two
 deterministic contact plans. The primary HYBRID_8_NEW plan has eight new
 unique bodies over 18 CP09/CP10 logical requests; the separate FULL_FRESH_22

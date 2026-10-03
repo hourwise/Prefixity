@@ -12,15 +12,15 @@ token count was requested, and no inference occurred. V1 remains
   `64d732dad2448e768ce12bc13a15bf3081f63205`.
 - Preparation branch: `codex/phase1c-claim2-v3-tokenization-preparation`.
 - Final source-provenance commit:
-  `d7d6af170748e570e03326835916266efc90b531`. Earlier source commits
+  `b0cc0e66544b5428a6c67a4e876d6b7302031675`. Earlier source commits
   were superseded before publication to normalize Git LF/CRLF source forms
   and bind the frozen Windows file ID;
   neither changed any historical evidence or the V3 materialization.
 - Distinct experiment ID:
-  `claim2-tokenization-v3-5ef8665ed781aa967d2f56ba2a78e74761827d86c7e6a16547835d8417bfbc84`.
+  `claim2-tokenization-v3-570cc81cbc7ddbba5c3e3128571f1197b79704b0e7af3868e6cecc1db443960f`.
 - [V3 identity](PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V3.json) canonical
   SHA-256 seal:
-  `da04c940b6bdb1e9e3d033f481e725803cab3771d639cf6328971bc2aa8c1cf9`.
+  `6dfca31b408b780e5aa318fdd1caa896bda6f5f91b72176555edc69255e51d01`.
   The `.sha256` sidecar and [offline identity builder](../../scripts/claim2_v3_tokenization_identity.py)
   reproduce it. It binds the 54 logical identities, 22 unique body hashes,
   14 V1 mappings, eight new hashes, both plans, accepted artifacts and
@@ -28,12 +28,12 @@ token count was requested, and no inference occurred. V1 remains
   pre-contact mode choice.
 
 The final frozen client is
-`D:\Users\fleur\Prefixity\target\claim2-v3-tokenization-freeze\d7d6af170748e570e03326835916266efc90b531\prefixity-phase1c-claim2-v3-tokenization.exe`.
+`D:\Users\fleur\Prefixity\target\claim2-v3-tokenization-freeze\b0cc0e66544b5428a6c67a4e876d6b7302031675\prefixity-phase1c-claim2-v3-tokenization.exe`.
 It is a one-time copy of the release build from that source commit. SHA-256:
-`fd351fdd32845dddc1922a817ea1528a1acf384c1dfffcd4a05c79796e6e9eff`;
+`8d2a53516120f7f94d3c249bd354be443231a54fdcea4066566d0efb87906d91`;
 size: `4,984,832` bytes; Windows file ID:
-`0x0000000000000000000700000045d923` (volume/index
-`volume=ba2f80f4;index=000700000045d923`). The copy is ignored build material;
+`0x0000000000000000000200000045d93a` (volume/index
+`volume=ba2f80f4;index=000200000045d93a`). The copy is ignored build material;
 its identity is tracked. The accepted GGUF SHA-256 is
 `cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13`;
 the accepted llama build `b10217-ddd4ec142` SHA-256 is
@@ -133,14 +133,14 @@ After separate authorization and that operator-started server, the future
 hybrid command is:
 
 ```powershell
-& 'D:\Users\fleur\Prefixity\target\claim2-v3-tokenization-freeze\d7d6af170748e570e03326835916266efc90b531\prefixity-phase1c-claim2-v3-tokenization.exe' execute --mode HYBRID_8_NEW --operator-started --model-path 'D:\Prefixity-Lab\models\Qwen3.5-9B\Qwen3.5-9B-Q4_K_M.gguf' --model-sha256 cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13 --llama-path 'C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe' --llama-sha256 cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617 --llama-build b10217-ddd4ec142 --context 8192 --slots 1 --reasoning off --offline --host 127.0.0.1 --port 8080 --evidence 'D:\Users\fleur\Prefixity\claim2-v3-hybrid-tokenization-pass-evidence.json'
+& 'D:\Users\fleur\Prefixity\target\claim2-v3-tokenization-freeze\b0cc0e66544b5428a6c67a4e876d6b7302031675\prefixity-phase1c-claim2-v3-tokenization.exe' execute --mode HYBRID_8_NEW --operator-started --model-path 'D:\Prefixity-Lab\models\Qwen3.5-9B\Qwen3.5-9B-Q4_K_M.gguf' --model-sha256 cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13 --llama-path 'C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe' --llama-sha256 cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617 --llama-build b10217-ddd4ec142 --context 8192 --slots 1 --reasoning off --offline --host 127.0.0.1 --port 8080 --evidence 'D:\Users\fleur\Prefixity\claim2-v3-hybrid-tokenization-pass-evidence.json'
 ```
 
 If pre-contact inheritance verification instead selects the separate
 contingency under the same registered instrument, the future command is:
 
 ```powershell
-& 'D:\Users\fleur\Prefixity\target\claim2-v3-tokenization-freeze\d7d6af170748e570e03326835916266efc90b531\prefixity-phase1c-claim2-v3-tokenization.exe' execute --mode FULL_FRESH_22 --operator-started --model-path 'D:\Prefixity-Lab\models\Qwen3.5-9B\Qwen3.5-9B-Q4_K_M.gguf' --model-sha256 cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13 --llama-path 'C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe' --llama-sha256 cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617 --llama-build b10217-ddd4ec142 --context 8192 --slots 1 --reasoning off --offline --host 127.0.0.1 --port 8080 --evidence 'D:\Users\fleur\Prefixity\claim2-v3-full-fresh-tokenization-pass-evidence.json'
+& 'D:\Users\fleur\Prefixity\target\claim2-v3-tokenization-freeze\b0cc0e66544b5428a6c67a4e876d6b7302031675\prefixity-phase1c-claim2-v3-tokenization.exe' execute --mode FULL_FRESH_22 --operator-started --model-path 'D:\Prefixity-Lab\models\Qwen3.5-9B\Qwen3.5-9B-Q4_K_M.gguf' --model-sha256 cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13 --llama-path 'C:\Users\USER\AppData\Local\Microsoft\WindowsApps\llama.exe' --llama-sha256 cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617 --llama-build b10217-ddd4ec142 --context 8192 --slots 1 --reasoning off --offline --host 127.0.0.1 --port 8080 --evidence 'D:\Users\fleur\Prefixity\claim2-v3-full-fresh-tokenization-pass-evidence.json'
 ```
 
 Neither execution command was run. No server contact or tokenization is
