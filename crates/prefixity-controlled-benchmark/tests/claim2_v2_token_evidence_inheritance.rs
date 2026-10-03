@@ -18,6 +18,39 @@ fn map_value(root: &std::path::Path) -> Value {
 }
 
 #[test]
+fn git_checkout_lf_and_crlf_forms_produce_the_same_pinned_identity_bytes() {
+    let root = repository_root();
+    let checked_out =
+        fs::read(root.join("docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V1.json")).unwrap();
+    let lf = String::from_utf8(checked_out.clone())
+        .unwrap()
+        .replace("\r\n", "\n")
+        .into_bytes();
+    let crlf = String::from_utf8(lf.clone())
+        .unwrap()
+        .replace('\n', "\r\n")
+        .into_bytes();
+    let expected_crlf = "4696629b5e0f2ed87f80bd3c193bc457d5e374f570df258b35892e54372be902";
+    let expected_lf = "437d803feebe6b10db4b5615c6a7ff731e8ecb4ff66d8e0fc694e42257989d84";
+    let a = inheritance::canonicalize_git_text_bytes("identity", &lf, expected_crlf, expected_lf)
+        .unwrap();
+    let b = inheritance::canonicalize_git_text_bytes("identity", &crlf, expected_crlf, expected_lf)
+        .unwrap();
+    assert_eq!(a, b);
+    let mut changed = lf;
+    changed[0] ^= 1;
+    assert!(inheritance::canonicalize_git_text_bytes(
+        "identity",
+        &changed,
+        expected_crlf,
+        expected_lf
+    )
+    .unwrap_err()
+    .to_string()
+    .contains("V1_TOKEN_EVIDENCE_NOT_REUSABLE"));
+}
+
+#[test]
 fn retained_case_map_reproduces_exactly_and_covers_14_hashes_for_36_requests() {
     let root = repository_root();
     assert_eq!(

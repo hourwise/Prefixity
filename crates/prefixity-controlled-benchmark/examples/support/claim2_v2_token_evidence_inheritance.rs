@@ -17,9 +17,13 @@ const V1_IDENTITY_PATH: &str = "docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENT
 const V1_IDENTITY_SHA256: &str = "4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16";
 const V1_IDENTITY_FILE_SHA256: &str =
     "4696629b5e0f2ed87f80bd3c193bc457d5e374f570df258b35892e54372be902";
+const V1_IDENTITY_FILE_LF_SHA256: &str =
+    "437d803feebe6b10db4b5615c6a7ff731e8ecb4ff66d8e0fc694e42257989d84";
 const V1_IDENTITY_SEAL_PATH: &str = "docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V1.sha256";
 const V1_IDENTITY_SEAL_FILE_SHA256: &str =
     "a0b247048f4d58f7dd5c1af8cd9a1a472e875156444273e2ea1724b3bb609102";
+const V1_IDENTITY_SEAL_FILE_LF_SHA256: &str =
+    "e4384ba69b87d14e39af34b803346ac7f03309542a7953d52aa56d5b50a7109d";
 const V1_RAW_EVIDENCE_PATH: &str = "claim2-tokenization-pass-evidence-v1.json";
 const V1_RAW_EVIDENCE_SHA256: &str =
     "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264";
@@ -27,9 +31,13 @@ const V1_RESULT_PATH: &str = "docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_
 const V1_RESULT_SEAL: &str = "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040";
 const V1_RESULT_FILE_SHA256: &str =
     "727b577ce044d11c9b69cca33f7e3d3b23eab9785875d7445dda028b9a2b1377";
+const V1_RESULT_FILE_LF_SHA256: &str =
+    "13a6cb66266ee64165650ca501b255b5d2643aee9b09c7166dd9e8031a8497be";
 const V1_RESULT_SEAL_PATH: &str = "docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V1.sha256";
 const V1_RESULT_SEAL_FILE_SHA256: &str =
     "f92b8620cfb61612f281f98940fe7c15aa11444fb079edcec571d25a8573d881";
+const V1_RESULT_SEAL_FILE_LF_SHA256: &str =
+    "e0860c5157bf2962e5520233ae53d6374625dbe7e368405fcb2bc4a3b7099f8d";
 const V1_IDENTITY_ID: &str =
     "claim2-tokenization-v1-a5a6b896555db8296318f38010b7120dad8ad191e1329f030e0f738f31b90b91";
 
@@ -89,15 +97,60 @@ fn read_pinned(
     Ok(bytes)
 }
 
+// Git's core.autocrlf converts these four tracked text files to CRLF on
+// Windows and retains LF on Unix. Both physical forms are independently
+// pinned; return the historical CRLF form so the generated map is invariant.
+pub fn canonicalize_git_text_bytes(
+    name: &str,
+    bytes: &[u8],
+    crlf_sha256: &str,
+    lf_sha256: &str,
+) -> Result<Vec<u8>, Box<dyn Error>> {
+    if digest(bytes) == crlf_sha256 {
+        return Ok(bytes.to_vec());
+    }
+    if digest(bytes) != lf_sha256 {
+        return Err(fail(format!(
+            "V1_TOKEN_EVIDENCE_NOT_REUSABLE: {name} differs from both pinned Git text forms"
+        ))
+        .into());
+    }
+    let mut crlf = Vec::with_capacity(bytes.len() + bytes.iter().filter(|b| **b == b'\n').count());
+    for byte in bytes {
+        if *byte == b'\n' {
+            crlf.push(b'\r');
+        }
+        crlf.push(*byte);
+    }
+    verify_pinned_bytes(name, &crlf, crlf_sha256)?;
+    Ok(crlf)
+}
+
+fn read_pinned_git_text(
+    root: &Path,
+    name: &str,
+    path: &str,
+    crlf_sha256: &str,
+    lf_sha256: &str,
+) -> Result<Vec<u8>, Box<dyn Error>> {
+    canonicalize_git_text_bytes(name, &fs::read(root.join(path))?, crlf_sha256, lf_sha256)
+}
+
 fn read_verified_sidecar(
     root: &Path,
     name: &str,
     path: &str,
     expected_file_sha256: &str,
+    expected_lf_file_sha256: &str,
     expected_content_sha256: &str,
 ) -> Result<Vec<u8>, Box<dyn Error>> {
-    let sidecar_bytes = fs::read(root.join(path))?;
-    verify_pinned_bytes(name, &sidecar_bytes, expected_file_sha256)?;
+    let sidecar_bytes = read_pinned_git_text(
+        root,
+        name,
+        path,
+        expected_file_sha256,
+        expected_lf_file_sha256,
+    )?;
     let sidecar = std::str::from_utf8(&sidecar_bytes)?;
     let found = sidecar
         .split_whitespace()
@@ -146,11 +199,12 @@ pub fn map_bytes(root: &Path, regenerated_v1_ledger: &[u8]) -> Result<Vec<u8>, B
         V1_PLAN_PATH,
         V1_PLAN_SHA256,
     )?;
-    let identity_bytes = read_pinned(
+    let identity_bytes = read_pinned_git_text(
         root,
         "V1 tokenization identity file",
         V1_IDENTITY_PATH,
         V1_IDENTITY_FILE_SHA256,
+        V1_IDENTITY_FILE_LF_SHA256,
     )?;
     let identity_value = json(&identity_bytes, "V1 tokenization identity")?;
     verify_pinned_bytes(
@@ -163,6 +217,7 @@ pub fn map_bytes(root: &Path, regenerated_v1_ledger: &[u8]) -> Result<Vec<u8>, B
         "V1 tokenization identity",
         V1_IDENTITY_SEAL_PATH,
         V1_IDENTITY_SEAL_FILE_SHA256,
+        V1_IDENTITY_SEAL_FILE_LF_SHA256,
         V1_IDENTITY_SHA256,
     )?;
     let raw_evidence = read_pinned(
@@ -171,11 +226,12 @@ pub fn map_bytes(root: &Path, regenerated_v1_ledger: &[u8]) -> Result<Vec<u8>, B
         V1_RAW_EVIDENCE_PATH,
         V1_RAW_EVIDENCE_SHA256,
     )?;
-    let result_bytes = read_pinned(
+    let result_bytes = read_pinned_git_text(
         root,
         "V1 interpreted tokenization result file",
         V1_RESULT_PATH,
         V1_RESULT_FILE_SHA256,
+        V1_RESULT_FILE_LF_SHA256,
     )?;
     let result_value = json(&result_bytes, "interpreted V1 tokenization result")?;
     let result_canonical = canonical_json(&result_value)?;
@@ -189,6 +245,7 @@ pub fn map_bytes(root: &Path, regenerated_v1_ledger: &[u8]) -> Result<Vec<u8>, B
         "V1 interpreted-result",
         V1_RESULT_SEAL_PATH,
         V1_RESULT_SEAL_FILE_SHA256,
+        V1_RESULT_SEAL_FILE_LF_SHA256,
         V1_RESULT_SEAL,
     )?;
 

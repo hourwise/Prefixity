@@ -4432,5 +4432,13 @@ jobs to pass before promotion; the promoted SHA and CI run are reported in
 the supervisor closeout. No V2 tokenizer plan, token contacts, or scored
 pilot was started.
 
+Publication correction: the first candidate's macOS and Ubuntu tests exposed
+Git's LF checkout of four V1 identity/result text files, while the local
+Windows audit had pinned their CRLF checkout bytes. The revised audit pins
+both exact physical Git text forms, preserves the V1 canonical seals and raw
+evidence byte pins, and emits one invariant inheritance map. No V1 file or
+measurement was changed. The replacement candidate requires fresh four-job
+CI before promotion.
+
 Next authorized task: `CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION` only.
 Do not tokenize or infer from this materialization record.

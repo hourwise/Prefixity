@@ -41,6 +41,12 @@ and interpreted-result seal `03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df
 They remain **V1 measurements reused in V2**, never new V2 contacts. Reuse in
 a later count plan still requires the exact V1 GGUF/tokenizer, llama build,
 reasoning/template behavior, endpoint, and other relevant runtime settings.
+Git checks out four historical identity/result text files with CRLF on Windows
+and LF on Unix. The inheritance audit pins the SHA-256 of both physical forms,
+verifies the unchanged canonical JSON seals, and emits the same historical
+CRLF-form binding in its map. The raw token evidence, request ledger, and
+contact plan retain exact byte pins without text conversion. Any other text
+content or line-ending form fails the inheritance gate.
 
 ## New-case evidence
 
