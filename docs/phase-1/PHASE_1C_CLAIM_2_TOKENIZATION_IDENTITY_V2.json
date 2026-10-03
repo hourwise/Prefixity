@@ -1,0 +1,656 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-tokenization-v2-identity",
+  "schema_version": 2,
+  "experiment_id": "claim2-tokenization-v2-fc236cecc0f650ad8678079eaad7000b12d2d7151a2d67e4b84a58183b706138",
+  "classification": "OFFLINE_NON_INFERENCE_TOKENIZATION_PREPARATION",
+  "bindings": {
+    "materialization_commit": "98ef8a1edeb3097b6bdca264ea52fccf7cb14be6",
+    "artifact_hashes": {
+      "v2_contract_sha256": "7eb29c7be0ffc469039d02697f3372b6e8a8ee9dd0118953929cfc2a59a502e9",
+      "v2_ledger_sha256": "a539c33355827ef574912ee72e235bf6301bd0acdc6666fa30effebed242a5eb",
+      "v2_advancing_domain_sha256": "d1439be00db6ff7a63e2646124008c05af6be715172ad64427c99f929aebf1c9",
+      "v2_inheritance_map_sha256": "2d33c1bd253f586d0363620ae14379ee2de49e58429598eff8b5b1c780bd268d",
+      "v3_materialization_successor_sha256": "a24c37cb879b658736d06680425d4e0dec036cf4ff85ef63eba1206ed7ff4732"
+    },
+    "logical_request_identities": [
+      {
+        "logical_request_id": "CP02/BASELINE/slot-1",
+        "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/BASELINE/slot-2",
+        "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/BASELINE/slot-3",
+        "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/NO_OP/slot-1",
+        "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/NO_OP/slot-2",
+        "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/NO_OP/slot-3",
+        "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/INTERVENTION/slot-1",
+        "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/INTERVENTION/slot-2",
+        "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP02/INTERVENTION/slot-3",
+        "request_body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/BASELINE/slot-1",
+        "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/BASELINE/slot-2",
+        "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/BASELINE/slot-3",
+        "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/NO_OP/slot-1",
+        "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/NO_OP/slot-2",
+        "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/NO_OP/slot-3",
+        "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/INTERVENTION/slot-1",
+        "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/INTERVENTION/slot-2",
+        "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP03/INTERVENTION/slot-3",
+        "request_body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP07/BASELINE/slot-1",
+        "request_body_sha256": "35755aff459357bc821aafaea115a880a45e0aaf72199d4c8f5b8aebe98bf974",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP07/BASELINE/slot-2",
+        "request_body_sha256": "0f230794e1a0bedeac2c85665f4df6952234e088ca78cea33923c6395d1292ab",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP07/BASELINE/slot-3",
+        "request_body_sha256": "7bd750c3e9b851c0f904178600a896a2e9075a81147504d7e7db85a82a559738",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP07/NO_OP/slot-1",
+        "request_body_sha256": "35755aff459357bc821aafaea115a880a45e0aaf72199d4c8f5b8aebe98bf974",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP07/NO_OP/slot-2",
+        "request_body_sha256": "0f230794e1a0bedeac2c85665f4df6952234e088ca78cea33923c6395d1292ab",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP07/NO_OP/slot-3",
+        "request_body_sha256": "7bd750c3e9b851c0f904178600a896a2e9075a81147504d7e7db85a82a559738",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP07/INTERVENTION/slot-1",
+        "request_body_sha256": "35755aff459357bc821aafaea115a880a45e0aaf72199d4c8f5b8aebe98bf974",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP07/INTERVENTION/slot-2",
+        "request_body_sha256": "0f230794e1a0bedeac2c85665f4df6952234e088ca78cea33923c6395d1292ab",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP07/INTERVENTION/slot-3",
+        "request_body_sha256": "279a7d4de2aa17af9e3e60406190701efe6a5c64835ec30cf667f3844446d805",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/BASELINE/slot-1",
+        "request_body_sha256": "fe9c2b274c0f82bddec9d3a7d0273016bf45cee6aac79d4558877cad6d6ed112",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/BASELINE/slot-2",
+        "request_body_sha256": "49c9e6e8b423a53f6d59fb35ecaad4378d74d7c2dd73d06f20b1796d0c15d387",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/BASELINE/slot-3",
+        "request_body_sha256": "9757637a4ae2c5f997ac288cc1f53d4865f8ff6a0984d4da145280ffdbd2e594",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/NO_OP/slot-1",
+        "request_body_sha256": "fe9c2b274c0f82bddec9d3a7d0273016bf45cee6aac79d4558877cad6d6ed112",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/NO_OP/slot-2",
+        "request_body_sha256": "49c9e6e8b423a53f6d59fb35ecaad4378d74d7c2dd73d06f20b1796d0c15d387",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/NO_OP/slot-3",
+        "request_body_sha256": "9757637a4ae2c5f997ac288cc1f53d4865f8ff6a0984d4da145280ffdbd2e594",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/INTERVENTION/slot-1",
+        "request_body_sha256": "fe9c2b274c0f82bddec9d3a7d0273016bf45cee6aac79d4558877cad6d6ed112",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/INTERVENTION/slot-2",
+        "request_body_sha256": "49c9e6e8b423a53f6d59fb35ecaad4378d74d7c2dd73d06f20b1796d0c15d387",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP08/INTERVENTION/slot-3",
+        "request_body_sha256": "c5975a9d340985d322b94a90321ec9c9c74fe772b2ee3eee5b98ea17699c8f90",
+        "evidence_classification": "NEW_TOKEN_COUNT_REQUIRED"
+      },
+      {
+        "logical_request_id": "CP05/BASELINE/slot-1",
+        "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/BASELINE/slot-2",
+        "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/BASELINE/slot-3",
+        "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/NO_OP/slot-1",
+        "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/NO_OP/slot-2",
+        "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/NO_OP/slot-3",
+        "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/INTERVENTION/slot-1",
+        "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/INTERVENTION/slot-2",
+        "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP05/INTERVENTION/slot-3",
+        "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/BASELINE/slot-1",
+        "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/BASELINE/slot-2",
+        "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/BASELINE/slot-3",
+        "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/NO_OP/slot-1",
+        "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/NO_OP/slot-2",
+        "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/NO_OP/slot-3",
+        "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/INTERVENTION/slot-1",
+        "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/INTERVENTION/slot-2",
+        "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      },
+      {
+        "logical_request_id": "CP06/INTERVENTION/slot-3",
+        "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+        "evidence_classification": "INHERITED_V1_TOKEN_COUNT"
+      }
+    ],
+    "unique_request_hashes": [
+      "0f230794e1a0bedeac2c85665f4df6952234e088ca78cea33923c6395d1292ab",
+      "279a7d4de2aa17af9e3e60406190701efe6a5c64835ec30cf667f3844446d805",
+      "35755aff459357bc821aafaea115a880a45e0aaf72199d4c8f5b8aebe98bf974",
+      "49c9e6e8b423a53f6d59fb35ecaad4378d74d7c2dd73d06f20b1796d0c15d387",
+      "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+      "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+      "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+      "7bd750c3e9b851c0f904178600a896a2e9075a81147504d7e7db85a82a559738",
+      "9757637a4ae2c5f997ac288cc1f53d4865f8ff6a0984d4da145280ffdbd2e594",
+      "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+      "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+      "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+      "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+      "c5975a9d340985d322b94a90321ec9c9c74fe772b2ee3eee5b98ea17699c8f90",
+      "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+      "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+      "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+      "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+      "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+      "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+      "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+      "fe9c2b274c0f82bddec9d3a7d0273016bf45cee6aac79d4558877cad6d6ed112"
+    ],
+    "inherited_count_mappings": [
+      {
+        "input_tokens": 1655,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "ddf5a18d772530dae08c43ec9396baee0fcf79897537cf9211dbacc5e2d42301"
+        ],
+        "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+        "request_body_utf8_byte_length": 7791,
+        "v1_logical_request_ids": [
+          "CP06/BASELINE/slot-2",
+          "CP06/INTERVENTION/slot-2",
+          "CP06/NO_OP/slot-2"
+        ],
+        "v2_logical_request_ids": [
+          "CP06/BASELINE/slot-2",
+          "CP06/INTERVENTION/slot-2",
+          "CP06/NO_OP/slot-2"
+        ]
+      },
+      {
+        "input_tokens": 1440,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "1d6984e252ddd5afe409e41a4c2d09eb8cdbfdea15d32689d040ee2ec770ab87"
+        ],
+        "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+        "request_body_utf8_byte_length": 5641,
+        "v1_logical_request_ids": [
+          "CP02/BASELINE/slot-2",
+          "CP02/INTERVENTION/slot-2",
+          "CP02/NO_OP/slot-2"
+        ],
+        "v2_logical_request_ids": [
+          "CP02/BASELINE/slot-2",
+          "CP02/INTERVENTION/slot-2",
+          "CP02/NO_OP/slot-2"
+        ]
+      },
+      {
+        "input_tokens": 1305,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "4cad53f5f8de8351ed49f9fd4e43acabf099cbf1c9051921239a41bee76d4756"
+        ],
+        "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+        "request_body_utf8_byte_length": 5047,
+        "v1_logical_request_ids": [
+          "CP03/BASELINE/slot-2",
+          "CP03/INTERVENTION/slot-2",
+          "CP03/NO_OP/slot-2"
+        ],
+        "v2_logical_request_ids": [
+          "CP03/BASELINE/slot-2",
+          "CP03/INTERVENTION/slot-2",
+          "CP03/NO_OP/slot-2"
+        ]
+      },
+      {
+        "input_tokens": 249,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "f6ae6933e600c388bc4a2250292b6a44c136114ad50240b83e01f3f697ae16b4"
+        ],
+        "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+        "request_body_utf8_byte_length": 1487,
+        "v1_logical_request_ids": [
+          "CP03/BASELINE/slot-1",
+          "CP03/INTERVENTION/slot-1",
+          "CP03/NO_OP/slot-1"
+        ],
+        "v2_logical_request_ids": [
+          "CP03/BASELINE/slot-1",
+          "CP03/INTERVENTION/slot-1",
+          "CP03/NO_OP/slot-1"
+        ]
+      },
+      {
+        "input_tokens": 3167,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "74cabaeb943486b2ca2ed839e1e4091ea2c50bd438f5775b102b152dd9d7ef6e"
+        ],
+        "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+        "request_body_utf8_byte_length": 14663,
+        "v1_logical_request_ids": [
+          "CP06/BASELINE/slot-3",
+          "CP06/INTERVENTION/slot-3",
+          "CP06/NO_OP/slot-3"
+        ],
+        "v2_logical_request_ids": [
+          "CP06/BASELINE/slot-3",
+          "CP06/INTERVENTION/slot-3",
+          "CP06/NO_OP/slot-3"
+        ]
+      },
+      {
+        "input_tokens": 1443,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "6dd3224a80db629a61593dcea3a124e90e44b54dc371a23d3be77ffc693a46d6"
+        ],
+        "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+        "request_body_utf8_byte_length": 7024,
+        "v1_logical_request_ids": [
+          "CP06/BASELINE/slot-1",
+          "CP06/INTERVENTION/slot-1",
+          "CP06/NO_OP/slot-1"
+        ],
+        "v2_logical_request_ids": [
+          "CP06/BASELINE/slot-1",
+          "CP06/INTERVENTION/slot-1",
+          "CP06/NO_OP/slot-1"
+        ]
+      },
+      {
+        "input_tokens": 3101,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "72029a4ad18408bb15b1b74c7e116438d19386973cdcdf2f8201f366c83d1e3a"
+        ],
+        "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+        "request_body_utf8_byte_length": 14134,
+        "v1_logical_request_ids": [
+          "CP05/BASELINE/slot-3",
+          "CP05/INTERVENTION/slot-3",
+          "CP05/NO_OP/slot-3"
+        ],
+        "v2_logical_request_ids": [
+          "CP05/BASELINE/slot-3",
+          "CP05/INTERVENTION/slot-3",
+          "CP05/NO_OP/slot-3"
+        ]
+      },
+      {
+        "input_tokens": 1390,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "2701d28a518509adbc559ade97d42edc2d20e338e742d467e44a45b45c81e622"
+        ],
+        "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+        "request_body_utf8_byte_length": 6659,
+        "v1_logical_request_ids": [
+          "CP05/BASELINE/slot-1",
+          "CP05/INTERVENTION/slot-1",
+          "CP05/NO_OP/slot-1"
+        ],
+        "v2_logical_request_ids": [
+          "CP05/BASELINE/slot-1",
+          "CP05/INTERVENTION/slot-1",
+          "CP05/NO_OP/slot-1"
+        ]
+      },
+      {
+        "input_tokens": 1590,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "fc83b82dcf72cfccc2a63eabf107543c9dc9982e2a636beaedae97cbf220fb04"
+        ],
+        "request_body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+        "request_body_utf8_byte_length": 6318,
+        "v1_logical_request_ids": [
+          "CP03/INTERVENTION/slot-3"
+        ],
+        "v2_logical_request_ids": [
+          "CP03/INTERVENTION/slot-3"
+        ]
+      },
+      {
+        "input_tokens": 4078,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "a5572543f7e83c2c97eaa844b048ea7780b474ca6cfa36797af673c12d5999ce"
+        ],
+        "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+        "request_body_utf8_byte_length": 15754,
+        "v1_logical_request_ids": [
+          "CP02/BASELINE/slot-3",
+          "CP02/NO_OP/slot-3"
+        ],
+        "v2_logical_request_ids": [
+          "CP02/BASELINE/slot-3",
+          "CP02/NO_OP/slot-3"
+        ]
+      },
+      {
+        "input_tokens": 3093,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "12d77e8b1111966392368ed4aa1085e68c4b79564a7e3f20b9d214cf72b86500"
+        ],
+        "request_body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+        "request_body_utf8_byte_length": 12317,
+        "v1_logical_request_ids": [
+          "CP02/INTERVENTION/slot-3"
+        ],
+        "v2_logical_request_ids": [
+          "CP02/INTERVENTION/slot-3"
+        ]
+      },
+      {
+        "input_tokens": 2488,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "c52112bec861dca5d0455bf897c277cbb3b0675be42026bde0fec23d35525748"
+        ],
+        "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+        "request_body_utf8_byte_length": 9042,
+        "v1_logical_request_ids": [
+          "CP03/BASELINE/slot-3",
+          "CP03/NO_OP/slot-3"
+        ],
+        "v2_logical_request_ids": [
+          "CP03/BASELINE/slot-3",
+          "CP03/NO_OP/slot-3"
+        ]
+      },
+      {
+        "input_tokens": 241,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "1d307b0e223ae9de4a8ec8636352866d7f8ee3d66d275b4296b1efaacb266c3a"
+        ],
+        "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+        "request_body_utf8_byte_length": 1375,
+        "v1_logical_request_ids": [
+          "CP02/BASELINE/slot-1",
+          "CP02/INTERVENTION/slot-1",
+          "CP02/NO_OP/slot-1"
+        ],
+        "v2_logical_request_ids": [
+          "CP02/BASELINE/slot-1",
+          "CP02/INTERVENTION/slot-1",
+          "CP02/NO_OP/slot-1"
+        ]
+      },
+      {
+        "input_tokens": 1608,
+        "measurement_label": "V1_MEASUREMENT_REUSED_IN_V2",
+        "message_sequence_sha256_values": [
+          "76563ff2b4858d4df90ebd50ac4f14177c9b72d5d7fe75bd7303bba06c95c548"
+        ],
+        "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+        "request_body_utf8_byte_length": 7459,
+        "v1_logical_request_ids": [
+          "CP05/BASELINE/slot-2",
+          "CP05/INTERVENTION/slot-2",
+          "CP05/NO_OP/slot-2"
+        ],
+        "v2_logical_request_ids": [
+          "CP05/BASELINE/slot-2",
+          "CP05/INTERVENTION/slot-2",
+          "CP05/NO_OP/slot-2"
+        ]
+      }
+    ],
+    "v1_evidence_seals": {
+      "experiment_id": "claim2-tokenization-v1-a5a6b896555db8296318f38010b7120dad8ad191e1329f030e0f738f31b90b91",
+      "identity_seal": "4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16",
+      "raw_evidence_sha256": "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264",
+      "interpreted_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040",
+      "request_ledger_sha256": "739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45",
+      "contact_plan_sha256": "6b7634a3fc7a3d4b76289aea1772c1df686a6641309acc9e307e5f330dfefdf6"
+    },
+    "new_request_hashes": [
+      "0f230794e1a0bedeac2c85665f4df6952234e088ca78cea33923c6395d1292ab",
+      "279a7d4de2aa17af9e3e60406190701efe6a5c64835ec30cf667f3844446d805",
+      "35755aff459357bc821aafaea115a880a45e0aaf72199d4c8f5b8aebe98bf974",
+      "49c9e6e8b423a53f6d59fb35ecaad4378d74d7c2dd73d06f20b1796d0c15d387",
+      "7bd750c3e9b851c0f904178600a896a2e9075a81147504d7e7db85a82a559738",
+      "9757637a4ae2c5f997ac288cc1f53d4865f8ff6a0984d4da145280ffdbd2e594",
+      "c5975a9d340985d322b94a90321ec9c9c74fe772b2ee3eee5b98ea17699c8f90",
+      "fe9c2b274c0f82bddec9d3a7d0273016bf45cee6aac79d4558877cad6d6ed112"
+    ],
+    "plans": {
+      "hybrid_path": "fixtures/claim2/tokenization-contact-plan-v2-hybrid.json",
+      "hybrid_sha256": "b694557f04016c04552a5f45cf398de3747fc6fc4eebb7887a17c66dcc951bf3",
+      "hybrid_readiness_contacts": 1,
+      "hybrid_input_token_contacts": 8,
+      "full_fresh_path": "fixtures/claim2/tokenization-contact-plan-v2-full-fresh.json",
+      "full_fresh_sha256": "76333c07b90b1d6d94356e300dd2812532bdb3f01b6beef0dc608ca5c0ea1742",
+      "full_fresh_readiness_contacts": 1,
+      "full_fresh_input_token_contacts": 22
+    },
+    "instrument_identity": {
+      "gguf_path": "D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf",
+      "gguf_sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+      "llama_path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "llama_sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+      "llama_build": "b10217-ddd4ec142"
+    },
+    "runtime_contract": {
+      "context_tokens": 8192,
+      "slots": 1,
+      "reasoning": "off",
+      "offline": true,
+      "host": "127.0.0.1",
+      "port": 8080,
+      "max_tokens": 1024,
+      "temperature": 0,
+      "top_p": 1,
+      "seed": 1,
+      "stream": false,
+      "chat_template_kwargs": "ABSENT",
+      "mmproj": "ABSENT",
+      "hf": "ABSENT"
+    },
+    "client_source": {
+      "source_commit": "94276e930f87b4a38beb46f40892f3fef95078ab",
+      "file_sha256": {
+        "crates/prefixity-controlled-benchmark/Cargo.toml": "645efbd275b9abae32310e3a6149b1eff4a5e37e189b771da190d6604f09cb64",
+        "crates/prefixity-controlled-benchmark/src/lib.rs": "780fe91ad2aada2e17a7fbf32512b50de0d8c3b3337477f2f8fc839759d20566",
+        "crates/prefixity-controlled-benchmark/src/phase1c_claim2_tokenization.rs": "367b5c94bda0cef846a00f01929db71a1cd0e59a8e52ad581605a8180a916588",
+        "crates/prefixity-controlled-benchmark/src/phase1c_claim2_v2_tokenization.rs": "f292bf0570a3bfc5f66b262b712be772e28061245df857e62a986d21f4cbe838",
+        "crates/prefixity-controlled-benchmark/src/bin/phase1c_claim2_v2_tokenization.rs": "03b100b2846c7fae3dcc1c3ab0a4fdf5419a2a9a776bc6a38dbe0deb551078b6",
+        "scripts/claim2_v2_tokenization_plans.py": "d4daac1a02a6d239671d55bd0824db5fa42346e6e496970b81d356b6df22b448",
+        "scripts/claim2_v2_tokenization_identity.py": "b85b2d0361c680e33d25994e6f0646d6894fbb512f57aa3dbe0f0fd6b9f37ec1"
+      }
+    },
+    "client_executable": {
+      "path": "D:\\Users\\fleur\\Prefixity\\target\\claim2-v2-tokenization-freeze\\94276e930f87b4a38beb46f40892f3fef95078ab\\prefixity-phase1c-claim2-v2-tokenization.exe",
+      "sha256": "de1a4bd1d185a440568159d75db150fcaa841ae3d8713dcf04c91d770cfe61be",
+      "bytes": 3766784,
+      "windows_file_id": "0x00000000000000000004000000459843"
+    },
+    "zero_inference_rule": {
+      "inference_allowance": 0,
+      "only_endpoints": [
+        {
+          "method": "GET",
+          "path": "/health"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/chat/completions/input_tokens"
+        }
+      ]
+    },
+    "plan_selection_rule": {
+      "before_first_contact": true,
+      "hybrid_if": "all 14 V1 hashes, 36 mappings, seals, exact bytes, and accepted runtime/tokenizer identity verify",
+      "otherwise": "FULL_FRESH_22; no adaptive switch after contact",
+      "runtime_drift": "requires newly sealed instrument identity before contact"
+    }
+  }
+}

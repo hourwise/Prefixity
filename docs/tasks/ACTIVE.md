@@ -4442,3 +4442,33 @@ CI before promotion.
 
 Next authorized task: `CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION` only.
 Do not tokenize or infer from this materialization record.
+
+## Claim 2 V2 non-inference tokenization preparation
+
+Status: `CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION_READY_FOR_OPERATOR_SERVER`
+subject to the exact candidate's four CI jobs passing before promotion. The
+source-provenance commit is
+`94276e930f87b4a38beb46f40892f3fef95078ab`. The distinct V2 identity,
+frozen executable, two contact plans, and detailed offline evidence are in
+[`PHASE_1C_CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION.md`](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_TOKENIZATION_PREPARATION.md).
+
+Acceptance verified offline: 54 logical requests, 22 exact unique bodies,
+14 sealed V1 hashes/36 retained logical requests, and eight new hashes/18
+logical requests. The primary plan permits one future readiness and eight
+future input-token contacts. The contingency plan permits one future
+readiness and 22 future input-token contacts. Both have zero inference
+allowance and require a single pre-contact mode choice. The frozen-binary
+preflight verified both plans, V1 inheritance, source/executable identity,
+and current registered GGUF/llama hashes with zero contacts.
+
+Validation: complete locked/offline workspace tests; formatting;
+warnings-denied workspace Clippy; Rust 1.86 locked/offline workspace check;
+exact V2 domain, ledger, successor, inheritance-map, and plan regeneration;
+endpoint-denial, body-tamper, plan-substitution, and CLI rejection tests;
+staged diff whitespace review. The V1 token admission failure is unchanged.
+CP07/CP08 token counts, context fit, reduction gates, and CPU practicality
+remain unknown. No server startup, `/health`, `/input_tokens`, tokenizer, or
+inference was performed.
+
+Stop here after promotion. Any V2 tokenization pass requires a separately
+authorized operator-started server; this preparation does not authorize it.
