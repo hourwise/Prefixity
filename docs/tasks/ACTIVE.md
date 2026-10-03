@@ -4472,3 +4472,33 @@ inference was performed.
 
 Stop here after promotion. Any V2 tokenization pass requires a separately
 authorized operator-started server; this preparation does not authorize it.
+
+## Claim 2 V2 tokenization execution and admission result
+
+Status: `WORKLOAD_V2_TOKEN_ADMISSION_FAILED`. The separately authorized,
+operator-started server was used for one frozen `HYBRID_8_NEW` client pass:
+one readiness contact, eight successful unique-body input-token contacts,
+zero inference, and no retry or mode change. Four retained cases contributed
+14 sealed V1 unique counts over 36 logical requests; CP07/CP08 contributed
+eight fresh unique counts over 18 logical requests. The complete 54-request
+mapping, raw SHA-256, canonical result seal, process identity, gate arithmetic,
+and shutdown are recorded in
+[`PHASE_1C_CLAIM_2_WORKLOAD_V2_TOKENIZATION_EXECUTION_RESULT.md`](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V2_TOKENIZATION_EXECUTION_RESULT.md).
+
+CP02/CP03 met all positive and context gates, and CP05/CP06 remained
+zero-mutation controls. CP07/CP08 both met all three positive reduction
+thresholds but failed the frozen 6,000-input-token gate: their slot-3
+BASELINE/NO_OP counts were 6,811 and 7,451. CP08's maximum including the
+1,024-token output reserve was 8,475, above context 8,192. The failure is
+complete valid scientific evidence, not an inconclusive collection. No
+workload or threshold was altered. Exact logical input totals were 52,034
+BASELINE, 52,034 NO_OP, and 45,178 INTERVENTION, 149,246 in total;
+historical-rate CPU arithmetic remains planning only. The original server
+was re-identified and terminated after sealing evidence; no llama process,
+port-8080 listener, or V2 client remained.
+
+Validation: deterministic interpretation reproduction, independent
+hash/join/gate arithmetic, full workspace checks, and exact candidate CI
+before any result promotion. The next authorized task is
+`CLAIM_2_WORKLOAD_V2_DESIGN_REVIEW` only. Do not start it from this record;
+do not prepare a scored pilot from this failed workload.

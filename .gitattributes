@@ -1,2 +1,3 @@
 # Preserve the exact client-written evidence bytes and their published SHA-256.
 claim2-tokenization-pass-evidence-v1.json -text
+claim2-v2-hybrid-tokenization-pass-evidence.json -text

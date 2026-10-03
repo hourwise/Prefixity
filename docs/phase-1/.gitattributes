@@ -1,2 +1,4 @@
 # Phase 1B.9 hashes these exact historical bytes via include_bytes!.
 PHASE_1B9_PREREGISTRATION.md -text
+PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V2.json -text
+PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V2.sha256 -text
