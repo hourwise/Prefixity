@@ -153,6 +153,15 @@ fn sha256_file(path: &Path) -> Result<String, String> {
     Ok(format!("{:x}", hasher.finalize()))
 }
 
+fn sha256_source_file(path: &Path) -> Result<String, String> {
+    let bytes = fs::read(path).map_err(|e| format!("cannot read V3 source {path:?}: {e}"))?;
+    let text = String::from_utf8(bytes).map_err(|e| e.to_string())?;
+    Ok(format!(
+        "{:x}",
+        Sha256::digest(text.replace("\r\n", "\n").as_bytes())
+    ))
+}
+
 fn verify_frozen_executable_record(
     executable: &Path,
     record: &serde_json::Value,
@@ -213,7 +222,7 @@ fn verify_frozen_experiment_identity(
         ),
     ];
     for (key, path) in source_files {
-        if source[key] != sha256_file(&root.join(path))? {
+        if source[key] != sha256_source_file(&root.join(path))? {
             return Err(format!("V3 source provenance mismatch: {path}"));
         }
     }
@@ -574,8 +583,9 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::{
-        parse_execute_confirmation, selected_mode, sha256_file, verify_frozen_executable_record,
-        LLAMA_BUILD, LLAMA_PATH, LLAMA_SHA256, MODEL_PATH, MODEL_SHA256,
+        parse_execute_confirmation, selected_mode, sha256_file, sha256_source_file,
+        verify_frozen_executable_record, LLAMA_BUILD, LLAMA_PATH, LLAMA_SHA256, MODEL_PATH,
+        MODEL_SHA256,
     };
     use serde_json::json;
     use std::fs;
@@ -684,5 +694,20 @@ mod tests {
     fn pre_contact_mode_is_selected_once_from_inheritance() {
         assert_eq!(selected_mode(true), "HYBRID_8_NEW");
         assert_eq!(selected_mode(false), "FULL_FRESH_22");
+    }
+
+    #[test]
+    fn source_provenance_accepts_only_line_ending_equivalence() {
+        let path = std::env::temp_dir().join(format!(
+            "prefixity-v3-source-form-test-{}",
+            std::process::id()
+        ));
+        fs::write(&path, b"alpha\nbeta\n").unwrap();
+        let canonical = sha256_source_file(&path).unwrap();
+        fs::write(&path, b"alpha\r\nbeta\r\n").unwrap();
+        assert_eq!(sha256_source_file(&path).unwrap(), canonical);
+        fs::write(&path, b"alpha\r\ngamma\r\n").unwrap();
+        assert_ne!(sha256_source_file(&path).unwrap(), canonical);
+        fs::remove_file(path).unwrap();
     }
 }
