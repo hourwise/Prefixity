@@ -4502,3 +4502,33 @@ hash/join/gate arithmetic, full workspace checks, and exact candidate CI
 before any result promotion. The next authorized task is
 `CLAIM_2_WORKLOAD_V2_DESIGN_REVIEW` only. Do not start it from this record;
 do not prepare a scored pilot from this failed workload.
+
+## Claim 2 V2 failure review and V3 workload design
+
+Status: `CLAIM_2_WORKLOAD_V3_DESIGN_READY`. The documentation-only
+[V3 design review](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_DESIGN_REVIEW.md)
+compares sealed V1 and V2 tokenization outcomes and retains both historical
+failure classifications unchanged. CP01/CP04 missed only `D3 >= 800` by 25
+tokens; CP07/CP08 passed reduction gates but failed the 6,000-token complete
+baseline input limit, with CP08 also above the 8,192 context after reserving
+1,024 output tokens. Complete contact accounting, exact mapping, and legal
+duplicate selection reveal no mechanism or tokenizer defect in these results.
+
+The smallest defensible V3 design keeps CP02/CP03 as positive candidates,
+CP05/CP06 as zero-mutation controls, and proposes genuinely new CP09 software
+release promotion and CP10 observation-data publication. Their ordinary
+packet reattachments, complete governing objects, deterministic evaluators,
+distinct semantics, and dependency risks are specified at design level only.
+`controlled-evidence-policy-v1`, one legal `EXACT_DUPLICATE_PRUNE` target,
+positive and context gates, and control requirements remain frozen. Retained
+V1 counts are eligible for future reuse only after V3 materialization proves
+exact request-byte and instrument/runtime identity; no V3 counts exist yet.
+
+Validation: reviewed the V1/V2 design, materialization, preparation,
+interpreted results, ledgers, contracts, and inheritance evidence; checked
+the documentation diff and links. Candidate CI must pass before promotion;
+the exact promoted SHA and CI results are in the supervisor closeout. No
+fixture, code, evidence, identity, or seal changed. No server, tokenizer,
+inference, or scored-pilot preparation was started. Remaining work is only
+the separately authorized offline
+`CLAIM_2_WORKLOAD_V3_MATERIALIZATION_PREPARATION`; do not start it here.
