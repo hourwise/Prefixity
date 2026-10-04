@@ -1,0 +1,25 @@
+{
+  "schema_id": "prefixity.phase1c.claim2-reduced-scored-pilot-identity",
+  "schema_version": 1,
+  "study": "CLAIM_2_REDUCED_COHORT_DOWNSTREAM_EFFICACY_FEASIBILITY_PILOT",
+  "decision_review_commit": "1f6812983054aa460060d0bbd6e6cfd60ce3666f",
+  "source_provenance_commit": "0dde3366587710e294517a4ad41973b392923732",
+  "manifest_path": "docs/phase-1/PHASE_1C_CLAIM_2_REDUCED_PILOT_MANIFEST.json",
+  "manifest_sha256": "7f433c684d7c188584c36045113300074407f454473662f58b57046fe496984d",
+  "v1_token_identity_sha256": "4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16",
+  "v1_raw_evidence_sha256": "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264",
+  "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040",
+  "frozen_client": {
+    "path": "D:\\Users\\fleur\\Prefixity\\target\\claim2-reduced-pilot-freeze\\0dde336\\prefixity-phase1c-claim2-reduced-pilot.exe",
+    "sha256": "232c38f426ca10cbadf00da1f31ca3cdb212c660266fa384132689c20613bfb6",
+    "bytes": 4389888,
+    "windows_file_id": "0x0000000000000000000300000045db24"
+  },
+  "inference_endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+  "readiness_endpoint": "NONE",
+  "tokenization_endpoint": "NONE",
+  "retry_count": 0,
+  "operator_server_starts": 12,
+  "preparation_server_contacts": 0,
+  "preparation_inference_requests": 0
+}

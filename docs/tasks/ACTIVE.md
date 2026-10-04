@@ -4651,3 +4651,26 @@ candidate CI before exact-SHA promotion. The supervisor closeout records
 the final CI outcome and promoted SHA. Zero server contacts, tokenization,
 inference, and fixture/code changes occurred. The only next authorized task
 is `CLAIM_2_REDUCED_COHORT_SCORED_PILOT_PREPARATION`; do not begin it here.
+
+## Claim 2 reduced-cohort scored-pilot preparation
+
+Status: `CLAIM_2_REDUCED_COHORT_SCORED_PILOT_PREPARATION_READY_FOR_EXECUTION`.
+The [preparation record](../phase-1/PHASE_1C_CLAIM_2_REDUCED_PILOT_PREPARATION.md)
+freezes the separately labelled CP02/CP03 positive and CP05/CP06 control
+pilot. The ordered 12 arms contain at most 36 scored requests. The new
+one-arm client replays all 36 exact renderer bodies offline against the
+sealed V1 ledger/result: 14 unique body hashes and 64,612 inherited input
+tokens (22,165 BASELINE, 22,165 NO_OP, 20,282 INTERVENTION). It freezes
+canonical advancing actions, the hidden deterministic final evaluator,
+BASELINE competence, NO_OP/preservation/control/study classifications,
+fresh operator-started server per arm, exactly-once raw evidence, and
+fail-closed resume. The manifest and new experiment identity are sealed;
+source provenance and the frozen release executable are recorded there.
+
+Validation: final frozen-binary offline preflight reported 12 arms, 36
+maximum requests, 14 unique bodies, 36 token mappings, and zero contacts;
+targeted client scoring/body tests passed. Candidate CI, exact-SHA promotion,
+post-promotion CI and final closeout are recorded by the supervisor after
+they finish. No server, tokenization endpoint, model inference, or scored
+pilot execution occurred. The only next authorized task is the separate
+`CLAIM_2_REDUCED_COHORT_SCORED_PILOT_EXECUTION`; do not start it here.

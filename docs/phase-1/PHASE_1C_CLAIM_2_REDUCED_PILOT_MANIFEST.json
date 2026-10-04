@@ -1,0 +1,471 @@
+{
+  "advancing_domain_sha256": "b4689157548864c819945dd8260478dc0ba6a5811dd96626768f3f5b83a09fc8",
+  "arm_token_totals": {
+    "BASELINE": 22165,
+    "INTERVENTION": 20282,
+    "NO_OP": 22165
+  },
+  "arms": [
+    {
+      "arm": "BASELINE",
+      "case_id": "CP02",
+      "evaluator_sha256": "dbb16cdb9869a4068374ad7059a958131e85ef76f6b806314700af9bd222e826",
+      "evidence_directory": "arm-01",
+      "fixture_sha256": "93ecf6581bf6a0c436710526d5f8c7b53f971470c99db0578509f5b2cda0913d",
+      "fresh_operator_server": true,
+      "intervention_decision": "EXACT_DUPLICATE_PRUNE_ON_SLOT_3",
+      "ordinal": 1,
+      "requests": [
+        {
+          "body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+          "expected_action_id": "build_symbol_inventory",
+          "input_tokens_v1_inherited": 241,
+          "logical_request_id": "CP02/BASELINE/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+          "expected_action_id": "inspect_resolution_chain",
+          "input_tokens_v1_inherited": 1440,
+          "logical_request_id": "CP02/BASELINE/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 4078,
+          "logical_request_id": "CP02/BASELINE/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "positive"
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP02",
+      "evaluator_sha256": "dbb16cdb9869a4068374ad7059a958131e85ef76f6b806314700af9bd222e826",
+      "evidence_directory": "arm-02",
+      "fixture_sha256": "93ecf6581bf6a0c436710526d5f8c7b53f971470c99db0578509f5b2cda0913d",
+      "fresh_operator_server": true,
+      "intervention_decision": "EXACT_DUPLICATE_PRUNE_ON_SLOT_3",
+      "ordinal": 2,
+      "requests": [
+        {
+          "body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+          "expected_action_id": "build_symbol_inventory",
+          "input_tokens_v1_inherited": 241,
+          "logical_request_id": "CP02/NO_OP/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+          "expected_action_id": "inspect_resolution_chain",
+          "input_tokens_v1_inherited": 1440,
+          "logical_request_id": "CP02/NO_OP/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 4078,
+          "logical_request_id": "CP02/NO_OP/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "positive"
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP02",
+      "evaluator_sha256": "dbb16cdb9869a4068374ad7059a958131e85ef76f6b806314700af9bd222e826",
+      "evidence_directory": "arm-03",
+      "fixture_sha256": "93ecf6581bf6a0c436710526d5f8c7b53f971470c99db0578509f5b2cda0913d",
+      "fresh_operator_server": true,
+      "intervention_decision": "EXACT_DUPLICATE_PRUNE_ON_SLOT_3",
+      "ordinal": 3,
+      "requests": [
+        {
+          "body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+          "expected_action_id": "build_symbol_inventory",
+          "input_tokens_v1_inherited": 241,
+          "logical_request_id": "CP02/INTERVENTION/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+          "expected_action_id": "inspect_resolution_chain",
+          "input_tokens_v1_inherited": 1440,
+          "logical_request_id": "CP02/INTERVENTION/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 3093,
+          "logical_request_id": "CP02/INTERVENTION/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "positive"
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP03",
+      "evaluator_sha256": "f568dbc069bc96e2897f57e70c632116dcbc16fdaa51fca380549f5be0b177a5",
+      "evidence_directory": "arm-04",
+      "fixture_sha256": "f740e754a28fb17bbdac756bff01f4ca166edd7edd89484668e393a98814f47d",
+      "fresh_operator_server": true,
+      "intervention_decision": "EXACT_DUPLICATE_PRUNE_ON_SLOT_3",
+      "ordinal": 4,
+      "requests": [
+        {
+          "body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+          "expected_action_id": "collect_dependency_inventory",
+          "input_tokens_v1_inherited": 249,
+          "logical_request_id": "CP03/BASELINE/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+          "expected_action_id": "verify_snapshot_and_constraints",
+          "input_tokens_v1_inherited": 1305,
+          "logical_request_id": "CP03/BASELINE/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 2488,
+          "logical_request_id": "CP03/BASELINE/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "positive"
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP03",
+      "evaluator_sha256": "f568dbc069bc96e2897f57e70c632116dcbc16fdaa51fca380549f5be0b177a5",
+      "evidence_directory": "arm-05",
+      "fixture_sha256": "f740e754a28fb17bbdac756bff01f4ca166edd7edd89484668e393a98814f47d",
+      "fresh_operator_server": true,
+      "intervention_decision": "EXACT_DUPLICATE_PRUNE_ON_SLOT_3",
+      "ordinal": 5,
+      "requests": [
+        {
+          "body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+          "expected_action_id": "collect_dependency_inventory",
+          "input_tokens_v1_inherited": 249,
+          "logical_request_id": "CP03/NO_OP/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+          "expected_action_id": "verify_snapshot_and_constraints",
+          "input_tokens_v1_inherited": 1305,
+          "logical_request_id": "CP03/NO_OP/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 2488,
+          "logical_request_id": "CP03/NO_OP/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "positive"
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP03",
+      "evaluator_sha256": "f568dbc069bc96e2897f57e70c632116dcbc16fdaa51fca380549f5be0b177a5",
+      "evidence_directory": "arm-06",
+      "fixture_sha256": "f740e754a28fb17bbdac756bff01f4ca166edd7edd89484668e393a98814f47d",
+      "fresh_operator_server": true,
+      "intervention_decision": "EXACT_DUPLICATE_PRUNE_ON_SLOT_3",
+      "ordinal": 6,
+      "requests": [
+        {
+          "body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+          "expected_action_id": "collect_dependency_inventory",
+          "input_tokens_v1_inherited": 249,
+          "logical_request_id": "CP03/INTERVENTION/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+          "expected_action_id": "verify_snapshot_and_constraints",
+          "input_tokens_v1_inherited": 1305,
+          "logical_request_id": "CP03/INTERVENTION/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 1590,
+          "logical_request_id": "CP03/INTERVENTION/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "positive"
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP05",
+      "evaluator_sha256": "6cf63794c4ca309ff480f7260a7f5f64b04de85d1bd45ad5923534d13e324c9a",
+      "evidence_directory": "arm-07",
+      "fixture_sha256": "beef5f855323e7cfbe5e48fc82c74f4ed987d12c7016862efcdfecb8669a6ed2",
+      "fresh_operator_server": true,
+      "intervention_decision": "ZERO_MUTATION",
+      "ordinal": 7,
+      "requests": [
+        {
+          "body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+          "expected_action_id": "inspect_initial_catalog",
+          "input_tokens_v1_inherited": 1390,
+          "logical_request_id": "CP05/BASELINE/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+          "expected_action_id": "rebuild_route_index_and_export",
+          "input_tokens_v1_inherited": 1608,
+          "logical_request_id": "CP05/BASELINE/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 3101,
+          "logical_request_id": "CP05/BASELINE/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "zero_mutation_control"
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP05",
+      "evaluator_sha256": "6cf63794c4ca309ff480f7260a7f5f64b04de85d1bd45ad5923534d13e324c9a",
+      "evidence_directory": "arm-08",
+      "fixture_sha256": "beef5f855323e7cfbe5e48fc82c74f4ed987d12c7016862efcdfecb8669a6ed2",
+      "fresh_operator_server": true,
+      "intervention_decision": "ZERO_MUTATION",
+      "ordinal": 8,
+      "requests": [
+        {
+          "body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+          "expected_action_id": "inspect_initial_catalog",
+          "input_tokens_v1_inherited": 1390,
+          "logical_request_id": "CP05/NO_OP/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+          "expected_action_id": "rebuild_route_index_and_export",
+          "input_tokens_v1_inherited": 1608,
+          "logical_request_id": "CP05/NO_OP/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 3101,
+          "logical_request_id": "CP05/NO_OP/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "zero_mutation_control"
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP05",
+      "evaluator_sha256": "6cf63794c4ca309ff480f7260a7f5f64b04de85d1bd45ad5923534d13e324c9a",
+      "evidence_directory": "arm-09",
+      "fixture_sha256": "beef5f855323e7cfbe5e48fc82c74f4ed987d12c7016862efcdfecb8669a6ed2",
+      "fresh_operator_server": true,
+      "intervention_decision": "ZERO_MUTATION",
+      "ordinal": 9,
+      "requests": [
+        {
+          "body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+          "expected_action_id": "inspect_initial_catalog",
+          "input_tokens_v1_inherited": 1390,
+          "logical_request_id": "CP05/INTERVENTION/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+          "expected_action_id": "rebuild_route_index_and_export",
+          "input_tokens_v1_inherited": 1608,
+          "logical_request_id": "CP05/INTERVENTION/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 3101,
+          "logical_request_id": "CP05/INTERVENTION/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "zero_mutation_control"
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP06",
+      "evaluator_sha256": "d08c1e750118ae28210aef4e058722e8e9e2bac89d88fe51e1fb32872e5350e6",
+      "evidence_directory": "arm-10",
+      "fixture_sha256": "bc1d91824c7d88fa79bcc406e1d0a8cfc1f8b90da8c1ba32b2ff43761303a741",
+      "fresh_operator_server": true,
+      "intervention_decision": "ZERO_MUTATION",
+      "ordinal": 10,
+      "requests": [
+        {
+          "body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+          "expected_action_id": "inspect_policy_index",
+          "input_tokens_v1_inherited": 1443,
+          "logical_request_id": "CP06/BASELINE/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+          "expected_action_id": "verify_audit_receipt",
+          "input_tokens_v1_inherited": 1655,
+          "logical_request_id": "CP06/BASELINE/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 3167,
+          "logical_request_id": "CP06/BASELINE/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "zero_mutation_control"
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP06",
+      "evaluator_sha256": "d08c1e750118ae28210aef4e058722e8e9e2bac89d88fe51e1fb32872e5350e6",
+      "evidence_directory": "arm-11",
+      "fixture_sha256": "bc1d91824c7d88fa79bcc406e1d0a8cfc1f8b90da8c1ba32b2ff43761303a741",
+      "fresh_operator_server": true,
+      "intervention_decision": "ZERO_MUTATION",
+      "ordinal": 11,
+      "requests": [
+        {
+          "body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+          "expected_action_id": "inspect_policy_index",
+          "input_tokens_v1_inherited": 1443,
+          "logical_request_id": "CP06/NO_OP/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+          "expected_action_id": "verify_audit_receipt",
+          "input_tokens_v1_inherited": 1655,
+          "logical_request_id": "CP06/NO_OP/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 3167,
+          "logical_request_id": "CP06/NO_OP/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "zero_mutation_control"
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP06",
+      "evaluator_sha256": "d08c1e750118ae28210aef4e058722e8e9e2bac89d88fe51e1fb32872e5350e6",
+      "evidence_directory": "arm-12",
+      "fixture_sha256": "bc1d91824c7d88fa79bcc406e1d0a8cfc1f8b90da8c1ba32b2ff43761303a741",
+      "fresh_operator_server": true,
+      "intervention_decision": "ZERO_MUTATION",
+      "ordinal": 12,
+      "requests": [
+        {
+          "body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+          "expected_action_id": "inspect_policy_index",
+          "input_tokens_v1_inherited": 1443,
+          "logical_request_id": "CP06/INTERVENTION/slot-1",
+          "slot": 1
+        },
+        {
+          "body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+          "expected_action_id": "verify_audit_receipt",
+          "input_tokens_v1_inherited": 1655,
+          "logical_request_id": "CP06/INTERVENTION/slot-2",
+          "slot": 2
+        },
+        {
+          "body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+          "expected_action_id": null,
+          "input_tokens_v1_inherited": 3167,
+          "logical_request_id": "CP06/INTERVENTION/slot-3",
+          "slot": 3
+        }
+      ],
+      "role": "zero_mutation_control"
+    }
+  ],
+  "classification_rules": "positive: BASELINE failure => BASELINE_INCAPABLE; BASELINE success and NO_OP failure => NO_OP_PIPELINE_REGRESSION; both success and INTERVENTION success/failure => DOWNSTREAM_SUCCESS_PRESERVED/REGRESSED; controls compare all three outcomes for CONTROL_OUTCOME_DIVERGENCE",
+  "client_source_sha256": "629d7924f05d5479b4061afe7662124f0ffc8283fec3ca5d39fab1b4e5ebd76e",
+  "decision_review_commit": "1f6812983054aa460060d0bbd6e6cfd60ce3666f",
+  "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+  "fresh_server_per_arm": true,
+  "llama_build": "b10217-ddd4ec142",
+  "llama_sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+  "logical_request_ceiling": 36,
+  "model_sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+  "request": {
+    "chat_template_kwargs": "ABSENT",
+    "max_tokens": 1024,
+    "seed": 1,
+    "stream": false,
+    "temperature": 0,
+    "top_p": 1
+  },
+  "resume_rule": "next wholly unstarted arm only after completed evidence verification; never resend ambiguous request or restart a partial arm",
+  "retry_count": 0,
+  "runtime": {
+    "context": 8192,
+    "host": "127.0.0.1",
+    "offline": true,
+    "port": 8080,
+    "reasoning": "off",
+    "slots": 1
+  },
+  "schema_id": "prefixity.phase1c.claim2-reduced-scored-pilot-manifest",
+  "schema_version": 1,
+  "scoring_specification": "request slots 1 and 2 require exact canonical expected action; slot 3 uses pinned hidden deterministic evaluator; all three must pass for ARM_TASK_SUCCESS; malformed advancing response ends arm without another dispatch",
+  "study": "CLAIM_2_REDUCED_COHORT_DOWNSTREAM_EFFICACY_FEASIBILITY_PILOT",
+  "study_rules": "both positives preserved and controls invariant => FEASIBILITY_PASSED; positive treatment regression => REGRESSION_OBSERVED; baseline incapability => INCONCLUSIVE_BASELINE; pipeline/control/evidence inconsistency => INCONCLUSIVE_INTEGRITY",
+  "unique_body_hashes": [
+    "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+    "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+    "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+    "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+    "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+    "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+    "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+    "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+    "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+    "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+    "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+    "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+    "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+    "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa"
+  ],
+  "v1_identity_seal": "4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16",
+  "v1_raw_sha256": "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264",
+  "v1_request_ledger_sha256": "739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45",
+  "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040",
+  "workload_renderer_source_sha256": "b13e7cb22037a6dd62dcff2018fed95d1cabac9e3065c230796180403699c4c6"
+}

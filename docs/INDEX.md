@@ -84,6 +84,7 @@
 | [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION.md), [`PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V3.json`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V3.json), [`../fixtures/claim2/tokenization-contact-plan-v3-hybrid.json`](../fixtures/claim2/tokenization-contact-plan-v3-hybrid.json), and [`../fixtures/claim2/tokenization-contact-plan-v3-full-fresh.json`](../fixtures/claim2/tokenization-contact-plan-v3-full-fresh.json) | Distinct V3 offline client and sealed identity, exact V1 inheritance, eight-new-body primary and 22-body contingency plans, frozen executable, and zero-contact preflight. | Reviewing preparation before a separately authorized operator-started server and non-inference tokenization pass; CP09/CP10 admission remains unknown. |
 | [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_EXECUTION_RESULT.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_EXECUTION_RESULT.md), [`PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V3.json`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V3.json), and [`../claim2-v3-hybrid-tokenization-pass-evidence.json`](../claim2-v3-hybrid-tokenization-pass-evidence.json) | Single V3 hybrid token-only pass, eight fresh counts plus 14 sealed inherited counts mapped to all 54 requests, CP09 context and CP10 reduction failures, sealed interpretation, and verified server shutdown. | Reviewing `WORKLOAD_V3_TOKEN_ADMISSION_FAILED`; next work is a separate V3 design review. |
 | [`phase-1/PHASE_1C_CLAIM_2_REDUCED_COHORT_DECISION_REVIEW.md`](phase-1/PHASE_1C_CLAIM_2_REDUCED_COHORT_DECISION_REVIEW.md) | Documentation-only V3 design review decision: preserve V1/V2/V3 failures, stop replacement-case admission iteration, and define a separately labelled two-positive/two-control downstream-efficacy feasibility cohort from 36 already counted requests. | Reviewing why only reduced-cohort scored-pilot preparation is next; no scored inference or new tokenization is authorized here. |
+| [`phase-1/PHASE_1C_CLAIM_2_REDUCED_PILOT_PREPARATION.md`](phase-1/PHASE_1C_CLAIM_2_REDUCED_PILOT_PREPARATION.md), [`PHASE_1C_CLAIM_2_REDUCED_PILOT_MANIFEST.json`](phase-1/PHASE_1C_CLAIM_2_REDUCED_PILOT_MANIFEST.json), and [`PHASE_1C_CLAIM_2_REDUCED_PILOT_IDENTITY.json`](phase-1/PHASE_1C_CLAIM_2_REDUCED_PILOT_IDENTITY.json) | Frozen 12-arm scored-pilot order, 36 exact request mappings to 14 inherited V1 bodies, deterministic scoring and isolation, exactly-once evidence, sealed client, and zero-contact offline preflight. | Reviewing preparation before separately authorized scored execution; no pilot model outcome exists. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
@@ -159,8 +160,10 @@ and CP10 missed the request-3 20% reduction gate. The subsequent
 documentation-only decision review freezes those failures and selects
 CP02/CP03 positives with CP05/CP06 controls for a separately labelled
 reduced-cohort downstream-efficacy feasibility design. The next task is
-only `CLAIM_2_REDUCED_COHORT_SCORED_PILOT_PREPARATION`; no scored-pilot
-preparation or CP02/CP03 scored inference has begun.
+only `CLAIM_2_REDUCED_COHORT_SCORED_PILOT_EXECUTION`. Offline preparation
+has frozen the exact 12-arm plan, inherited-body admission, scoring,
+one-arm client, evidence and resume rules; no CP02/CP03 scored inference
+has begun.
 The Phase 1A corpus/import evidence and later Phase 1B/1C results remain in
 the linked closeouts and gates above.
 
