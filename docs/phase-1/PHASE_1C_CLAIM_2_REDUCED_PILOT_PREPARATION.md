@@ -115,14 +115,14 @@ all 12 completed arm records.
 
 The [identity](PHASE_1C_CLAIM_2_REDUCED_PILOT_IDENTITY.json) binds the
 manifest SHA-256, source-provenance commit
-`0dde3366587710e294517a4ad41973b392923732`, V1 seals, and frozen
+`3203f0d4b9576f55cd5c069a79251f5c7b2a0a1f`, V1 seals, and frozen
 client at
-`D:\Users\fleur\Prefixity\target\claim2-reduced-pilot-freeze\0dde336\prefixity-phase1c-claim2-reduced-pilot.exe`.
+`D:\Users\fleur\Prefixity\target\claim2-reduced-pilot-freeze\3203f0d\prefixity-phase1c-claim2-reduced-pilot.exe`.
 The client SHA-256 is
-`232c38f426ca10cbadf00da1f31ca3cdb212c660266fa384132689c20613bfb6`,
-size 4,389,888 bytes, Windows file ID
-`0x0000000000000000000300000045db24`. Canonical identity seal:
-`f59b3f71abae4a238cf7939dfa85bf3532d2b1608abbe0753914df111ddf65c2`.
+`8ffa8ea52907764b2f9a2fd8990f41690d87e6086bceac4fa39300f2cd441564`,
+size 4,392,960 bytes, Windows file ID
+`0x0000000000000000000200000045e679`. Canonical identity seal:
+`04a3631e9dab4ba9e5841c36da8946e9ca1a6a43ad9e0e0aac21ad73bba6266d`.
 The final frozen executable passed offline preflight: 12 arms, 36 maximum
 logical requests, 14 unique bodies, 36 token mappings, 64,612 inherited
 input tokens, zero actual inference and server contacts.
@@ -150,7 +150,7 @@ the exact frozen client, substituting that verified PID and the dedicated
 evidence directory. For the first arm:
 
 ```powershell
-$pilot = 'D:\Users\fleur\Prefixity\target\claim2-reduced-pilot-freeze\0dde336\prefixity-phase1c-claim2-reduced-pilot.exe'
+$pilot = 'D:\Users\fleur\Prefixity\target\claim2-reduced-pilot-freeze\3203f0d\prefixity-phase1c-claim2-reduced-pilot.exe'
 $evidence = 'D:\Prefixity-Lab\evidence\claim2-reduced-scored-pilot-v1'
 & $pilot preflight
 & $pilot next --evidence $evidence

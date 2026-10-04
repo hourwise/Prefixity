@@ -416,7 +416,7 @@
     }
   ],
   "classification_rules": "positive: BASELINE failure => BASELINE_INCAPABLE; BASELINE success and NO_OP failure => NO_OP_PIPELINE_REGRESSION; both success and INTERVENTION success/failure => DOWNSTREAM_SUCCESS_PRESERVED/REGRESSED; controls compare all three outcomes for CONTROL_OUTCOME_DIVERGENCE",
-  "client_source_sha256": "629d7924f05d5479b4061afe7662124f0ffc8283fec3ca5d39fab1b4e5ebd76e",
+  "client_source_sha256": "1c33845906f56482397e594066aec0b3ab39ec36325b77df4e43ce520c4b9f15",
   "decision_review_commit": "1f6812983054aa460060d0bbd6e6cfd60ce3666f",
   "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
   "fresh_server_per_arm": true,
@@ -467,5 +467,5 @@
   "v1_raw_sha256": "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264",
   "v1_request_ledger_sha256": "739205fb56e4f40bd55245f37d0768b8ca73c891b2f8d28bdb8f284e9f811d45",
   "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040",
-  "workload_renderer_source_sha256": "b13e7cb22037a6dd62dcff2018fed95d1cabac9e3065c230796180403699c4c6"
+  "workload_renderer_source_sha256": "f9cf47279c80913bc8232ff635a2e53c7b1511edde1a733232d5de900c76f4a2"
 }
