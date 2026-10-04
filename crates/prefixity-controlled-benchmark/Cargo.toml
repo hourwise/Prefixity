@@ -62,6 +62,10 @@ path = "src/bin/phase1c_claim2_v2_tokenization.rs"
 name = "prefixity-phase1c-claim2-v3-tokenization"
 path = "src/bin/phase1c_claim2_v3_tokenization.rs"
 
+[[bin]]
+name = "prefixity-phase1c-claim2-reduced-pilot"
+path = "src/bin/phase1c_claim2_reduced_pilot.rs"
+
 [dependencies]
 prefixity-core = { path = "../prefixity-core" }
 serde = { workspace = true }
