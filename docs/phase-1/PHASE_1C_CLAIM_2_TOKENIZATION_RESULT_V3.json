@@ -1,0 +1,1265 @@
+{
+  "authoritative_logical_counts": [
+    {
+      "arm": "BASELINE",
+      "case_id": "CP02",
+      "input_tokens": 241,
+      "logical_request_id": "CP02/BASELINE/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+      "request_slot": 1
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP02",
+      "input_tokens": 1440,
+      "logical_request_id": "CP02/BASELINE/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+      "request_slot": 2
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP02",
+      "input_tokens": 4078,
+      "logical_request_id": "CP02/BASELINE/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+      "request_slot": 3
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP02",
+      "input_tokens": 241,
+      "logical_request_id": "CP02/NO_OP/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+      "request_slot": 1
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP02",
+      "input_tokens": 1440,
+      "logical_request_id": "CP02/NO_OP/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+      "request_slot": 2
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP02",
+      "input_tokens": 4078,
+      "logical_request_id": "CP02/NO_OP/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+      "request_slot": 3
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP02",
+      "input_tokens": 241,
+      "logical_request_id": "CP02/INTERVENTION/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+      "request_slot": 1
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP02",
+      "input_tokens": 1440,
+      "logical_request_id": "CP02/INTERVENTION/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+      "request_slot": 2
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP02",
+      "input_tokens": 3093,
+      "logical_request_id": "CP02/INTERVENTION/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+      "request_slot": 3
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP03",
+      "input_tokens": 249,
+      "logical_request_id": "CP03/BASELINE/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+      "request_slot": 1
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP03",
+      "input_tokens": 1305,
+      "logical_request_id": "CP03/BASELINE/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+      "request_slot": 2
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP03",
+      "input_tokens": 2488,
+      "logical_request_id": "CP03/BASELINE/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+      "request_slot": 3
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP03",
+      "input_tokens": 249,
+      "logical_request_id": "CP03/NO_OP/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+      "request_slot": 1
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP03",
+      "input_tokens": 1305,
+      "logical_request_id": "CP03/NO_OP/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+      "request_slot": 2
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP03",
+      "input_tokens": 2488,
+      "logical_request_id": "CP03/NO_OP/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+      "request_slot": 3
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP03",
+      "input_tokens": 249,
+      "logical_request_id": "CP03/INTERVENTION/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+      "request_slot": 1
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP03",
+      "input_tokens": 1305,
+      "logical_request_id": "CP03/INTERVENTION/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+      "request_slot": 2
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP03",
+      "input_tokens": 1590,
+      "logical_request_id": "CP03/INTERVENTION/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+      "request_slot": 3
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP09",
+      "input_tokens": 4400,
+      "logical_request_id": "CP09/BASELINE/slot-1",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+      "request_slot": 1
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP09",
+      "input_tokens": 4876,
+      "logical_request_id": "CP09/BASELINE/slot-2",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+      "request_slot": 2
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP09",
+      "input_tokens": 7569,
+      "logical_request_id": "CP09/BASELINE/slot-3",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+      "request_slot": 3
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP09",
+      "input_tokens": 4400,
+      "logical_request_id": "CP09/NO_OP/slot-1",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+      "request_slot": 1
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP09",
+      "input_tokens": 4876,
+      "logical_request_id": "CP09/NO_OP/slot-2",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+      "request_slot": 2
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP09",
+      "input_tokens": 7569,
+      "logical_request_id": "CP09/NO_OP/slot-3",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+      "request_slot": 3
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP09",
+      "input_tokens": 4400,
+      "logical_request_id": "CP09/INTERVENTION/slot-1",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+      "request_slot": 1
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP09",
+      "input_tokens": 4876,
+      "logical_request_id": "CP09/INTERVENTION/slot-2",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+      "request_slot": 2
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP09",
+      "input_tokens": 5252,
+      "logical_request_id": "CP09/INTERVENTION/slot-3",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "072acb8f7b44dd5d1bba2adec8ab22e4e71c8e01634e8359ea75078bb077e124",
+      "request_slot": 3
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP10",
+      "input_tokens": 2754,
+      "logical_request_id": "CP10/BASELINE/slot-1",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+      "request_slot": 1
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP10",
+      "input_tokens": 3347,
+      "logical_request_id": "CP10/BASELINE/slot-2",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+      "request_slot": 2
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP10",
+      "input_tokens": 5154,
+      "logical_request_id": "CP10/BASELINE/slot-3",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+      "request_slot": 3
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP10",
+      "input_tokens": 2754,
+      "logical_request_id": "CP10/NO_OP/slot-1",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+      "request_slot": 1
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP10",
+      "input_tokens": 3347,
+      "logical_request_id": "CP10/NO_OP/slot-2",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+      "request_slot": 2
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP10",
+      "input_tokens": 5154,
+      "logical_request_id": "CP10/NO_OP/slot-3",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+      "request_slot": 3
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP10",
+      "input_tokens": 2754,
+      "logical_request_id": "CP10/INTERVENTION/slot-1",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+      "request_slot": 1
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP10",
+      "input_tokens": 3347,
+      "logical_request_id": "CP10/INTERVENTION/slot-2",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+      "request_slot": 2
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP10",
+      "input_tokens": 4158,
+      "logical_request_id": "CP10/INTERVENTION/slot-3",
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "dca48d2c34206984ed13ac9b2fb1ed0d83a882f1882cf25b3623da2cdf819b76",
+      "request_slot": 3
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP05",
+      "input_tokens": 1390,
+      "logical_request_id": "CP05/BASELINE/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+      "request_slot": 1
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP05",
+      "input_tokens": 1608,
+      "logical_request_id": "CP05/BASELINE/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+      "request_slot": 2
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP05",
+      "input_tokens": 3101,
+      "logical_request_id": "CP05/BASELINE/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+      "request_slot": 3
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP05",
+      "input_tokens": 1390,
+      "logical_request_id": "CP05/NO_OP/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+      "request_slot": 1
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP05",
+      "input_tokens": 1608,
+      "logical_request_id": "CP05/NO_OP/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+      "request_slot": 2
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP05",
+      "input_tokens": 3101,
+      "logical_request_id": "CP05/NO_OP/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+      "request_slot": 3
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP05",
+      "input_tokens": 1390,
+      "logical_request_id": "CP05/INTERVENTION/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+      "request_slot": 1
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP05",
+      "input_tokens": 1608,
+      "logical_request_id": "CP05/INTERVENTION/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+      "request_slot": 2
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP05",
+      "input_tokens": 3101,
+      "logical_request_id": "CP05/INTERVENTION/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+      "request_slot": 3
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP06",
+      "input_tokens": 1443,
+      "logical_request_id": "CP06/BASELINE/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+      "request_slot": 1
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP06",
+      "input_tokens": 1655,
+      "logical_request_id": "CP06/BASELINE/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+      "request_slot": 2
+    },
+    {
+      "arm": "BASELINE",
+      "case_id": "CP06",
+      "input_tokens": 3167,
+      "logical_request_id": "CP06/BASELINE/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+      "request_slot": 3
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP06",
+      "input_tokens": 1443,
+      "logical_request_id": "CP06/NO_OP/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+      "request_slot": 1
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP06",
+      "input_tokens": 1655,
+      "logical_request_id": "CP06/NO_OP/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+      "request_slot": 2
+    },
+    {
+      "arm": "NO_OP",
+      "case_id": "CP06",
+      "input_tokens": 3167,
+      "logical_request_id": "CP06/NO_OP/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+      "request_slot": 3
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP06",
+      "input_tokens": 1443,
+      "logical_request_id": "CP06/INTERVENTION/slot-1",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+      "request_slot": 1
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP06",
+      "input_tokens": 1655,
+      "logical_request_id": "CP06/INTERVENTION/slot-2",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+      "request_slot": 2
+    },
+    {
+      "arm": "INTERVENTION",
+      "case_id": "CP06",
+      "input_tokens": 3167,
+      "logical_request_id": "CP06/INTERVENTION/slot-3",
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+      "request_slot": 3
+    }
+  ],
+  "authoritative_unique_counts": [
+    {
+      "input_tokens": 5252,
+      "logical_request_ids": [
+        "CP09/INTERVENTION/slot-3"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "072acb8f7b44dd5d1bba2adec8ab22e4e71c8e01634e8359ea75078bb077e124",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "a4527b8a816f9360711383505f77b3df90e670b17c4675fd22ac303558e431a8",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 7569,
+      "logical_request_ids": [
+        "CP09/BASELINE/slot-3",
+        "CP09/NO_OP/slot-3"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "9caa630993377b09a577d0f84a70d4972d492b4174e84fb8302c3c2518721e07",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 4400,
+      "logical_request_ids": [
+        "CP09/BASELINE/slot-1",
+        "CP09/INTERVENTION/slot-1",
+        "CP09/NO_OP/slot-1"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "109f3ed993ce4873bb0eb1cab8e8e3bc6cbb8ee9032c7d6d01aeae54436f7c85",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 5154,
+      "logical_request_ids": [
+        "CP10/BASELINE/slot-3",
+        "CP10/NO_OP/slot-3"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "ef2c5eadb6ee9a7c29987b583f870592fd59e9b6ff04e1c4dfc3d3b699faa147",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 1655,
+      "logical_request_ids": [
+        "CP06/BASELINE/slot-2",
+        "CP06/INTERVENTION/slot-2",
+        "CP06/NO_OP/slot-2"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "54fecd2b3ccec699c03cb79e59b49364179448fcfe27b3aedf9d6c36fe899d6b",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 1440,
+      "logical_request_ids": [
+        "CP02/BASELINE/slot-2",
+        "CP02/INTERVENTION/slot-2",
+        "CP02/NO_OP/slot-2"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "6a8f7d70915126eb72504449c1a4e934afc37805b49bef986ae74491e430b0ea",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 1305,
+      "logical_request_ids": [
+        "CP03/BASELINE/slot-2",
+        "CP03/INTERVENTION/slot-2",
+        "CP03/NO_OP/slot-2"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "70163a6daefe31d93502c688e632b62128438cc1d71096c30d5affa698cd8fca",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 2754,
+      "logical_request_ids": [
+        "CP10/BASELINE/slot-1",
+        "CP10/INTERVENTION/slot-1",
+        "CP10/NO_OP/slot-1"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "e895d7a027b19c74f7991861f8cb70266426b24db3e30c42ec17678d44e4edfa",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 249,
+      "logical_request_ids": [
+        "CP03/BASELINE/slot-1",
+        "CP03/INTERVENTION/slot-1",
+        "CP03/NO_OP/slot-1"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "a5725dafebdb3496f77bdacdf9fd1954ecb412fe90e3efe19f0e65b0d9a7f4e8",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 3167,
+      "logical_request_ids": [
+        "CP06/BASELINE/slot-3",
+        "CP06/INTERVENTION/slot-3",
+        "CP06/NO_OP/slot-3"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "a5b4659f0acf865828bd3f3b73b619b6801ccfeff7b360f2e8a2c1f0ebe6885a",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 1443,
+      "logical_request_ids": [
+        "CP06/BASELINE/slot-1",
+        "CP06/INTERVENTION/slot-1",
+        "CP06/NO_OP/slot-1"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "b2b7e400bc35084e33abe4d45233483fe0edb5b646d07a81c03e3df1c9252833",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 3101,
+      "logical_request_ids": [
+        "CP05/BASELINE/slot-3",
+        "CP05/INTERVENTION/slot-3",
+        "CP05/NO_OP/slot-3"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "c2d54cc46c9902a5b44f99adfdec7f257fdeb7f606c88388e7acd0f642b8850f",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 1390,
+      "logical_request_ids": [
+        "CP05/BASELINE/slot-1",
+        "CP05/INTERVENTION/slot-1",
+        "CP05/NO_OP/slot-1"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "cd270883a8bf9c0421b02a342d7cad4a74d2318fb7c606db4793c773750bf238",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 3347,
+      "logical_request_ids": [
+        "CP10/BASELINE/slot-2",
+        "CP10/INTERVENTION/slot-2",
+        "CP10/NO_OP/slot-2"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "b2b087fcf9391775bb2d9f9215ac5f7377aa489ab133be63c03d2e0096cd151d",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 1590,
+      "logical_request_ids": [
+        "CP03/INTERVENTION/slot-3"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "da71227c25df423e4b7440b4bb2ff6f519fb63125244b675fe2f6ff0e1e713aa",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 4158,
+      "logical_request_ids": [
+        "CP10/INTERVENTION/slot-3"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "dca48d2c34206984ed13ac9b2fb1ed0d83a882f1882cf25b3623da2cdf819b76",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "d4ce2435386d33f965dedd5c8dcecd8e93a9147ae3fdd1ba69bb11e6c4833de0",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 4078,
+      "logical_request_ids": [
+        "CP02/BASELINE/slot-3",
+        "CP02/NO_OP/slot-3"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "e34f64f73c75aa6de2de7211deb257470337c23ec63c54e5a60eb78108149f76",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 3093,
+      "logical_request_ids": [
+        "CP02/INTERVENTION/slot-3"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "e617de0121cb21e541c0dde39f529a0ac5008c0c06b1695d9db0729263f4860f",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 2488,
+      "logical_request_ids": [
+        "CP03/BASELINE/slot-3",
+        "CP03/NO_OP/slot-3"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "e9444cb4b33be2d4aa21765855fc3662852e4b747be9539ce05aab32b4c8c1b5",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 241,
+      "logical_request_ids": [
+        "CP02/BASELINE/slot-1",
+        "CP02/INTERVENTION/slot-1",
+        "CP02/NO_OP/slot-1"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "f3b656cbf606ea89aa14bdaa6c7dcdd582decdb61d1e9f95f9c0a1663216860b",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 1608,
+      "logical_request_ids": [
+        "CP05/BASELINE/slot-2",
+        "CP05/INTERVENTION/slot-2",
+        "CP05/NO_OP/slot-2"
+      ],
+      "measurement_origin": "INHERITED_V1_TOKEN_COUNT",
+      "request_body_sha256": "f4df02bdb816af518e3c36a129373ab6942f016705209583a8d2c36ca6bfebaa",
+      "source": {
+        "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+      }
+    },
+    {
+      "input_tokens": 4876,
+      "logical_request_ids": [
+        "CP09/BASELINE/slot-2",
+        "CP09/INTERVENTION/slot-2",
+        "CP09/NO_OP/slot-2"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "b2ed034c2cd345ec692239c74f6ec8fbc11dc923892ffb829cef2ad74585b03b",
+        "response_body_utf8_byte_length": 54
+      }
+    }
+  ],
+  "case_results": [
+    {
+      "admission_pass": true,
+      "arms_input_tokens_by_slot": {
+        "BASELINE": [
+          241,
+          1440,
+          4078
+        ],
+        "INTERVENTION": [
+          241,
+          1440,
+          3093
+        ],
+        "NO_OP": [
+          241,
+          1440,
+          4078
+        ]
+      },
+      "case_id": "CP02",
+      "context_pass": true,
+      "metrics": {
+        "Bsum": 5759,
+        "D3": 985,
+        "Dsum": 985,
+        "Isum": 4774,
+        "R3": 0.2415399705738107,
+        "Rsum": 0.17103663830526133,
+        "gates": {
+          "D3_at_least_800": true,
+          "R3_at_least_0_20": true,
+          "Rsum_at_least_0_08": true
+        }
+      },
+      "reduction_or_control_pass": true
+    },
+    {
+      "admission_pass": true,
+      "arms_input_tokens_by_slot": {
+        "BASELINE": [
+          249,
+          1305,
+          2488
+        ],
+        "INTERVENTION": [
+          249,
+          1305,
+          1590
+        ],
+        "NO_OP": [
+          249,
+          1305,
+          2488
+        ]
+      },
+      "case_id": "CP03",
+      "context_pass": true,
+      "metrics": {
+        "Bsum": 4042,
+        "D3": 898,
+        "Dsum": 898,
+        "Isum": 3144,
+        "R3": 0.3609324758842444,
+        "Rsum": 0.22216724393864423,
+        "gates": {
+          "D3_at_least_800": true,
+          "R3_at_least_0_20": true,
+          "Rsum_at_least_0_08": true
+        }
+      },
+      "reduction_or_control_pass": true
+    },
+    {
+      "admission_pass": false,
+      "arms_input_tokens_by_slot": {
+        "BASELINE": [
+          4400,
+          4876,
+          7569
+        ],
+        "INTERVENTION": [
+          4400,
+          4876,
+          5252
+        ],
+        "NO_OP": [
+          4400,
+          4876,
+          7569
+        ]
+      },
+      "case_id": "CP09",
+      "context_pass": false,
+      "metrics": {
+        "Bsum": 16845,
+        "D3": 2317,
+        "Dsum": 2317,
+        "Isum": 14528,
+        "R3": 0.3061170564143216,
+        "Rsum": 0.1375482338972989,
+        "gates": {
+          "D3_at_least_800": true,
+          "R3_at_least_0_20": true,
+          "Rsum_at_least_0_08": true
+        }
+      },
+      "reduction_or_control_pass": true
+    },
+    {
+      "admission_pass": false,
+      "arms_input_tokens_by_slot": {
+        "BASELINE": [
+          2754,
+          3347,
+          5154
+        ],
+        "INTERVENTION": [
+          2754,
+          3347,
+          4158
+        ],
+        "NO_OP": [
+          2754,
+          3347,
+          5154
+        ]
+      },
+      "case_id": "CP10",
+      "context_pass": true,
+      "metrics": {
+        "Bsum": 11255,
+        "D3": 996,
+        "Dsum": 996,
+        "Isum": 10259,
+        "R3": 0.19324796274738068,
+        "Rsum": 0.088494002665482,
+        "gates": {
+          "D3_at_least_800": true,
+          "R3_at_least_0_20": false,
+          "Rsum_at_least_0_08": true
+        }
+      },
+      "reduction_or_control_pass": false
+    },
+    {
+      "admission_pass": true,
+      "arms_input_tokens_by_slot": {
+        "BASELINE": [
+          1390,
+          1608,
+          3101
+        ],
+        "INTERVENTION": [
+          1390,
+          1608,
+          3101
+        ],
+        "NO_OP": [
+          1390,
+          1608,
+          3101
+        ]
+      },
+      "case_id": "CP05",
+      "context_pass": true,
+      "metrics": {
+        "control_zero_mutation": true,
+        "legal_reduction_tokens": 0
+      },
+      "reduction_or_control_pass": true
+    },
+    {
+      "admission_pass": true,
+      "arms_input_tokens_by_slot": {
+        "BASELINE": [
+          1443,
+          1655,
+          3167
+        ],
+        "INTERVENTION": [
+          1443,
+          1655,
+          3167
+        ],
+        "NO_OP": [
+          1443,
+          1655,
+          3167
+        ]
+      },
+      "case_id": "CP06",
+      "context_pass": true,
+      "metrics": {
+        "control_zero_mutation": true,
+        "legal_reduction_tokens": 0
+      },
+      "reduction_or_control_pass": true
+    }
+  ],
+  "contact_accounting": {
+    "inference_requests": 0,
+    "readiness_contacts": 1,
+    "unique_token_count_contacts": 8
+  },
+  "context_fit": {
+    "above_6000_logical_request_ids": [
+      "CP09/BASELINE/slot-3",
+      "CP09/NO_OP/slot-3"
+    ],
+    "above_8192_with_reserve_logical_request_ids": [
+      "CP09/BASELINE/slot-3",
+      "CP09/NO_OP/slot-3"
+    ],
+    "all_requests_pass": false,
+    "context_tokens": 8192,
+    "input_limit": 6000,
+    "maximum_input_tokens": 7569,
+    "maximum_logical_request_ids": [
+      "CP09/BASELINE/slot-3",
+      "CP09/NO_OP/slot-3"
+    ],
+    "maximum_with_output_reserve": 8593,
+    "output_reserve_tokens": 1024
+  },
+  "cpu_practicality": {
+    "classification": "CPU_RUNTIME_PRACTICALITY_REVIEW_REQUIRED",
+    "complete_cohort_logical_input_tokens": 145599,
+    "fresh_server_starts_for_18_arms": 18,
+    "fresh_start_duration_measured": false,
+    "historical_model_capability_classification": "MODEL_CAPABILITY_ACCEPTED",
+    "interpretation": "Historical rounded-rate arithmetic only; V3 runtime was not measured and does not alter token admission.",
+    "logical_input_tokens_by_arm": {
+      "BASELINE": 50265,
+      "INTERVENTION": 45069,
+      "NO_OP": 50265
+    },
+    "output_scenarios": [
+      {
+        "assumed_completion_tokens_per_request": 50,
+        "assumed_completion_tokens_total": 2700,
+        "decode_hours_at_2_to_1_2_tokens_per_second": [
+          0.375,
+          0.625
+        ],
+        "input_plus_decode_hours_before_startups_at_fast_to_slow_rates": [
+          4.419417,
+          5.118796
+        ]
+      },
+      {
+        "assumed_completion_tokens_per_request": 80,
+        "assumed_completion_tokens_total": 4320,
+        "decode_hours_at_2_to_1_2_tokens_per_second": [
+          0.6,
+          1.0
+        ],
+        "input_plus_decode_hours_before_startups_at_fast_to_slow_rates": [
+          4.644417,
+          5.493796
+        ]
+      },
+      {
+        "assumed_completion_tokens_per_request": 150,
+        "assumed_completion_tokens_total": 8100,
+        "decode_hours_at_2_to_1_2_tokens_per_second": [
+          1.125,
+          1.875
+        ],
+        "input_plus_decode_hours_before_startups_at_fast_to_slow_rates": [
+          5.169417,
+          6.368796
+        ]
+      },
+      {
+        "assumed_completion_tokens_per_request": 1024,
+        "assumed_completion_tokens_total": 55296,
+        "decode_hours_at_2_to_1_2_tokens_per_second": [
+          7.68,
+          12.8
+        ],
+        "input_plus_decode_hours_before_startups_at_fast_to_slow_rates": [
+          11.724417,
+          17.293796
+        ]
+      }
+    ],
+    "planning_decode_rate_tokens_per_second": [
+      1.2,
+      2
+    ],
+    "planning_prefill_hours_at_10_to_9_tokens_per_second": [
+      4.044417,
+      4.493796
+    ],
+    "planning_prefill_rate_tokens_per_second": [
+      9,
+      10
+    ]
+  },
+  "failed_admission_gates": {
+    "context_input_over_6000": [
+      "CP09/BASELINE/slot-3",
+      "CP09/NO_OP/slot-3"
+    ],
+    "context_with_reserve_over_8192": [
+      "CP09/BASELINE/slot-3",
+      "CP09/NO_OP/slot-3"
+    ],
+    "positive_or_control_failures": [
+      "CP10"
+    ]
+  },
+  "fresh_authoritative_counts": [
+    {
+      "input_tokens": 5252,
+      "logical_request_ids": [
+        "CP09/INTERVENTION/slot-3"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "072acb8f7b44dd5d1bba2adec8ab22e4e71c8e01634e8359ea75078bb077e124",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "a4527b8a816f9360711383505f77b3df90e670b17c4675fd22ac303558e431a8",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 7569,
+      "logical_request_ids": [
+        "CP09/BASELINE/slot-3",
+        "CP09/NO_OP/slot-3"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "16ae8c7a765f492d42ac73fb623c9c15cdf9ac2e721ea23bcdbf37515f77650e",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "9caa630993377b09a577d0f84a70d4972d492b4174e84fb8302c3c2518721e07",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 4400,
+      "logical_request_ids": [
+        "CP09/BASELINE/slot-1",
+        "CP09/INTERVENTION/slot-1",
+        "CP09/NO_OP/slot-1"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "3dd27d01a12eda06edc2854da9b29daebb74fc898e77b356acfe91754639c129",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "109f3ed993ce4873bb0eb1cab8e8e3bc6cbb8ee9032c7d6d01aeae54436f7c85",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 5154,
+      "logical_request_ids": [
+        "CP10/BASELINE/slot-3",
+        "CP10/NO_OP/slot-3"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "432e82c36c18962c629e6748f15c5573a5f028d606803fb5ec6ada337b6b4f76",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "ef2c5eadb6ee9a7c29987b583f870592fd59e9b6ff04e1c4dfc3d3b699faa147",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 2754,
+      "logical_request_ids": [
+        "CP10/BASELINE/slot-1",
+        "CP10/INTERVENTION/slot-1",
+        "CP10/NO_OP/slot-1"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "95b27980c6768ec88582136f2d2867082a398527858706d7970596ab553d94f1",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "e895d7a027b19c74f7991861f8cb70266426b24db3e30c42ec17678d44e4edfa",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 3347,
+      "logical_request_ids": [
+        "CP10/BASELINE/slot-2",
+        "CP10/INTERVENTION/slot-2",
+        "CP10/NO_OP/slot-2"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "d6b63ffc245060733f24c5ad73db30d739cfea74a3e77763fc4f6be29e4b7d45",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "b2b087fcf9391775bb2d9f9215ac5f7377aa489ab133be63c03d2e0096cd151d",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 4158,
+      "logical_request_ids": [
+        "CP10/INTERVENTION/slot-3"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "dca48d2c34206984ed13ac9b2fb1ed0d83a882f1882cf25b3623da2cdf819b76",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "d4ce2435386d33f965dedd5c8dcecd8e93a9147ae3fdd1ba69bb11e6c4833de0",
+        "response_body_utf8_byte_length": 54
+      }
+    },
+    {
+      "input_tokens": 4876,
+      "logical_request_ids": [
+        "CP09/BASELINE/slot-2",
+        "CP09/INTERVENTION/slot-2",
+        "CP09/NO_OP/slot-2"
+      ],
+      "measurement_origin": "FRESH_V3_INPUT_TOKEN_COUNT",
+      "request_body_sha256": "f66c30febcabb0d80cefb1cf5a5cd738e95438734f3dd5f7fb6bec80073f7772",
+      "source": {
+        "http_status": 200,
+        "response_body_sha256": "b2ed034c2cd345ec692239c74f6ec8fbc11dc923892ffb829cef2ad74585b03b",
+        "response_body_utf8_byte_length": 54
+      }
+    }
+  ],
+  "interpretation_boundary": {
+    "no_inference": true,
+    "no_scored_pilot": true,
+    "server_shutdown_sealed_separately": true,
+    "workload_or_threshold_modified": false
+  },
+  "provenance": {
+    "experiment_id": "claim2-tokenization-v3-570cc81cbc7ddbba5c3e3128571f1197b79704b0e7af3868e6cecc1db443960f",
+    "experiment_identity_seal": "6dfca31b408b780e5aa318fdd1caa896bda6f5f91b72176555edc69255e51d01",
+    "frozen_client": {
+      "bytes": 4984832,
+      "path": "D:\\Users\\fleur\\Prefixity\\target\\claim2-v3-tokenization-freeze\\b0cc0e66544b5428a6c67a4e876d6b7302031675\\prefixity-phase1c-claim2-v3-tokenization.exe",
+      "sha256": "8d2a53516120f7f94d3c249bd354be443231a54fdcea4066566d0efb87906d91",
+      "volume_index_file_id": "volume=ba2f80f4;index=000200000045d93a",
+      "windows_file_id": "0x0000000000000000000200000045d93a"
+    },
+    "gguf_sha256": "cd76ec205963b3b33350093e6904d9de16c4e666fd104e1f632d25c7f15f2a13",
+    "hybrid_plan_sha256": "7897b44d1c6e3c43d387f760fe4994ff5ee94ca1d258e86a3bc2c91b6033ce7e",
+    "ledger_sha256": "406586d71839d91bc565b9db5da69a3d4152193c4109f7876e6a1dc56d89dce2",
+    "llama_sha256": "cbe0655558e73168b3bc73f61aa70ec224475152b44c022f6e837616704d0617",
+    "precontact_server": {
+      "command_line": "\"C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe\" serve -m D:\\Prefixity-Lab\\models\\Qwen3.5-9B\\Qwen3.5-9B-Q4_K_M.gguf -c 8192 -np 1 --metrics --reasoning off --offline --host 127.0.0.1 --port 8080",
+      "creation_time_local": "2026-10-04T08:39:11",
+      "executable_path": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\llama.exe",
+      "listener": {
+        "local_address": "127.0.0.1",
+        "local_port": 8080,
+        "owning_pid": 20260
+      },
+      "matching_listeners": 1,
+      "matching_server_processes": 1,
+      "parent_pid": 2356,
+      "pid": 20260
+    },
+    "promoted_preparation_commit": "3653035dbb85548569fd124f3feb3f0efae721de",
+    "raw_evidence_bytes": 10742,
+    "raw_evidence_path": "claim2-v3-hybrid-tokenization-pass-evidence.json",
+    "raw_evidence_sha256": "b081e435982e9354d0b72a16964c0f5e62b2b5beb25383be0553b9647b21ee83",
+    "source_provenance_commit": "b0cc0e66544b5428a6c67a4e876d6b7302031675",
+    "v1_identity_seal": "4b7265e8a509829b3109947302ec82c2efec4f05cedd3aeac926324fa2a11f16",
+    "v1_raw_evidence_sha256": "caf62ccaba1130a0e75d55316a1828cdcb17a8df4cc73f839f96f31a6110c264",
+    "v1_result_seal": "03263b532a13619f9e6e38a447bf984651a712944d7c9aa83df9a86764821040"
+  },
+  "readiness": {
+    "error": null,
+    "http_status": 200,
+    "response_body_sha256": "a29ee2b15c494311c52521766e44af56a3ad2248e7a8ab465e5206463c13d288",
+    "response_body_utf8_byte_length": 15,
+    "status": "READY"
+  },
+  "schema_id": "prefixity.phase1c.claim2-tokenization-v3-interpreted-result",
+  "schema_version": 3,
+  "selected_mode": "HYBRID_8_NEW",
+  "terminal_classification": "WORKLOAD_V3_TOKEN_ADMISSION_FAILED"
+}

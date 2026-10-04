@@ -1,5 +1,8 @@
 # Preserve the exact client-written evidence bytes and their published SHA-256.
 claim2-tokenization-pass-evidence-v1.json -text
 claim2-v2-hybrid-tokenization-pass-evidence.json -text
+claim2-v3-hybrid-tokenization-pass-evidence.json -text
 docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V3.json -text
 docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V3.sha256 -text
+docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V3.json -text
+docs/phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V3.sha256 -text

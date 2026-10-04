@@ -37,6 +37,9 @@ jobs:
           python scripts/claim2_v2_tokenization_plans.py --check
           python scripts/claim2_v2_tokenization_result.py --check
 
+      - name: Verify sealed Claim 2 V3 tokenization result
+        run: python scripts/claim2_v3_tokenization_result.py --check
+
   # Verify the declared minimum supported Rust version stays buildable. The
   # declared MSRV (see workspace Cargo.toml rust-version) is driven by the
   # locked dependency graph (e.g. idna_adapter/icu require rustc 1.86), not

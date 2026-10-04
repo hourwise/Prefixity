@@ -4597,3 +4597,27 @@ No llama server startup, `/health`, `/input_tokens`, tokenizer, inference,
 token-admission decision, or scored-pilot work occurred. Stop after
 promotion. Any live non-inference V3 tokenization pass requires a separately
 authorized operator-started server; this preparation does not authorize it.
+
+## Claim 2 V3 non-inference tokenization execution
+
+Status: `WORKLOAD_V3_TOKEN_ADMISSION_FAILED`. The [execution record](../phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_EXECUTION_RESULT.md)
+preserves the one authorized HYBRID_8_NEW client run. Exact pre-contact
+repository, identity, executable, instrument, process, listener, and V1
+inheritance checks selected the hybrid plan. One readiness and eight unique
+input-token contacts completed with zero inference. The client-written raw
+evidence is unchanged; a separate deterministic result maps 14 inherited V1
+and eight fresh counts onto all 22 unique bodies and 54 logical requests.
+
+CP02/CP03 and CP05/CP06 pass their frozen criteria. CP09 passes reduction
+gates but fails input/context gates at 7,569 tokens for BASELINE/NO_OP slot 3;
+CP10 passes context and two reduction gates but reaches only 19.325% at the
+slot-3 reduction gate requiring 20%. Overall V3 token admission therefore
+fails scientifically. No fixture, plan, threshold, historical evidence, or
+model was changed. The exact operator-started server was re-identified and
+terminated; zero relevant processes and port-8080 listeners remain.
+
+Validation: deterministic result regeneration and canonical sidecar,
+independent hash/join/gate checks, full workspace checks, and exact candidate
+CI before promotion. The supervisor closeout records final CI and promoted
+SHA. The only next authorized task is the separate
+`CLAIM_2_WORKLOAD_V3_DESIGN_REVIEW`; do not start it here.
