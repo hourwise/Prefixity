@@ -4621,3 +4621,33 @@ independent hash/join/gate checks, full workspace checks, and exact candidate
 CI before promotion. The supervisor closeout records final CI and promoted
 SHA. The only next authorized task is the separate
 `CLAIM_2_WORKLOAD_V3_DESIGN_REVIEW`; do not start it here.
+
+## Claim 2 reduced-cohort scored-pilot decision review
+
+Status: `CLAIM_2_REDUCED_COHORT_SCORED_PILOT_DESIGN_READY`. This is the
+authorized V3 design review, completed as a documentation-only
+[decision](../phase-1/PHASE_1C_CLAIM_2_REDUCED_COHORT_DECISION_REVIEW.md).
+It retains the immutable V1, V2, and V3 scientific token-admission failures
+and ends replacement-case iteration for the current Claim-2 phase. The
+available materialization and token-count evidence does not indicate a
+selection or dependency-mechanism defect, while no CP02/CP03 scored model
+outcome yet establishes downstream success preservation.
+
+The separate reduced feasibility cohort is fixed in order CP02 and CP03
+positives, then CP05 and CP06 zero-mutation controls. Three arms and three
+sequential requests per arm imply 36 future inference requests maximum, not
+authorization to dispatch them. Exact V3 logical mappings reproduce
+64,612 already measured input tokens across the cohort. The frozen
+reduction/context gates are unchanged; failed positives are not promoted.
+Future preparation must revalidate all 14 V1 exact-body hash/count joins,
+seals, and instrument semantics before count reuse. The narrower selection
+does not support the original four-positive or population-level efficacy
+claim. CPU practicality remains a separate review requirement.
+
+Validation: exact V1/V2/V3 result and design-record review, independent
+36-request/64,612-token mapping arithmetic, documentation links, research-
+state consistency and relevant targeted tests, whitespace review, and
+candidate CI before exact-SHA promotion. The supervisor closeout records
+the final CI outcome and promoted SHA. Zero server contacts, tokenization,
+inference, and fixture/code changes occurred. The only next authorized task
+is `CLAIM_2_REDUCED_COHORT_SCORED_PILOT_PREPARATION`; do not begin it here.

@@ -83,6 +83,7 @@
 | [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_MATERIALIZATION.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_MATERIALIZATION.md), [`../fixtures/claim2/workload-contract-v3.md`](../fixtures/claim2/workload-contract-v3.md), [`../fixtures/claim2/workload-request-ledger-v3.json`](../fixtures/claim2/workload-request-ledger-v3.json), and [`../fixtures/claim2/materialization-report-v4.json`](../fixtures/claim2/materialization-report-v4.json) | Offline CP02/03/09/10/05/06 materialization, exact 54-request ledger, V3 finite domain, conditional sealed V1 inheritance, new CP09/CP10 fixtures, and version-4 successor. | Reviewing `CLAIM_2_WORKLOAD_V3_MATERIALIZATION_READY_FOR_TOKENIZATION_PREPARATION`; new-case token admission remains unknown and only offline V3 tokenization preparation is next. |
 | [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION.md), [`PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V3.json`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_IDENTITY_V3.json), [`../fixtures/claim2/tokenization-contact-plan-v3-hybrid.json`](../fixtures/claim2/tokenization-contact-plan-v3-hybrid.json), and [`../fixtures/claim2/tokenization-contact-plan-v3-full-fresh.json`](../fixtures/claim2/tokenization-contact-plan-v3-full-fresh.json) | Distinct V3 offline client and sealed identity, exact V1 inheritance, eight-new-body primary and 22-body contingency plans, frozen executable, and zero-contact preflight. | Reviewing preparation before a separately authorized operator-started server and non-inference tokenization pass; CP09/CP10 admission remains unknown. |
 | [`phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_EXECUTION_RESULT.md`](phase-1/PHASE_1C_CLAIM_2_WORKLOAD_V3_TOKENIZATION_EXECUTION_RESULT.md), [`PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V3.json`](phase-1/PHASE_1C_CLAIM_2_TOKENIZATION_RESULT_V3.json), and [`../claim2-v3-hybrid-tokenization-pass-evidence.json`](../claim2-v3-hybrid-tokenization-pass-evidence.json) | Single V3 hybrid token-only pass, eight fresh counts plus 14 sealed inherited counts mapped to all 54 requests, CP09 context and CP10 reduction failures, sealed interpretation, and verified server shutdown. | Reviewing `WORKLOAD_V3_TOKEN_ADMISSION_FAILED`; next work is a separate V3 design review. |
+| [`phase-1/PHASE_1C_CLAIM_2_REDUCED_COHORT_DECISION_REVIEW.md`](phase-1/PHASE_1C_CLAIM_2_REDUCED_COHORT_DECISION_REVIEW.md) | Documentation-only V3 design review decision: preserve V1/V2/V3 failures, stop replacement-case admission iteration, and define a separately labelled two-positive/two-control downstream-efficacy feasibility cohort from 36 already counted requests. | Reviewing why only reduced-cohort scored-pilot preparation is next; no scored inference or new tokenization is authorized here. |
 | [`phase-1/WORKLOAD_CORPUS.md`](phase-1/WORKLOAD_CORPUS.md) | Corpus, licence, provenance and evaluation-leakage requirements. | Planning Phase 1A ingestion. |
 | [`phase-1/QUALITY_GATE.md`](phase-1/QUALITY_GATE.md) and [`phase-1/SUCCESS_CRITERIA.md`](phase-1/SUCCESS_CRITERIA.md) | Quality gates, safety failures and phase acceptance criteria. | Designing or evaluating interventions. |
 | [`phase-1/PHASE_1A_CORPUS_CLOSEOUT.md`](phase-1/PHASE_1A_CORPUS_CLOSEOUT.md) | Phase 1A corpus/import/observer closeout, historical Tracebench rejection and limitations. | Reviewing the completed Phase 1A corpus gate. |
@@ -151,13 +152,15 @@ of reduction against the 800-token gate; CP02 and CP03 passed, and CP05/CP06
 remained zero-mutation controls. V2 was materialized and its single
 non-inference hybrid pass completed as `WORKLOAD_V2_TOKEN_ADMISSION_FAILED`:
 CP07 and CP08 passed reduction gates but exceeded the frozen input ceiling.
-The separate offline V3 design review accepted roster
-CP02/CP03/CP09/CP10/CP05/CP06. V3 is now materialized offline as
-`CLAIM_2_WORKLOAD_V3_MATERIALIZATION_READY_FOR_TOKENIZATION_PREPARATION`:
-54 exact rendered requests, 14 inherited V1 hashes and eight uncounted new
-hashes. The next task is only offline
-`CLAIM_2_WORKLOAD_V3_TOKENIZATION_PREPARATION`; CP09/CP10 token counts,
-scored-pilot preparation, server startup, and inference have not begun.
+The historical V3 design review accepted roster
+CP02/CP03/CP09/CP10/CP05/CP06. V3 materialization and the single sealed
+non-inference pass are complete. V3 failed admission: CP09 exceeded context,
+and CP10 missed the request-3 20% reduction gate. The subsequent
+documentation-only decision review freezes those failures and selects
+CP02/CP03 positives with CP05/CP06 controls for a separately labelled
+reduced-cohort downstream-efficacy feasibility design. The next task is
+only `CLAIM_2_REDUCED_COHORT_SCORED_PILOT_PREPARATION`; no scored-pilot
+preparation or CP02/CP03 scored inference has begun.
 The Phase 1A corpus/import evidence and later Phase 1B/1C results remain in
 the linked closeouts and gates above.
 
