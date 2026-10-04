@@ -114,6 +114,8 @@ wholly unstarted ordinal. Completed arms are never rerun. `report` requires
 all 12 completed arm records.
 
 The [identity](PHASE_1C_CLAIM_2_REDUCED_PILOT_IDENTITY.json) binds the
+distinct experiment ID `claim2-reduced-cohort-scored-pilot-f66a5bee4422`,
+the
 manifest SHA-256, source-provenance commit
 `3203f0d4b9576f55cd5c069a79251f5c7b2a0a1f`, V1 seals, and frozen
 client at
@@ -122,7 +124,7 @@ The client SHA-256 is
 `8ffa8ea52907764b2f9a2fd8990f41690d87e6086bceac4fa39300f2cd441564`,
 size 4,392,960 bytes, Windows file ID
 `0x0000000000000000000200000045e679`. Canonical identity seal:
-`04a3631e9dab4ba9e5841c36da8946e9ca1a6a43ad9e0e0aac21ad73bba6266d`.
+`9535e79e492e5c8181fe5e1b29e5f31758797fe42aedf4d37bc442bfe4f0ed48`.
 The final frozen executable passed offline preflight: 12 arms, 36 maximum
 logical requests, 14 unique bodies, 36 token mappings, 64,612 inherited
 input tokens, zero actual inference and server contacts.

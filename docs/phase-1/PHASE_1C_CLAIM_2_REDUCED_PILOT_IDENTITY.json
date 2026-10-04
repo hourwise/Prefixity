@@ -1,6 +1,7 @@
 {
   "schema_id": "prefixity.phase1c.claim2-reduced-scored-pilot-identity",
   "schema_version": 1,
+  "experiment_id": "claim2-reduced-cohort-scored-pilot-f66a5bee4422",
   "study": "CLAIM_2_REDUCED_COHORT_DOWNSTREAM_EFFICACY_FEASIBILITY_PILOT",
   "decision_review_commit": "1f6812983054aa460060d0bbd6e6cfd60ce3666f",
   "source_provenance_commit": "3203f0d4b9576f55cd5c069a79251f5c7b2a0a1f",
