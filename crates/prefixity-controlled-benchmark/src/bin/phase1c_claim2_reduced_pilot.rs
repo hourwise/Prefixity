@@ -51,6 +51,11 @@ fn file_hash(path: &Path) -> Result<String, String> {
     }
     Ok(format!("{:x}", hash.finalize()))
 }
+fn source_hash(path: &Path) -> Result<String, String> {
+    let source =
+        String::from_utf8(fs::read(path).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    Ok(digest(source.replace("\r\n", "\n").as_bytes()))
+}
 fn write_new(path: &Path, bytes: &[u8]) -> Result<(), String> {
     let mut file = OpenOptions::new()
         .write(true)
@@ -212,8 +217,8 @@ fn plan() -> Result<Value, String> {
         "arms":arms,"logical_request_ceiling":36,"unique_body_hashes":hashes,"arm_token_totals":totals,
         "advancing_domain_sha256":file_hash(&root.join("fixtures/claim2/advancing-output-domain-v1.json"))?,
         "v1_request_ledger_sha256":file_hash(&root.join("fixtures/claim2/tokenization-request-ledger-v1.json"))?,
-        "workload_renderer_source_sha256":file_hash(&root.join("crates/prefixity-controlled-benchmark/src/phase1c_claim2_workload.rs"))?,
-        "client_source_sha256":file_hash(&root.join("crates/prefixity-controlled-benchmark/src/bin/phase1c_claim2_reduced_pilot.rs"))?,
+        "workload_renderer_source_sha256":source_hash(&root.join("crates/prefixity-controlled-benchmark/src/phase1c_claim2_workload.rs"))?,
+        "client_source_sha256":source_hash(&root.join("crates/prefixity-controlled-benchmark/src/bin/phase1c_claim2_reduced_pilot.rs"))?,
         "model_sha256":MODEL_SHA,"llama_sha256":LLAMA_SHA,"llama_build":"b10217-ddd4ec142",
         "runtime":{"context":8192,"slots":1,"reasoning":"off","offline":true,"host":"127.0.0.1","port":8080},
         "request":{"max_tokens":1024,"temperature":0,"top_p":1,"seed":1,"stream":false,"chat_template_kwargs":"ABSENT"},
